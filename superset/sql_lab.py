@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=C,R,W
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from datetime import datetime
 import logging
 from time import sleep
@@ -186,10 +184,14 @@ def execute_sql(
         logging.info('Handling cursor')
         db_engine_spec.handle_cursor(cursor, query, session)
         logging.info('Fetching data: {}'.format(query.to_dict()))
-        data = db_engine_spec.fetch_data(cursor, query.limit)
         stats_logger.timing(
             'sqllab.query.time_executing_query',
             now_as_float() - query_start_time)
+        fetching_start_time = now_as_float()
+        data = db_engine_spec.fetch_data(cursor, query.limit)
+        stats_logger.timing(
+            'sqllab.query.time_fetching_results',
+            now_as_float() - fetching_start_time)
     except SoftTimeLimitExceeded as e:
         logging.exception(e)
         if conn is not None:

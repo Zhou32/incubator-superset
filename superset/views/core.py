@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=C,R,W
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
 from datetime import datetime, timedelta
+import inspect
 import logging
 import os
 import re
 import time
 import traceback
+from urllib import parse
 
 from flask import (
     flash, g, Markup, redirect, render_template, request, Response, url_for,
@@ -23,10 +20,8 @@ from flask_babel import gettext as __
 from flask_babel import lazy_gettext as _
 import pandas as pd
 import simplejson as json
-from six import text_type
-from six.moves.urllib import parse
 import sqlalchemy as sqla
-from sqlalchemy import and_, create_engine, or_, update
+from sqlalchemy import and_, create_engine, MetaData, or_, update
 from sqlalchemy.engine.url import make_url
 from sqlalchemy.exc import IntegrityError
 from unidecode import unidecode
@@ -210,7 +205,12 @@ class DatabaseView(SupersetModelView, DeleteMixin, YamlExportMixin):  # noqa
             'gets unpacked into the [sqlalchemy.MetaData]'
             '(http://docs.sqlalchemy.org/en/rel_1_0/core/metadata.html'
             '#sqlalchemy.schema.MetaData) call.<br/>'
-            '2. The ``schemas_allowed_for_csv_upload`` is a comma separated list '
+            '2. The ``metadata_cache_timeout`` is a cache timeout setting '
+            'in seconds for metadata fetch of this database. Specify it as '
+            '**"metadata_cache_timeout": {"schema_cache_timeout": 600}**. '
+            'If unset, cache will not be enabled for the functionality. '
+            'A timeout of 0 indicates that the cache never expires.<br/>'
+            '3. The ``schemas_allowed_for_csv_upload`` is a comma separated list '
             'of schemas that CSVs are allowed to upload to. '
             'Specify it as **"schemas_allowed": ["public", "csv_upload"]**. '
             'If database flavor does not support schema or any schema is allowed '
@@ -226,7 +226,7 @@ class DatabaseView(SupersetModelView, DeleteMixin, YamlExportMixin):  # noqa
             'all database schemas. For large data warehouse with thousands of '
             'tables, this can be expensive and put strain on the system.'),
         'cache_timeout': _(
-            'Duration (in seconds) of the caching timeout for this database. '
+            'Duration (in seconds) of the caching timeout for charts of this database. '
             'A timeout of 0 indicates that the cache never expires. '
             'Note this defaults to the global timeout if undefined.'),
         'allow_csv_upload': _(
@@ -241,7 +241,7 @@ class DatabaseView(SupersetModelView, DeleteMixin, YamlExportMixin):  # noqa
         'creator': _('Creator'),
         'changed_on_': _('Last Changed'),
         'sqlalchemy_uri': _('SQLAlchemy URI'),
-        'cache_timeout': _('Cache Timeout'),
+        'cache_timeout': _('Chart Cache Timeout'),
         'extra': _('Extra'),
         'allow_run_sync': _('Allow Run Sync'),
         'allow_run_async': _('Allow Run Async'),
@@ -253,9 +253,11 @@ class DatabaseView(SupersetModelView, DeleteMixin, YamlExportMixin):  # noqa
     }
 
     def pre_add(self, db):
+        self.check_extra(db)
         db.set_sqlalchemy_uri(db.sqlalchemy_uri)
         security_manager.merge_perm('database_access', db.perm)
-        for schema in db.all_schema_names():
+        # adding a new database we always want to force refresh schema list
+        for schema in db.all_schema_names(force_refresh=True):
             security_manager.merge_perm(
                 'schema_access', security_manager.get_schema_perm(db, schema))
 
@@ -271,6 +273,21 @@ class DatabaseView(SupersetModelView, DeleteMixin, YamlExportMixin):  # noqa
 
     def _delete(self, pk):
         DeleteMixin._delete(self, pk)
+
+    def check_extra(self, db):
+        # this will check whether json.loads(extra) can succeed
+        try:
+            extra = db.get_extra()
+        except Exception as e:
+            raise Exception('Extra field cannot be decoded by JSON. {}'.format(str(e)))
+
+        # this will check whether 'metadata_params' is configured correctly
+        metadata_signature = inspect.signature(MetaData)
+        for key in extra.get('metadata_params', {}):
+            if key not in metadata_signature.parameters:
+                raise Exception('The metadata_params in Extra field '
+                                'is not configured correctly. The key '
+                                '{} is invalid.'.format(key))
 
 
 appbuilder.add_link(
@@ -350,7 +367,7 @@ class CsvToDatabaseView(SimpleFormView):
             except OSError:
                 pass
             message = 'Table name {} already exists. Please pick another'.format(
-                form.name.data) if isinstance(e, IntegrityError) else text_type(e)
+                form.name.data) if isinstance(e, IntegrityError) else e
             flash(
                 message,
                 'danger')
@@ -1521,15 +1538,17 @@ class Superset(BaseSupersetView):
     @api
     @has_access_api
     @expose('/schemas/<db_id>/')
-    def schemas(self, db_id):
+    @expose('/schemas/<db_id>/<force_refresh>/')
+    def schemas(self, db_id, force_refresh='true'):
         db_id = int(db_id)
+        force_refresh = force_refresh.lower() == 'true'
         database = (
             db.session
             .query(models.Database)
             .filter_by(id=db_id)
             .one()
         )
-        schemas = database.all_schema_names()
+        schemas = database.all_schema_names(force_refresh=force_refresh)
         schemas = security_manager.schemas_accessible_by_user(database, schemas)
         return Response(
             json.dumps({'schemas': schemas}),
@@ -2322,7 +2341,7 @@ class Superset(BaseSupersetView):
             'columns': payload_columns,
             'selectStar': mydb.select_star(
                 table_name, schema=schema, show_cols=True, indent=True,
-                cols=columns, latest_partition=False),
+                cols=columns, latest_partition=True),
             'primaryKey': primary_key,
             'foreignKeys': foreign_keys,
             'indexes': keys,
@@ -2340,14 +2359,19 @@ class Superset(BaseSupersetView):
         return json_success(json.dumps(payload))
 
     @has_access
-    @expose('/select_star/<database_id>/<table_name>/')
+    @expose('/select_star/<database_id>/<table_name>')
+    @expose('/select_star/<database_id>/<table_name>/<schema>')
     @log_this
-    def select_star(self, database_id, table_name):
+    def select_star(self, database_id, table_name, schema=None):
         mydb = db.session.query(
             models.Database).filter_by(id=database_id).first()
-        return self.render_template(
-            'superset/ajah.html',
-            content=mydb.select_star(table_name, show_cols=True),
+        return json_success(
+            mydb.select_star(
+                table_name,
+                schema,
+                latest_partition=True,
+                show_cols=True,
+            ),
         )
 
     @expose('/theme/')
