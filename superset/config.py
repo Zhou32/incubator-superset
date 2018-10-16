@@ -92,7 +92,7 @@ ENABLE_PROXY_FIX = False
 APP_NAME = 'Superset'
 
 # Uncomment to setup an App icon
-APP_ICON = '/static/assets/images/superset-logo@2x.png'
+APP_ICON = '/static/assets/images/SavyBI-Logo-White.png'
 
 # Druid query timezone
 # tz.tzutc() : Using utc timezone
@@ -275,7 +275,7 @@ INTERVAL = 1
 BACKUP_COUNT = 30
 
 # Set this API key to enable Mapbox visualizations
-MAPBOX_API_KEY = os.environ.get('MAPBOX_API_KEY', '')
+MAPBOX_API_KEY = os.environ.get('pk.eyJ1IjoiZHJ1bmtlbjIwMDIiLCJhIjoiY2ptdTh5eHpqMm04ZjNxb2VqNzYyaWQ0OCJ9.md1F6GzpNbgiN_b8Fze0NA', 'pk.eyJ1IjoiZHJ1bmtlbjIwMDIiLCJhIjoiY2ptdTh5eHpqMm04ZjNxb2VqNzYyaWQ0OCJ9.md1F6GzpNbgiN_b8Fze0NA')
 
 # Maximum number of rows returned from a database
 # in async mode, no more than SQL_MAX_ROW will be returned and stored
