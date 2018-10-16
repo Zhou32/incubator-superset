@@ -65,9 +65,9 @@ const vizMap = {
   [VIZ_TYPES.area]: loadNvd3,
   [VIZ_TYPES.bar]: loadNvd3,
   [VIZ_TYPES.big_number]: () =>
-    loadVis(import(/* webpackChunkName: 'big_number' */ './BigNumber/index.js')),
+    loadVis(import(/* webpackChunkName: 'big_number' */ './BigNumber/adaptor.jsx')),
   [VIZ_TYPES.big_number_total]: () =>
-    loadVis(import(/* webpackChunkName: "big_number" */ './BigNumber/index.js')),
+    loadVis(import(/* webpackChunkName: "big_number" */ './BigNumber/adaptor.jsx')),
   [VIZ_TYPES.box_plot]: loadNvd3,
   [VIZ_TYPES.bubble]: loadNvd3,
   [VIZ_TYPES.bullet]: loadNvd3,
@@ -89,7 +89,7 @@ const vizMap = {
   [VIZ_TYPES.line_multi]: () =>
     loadVis(import(/* webpackChunkName: "line_multi" */ './nvd3/LineMulti.js')),
   [VIZ_TYPES.time_pivot]: loadNvd3,
-  [VIZ_TYPES.mapbox]: () => loadVis(import(/* webpackChunkName: "mapbox" */ './MapBox/MapBox.jsx')),
+  [VIZ_TYPES.mapbox]: () => loadVis(import(/* webpackChunkName: "mapbox" */ './MapBox/adaptor.jsx')),
   [VIZ_TYPES.markup]: () => loadVis(import(/* webpackChunkName: "markup" */ './markup.js')),
   [VIZ_TYPES.para]: () =>
     loadVis(import(/* webpackChunkName: "parallel_coordinates" */ './ParallelCoordinates/adaptor.jsx')),
@@ -101,7 +101,7 @@ const vizMap = {
   [VIZ_TYPES.sunburst]: () => loadVis(import(/* webpackChunkName: "sunburst" */ './Sunburst/adaptor.jsx')),
   [VIZ_TYPES.table]: () => loadVis(import(/* webpackChunkName: "table" */ './Table/adaptor.jsx')),
   [VIZ_TYPES.time_table]: () =>
-    loadVis(import(/* webpackChunkName: "time_table" */ './TimeTable/TimeTable.jsx')),
+    loadVis(import(/* webpackChunkName: "time_table" */ './TimeTable/adaptor.jsx')),
   [VIZ_TYPES.treemap]: () => loadVis(import(/* webpackChunkName: "treemap" */ './Treemap/adaptor.jsx')),
   [VIZ_TYPES.country_map]: () =>
     loadVis(import(/* webpackChunkName: "country_map" */ './CountryMap/adaptor.jsx')),
@@ -111,31 +111,31 @@ const vizMap = {
     loadVis(import(/* webpackChunkName: "world_map" */ './WorldMap/adaptor.jsx')),
   [VIZ_TYPES.dual_line]: loadNvd3,
   [VIZ_TYPES.event_flow]: () =>
-    loadVis(import(/* webpackChunkName: "EventFlow" */ './EventFlow.jsx')),
+    loadVis(import(/* webpackChunkName: "EventFlow" */ './EventFlow/adaptor.jsx')),
   [VIZ_TYPES.paired_ttest]: () =>
     loadVis(import(/* webpackChunkName: "paired_ttest" */ './PairedTTest/adaptor.jsx')),
   [VIZ_TYPES.partition]: () =>
     loadVis(import(/* webpackChunkName: "partition" */ './Partition/adaptor.jsx')),
   [VIZ_TYPES.deck_scatter]: () =>
-    loadVis(import(/* webpackChunkName: "deckgl/layers/scatter" */ './deckgl/layers/scatter.jsx')),
+    loadVis(import(/* webpackChunkName: "deckgl/layers/scatter" */ './deckgl/layers/Scatter/Scatter.jsx')),
   [VIZ_TYPES.deck_screengrid]: () =>
     loadVis(
-      import(/* webpackChunkName: "deckgl/layers/screengrid" */ './deckgl/layers/screengrid.jsx'),
+      import(/* webpackChunkName: "deckgl/layers/screengrid" */ './deckgl/layers/Screengrid/Screengrid.jsx'),
     ),
   [VIZ_TYPES.deck_grid]: () =>
-    loadVis(import(/* webpackChunkName: "deckgl/layers/grid" */ './deckgl/layers/grid.jsx')),
+    loadVis(import(/* webpackChunkName: "deckgl/layers/grid" */ './deckgl/layers/Grid/Grid.jsx')),
   [VIZ_TYPES.deck_hex]: () =>
-    loadVis(import(/* webpackChunkName: "deckgl/layers/hex" */ './deckgl/layers/hex.jsx')),
+    loadVis(import(/* webpackChunkName: "deckgl/layers/hex" */ './deckgl/layers/Hex/Hex.jsx')),
   [VIZ_TYPES.deck_path]: () =>
-    loadVis(import(/* webpackChunkName: "deckgl/layers/path" */ './deckgl/layers/path.jsx')),
+    loadVis(import(/* webpackChunkName: "deckgl/layers/path" */ './deckgl/layers/Path/Path.jsx')),
   [VIZ_TYPES.deck_geojson]: () =>
-    loadVis(import(/* webpackChunkName: "deckgl/layers/geojson" */ './deckgl/layers/geojson.jsx')),
+    loadVis(import(/* webpackChunkName: "deckgl/layers/geojson" */ './deckgl/layers/Geojson/Geojson.jsx')),
   [VIZ_TYPES.deck_arc]: () =>
-    loadVis(import(/* webpackChunkName: "deckgl/layers/arc" */ './deckgl/layers/arc.jsx')),
+    loadVis(import(/* webpackChunkName: "deckgl/layers/arc" */ './deckgl/layers/Arc/Arc.jsx')),
   [VIZ_TYPES.deck_polygon]: () =>
-    loadVis(import(/* webpackChunkName: "deckgl/layers/polygon" */ './deckgl/layers/polygon.jsx')),
+    loadVis(import(/* webpackChunkName: "deckgl/layers/polygon" */ './deckgl/layers/Polygon/Polygon.jsx')),
   [VIZ_TYPES.deck_multi]: () =>
-    loadVis(import(/* webpackChunkName: "deckgl/multi" */ './deckgl/multi.jsx')),
+    loadVis(import(/* webpackChunkName: "deckgl/multi" */ './deckgl/Multi/Multi.jsx')),
   [VIZ_TYPES.rose]: () => loadVis(import(/* webpackChunkName: "rose" */ './Rose/adaptor.jsx')),
 };
 
