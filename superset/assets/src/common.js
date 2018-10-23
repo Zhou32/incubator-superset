@@ -2,12 +2,8 @@
 import $ from 'jquery';
 import 'abortcontroller-polyfill/dist/abortcontroller-polyfill-only';
 import { SupersetClient } from '@superset-ui/core';
-
-import airbnb from './modules/colorSchemes/airbnb';
-import categoricalSchemes from './modules/colorSchemes/categorical';
-import lyft from './modules/colorSchemes/lyft';
-import { getInstance } from './modules/ColorSchemeManager';
 import { toggleCheckbox } from './modules/utils';
+import setupColors from './setup/setupColors';
 
 $(document).ready(function () {
   $(':checkbox[data-checkbox-api-prefix]').change(function () {
@@ -21,19 +17,14 @@ $(document).ready(function () {
   $('#language-picker a').click(function (ev) {
     ev.preventDefault();
 
-    const targetUrl = ev.currentTarget.href;
-    $.ajax(targetUrl).then(() => {
-      location.reload();
-    });
+    SupersetClient.get({ endpoint: ev.currentTarget.href })
+      .then(() => {
+        location.reload();
+      });
   });
 });
 
-// Register color schemes
-getInstance()
-  .registerScheme('bnbColors', airbnb.bnbColors)
-  .registerMultipleSchemes(categoricalSchemes)
-  .registerScheme('lyftColors', lyft.lyftColors)
-  .setDefaultSchemeName('bnbColors');
+setupColors();
 
 export function appSetup() {
   // A set of hacks to allow apps to run within a FAB template
@@ -42,9 +33,13 @@ export function appSetup() {
   window.jQuery = $;
   require('bootstrap');
 
+  const csrfNode = document.querySelector('#csrf_token');
+  const csrfToken = csrfNode ? csrfNode.value : null;
+
   SupersetClient.configure({
     protocol: (window.location && window.location.protocol) || '',
     host: (window.location && window.location.host) || '',
+    csrfToken,
   })
     .init()
     .catch((error) => {
