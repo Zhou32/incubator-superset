@@ -36,6 +36,7 @@ function getLayer(formData, payload, slice, filters) {
     });
   }
 
+  console.log(data);
   // Passing a layer creator function instead of a layer since the
   // layer needs to be regenerated at each render
   return new ScreenGridLayer({
@@ -127,7 +128,7 @@ function deckScreenGrid(slice, payload, setControlValue) {
     height: slice.height(),
   };
 
-  if (fd.autozoom) {
+  if (false && fd.autozoom) {
     viewport = common.fitViewport(viewport, getPoints(payload.data.features));
   }
 
