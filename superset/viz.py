@@ -2265,7 +2265,7 @@ class DeckScreengrid(BaseDeckGLViz):
 
     viz_type = 'deck_screengrid'
     verbose_name = _('Deck.gl - Screen Grid')
-    spatial_control_keys = ['spatial_address']
+    spatial_control_keys = ['spatial']
     is_timeseries = True
 
     def query_obj(self):
@@ -2275,7 +2275,7 @@ class DeckScreengrid(BaseDeckGLViz):
 
     def get_properties(self, d):
         return {
-            'position': [d.get('latitude'), d.get('longitude')],
+            'position': d.get('spatial'),
             'weight': d.get(self.metric_label) or 1,
             '__timestamp': d.get(DTTM_ALIAS) or d.get('__time'),
         }

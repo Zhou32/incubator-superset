@@ -673,7 +673,7 @@ export const visTypes = {
                 label: t('Query'),
                 expanded: true,
                 controlSetRows: [
-                    ['spatial_address', 'size'],
+                    ['spatial', 'size'],
                     ['row_limit', 'filter_nulls'],
                     ['adhoc_filters'],
                 ],
