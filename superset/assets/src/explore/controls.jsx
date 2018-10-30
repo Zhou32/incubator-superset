@@ -223,7 +223,7 @@ export const controls = {
     label: t('Y Axis Bounds'),
     renderTrigger: true,
     default: [null, null],
-    description: t('Bounds for the Y axis. When left empty, the bounds are ' +
+    description: t('Bounds for the Y-axis. When left empty, the bounds are ' +
     'dynamically defined based on the min/max of the data. Note that ' +
     "this feature will only expand the axis range. It won't " +
     "narrow the data's extent."),
@@ -485,8 +485,8 @@ export const controls = {
     label: t('Reduce X ticks'),
     renderTrigger: true,
     default: false,
-    description: t('Reduces the number of X axis ticks to be rendered. ' +
-    'If true, the x axis wont overflow and labels may be ' +
+    description: t('Reduces the number of X-axis ticks to be rendered. ' +
+    'If true, the x-axis will not overflow and labels may be ' +
     'missing. If false, a minimum width will be applied ' +
     'to columns and the width may overflow into an ' +
     'horizontal scroll.'),
@@ -534,7 +534,7 @@ export const controls = {
       'Usa',
       'Zambia',
     ].map(s => [s, s]),
-    description: t('The name of country that Superset should display'),
+    description: t('The name of the country that Superset should display'),
   },
   country_fieldtype: {
     type: 'SelectControl',
@@ -741,7 +741,7 @@ export const controls = {
     default: 'auto',
     clearable: false,
     renderTrigger: true,
-    description: t('The way the ticks are laid out on the X axis'),
+    description: t('The way the ticks are laid out on the X-axis'),
   },
 
   left_margin: {
@@ -1317,6 +1317,29 @@ export const controls = {
     'computing the total rows and columns'),
   },
 
+  js_agg_function: {
+    type: 'SelectControl',
+    label: t('Dynamic Aggregation Function'),
+    description: t('The function to use when aggregating points into groups'),
+    default: 'sum',
+    clearable: false,
+    renderTrigger: true,
+    choices: formatSelectOptions([
+      'sum',
+      'min',
+      'max',
+      'mean',
+      'median',
+      'count',
+      'variance',
+      'deviation',
+      'p1',
+      'p5',
+      'p95',
+      'p99',
+    ]),
+  },
+
   size_from: {
     type: 'TextControl',
     isInt: true,
@@ -1467,6 +1490,35 @@ export const controls = {
     description: t('Send range filter events to other charts'),
   },
 
+  toggle_polygons: {
+    type: 'CheckboxControl',
+    label: t('Multiple filtering'),
+    renderTrigger: true,
+    default: true,
+    description: t('Allow sending multiple polygons as a filter event'),
+  },
+
+  num_buckets: {
+    type: 'SelectControl',
+    multi: false,
+    freeForm: true,
+    label: t('Number of buckets to group data'),
+    default: 5,
+    choices: formatSelectOptions([2, 3, 5, 10]),
+    description: t('How many buckets should the data be grouped in.'),
+    renderTrigger: true,
+  },
+
+  break_points: {
+    type: 'SelectControl',
+    multi: true,
+    freeForm: true,
+    label: t('Bucket break points'),
+    choices: formatSelectOptions([]),
+    description: t('List of n+1 values for bucketing metric into n buckets.'),
+    renderTrigger: true,
+  },
+
   show_labels: {
     type: 'CheckboxControl',
     label: t('Show Labels'),
@@ -1514,7 +1566,7 @@ export const controls = {
     label: t('X bounds'),
     renderTrigger: true,
     default: false,
-    description: t('Whether to display the min and max values of the X axis'),
+    description: t('Whether to display the min and max values of the X-axis'),
   },
 
   y_axis_showminmax: {
@@ -1522,7 +1574,7 @@ export const controls = {
     label: t('Y bounds'),
     renderTrigger: true,
     default: false,
-    description: t('Whether to display the min and max values of the Y axis'),
+    description: t('Whether to display the min and max values of the Y-axis'),
   },
 
   rich_tooltip: {
@@ -1539,7 +1591,7 @@ export const controls = {
     label: t('Y Log Scale'),
     default: false,
     renderTrigger: true,
-    description: t('Use a log scale for the Y axis'),
+    description: t('Use a log scale for the Y-axis'),
   },
 
   x_log_scale: {
@@ -1547,7 +1599,7 @@ export const controls = {
     label: t('X Log Scale'),
     default: false,
     renderTrigger: true,
-    description: t('Use a log scale for the X axis'),
+    description: t('Use a log scale for the X-axis'),
   },
 
   log_scale: {
@@ -1878,6 +1930,10 @@ export const controls = {
       datasource: state.datasource,
     }),
     provideFormDataToProps: true,
+  },
+
+  filters: {
+    type: 'FilterPanel',
   },
 
   slice_id: {
