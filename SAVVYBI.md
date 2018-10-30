@@ -72,3 +72,27 @@ const vizMap = { …
 [VIZ_TYPES.line_chart]: () => loadVis(import(/* webpackChunkName: "line_chart" */ './line_chart.js')),
 [VIZ_TYPES.area_chart]: () => loadVis(import(/* webpackChunkName: "line_chart" */ './area_chart.js')),}
 ```
+
+## Add Australia Map
+
+Official instruction  https://superset.incubator.apache.org/visualization.html#you-need-to-add-a-new-country
+
+* Download `australia.geojson` from https://github.com/codeforamerica/click_that_hood/blob/master/public/data/australia.geojson
+* Save `australia.geojson` in `superset/assets/src/visualizations/CountryMap/countries/australia.geojson`
+* Add `Australia` into file `superset/assets/src/explore/controls.jsx` as bellow
+```
+select_country: {
+  type: 'SelectControl',
+  label: t('Country Name'),
+  default: 'Australia',
+  choices: [
+    'Australia',
+    'Belgium',
+    'Brazil',
+    'China',
+    'Egypt',
+    'France',
+    'Germany',
+    'India',
+    ...
+```
