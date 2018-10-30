@@ -6,7 +6,7 @@ import { addChart, removeChart, refreshChart } from '../../chart/chartAction';
 import { chart as initChart } from '../../chart/chartReducer';
 import { fetchDatasourceMetadata } from '../../dashboard/actions/datasources';
 import { applyDefaultFormData } from '../../explore/store';
-import { getAjaxErrorMsg } from '../../modules/utils';
+import { getClientErrorObject } from '../../modules/utils';
 import {
   Logger,
   LOG_ACTIONS_CHANGE_DASHBOARD_FILTER,
@@ -132,22 +132,23 @@ export function saveDashboardRequest(data, id, saveType) {
     SupersetClient.post({
       endpoint: `/superset/${path}/${id}/`,
       postPayload: { data },
-      parseMethod: null,
     })
       .then(response =>
         Promise.all([
-          Promise.resolve(response),
           dispatch(saveDashboardRequestSuccess()),
           dispatch(
             addSuccessToast(t('This dashboard was saved successfully.')),
           ),
-        ]),
+        ]).then(() => Promise.resolve(response)),
       )
-      .catch(error =>
-        dispatch(
-          addDangerToast(
-            `${t('Sorry, there was an error saving this dashboard: ')}
-          ${getAjaxErrorMsg(error) || error}`,
+      .catch(response =>
+        getClientErrorObject(response).then(({ error }) =>
+          dispatch(
+            addDangerToast(
+              `${t(
+                'Sorry, there was an error saving this dashboard: ',
+              )} ${error}}`,
+            ),
           ),
         ),
       );

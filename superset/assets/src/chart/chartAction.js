@@ -5,7 +5,8 @@ import { getExploreUrlAndPayload, getAnnotationJsonUrl } from '../explore/explor
 import { requiresQuery, ANNOTATION_SOURCE_TYPES } from '../modules/AnnotationTypes';
 import { addDangerToast } from '../messageToasts/actions';
 import { Logger, LOG_ACTIONS_LOAD_CHART } from '../logger';
-import { COMMON_ERR_MESSAGES } from '../utils/common';
+import { getClientErrorObject } from '../modules/utils';
+import { TIME_RANGE_SEPARATOR } from '../utils/common';
 import { t } from '../locales';
 
 export const CHART_UPDATE_STARTED = 'CHART_UPDATE_STARTED';
@@ -66,7 +67,8 @@ export function annotationQueryFailed(annotation, queryResponse, key) {
 export function runAnnotationQuery(annotation, timeout = 60, formData = null, key) {
   return function (dispatch, getState) {
     const sliceKey = key || Object.keys(getState().charts)[0];
-    const fd = formData || getState().charts[sliceKey].latestQueryFormData;
+    // make a copy of formData, not modifying original formData
+    const fd = { ...(formData || getState().charts[sliceKey].latestQueryFormData) };
 
     if (!requiresQuery(annotation.sourceType)) {
       return Promise.resolve();
@@ -75,6 +77,9 @@ export function runAnnotationQuery(annotation, timeout = 60, formData = null, ke
     const granularity = fd.time_grain_sqla || fd.granularity;
     fd.time_grain_sqla = granularity;
     fd.granularity = granularity;
+    if (fd.time_range) {
+      [fd.since, fd.util] = fd.time_range.split(TIME_RANGE_SEPARATOR);
+    }
 
     const sliceFormData = Object.keys(annotation.overrides).reduce(
       (d, k) => ({
@@ -163,36 +168,29 @@ export function runQuery(formData, force = false, timeout = 60, key) {
         });
         return dispatch(chartUpdateSucceeded(json, key));
       })
-      .catch((err) => {
-        Logger.append(LOG_ACTIONS_LOAD_CHART, {
-          slice_id: key,
-          has_err: true,
-          datasource: formData.datasource,
-          start_offset: logStart,
-          duration: Logger.getTimestamp() - logStart,
-        });
-        if (err.statusText === 'timeout') {
-          dispatch(chartUpdateTimeout(err.statusText, timeout, key));
-        } else if (err.statusText === 'AbortError') {
-          dispatch(chartUpdateStopped(key));
-        } else {
-          let errObject = err;
-          if (err.responseJSON) {
-            errObject = err.responseJSON;
-          } else if (err.stack) {
-            errObject = {
-              error:
-                t('Unexpected error: ') +
-                (err.description || t('(no description, click to see stack trace)')),
-              stacktrace: err.stack,
-            };
-          } else if (err.responseText && err.responseText.indexOf('CSRF') >= 0) {
-            errObject = {
-              error: COMMON_ERR_MESSAGES.SESSION_TIMED_OUT,
-            };
-          }
-          dispatch(chartUpdateFailed(errObject, key));
+      .catch((response) => {
+        const appendErrorLog = (errorDetails) => {
+          Logger.append(LOG_ACTIONS_LOAD_CHART, {
+            slice_id: key,
+            has_err: true,
+            error_details: errorDetails,
+            datasource: formData.datasource,
+            start_offset: logStart,
+            duration: Logger.getTimestamp() - logStart,
+          });
+        };
+
+        if (response.statusText === 'timeout') {
+          appendErrorLog('timeout');
+          return dispatch(chartUpdateTimeout(response.statusText, timeout, key));
+        } else if (response.name === 'AbortError') {
+          appendErrorLog('abort');
+          return dispatch(chartUpdateStopped(key));
         }
+        return getClientErrorObject(response).then((parsedResponse) => {
+          appendErrorLog(parsedResponse.error);
+          return dispatch(chartUpdateFailed(parsedResponse, key));
+        });
       });
 
     const annotationLayers = formData.annotation_layers || [];

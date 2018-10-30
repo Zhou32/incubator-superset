@@ -13,7 +13,6 @@ import {
   getFromArr,
   addToArr,
 } from '../reduxUtils';
-import featureFlags from '../featureFlags';
 import { t } from '../locales';
 
 export const sqlLabReducer = function (state = {}, action) {
@@ -250,6 +249,9 @@ export const sqlLabReducer = function (state = {}, action) {
       }
       return Object.assign({}, state, { queries: newQueries, queriesLastUpdate });
     },
+    [actions.SET_USER_OFFLINE]() {
+      return Object.assign({}, state, { offline: action.offline });
+    },
     [actions.CREATE_DATASOURCE_STARTED]() {
       return Object.assign({}, state, {
         isDatasourceLoading: true,
@@ -277,7 +279,6 @@ export const sqlLabReducer = function (state = {}, action) {
 };
 
 export default combineReducers({
-  featureFlags,
   sqlLab: sqlLabReducer,
   messageToasts,
 });
