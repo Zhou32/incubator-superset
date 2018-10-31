@@ -1,13 +1,13 @@
 /* global window, AbortController */
 /* eslint no-undef: 'error' */
+import { t } from '@superset-ui/translation';
 import { SupersetClient } from '@superset-ui/core';
 import { getExploreUrlAndPayload, getAnnotationJsonUrl } from '../explore/exploreUtils';
 import { requiresQuery, ANNOTATION_SOURCE_TYPES } from '../modules/AnnotationTypes';
 import { addDangerToast } from '../messageToasts/actions';
 import { Logger, LOG_ACTIONS_LOAD_CHART } from '../logger';
-import { getClientErrorObject } from '../modules/utils';
 import { TIME_RANGE_SEPARATOR } from '../utils/common';
-import { t } from '../locales';
+import getClientErrorObject from '../utils/getClientErrorObject';
 
 export const CHART_UPDATE_STARTED = 'CHART_UPDATE_STARTED';
 export function chartUpdateStarted(queryController, latestQueryFormData, key) {
@@ -78,7 +78,7 @@ export function runAnnotationQuery(annotation, timeout = 60, formData = null, ke
     fd.time_grain_sqla = granularity;
     fd.granularity = granularity;
     if (fd.time_range) {
-      [fd.since, fd.util] = fd.time_range.split(TIME_RANGE_SEPARATOR);
+      [fd.since, fd.until] = fd.time_range.split(TIME_RANGE_SEPARATOR);
     }
 
     const sliceFormData = Object.keys(annotation.overrides).reduce(
