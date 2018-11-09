@@ -618,52 +618,6 @@ export const visTypes = {
         },
     },
 
-    // deck_screengrid: {
-    //     label: t('Deck.gl - Screen grid'),
-    //     requiresTime: true,
-    //     controlPanelSections: [
-    //         {
-    //             label: t('Query'),
-    //             expanded: true,
-    //             controlSetRows: [
-    //                 ['spatial', 'size'],
-    //                 ['row_limit', 'filter_nulls'],
-    //                 ['adhoc_filters'],
-    //             ],
-    //         },
-    //         {
-    //             label: t('Map'),
-    //             controlSetRows: [
-    //                 ['mapbox_style', 'viewport'],
-    //                 ['autozoom', null],
-    //             ],
-    //         },
-    //         {
-    //             label: t('Grid'),
-    //             expanded: true,
-    //             controlSetRows: [
-    //                 ['grid_size', 'color_picker'],
-    //             ],
-    //         },
-    //         {
-    //             label: t('Advanced'),
-    //             controlSetRows: [
-    //                 ['js_columns'],
-    //                 ['js_data_mutator'],
-    //                 ['js_tooltip'],
-    //                 ['js_onclick_href'],
-    //             ],
-    //         },
-    //     ],
-    //     controlOverrides: {
-    //         size: {
-    //             label: t('Weight'),
-    //             description: t("Metric used as a weight for the grid's coloring"),
-    //             validators: [v.nonEmpty],
-    //         },
-    //         time_grain_sqla: timeGrainSqlaAnimationOverrides,
-    //     },
-    // },
 
     deck_screengrid: {
         label: t('Deck.gl - Screen grid'),
@@ -860,66 +814,6 @@ export const visTypes = {
             time_grain_sqla: timeGrainSqlaAnimationOverrides,
         },
     },
-
-    // deck_scatter: {
-    //     label: t('Deck.gl - Scatter plot'),
-    //     requiresTime: true,
-    //     onInit: controlState => ({
-    //         ...controlState,
-    //         time_grain_sqla: {
-    //             ...controlState.time_grain_sqla,
-    //             value: null,
-    //         },
-    //         granularity: {
-    //             ...controlState.granularity,
-    //             value: null,
-    //         },
-    //     }),
-    //     controlPanelSections: [
-    //         {
-    //             label: t('Query'),
-    //             expanded: true,
-    //             controlSetRows: [
-    //                 ['spatial_address'],
-    //                 ['adhoc_filters'],
-    //             ],
-    //         },
-    //         {
-    //             label: t('Map'),
-    //             expanded: true,
-    //             controlSetRows: [
-    //                 ['mapbox_style', 'viewport'],
-    //                 ['autozoom', null],
-    //             ],
-    //         },
-    //         {
-    //             label: t('Point Size'),
-    //             controlSetRows: [
-    //                 ['point_radius_fixed', 'point_unit'],
-    //                 ['radius']
-    //             ],
-    //         },
-    //         {
-    //             label: t('Advanced'),
-    //             controlSetRows: [
-    //                 ['js_columns'],
-    //                 ['js_data_mutator'],
-    //                 ['js_tooltip'],
-    //                 ['js_onclick_href'],
-    //             ],
-    //         },
-    //     ],
-    //     controlOverrides: {
-    //         dimension: {
-    //             label: t('Categorical Color'),
-    //             description: t('Pick a dimension from which categorical colors are defined'),
-    //         },
-    //         size: {
-    //             validators: [],
-    //         },
-    //         time_grain_sqla: timeGrainSqlaAnimationOverrides,
-    //     },
-    // },
 
     deck_scatter: {
         label: t('Deck.gl - Scatter plot'),
@@ -2002,6 +1896,35 @@ export const visTypes = {
             sections.NVD3TimeSeries[1],
         ],
     },
+
+    solarBI: {
+        label: t('Solar Business Intelligence'),
+        requiresTime: true,
+        controlPanelSections: [
+            {
+                label: t('Query'),
+                expanded: true,
+                controlSetRows: [
+                    ['spatial_address'],
+                    ['radius'],
+                    ['adhoc_filters'],
+                ],
+            },
+            {
+                label: t('Advanced'),
+                controlSetRows: [
+                    ['js_columns'],
+                    ['js_data_mutator'],
+                    ['js_tooltip'],
+                    ['js_onclick_href'],
+                ],
+            },
+        ],
+        controlOverrides: {
+            time_grain_sqla: timeGrainSqlaAnimationOverrides,
+        },
+    },
+
 };
 
 export default visTypes;
