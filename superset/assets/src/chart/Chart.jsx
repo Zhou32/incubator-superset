@@ -9,6 +9,7 @@ import RefreshChartOverlay from '../components/RefreshChartOverlay';
 import StackTraceMessage from '../components/StackTraceMessage';
 import ChartProps from '../visualizations/core/models/ChartProps';
 import SuperChart from '../visualizations/core/components/SuperChart';
+import ErrorBoundary from '../components/ErrorBoundary';
 import './chart.css';
 
 const propTypes = {
@@ -26,6 +27,7 @@ const propTypes = {
   // state
   chartAlert: PropTypes.string,
   chartStatus: PropTypes.string,
+  chartStackTrace: PropTypes.string,
   queryResponse: PropTypes.object,
   triggerQuery: PropTypes.bool,
   refreshOverlayVisible: PropTypes.bool,
@@ -89,10 +91,10 @@ class Chart extends React.PureComponent {
     });
   }
 
-  handleRenderFailure(e) {
+  handleRenderFailure(error, info) {
     const { actions, chartId } = this.props;
-    console.warn(e); // eslint-disable-line
-    actions.chartRenderingFailed(e, chartId);
+    console.warn(error); // eslint-disable-line
+    actions.chartRenderingFailed(error.toString(), chartId, info ? info.componentStack : null);
   }
 
   prepareChartProps() {
@@ -152,6 +154,7 @@ class Chart extends React.PureComponent {
       width,
       height,
       chartAlert,
+      chartStackTrace,
       chartStatus,
       errorMessage,
       onDismissRefreshOverlay,
@@ -176,12 +179,13 @@ class Chart extends React.PureComponent {
       >
         {this.renderTooltip()}
 
-        {isLoading && <Loading size={50} />}
+        {['loading', 'success'].indexOf(chartStatus) >= 0 && <Loading size={50} />}
 
         {chartAlert && (
           <StackTraceMessage
             message={chartAlert}
-            queryResponse={queryResponse}
+            link={queryResponse ? queryResponse.link : null}
+            stackTrace={chartStackTrace}
           />
         )}
 
@@ -194,14 +198,16 @@ class Chart extends React.PureComponent {
           />
         )}
 
-        <SuperChart
-          className={`slice_container ${snakeCase(vizType)} ${isFaded ? ' faded' : ''}`}
-          chartType={vizType}
-          chartProps={skipChartRendering ? null : this.prepareChartProps()}
-          onRenderSuccess={this.handleRenderSuccess}
-          onRenderFailure={this.handleRenderFailure}
-          skipRendering={skipChartRendering}
-        />
+        <ErrorBoundary onError={this.handleRenderFailure} showMessage={false}>
+          <SuperChart
+            className={`slice_container ${snakeCase(vizType)} ${isFaded ? ' faded' : ''}`}
+            chartType={vizType}
+            chartProps={skipChartRendering ? null : this.prepareChartProps()}
+            onRenderSuccess={this.handleRenderSuccess}
+            onRenderFailure={this.handleRenderFailure}
+            skipRendering={skipChartRendering}
+          />
+        </ErrorBoundary>
       </div>
     );
   }
