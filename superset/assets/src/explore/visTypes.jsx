@@ -1899,14 +1899,13 @@ export const visTypes = {
 
     solarBI: {
         label: t('Solar Business Intelligence'),
-        requiresTime: true,
+        requiresTime: false,
         controlPanelSections: [
             {
                 label: t('Query'),
                 expanded: true,
                 controlSetRows: [
-                    ['spatial_address'],
-                    ['radius'],
+                    ['spatial_address','radius'],
                     ['adhoc_filters'],
                 ],
             },
@@ -1920,9 +1919,6 @@ export const visTypes = {
                 ],
             },
         ],
-        controlOverrides: {
-            time_grain_sqla: timeGrainSqlaAnimationOverrides,
-        },
     },
 
 };

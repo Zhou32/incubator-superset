@@ -47,19 +47,15 @@ class SolarBI extends React.Component {
 
         var option = {
             title: {
-                text: 'Data from the past'
+                text: 'Solar Irradiance Data'
             },
             legend: {
-                data: ['bar'],
+                data: ['☀️ Irradiance ☀️ (W/m²)'],
                 align: 'left'
             },
             toolbox: {
-                // y: 'bottom',
+                showTitle:false,
                 feature: {
-                    magicType: {
-                        type: ['stack', 'tiled']
-                    },
-                    dataView: {},
                     saveAsImage: {
                         pixelRatio: 2
                     }
@@ -73,9 +69,11 @@ class SolarBI extends React.Component {
                     show: false
                 }
             },
-            yAxis: {},
+            yAxis: {
+                name: '(W/m²)'
+            },
             series: [{
-                name: 'bar',
+                name: '☀️ Irradiance ☀️ (W/m²)',
                 type: 'bar',
                 data: data1,
                 animationDelay: function (idx) {
@@ -106,7 +104,6 @@ class SolarBI extends React.Component {
 
                 <Map google={this.props.google}
                      zoom={this.state.zoom}
-                     style={{position: 'relative',height: '45%', width: '90%',marginTop: 0}}
                      initialCenter={{
                          lat: 40.854885,
                          lng: -88.081807
@@ -126,7 +123,7 @@ class SolarBI extends React.Component {
                     />
                 </Map>
                 <ReactEcharts option={this.state.options}
-                              style={{position: 'absolute', width: '90%', height: '40%',marginTop:'36%'}}/>
+                              style={{position: 'relative', width: '100%', height: '50%'}}/>
 
             </div>
         )
@@ -135,5 +132,4 @@ class SolarBI extends React.Component {
 
 
 export default GoogleApiWrapper({
-    apiKey: ""
 })(SolarBI)
