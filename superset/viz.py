@@ -2641,6 +2641,7 @@ class SolarBI(BaseViz):
     verbose_name = _('Solar Business Intelligence')
     spatial_control_keys = ['spatial_address']
     is_timeseries = False
+    partition = ['year', 'month']
 
     def search_address(self):
         lat = self.form_data['spatial_address']['lat']
@@ -2652,8 +2653,8 @@ class SolarBI(BaseViz):
             lng) + """)) ) * 6384.0999) <= """ + str(radius) + """ )
             OR (latitude = """ + str(lat) + """
             AND longitude = """ + str(lng) + """))
-            AND radiationtype='dni'
-            AND radiation != -999          
+            AND radiation_type='dni'
+            AND radiation != -999       
             """
         return where
 
@@ -2661,14 +2662,14 @@ class SolarBI(BaseViz):
         d = super(SolarBI, self).query_obj()
         fd = self.form_data
 
-        metric_1 = {'expressionType': 'SQL', 'sqlExpression': 'avg(radiation)', 'label': 'radiation'}
+        metric_1 = {'expressionType': 'SQL', 'sqlExpression': 'sum(radiation)', 'label': 'radiation'}
         # metric_2 = {'expressionType': 'SQL', 'sqlExpression': 'date', 'label': 'date'}
         # metric_3 = {'expressionType': 'SQL', 'sqlExpression': 'month', 'label': 'month'}
         # metric_4 = {'expressionType': 'SQL', 'sqlExpression': 'day', 'label': 'day'}
         metrics = [metric_1]
         d['metrics'] += metrics
-        d['groupby'] += ['year', 'month', 'day']
-        d['orderby'] = [('year', True), ('month', True), ('day', True), ]
+        d['groupby'] += self.partition
+        d['orderby'] = [(i, True) for i in self.partition]
         d['extras']['where'] = self.search_address()
         return d
 
@@ -2679,8 +2680,13 @@ class SolarBI(BaseViz):
         results = df.to_dict()
         x = []
         y = []
-        for i in range(len(results['year'])):
-            x.append(str(results['year'][i]) + '/' + str(results['month'][i]) + '/' + str(results['day'][i]))
+
+        for i in range(len(results[self.partition[0]])):
+            x_axis = str(results[self.partition[0]][i])
+            if len(self.partition) > 1:
+                for j in range(1, len(self.partition)):
+                    x_axis += '/' + str(results[self.partition[j]][i])
+            x.append(x_axis)
             y.append(results['radiation'][i])
         data = {'lat': lat, 'lng': lng, 'radius': radius, 'data': [x, y]}
         return data
