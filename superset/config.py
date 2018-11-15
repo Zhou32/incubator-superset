@@ -198,15 +198,14 @@ CORS_OPTIONS = {}
 # TODO: Add processing of other spreadsheet formats (xls, xlsx etc)
 ALLOWED_EXTENSIONS = set(['csv'])
 
-# CSV Options: key/value pairs that will be passed as argument to DataFrame.to_csv method
-# note: index option should not be overridden
+# CSV Options: key/value pairs that will be passed as argument to DataFrame.to_csv method note: index option should not be overridden
 CSV_EXPORT = {
     'encoding': 'utf-8',
 }
 
 # ---------------------------------------------------
 # Time grain configurations
-# ---------------------------------------------------
+# --------------------------------------------------
 # List of time grains to disable in the application (see list of builtin
 # time grains in superset/db_engine_specs.builtin_time_grains).
 # For example: to disable 1 second time grain:
@@ -322,7 +321,7 @@ HTTP_HEADERS = {'X-Frame-Options': 'SAMEORIGIN'}
 DEFAULT_DB_ID = None
 
 # Timeout duration for SQL Lab synchronous queries
-SQLLAB_TIMEOUT = 30
+SQLLAB_TIMEOUT = 300
 
 # SQLLAB_DEFAULT_DBID
 SQLLAB_DEFAULT_DBID = None
