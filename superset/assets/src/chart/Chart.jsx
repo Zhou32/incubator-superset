@@ -3,11 +3,11 @@ import { snakeCase } from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Tooltip } from 'react-bootstrap';
+import { ChartProps } from '@superset-ui/chart';
 import { Logger, LOG_ACTIONS_RENDER_CHART } from '../logger';
 import Loading from '../components/Loading';
 import RefreshChartOverlay from '../components/RefreshChartOverlay';
 import StackTraceMessage from '../components/StackTraceMessage';
-import ChartProps from '../visualizations/core/models/ChartProps';
 import SuperChart from '../visualizations/core/components/SuperChart';
 import ErrorBoundary from '../components/ErrorBoundary';
 import './chart.css';
@@ -79,7 +79,7 @@ class Chart extends React.PureComponent {
 
   handleRenderSuccess() {
     const { actions, chartStatus, chartId, vizType } = this.props;
-    if (chartStatus !== 'rendered') {
+    if (['loading', 'rendered'].indexOf(chartStatus) < 0) {
       actions.chartRenderingSucceeded(chartId);
     }
 
