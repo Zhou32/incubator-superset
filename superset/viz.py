@@ -2653,7 +2653,6 @@ class SolarBI(BaseViz):
             lng) + """)) ) * 6384.0999) <= """ + str(radius) + """ )
             OR (latitude = """ + str(lat) + """
             AND longitude = """ + str(lng) + """))
-            AND radiation_type='dni'
             AND radiation != -999       
             """
         return where
