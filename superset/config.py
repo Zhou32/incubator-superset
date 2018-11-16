@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # pylint: disable=C,R,W
 """The main config file for Superset
 
@@ -6,11 +5,6 @@ All configuration in this file can be overridden by providing a superset_config
 in your PYTHONPATH as there is a ``from superset_config import *``
 at the end of this file.
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
 from collections import OrderedDict
 import imp
 import json
@@ -204,15 +198,14 @@ CORS_OPTIONS = {}
 # TODO: Add processing of other spreadsheet formats (xls, xlsx etc)
 ALLOWED_EXTENSIONS = set(['csv'])
 
-# CSV Options: key/value pairs that will be passed as argument to DataFrame.to_csv method
-# note: index option should not be overridden
+# CSV Options: key/value pairs that will be passed as argument to DataFrame.to_csv method note: index option should not be overridden
 CSV_EXPORT = {
     'encoding': 'utf-8',
 }
 
 # ---------------------------------------------------
 # Time grain configurations
-# ---------------------------------------------------
+# --------------------------------------------------
 # List of time grains to disable in the application (see list of builtin
 # time grains in superset/db_engine_specs.builtin_time_grains).
 # For example: to disable 1 second time grain:
@@ -288,8 +281,8 @@ MAPBOX_API_KEY = os.environ.get('pk.eyJ1IjoiZHJ1bmtlbjIwMDIiLCJhIjoiY2ptdTh5eHpq
 # in the results backend. This also becomes the limit when exporting CSVs
 SQL_MAX_ROW = 100000
 
-# Limit to be returned to the frontend.
-DISPLAY_MAX_ROW = 1000
+# Default row limit for SQL Lab queries
+DEFAULT_SQLLAB_LIMIT = 1000
 
 # Maximum number of tables/views displayed in the dropdown window in SQL Lab.
 MAX_TABLE_NAMES = 3000
@@ -328,7 +321,7 @@ HTTP_HEADERS = {'X-Frame-Options': 'SAMEORIGIN'}
 DEFAULT_DB_ID = None
 
 # Timeout duration for SQL Lab synchronous queries
-SQLLAB_TIMEOUT = 30
+SQLLAB_TIMEOUT = 300
 
 # SQLLAB_DEFAULT_DBID
 SQLLAB_DEFAULT_DBID = None

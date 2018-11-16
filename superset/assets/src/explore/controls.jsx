@@ -35,24 +35,27 @@
  *
  * Note that the keys defined in controls in this file that are not listed above represent
  * props specific for the React component defined as `type`. Also note that this module work
- * in tandem with `visTypes.js` that defines how controls are composed into sections for
+ * in tandem with `controlPanels/index.js` that defines how controls are composed into sections for
  * each and every visualization type.
  */
 import React from 'react';
+import { t } from '@superset-ui/translation';
 import {
     formatSelectOptionsForRange,
     formatSelectOptions,
     mainMetric,
 } from '../modules/utils';
 import * as v from './validators';
-import {colorPrimary} from '../modules/colors';
-import {defaultViewport} from '../modules/geo';
+
+import { PRIMARY_COLOR } from '../modules/colors';
+import { defaultViewport } from '../modules/geo';
 import ColumnOption from '../components/ColumnOption';
 import OptionDescription from '../components/OptionDescription';
-import {t} from '../locales';
-import {getAllSchemes} from '../modules/ColorSchemeManager';
-import sequentialSchemes from '../modules/colorSchemes/sequential';
+import getCategoricalSchemeRegistry from '../modules/colors/CategoricalSchemeRegistrySingleton';
+import getSequentialSchemeRegistry from '../modules/colors/SequentialSchemeRegistrySingleton';
 
+const categoricalSchemeRegistry = getCategoricalSchemeRegistry();
+const sequentialSchemeRegistry = getSequentialSchemeRegistry();
 const D3_FORMAT_DOCS = 'D3 format syntax: https://github.com/d3/d3-format';
 
 // input choices & options
@@ -207,407 +210,364 @@ export const controls = {
         description: t('The type of visualization to display'),
     },
 
-    percent_metrics: {
-        ...metrics,
-        multi: true,
-        default: [],
-        label: t('Percentage Metrics'),
-        validators: [],
-        description: t('Metrics for which percentage of total are to be displayed'),
-    },
+  percent_metrics: {
+    ...metrics,
+    multi: true,
+    default: [],
+    label: t('Percentage Metrics'),
+    validators: [],
+    description: t('Metrics for which percentage of total are to be displayed'),
+  },
 
-    y_axis_bounds: {
-        type: 'BoundsControl',
-        label: t('Y Axis Bounds'),
-        renderTrigger: true,
-        default: [null, null],
-        description: t('Bounds for the Y axis. When left empty, the bounds are ' +
-            'dynamically defined based on the min/max of the data. Note that ' +
-            "this feature will only expand the axis range. It won't " +
-            "narrow the data's extent."),
-    },
+  y_axis_bounds: {
+    type: 'BoundsControl',
+    label: t('Y Axis Bounds'),
+    renderTrigger: true,
+    default: [null, null],
+    description: t('Bounds for the Y-axis. When left empty, the bounds are ' +
+    'dynamically defined based on the min/max of the data. Note that ' +
+    "this feature will only expand the axis range. It won't " +
+    "narrow the data's extent."),
+  },
 
-    order_by_cols: {
-        type: 'SelectControl',
-        multi: true,
-        label: t('Ordering'),
-        default: [],
-        description: t('One or many metrics to display'),
-        mapStateToProps: state => ({
-            choices: (state.datasource) ? state.datasource.order_by_choices : [],
-        }),
-    },
-    color_picker: {
-        label: t('Fixed Color'),
-        description: t('Use this to define a static color for all circles'),
-        type: 'ColorPickerControl',
-        default: colorPrimary,
-        renderTrigger: true,
-    },
+  order_by_cols: {
+    type: 'SelectControl',
+    multi: true,
+    label: t('Ordering'),
+    default: [],
+    description: t('One or many metrics to display'),
+    mapStateToProps: state => ({
+      choices: (state.datasource) ? state.datasource.order_by_choices : [],
+    }),
+  },
+  color_picker: {
+    label: t('Fixed Color'),
+    description: t('Use this to define a static color for all circles'),
+    type: 'ColorPickerControl',
+    default: PRIMARY_COLOR,
+    renderTrigger: true,
+  },
 
-    target_color_picker: {
-        label: t('Target Color'),
-        description: t('Color of the target location'),
-        type: 'ColorPickerControl',
-        default: colorPrimary,
-        renderTrigger: true,
-    },
+  target_color_picker: {
+    label: t('Target Color'),
+    description: t('Color of the target location'),
+    type: 'ColorPickerControl',
+    default: PRIMARY_COLOR,
+    renderTrigger: true,
+  },
 
-    legend_position: {
-        label: t('Legend Position'),
-        description: t('Choose the position of the legend'),
-        type: 'SelectControl',
-        clearable: false,
-        default: 'tr',
-        choices: [
-            [null, 'None'],
-            ['tl', 'Top left'],
-            ['tr', 'Top right'],
-            ['bl', 'Bottom left'],
-            ['br', 'Bottom right'],
-        ],
-        renderTrigger: true,
-    },
+  legend_position: {
+    label: t('Legend Position'),
+    description: t('Choose the position of the legend'),
+    type: 'SelectControl',
+    clearable: false,
+    default: 'tr',
+    choices: [
+      [null, 'None'],
+      ['tl', 'Top left'],
+      ['tr', 'Top right'],
+      ['bl', 'Bottom left'],
+      ['br', 'Bottom right'],
+    ],
+    renderTrigger: true,
+  },
 
-    fill_color_picker: {
-        label: t('Fill Color'),
-        description: t(' Set the opacity to 0 if you do not want to override the color specified in the GeoJSON'),
-        type: 'ColorPickerControl',
-        default: colorPrimary,
-        renderTrigger: true,
-    },
+  fill_color_picker: {
+    label: t('Fill Color'),
+    description: t(' Set the opacity to 0 if you do not want to override the color specified in the GeoJSON'),
+    type: 'ColorPickerControl',
+    default: PRIMARY_COLOR,
+    renderTrigger: true,
+  },
 
-    stroke_color_picker: {
-        label: t('Stroke Color'),
-        description: t(' Set the opacity to 0 if you do not want to override the color specified in the GeoJSON'),
-        type: 'ColorPickerControl',
-        default: colorPrimary,
-        renderTrigger: true,
-    },
+  stroke_color_picker: {
+    label: t('Stroke Color'),
+    description: t(' Set the opacity to 0 if you do not want to override the color specified in the GeoJSON'),
+    type: 'ColorPickerControl',
+    default: PRIMARY_COLOR,
+    renderTrigger: true,
+  },
 
-    metric_2: {
-        ...metric,
-        label: t('Right Axis Metric'),
-        clearable: true,
-        description: t('Choose a metric for right axis'),
-    },
+  metric_2: {
+    ...metric,
+    label: t('Right Axis Metric'),
+    clearable: true,
+    description: t('Choose a metric for right axis'),
+  },
 
-    stacked_style: {
-        type: 'SelectControl',
-        label: t('Stacked Style'),
-        renderTrigger: true,
-        choices: [
-            ['stack', 'stack'],
-            ['stream', 'stream'],
-            ['expand', 'expand'],
-        ],
-        default: 'stack',
-        description: '',
-    },
+  stacked_style: {
+    type: 'SelectControl',
+    label: t('Stacked Style'),
+    renderTrigger: true,
+    choices: [
+      ['stack', 'stack'],
+      ['stream', 'stream'],
+      ['expand', 'expand'],
+    ],
+    default: 'stack',
+    description: '',
+  },
 
-    sort_x_axis: {
-        type: 'SelectControl',
-        label: t('Sort X Axis'),
-        choices: sortAxisChoices,
-        clearable: false,
-        default: 'alpha_asc',
-    },
+  sort_x_axis: {
+    type: 'SelectControl',
+    label: t('Sort X Axis'),
+    choices: sortAxisChoices,
+    clearable: false,
+    default: 'alpha_asc',
+  },
 
-    sort_y_axis: {
-        type: 'SelectControl',
-        label: t('Sort Y Axis'),
-        choices: sortAxisChoices,
-        clearable: false,
-        default: 'alpha_asc',
-    },
+  sort_y_axis: {
+    type: 'SelectControl',
+    label: t('Sort Y Axis'),
+    choices: sortAxisChoices,
+    clearable: false,
+    default: 'alpha_asc',
+  },
 
-    linear_color_scheme: {
-        type: 'ColorSchemeControl',
-        label: t('Linear Color Scheme'),
-        choices: [
-            ['fire', 'fire'],
-            ['white_black', 'white/black'],
-            ['black_white', 'black/white'],
-            ['dark_blue', 'light/dark blue'],
-            ['pink_grey', 'pink/white/grey'],
-            ['greens', 'greens'],
-            ['purples', 'purples'],
-            ['oranges', 'oranges'],
-            ['blue_white_yellow', 'blue/white/yellow'],
-            ['red_yellow_blue', 'red/yellowish/blue'],
-            ['brown_white_green', 'brown/white/green'],
-            ['purple_white_green', 'purple/white/green'],
-            ['schemeBrBG', 'brown/green'],
-            ['schemePRGn', 'purple/green'],
-            ['schemePiYG', 'pink/green'],
-            ['schemePuOr', 'purple/orange'],
-            ['schemeRdBu', 'red/blue'],
-            ['schemeRdGy', 'red/gray/black'],
-            ['schemeRdYlBu', 'red/yellow/blue'],
-            ['schemeRdYlGn', 'red/yellow/green'],
-            ['schemeSpectral', 'rainbow'],
-            ['schemeBlues', 'd3/blues'],
-            ['schemeGreens', 'd3/greens'],
-            ['schemeGrays', 'd3/grays'],
-            ['schemeOranges', 'd3/oranges'],
-            ['schemePurples', 'd3/purples'],
-            ['schemeReds', 'd3/reds'],
-            ['schemeViridis', 'd3/purple/blue/green/yellow'],
-            ['schemeInferno', 'd3/purple/red/orange/yellow'],
-            ['schemeMagma', 'd3/purple/pink/peach'],
-            ['schemeWarm', 'd3/warm/purple/pink/yellow/green'],
-            ['schemeCool', 'd3/cool/blue/green'],
-            ['schemeCubehelixDefault', 'd3/black/green/brown/pink/blue'],
-            ['schemeBuGn', 'd3/blue/green'],
-            ['schemeBuPu', 'd3/blue/purple'],
-            ['schemeGnBu', 'd3/green/blue'],
-            ['schemeOrRd', 'd3/orange/red'],
-            ['schemePuBuGn', 'd3/purple/blue/green'],
-            ['schemePuBu', 'd3/purple/blue'],
-            ['schemePuRd', 'd3/purple/red'],
-            ['schemeRdPu', 'd3/red/purple'],
-            ['schemeYlGnBu', 'd3/yellow/green/blue'],
-            ['schemeYlGn', 'd3/yellow/green'],
-            ['schemeYlOrBr', 'd3/yellow/brown'],
-            ['schemeYlOrRd', 'd3/yellow/orange/red'],
-        ],
-        default: 'blue_white_yellow',
-        clearable: false,
-        description: '',
-        renderTrigger: true,
-        schemes: sequentialSchemes,
-        isLinear: true,
-    },
+  linear_color_scheme: {
+    type: 'ColorSchemeControl',
+    label: t('Linear Color Scheme'),
+    choices: () => sequentialSchemeRegistry
+      .values()
+      .map(value => [value.name, value.label]),
+    default: 'blue_white_yellow',
+    clearable: false,
+    description: '',
+    renderTrigger: true,
+    schemes: () => sequentialSchemeRegistry.getMap(),
+    isLinear: true,
+  },
 
-    normalize_across: {
-        type: 'SelectControl',
-        label: t('Normalize Across'),
-        choices: [
-            ['heatmap', 'heatmap'],
-            ['x', 'x'],
-            ['y', 'y'],
-        ],
-        default: 'heatmap',
-        description: t('Color will be rendered based on a ratio ' +
-            'of the cell against the sum of across this ' +
-            'criteria'),
-    },
+  normalize_across: {
+    type: 'SelectControl',
+    label: t('Normalize Across'),
+    choices: [
+      ['heatmap', 'heatmap'],
+      ['x', 'x'],
+      ['y', 'y'],
+    ],
+    default: 'heatmap',
+    description: t('Color will be rendered based on a ratio ' +
+    'of the cell against the sum of across this ' +
+    'criteria'),
+  },
 
-    horizon_color_scale: {
-        type: 'SelectControl',
-        renderTrigger: true,
-        label: t('Value Domain'),
-        choices: [
-            ['series', 'series'],
-            ['overall', 'overall'],
-            ['change', 'change'],
-        ],
-        default: 'series',
-        description: t('series: Treat each series independently; overall: All series use the same scale; change: Show changes compared to the first data point in each series'),
-    },
+  horizon_color_scale: {
+    type: 'SelectControl',
+    renderTrigger: true,
+    label: t('Value Domain'),
+    choices: [
+      ['series', 'series'],
+      ['overall', 'overall'],
+      ['change', 'change'],
+    ],
+    default: 'series',
+    description: t('series: Treat each series independently; overall: All series use the same scale; change: Show changes compared to the first data point in each series'),
+  },
 
-    canvas_image_rendering: {
-        type: 'SelectControl',
-        label: t('Rendering'),
-        renderTrigger: true,
-        choices: [
-            ['pixelated', 'pixelated (Sharp)'],
-            ['auto', 'auto (Smooth)'],
-        ],
-        default: 'pixelated',
-        description: t('image-rendering CSS attribute of the canvas object that ' +
-            'defines how the browser scales up the image'),
-    },
+  canvas_image_rendering: {
+    type: 'SelectControl',
+    label: t('Rendering'),
+    renderTrigger: true,
+    choices: [
+      ['pixelated', 'pixelated (Sharp)'],
+      ['auto', 'auto (Smooth)'],
+    ],
+    default: 'pixelated',
+    description: t('image-rendering CSS attribute of the canvas object that ' +
+    'defines how the browser scales up the image'),
+  },
 
-    xscale_interval: {
-        type: 'SelectControl',
-        label: t('XScale Interval'),
-        renderTrigger: true,
-        choices: formatSelectOptionsForRange(1, 50),
-        default: '1',
-        clearable: false,
-        description: t('Number of steps to take between ticks when ' +
-            'displaying the X scale'),
-    },
+  xscale_interval: {
+    type: 'SelectControl',
+    label: t('XScale Interval'),
+    renderTrigger: true,
+    choices: formatSelectOptionsForRange(1, 50),
+    default: '1',
+    clearable: false,
+    description: t('Number of steps to take between ticks when ' +
+    'displaying the X scale'),
+  },
 
-    yscale_interval: {
-        type: 'SelectControl',
-        label: t('YScale Interval'),
-        choices: formatSelectOptionsForRange(1, 50),
-        default: '1',
-        clearable: false,
-        renderTrigger: true,
-        description: t('Number of steps to take between ticks when ' +
-            'displaying the Y scale'),
-    },
+  yscale_interval: {
+    type: 'SelectControl',
+    label: t('YScale Interval'),
+    choices: formatSelectOptionsForRange(1, 50),
+    default: '1',
+    clearable: false,
+    renderTrigger: true,
+    description: t('Number of steps to take between ticks when ' +
+    'displaying the Y scale'),
+  },
 
-    include_time: {
-        type: 'CheckboxControl',
-        label: t('Include Time'),
-        description: t('Whether to include the time granularity as defined in the time section'),
-        default: false,
-    },
+  include_time: {
+    type: 'CheckboxControl',
+    label: t('Include Time'),
+    description: t('Whether to include the time granularity as defined in the time section'),
+    default: false,
+  },
 
-    autozoom: {
-        type: 'CheckboxControl',
-        label: t('Auto Zoom'),
-        default: true,
-        renderTrigger: true,
-        description: t('When checked, the map will zoom to your data after each query'),
-    },
+  autozoom: {
+    type: 'CheckboxControl',
+    label: t('Auto Zoom'),
+    default: true,
+    renderTrigger: true,
+    description: t('When checked, the map will zoom to your data after each query'),
+  },
 
-    show_perc: {
-        type: 'CheckboxControl',
-        label: t('Show percentage'),
-        renderTrigger: true,
-        description: t('Whether to include the percentage in the tooltip'),
-        default: true,
-    },
+  show_perc: {
+    type: 'CheckboxControl',
+    label: t('Show percentage'),
+    renderTrigger: true,
+    description: t('Whether to include the percentage in the tooltip'),
+    default: true,
+  },
 
-    bar_stacked: {
-        type: 'CheckboxControl',
-        label: t('Stacked Bars'),
-        renderTrigger: true,
-        default: false,
-        description: null,
-    },
+  bar_stacked: {
+    type: 'CheckboxControl',
+    label: t('Stacked Bars'),
+    renderTrigger: true,
+    default: false,
+    description: null,
+  },
 
-    pivot_margins: {
-        type: 'CheckboxControl',
-        label: t('Show totals'),
-        renderTrigger: false,
-        default: true,
-        description: t('Display total row/column'),
-    },
+  pivot_margins: {
+    type: 'CheckboxControl',
+    label: t('Show totals'),
+    renderTrigger: false,
+    default: true,
+    description: t('Display total row/column'),
+  },
 
-    show_markers: {
-        type: 'CheckboxControl',
-        label: t('Show Markers'),
-        renderTrigger: true,
-        default: false,
-        description: t('Show data points as circle markers on the lines'),
-    },
+  show_markers: {
+    type: 'CheckboxControl',
+    label: t('Show Markers'),
+    renderTrigger: true,
+    default: false,
+    description: t('Show data points as circle markers on the lines'),
+  },
 
-    show_bar_value: {
-        type: 'CheckboxControl',
-        label: t('Bar Values'),
-        default: false,
-        renderTrigger: true,
-        description: t('Show the value on top of the bar'),
-    },
+  show_bar_value: {
+    type: 'CheckboxControl',
+    label: t('Bar Values'),
+    default: false,
+    renderTrigger: true,
+    description: t('Show the value on top of the bar'),
+  },
 
-    order_bars: {
-        type: 'CheckboxControl',
-        label: t('Sort Bars'),
-        default: false,
-        renderTrigger: true,
-        description: t('Sort bars by x labels.'),
-    },
+  order_bars: {
+    type: 'CheckboxControl',
+    label: t('Sort Bars'),
+    default: false,
+    renderTrigger: true,
+    description: t('Sort bars by x labels.'),
+  },
 
-    combine_metric: {
-        type: 'CheckboxControl',
-        label: t('Combine Metrics'),
-        default: false,
-        description: t('Display metrics side by side within each column, as ' +
-            'opposed to each column being displayed side by side for each metric.'),
-    },
+  combine_metric: {
+    type: 'CheckboxControl',
+    label: t('Combine Metrics'),
+    default: false,
+    description: t('Display metrics side by side within each column, as ' +
+    'opposed to each column being displayed side by side for each metric.'),
+  },
 
-    show_controls: {
-        type: 'CheckboxControl',
-        label: t('Extra Controls'),
-        renderTrigger: true,
-        default: false,
-        description: t('Whether to show extra controls or not. Extra controls ' +
-            'include things like making mulitBar charts stacked ' +
-            'or side by side.'),
-    },
+  show_controls: {
+    type: 'CheckboxControl',
+    label: t('Extra Controls'),
+    renderTrigger: true,
+    default: false,
+    description: t('Whether to show extra controls or not. Extra controls ' +
+    'include things like making mulitBar charts stacked ' +
+    'or side by side.'),
+  },
 
-    reduce_x_ticks: {
-        type: 'CheckboxControl',
-        label: t('Reduce X ticks'),
-        renderTrigger: true,
-        default: false,
-        description: t('Reduces the number of X axis ticks to be rendered. ' +
-            'If true, the x axis wont overflow and labels may be ' +
-            'missing. If false, a minimum width will be applied ' +
-            'to columns and the width may overflow into an ' +
-            'horizontal scroll.'),
-    },
+  reduce_x_ticks: {
+    type: 'CheckboxControl',
+    label: t('Reduce X ticks'),
+    renderTrigger: true,
+    default: false,
+    description: t('Reduces the number of X-axis ticks to be rendered. ' +
+    'If true, the x-axis will not overflow and labels may be ' +
+    'missing. If false, a minimum width will be applied ' +
+    'to columns and the width may overflow into an ' +
+    'horizontal scroll.'),
+  },
 
-    include_series: {
-        type: 'CheckboxControl',
-        label: t('Include Series'),
-        renderTrigger: true,
-        default: false,
-        description: t('Include series name as an axis'),
-    },
+  include_series: {
+    type: 'CheckboxControl',
+    label: t('Include Series'),
+    renderTrigger: true,
+    default: false,
+    description: t('Include series name as an axis'),
+  },
 
-    secondary_metric: {
-        ...metric,
-        label: t('Color Metric'),
-        default: null,
-        validators: [],
-        description: t('A metric to use for color'),
-    },
-    select_country: {
-        type: 'SelectControl',
-        label: t('Country Name'),
-        default: 'France',
-        choices: [
-            'Belgium',
-            'Brazil',
-            'China',
-            'Egypt',
-            'France',
-            'Germany',
-            'India',
-            'Italy',
-            'Portugal',
-            'Morocco',
-            'Myanmar',
-            'Netherlands',
-            'Russia',
-            'Singapore',
-            'Spain',
-            'Thailand',
-            'Timorleste',
-            'Uk',
-            'Ukraine',
-            'Usa',
-            'Zambia',
-        ].map(s => [s, s]),
-        description: t('The name of country that Superset should display'),
-    },
-    country_fieldtype: {
-        type: 'SelectControl',
-        label: t('Country Field Type'),
-        default: 'cca2',
-        choices: [
-            ['name', 'Full name'],
-            ['cioc', 'code International Olympic Committee (cioc)'],
-            ['cca2', 'code ISO 3166-1 alpha-2 (cca2)'],
-            ['cca3', 'code ISO 3166-1 alpha-3 (cca3)'],
-        ],
-        description: t('The country code standard that Superset should expect ' +
-            'to find in the [country] column'),
-    },
+  secondary_metric: {
+    ...metric,
+    label: t('Color Metric'),
+    default: null,
+    validators: [],
+    description: t('A metric to use for color'),
+  },
+  select_country: {
+    type: 'SelectControl',
+    label: t('Country Name'),
+    default: 'Australia',
+    choices: [
+      'Australia',
+      'Belgium',
+      'Brazil',
+      'China',
+      'Egypt',
+      'France',
+      'Germany',
+      'India',
+      'Italy',
+      'Portugal',
+      'Morocco',
+      'Myanmar',
+      'Netherlands',
+      'Russia',
+      'Singapore',
+      'Spain',
+      'Thailand',
+      'Timorleste',
+      'Uk',
+      'Ukraine',
+      'Usa',
+      'Zambia',
+    ].map(s => [s, s]),
+    description: t('The name of the country that Superset should display'),
+  },
+  country_fieldtype: {
+    type: 'SelectControl',
+    label: t('Country Field Type'),
+    default: 'cca2',
+    choices: [
+      ['name', 'Full name'],
+      ['cioc', 'code International Olympic Committee (cioc)'],
+      ['cca2', 'code ISO 3166-1 alpha-2 (cca2)'],
+      ['cca3', 'code ISO 3166-1 alpha-3 (cca3)'],
+    ],
+    description: t('The country code standard that Superset should expect ' +
+    'to find in the [country] column'),
+  },
 
-    freq: {
-        type: 'SelectControl',
-        label: t('Frequency'),
-        default: 'W-MON',
-        freeForm: true,
-        clearable: false,
-        choices: [
-            ['AS', 'Year (freq=AS)'],
-            ['52W-MON', '52 weeks starting Monday (freq=52W-MON)'],
-            ['W-SUN', '1 week starting Sunday (freq=W-SUN)'],
-            ['W-MON', '1 week starting Monday (freq=W-MON)'],
-            ['D', 'Day (freq=D)'],
-            ['4W-MON', '4 weeks (freq=4W-MON)'],
-        ],
-        description: t(
-            `The periodicity over which to pivot time. Users can provide
+  freq: {
+    type: 'SelectControl',
+    label: t('Frequency'),
+    default: 'W-MON',
+    freeForm: true,
+    clearable: false,
+    choices: [
+      ['AS', 'Year (freq=AS)'],
+      ['52W-MON', '52 weeks starting Monday (freq=52W-MON)'],
+      ['W-SUN', '1 week starting Sunday (freq=W-SUN)'],
+      ['W-MON', '1 week starting Monday (freq=W-MON)'],
+      ['D', 'Day (freq=D)'],
+      ['4W-MON', '4 weeks (freq=4W-MON)'],
+    ],
+    description: t(
+      `The periodicity over which to pivot time. Users can provide
       "Pandas" offset alias.
       Click on the info bubble for more details on accepted "freq" expressions.`),
         tooltipOnClick: () => {
@@ -731,15 +691,86 @@ export const controls = {
         choices: formatSelectOptions([0, 100, 200, 300, 500]),
     },
 
-    stroke_width: {
-        type: 'SelectControl',
-        freeForm: true,
-        label: t('Stroke Width'),
-        validators: [v.integer],
-        default: null,
-        renderTrigger: true,
-        choices: formatSelectOptions([1, 2, 3, 4, 5]),
-    },
+  druid_time_origin: {
+    type: 'SelectControl',
+    freeForm: true,
+    label: t('Origin'),
+    choices: [
+      ['', 'default'],
+      ['now', 'now'],
+    ],
+    default: null,
+    description: t('Defines the origin where time buckets start, ' +
+    'accepts natural dates as in `now`, `sunday` or `1970-01-01`'),
+  },
+
+  bottom_margin: {
+    type: 'SelectControl',
+    clearable: false,
+    freeForm: true,
+    label: t('Bottom Margin'),
+    choices: formatSelectOptions(['auto', 50, 75, 100, 125, 150, 200]),
+    default: 'auto',
+    renderTrigger: true,
+    description: t('Bottom margin, in pixels, allowing for more room for axis labels'),
+  },
+
+  x_ticks_layout: {
+    type: 'SelectControl',
+    label: t('X Tick Layout'),
+    choices: formatSelectOptions(['auto', 'flat', '45°', 'staggered']),
+    default: 'auto',
+    clearable: false,
+    renderTrigger: true,
+    description: t('The way the ticks are laid out on the X-axis'),
+  },
+
+  left_margin: {
+    type: 'SelectControl',
+    freeForm: true,
+    clearable: false,
+    label: t('Left Margin'),
+    choices: formatSelectOptions(['auto', 50, 75, 100, 125, 150, 200]),
+    default: 'auto',
+    renderTrigger: true,
+    description: t('Left margin, in pixels, allowing for more room for axis labels'),
+  },
+
+  granularity: {
+    type: 'SelectControl',
+    freeForm: true,
+    label: t('Time Granularity'),
+    default: 'one day',
+    choices: [
+      [null, 'all'],
+      ['PT5S', '5 seconds'],
+      ['PT30S', '30 seconds'],
+      ['PT1M', '1 minute'],
+      ['PT5M', '5 minutes'],
+      ['PT30M', '30 minutes'],
+      ['PT1H', '1 hour'],
+      ['PT6H', '6 hour'],
+      ['P1D', '1 day'],
+      ['P7D', '7 days'],
+      ['P1W', 'week'],
+      ['week_starting_sunday', 'week starting Sunday'],
+      ['week_ending_saturday', 'week ending Saturday'],
+      ['P1M', 'month'],
+      ['P3M', 'quarter'],
+      ['P1Y', 'year'],
+    ],
+    description: t('The time granularity for the visualization. Note that you ' +
+    'can type and use simple natural language as in `10 seconds`, ' +
+    '`1 day` or `56 weeks`'),
+  },
+
+  domain_granularity: {
+    type: 'SelectControl',
+    label: t('Domain'),
+    default: 'month',
+    choices: formatSelectOptions(['hour', 'day', 'week', 'month', 'year']),
+    description: t('The time unit used for the grouping of blocks'),
+  },
 
     all_columns_x: {
         type: 'SelectControl',
@@ -860,28 +891,74 @@ export const controls = {
         choices: formatSelectOptions(['10', '25', '50', '75', '100', '150', '200', '250']),
         description: t('Link length in the force layout'),
     },
+  pandas_aggfunc: {
+    type: 'SelectControl',
+    label: t('Aggregation function'),
+    clearable: false,
+    choices: formatSelectOptions([
+      'sum',
+      'mean',
+      'min',
+      'max',
+      'stdev',
+      'var',
+    ]),
+    default: 'sum',
+    description: t('Aggregate function to apply when pivoting and ' +
+    'computing the total rows and columns'),
+  },
 
-    charge: {
-        type: 'SelectControl',
-        renderTrigger: true,
-        freeForm: true,
-        label: t('Charge'),
-        default: '-500',
-        choices: formatSelectOptions([
-            '-50',
-            '-75',
-            '-100',
-            '-150',
-            '-200',
-            '-250',
-            '-500',
-            '-1000',
-            '-2500',
-            '-5000',
-        ]),
-        description: t('Charge in the force layout'),
-    },
+  js_agg_function: {
+    type: 'SelectControl',
+    label: t('Dynamic Aggregation Function'),
+    description: t('The function to use when aggregating points into groups'),
+    default: 'sum',
+    clearable: false,
+    renderTrigger: true,
+    choices: formatSelectOptions([
+      'sum',
+      'min',
+      'max',
+      'mean',
+      'median',
+      'count',
+      'variance',
+      'deviation',
+      'p1',
+      'p5',
+      'p95',
+      'p99',
+    ]),
+  },
 
+  size_from: {
+    type: 'TextControl',
+    isInt: true,
+    label: t('Font Size From'),
+    renderTrigger: true,
+    default: '20',
+    description: t('Font size for the smallest value in the list'),
+  },
+
+  size_to: {
+    type: 'TextControl',
+    isInt: true,
+    label: t('Font Size To'),
+    renderTrigger: true,
+    default: '150',
+    description: t('Font size for the biggest value in the list'),
+  },
+
+  instant_filtering: {
+    type: 'CheckboxControl',
+    label: t('Instant Filtering'),
+    renderTrigger: true,
+    default: true,
+    description: (
+      'Whether to apply filters as they change, or wait for' +
+      'users to hit an [Apply] button'
+    ),
+  },
     granularity_sqla: {
         type: 'SelectControl',
         label: t('Time Column'),
@@ -910,19 +987,315 @@ export const controls = {
         },
     },
 
-    time_grain_sqla: {
-        type: 'SelectControl',
-        label: t('Time Grain'),
-        default: 'P1D',
-        description: t('The time granularity for the visualization. This ' +
-            'applies a date transformation to alter ' +
-            'your time column and defines a new time granularity. ' +
-            'The options here are defined on a per database ' +
-            'engine basis in the Superset source code.'),
-        mapStateToProps: state => ({
-            choices: (state.datasource) ? state.datasource.time_grain_sqla : null,
-        }),
-    },
+  show_brush: {
+    type: 'SelectControl',
+    label: t('Show Range Filter'),
+    renderTrigger: true,
+    clearable: false,
+    default: 'auto',
+    choices: [
+      ['yes', 'Yes'],
+      ['no', 'No'],
+      ['auto', 'Auto'],
+    ],
+    description: t('Whether to display the time range interactive selector'),
+  },
+
+  date_filter: {
+    type: 'CheckboxControl',
+    label: t('Date Filter'),
+    default: true,
+    description: t('Whether to include a time filter'),
+  },
+
+  show_sqla_time_granularity: {
+    type: 'CheckboxControl',
+    label: t('Show SQL Granularity Dropdown'),
+    default: false,
+    description: t('Check to include SQL Granularity dropdown'),
+  },
+
+  show_sqla_time_column: {
+    type: 'CheckboxControl',
+    label: t('Show SQL Time Column'),
+    default: false,
+    description: t('Check to include Time Column dropdown'),
+  },
+
+  show_druid_time_granularity: {
+    type: 'CheckboxControl',
+    label: t('Show Druid Granularity Dropdown'),
+    default: false,
+    description: t('Check to include Druid Granularity dropdown'),
+  },
+
+  show_druid_time_origin: {
+    type: 'CheckboxControl',
+    label: t('Show Druid Time Origin'),
+    default: false,
+    description: t('Check to include Time Origin dropdown'),
+  },
+
+  show_datatable: {
+    type: 'CheckboxControl',
+    label: t('Data Table'),
+    default: false,
+    renderTrigger: true,
+    description: t('Whether to display the interactive data table'),
+  },
+
+  include_search: {
+    type: 'CheckboxControl',
+    label: t('Search Box'),
+    renderTrigger: true,
+    default: false,
+    description: t('Whether to include a client side search box'),
+  },
+
+  table_filter: {
+    type: 'CheckboxControl',
+    label: t('Emit Filter Events'),
+    renderTrigger: true,
+    default: false,
+    description: t('Whether to apply filter when items are clicked'),
+  },
+
+  align_pn: {
+    type: 'CheckboxControl',
+    label: t('Align +/-'),
+    renderTrigger: true,
+    default: false,
+    description: t('Whether to align the background chart for +/- values'),
+  },
+
+  color_pn: {
+    type: 'CheckboxControl',
+    label: t('Color +/-'),
+    renderTrigger: true,
+    default: true,
+    description: t('Whether to color +/- values'),
+  },
+
+  show_bubbles: {
+    type: 'CheckboxControl',
+    label: t('Show Bubbles'),
+    default: false,
+    renderTrigger: true,
+    description: t('Whether to display bubbles on top of countries'),
+  },
+
+  show_legend: {
+    type: 'CheckboxControl',
+    label: t('Legend'),
+    renderTrigger: true,
+    default: true,
+    description: t('Whether to display the legend (toggles)'),
+  },
+
+  send_time_range: {
+    type: 'CheckboxControl',
+    label: t('Propagate'),
+    renderTrigger: true,
+    default: false,
+    description: t('Send range filter events to other charts'),
+  },
+
+  toggle_polygons: {
+    type: 'CheckboxControl',
+    label: t('Multiple filtering'),
+    renderTrigger: true,
+    default: true,
+    description: t('Allow sending multiple polygons as a filter event'),
+  },
+
+  num_buckets: {
+    type: 'SelectControl',
+    multi: false,
+    freeForm: true,
+    label: t('Number of buckets to group data'),
+    default: 5,
+    choices: formatSelectOptions([2, 3, 5, 10]),
+    description: t('How many buckets should the data be grouped in.'),
+    renderTrigger: true,
+  },
+
+  break_points: {
+    type: 'SelectControl',
+    multi: true,
+    freeForm: true,
+    label: t('Bucket break points'),
+    choices: formatSelectOptions([]),
+    description: t('List of n+1 values for bucketing metric into n buckets.'),
+    renderTrigger: true,
+  },
+
+  show_labels: {
+    type: 'CheckboxControl',
+    label: t('Show Labels'),
+    renderTrigger: true,
+    default: true,
+    description: t(
+      'Whether to display the labels. Note that the label only displays when the the 5% ' +
+      'threshold.'),
+  },
+
+  show_values: {
+    type: 'CheckboxControl',
+    label: t('Show Values'),
+    renderTrigger: true,
+    default: false,
+    description: t('Whether to display the numerical values within the cells'),
+  },
+
+  show_metric_name: {
+    type: 'CheckboxControl',
+    label: t('Show Metric Names'),
+    renderTrigger: true,
+    default: true,
+    description: t('Whether to display the metric name as a title'),
+  },
+
+  show_trend_line: {
+    type: 'CheckboxControl',
+    label: t('Show Trend Line'),
+    renderTrigger: true,
+    default: true,
+    description: t('Whether to display the trend line'),
+  },
+
+  start_y_axis_at_zero: {
+    type: 'CheckboxControl',
+    label: t('Start y-axis at 0'),
+    renderTrigger: true,
+    default: true,
+    description: t('Start y-axis at zero. Uncheck to start y-axis at minimum value in the data.'),
+  },
+
+  x_axis_showminmax: {
+    type: 'CheckboxControl',
+    label: t('X bounds'),
+    renderTrigger: true,
+    default: false,
+    description: t('Whether to display the min and max values of the X-axis'),
+  },
+
+  y_axis_showminmax: {
+    type: 'CheckboxControl',
+    label: t('Y bounds'),
+    renderTrigger: true,
+    default: false,
+    description: t('Whether to display the min and max values of the Y-axis'),
+  },
+
+  rich_tooltip: {
+    type: 'CheckboxControl',
+    label: t('Rich Tooltip'),
+    renderTrigger: true,
+    default: true,
+    description: t('The rich tooltip shows a list of all series for that ' +
+    'point in time'),
+  },
+
+  y_log_scale: {
+    type: 'CheckboxControl',
+    label: t('Y Log Scale'),
+    default: false,
+    renderTrigger: true,
+    description: t('Use a log scale for the Y-axis'),
+  },
+
+  x_log_scale: {
+    type: 'CheckboxControl',
+    label: t('X Log Scale'),
+    default: false,
+    renderTrigger: true,
+    description: t('Use a log scale for the X-axis'),
+  },
+
+  log_scale: {
+    type: 'CheckboxControl',
+    label: t('Log Scale'),
+    default: false,
+    renderTrigger: true,
+    description: t('Use a log scale'),
+  },
+
+  donut: {
+    type: 'CheckboxControl',
+    label: t('Donut'),
+    default: false,
+    renderTrigger: true,
+    description: t('Do you want a donut or a pie?'),
+  },
+
+  labels_outside: {
+    type: 'CheckboxControl',
+    label: t('Put labels outside'),
+    default: true,
+    renderTrigger: true,
+    description: t('Put the labels outside the pie?'),
+  },
+
+  contribution: {
+    type: 'CheckboxControl',
+    label: t('Contribution'),
+    default: false,
+    description: t('Compute the contribution to the total'),
+  },
+
+  time_compare: {
+    type: 'SelectControl',
+    multi: true,
+    freeForm: true,
+    label: t('Time Shift'),
+    choices: formatSelectOptions([
+      '1 day',
+      '1 week',
+      '28 days',
+      '30 days',
+      '52 weeks',
+      '1 year',
+    ]),
+    description: t('Overlay one or more timeseries from a ' +
+    'relative time period. Expects relative time deltas ' +
+    'in natural language (example:  24 hours, 7 days, ' +
+    '56 weeks, 365 days)'),
+  },
+
+  comparison_type: {
+    type: 'SelectControl',
+    label: t('Calculation type'),
+    default: 'values',
+    choices: [
+      ['values', 'Actual Values'],
+      ['absolute', 'Absolute difference'],
+      ['percentage', 'Percentage change'],
+      ['ratio', 'Ratio'],
+    ],
+    description: t('How to display time shifts: as individual lines; as the ' +
+    'absolute difference between the main time series and each time shift; ' +
+    'as the percentage change; or as the ratio between series and time shifts.'),
+  },
+
+  subheader: {
+    type: 'TextControl',
+    label: t('Subheader'),
+    description: t('Description text that shows up below your Big Number'),
+  },
+
+  mapbox_label: {
+    type: 'SelectControl',
+    multi: true,
+    label: t('label'),
+    default: [],
+    description: t('`count` is COUNT(*) if a group by is used. ' +
+    'Numerical columns will be aggregated with the aggregator. ' +
+    'Non-numerical columns will be used to label points. ' +
+    'Leave empty to get a count of points in each cluster.'),
+    mapStateToProps: state => ({
+      choices: (state.datasource) ? state.datasource.all_cols : [],
+    }),
+  },
 
     resample_rule: {
         type: 'SelectControl',
@@ -951,12 +1324,264 @@ export const controls = {
         description: t('Pandas resample fill method'),
     },
 
-    time_range: {
-        type: 'DateFilterControl',
-        freeForm: true,
-        label: t('Time range'),
-        default: t('Last week'),
-    },
+
+  point_unit: {
+    type: 'SelectControl',
+    label: t('Point Unit'),
+    default: 'square_m',
+    clearable: false,
+    choices: [
+      ['square_m', 'Square meters'],
+      ['square_km', 'Square kilometers'],
+      ['square_miles', 'Square miles'],
+      ['radius_m', 'Radius in meters'],
+      ['radius_km', 'Radius in kilometers'],
+      ['radius_miles', 'Radius in miles'],
+    ],
+    description: t('The unit of measure for the specified point radius'),
+  },
+
+  global_opacity: {
+    type: 'TextControl',
+    label: t('Opacity'),
+    default: 1,
+    isFloat: true,
+    description: t('Opacity of all clusters, points, and labels. ' +
+    'Between 0 and 1.'),
+  },
+
+  opacity: {
+    type: 'SliderControl',
+    label: t('Opacity'),
+    default: 80,
+    step: 1,
+    min: 0,
+    max: 100,
+    renderTrigger: true,
+    description: t('Opacity, expects values between 0 and 100'),
+  },
+
+  viewport: {
+    type: 'ViewportControl',
+    label: t('Viewport'),
+    renderTrigger: false,
+    description: t('Parameters related to the view and perspective on the map'),
+    // default is whole world mostly centered
+    default: defaultViewport,
+    // Viewport changes shouldn't prompt user to re-run query
+    dontRefreshOnChange: true,
+  },
+
+  viewport_zoom: {
+    type: 'TextControl',
+    label: t('Zoom'),
+    renderTrigger: true,
+    isFloat: true,
+    default: 11,
+    description: t('Zoom level of the map'),
+    places: 8,
+    // Viewport zoom shouldn't prompt user to re-run query
+    dontRefreshOnChange: true,
+  },
+
+  viewport_latitude: {
+    type: 'TextControl',
+    label: t('Default latitude'),
+    renderTrigger: true,
+    default: 37.772123,
+    isFloat: true,
+    description: t('Latitude of default viewport'),
+    places: 8,
+    // Viewport latitude changes shouldn't prompt user to re-run query
+    dontRefreshOnChange: true,
+  },
+
+  viewport_longitude: {
+    type: 'TextControl',
+    label: t('Default longitude'),
+    renderTrigger: true,
+    default: -122.405293,
+    isFloat: true,
+    description: t('Longitude of default viewport'),
+    places: 8,
+    // Viewport longitude changes shouldn't prompt user to re-run query
+    dontRefreshOnChange: true,
+  },
+
+  render_while_dragging: {
+    type: 'CheckboxControl',
+    label: t('Live render'),
+    default: true,
+    description: t('Points and clusters will update as viewport is being changed'),
+  },
+
+  mapbox_color: {
+    type: 'SelectControl',
+    freeForm: true,
+    label: t('RGB Color'),
+    default: 'rgb(0, 122, 135)',
+    choices: [
+      ['rgb(0, 139, 139)', 'Dark Cyan'],
+      ['rgb(128, 0, 128)', 'Purple'],
+      ['rgb(255, 215, 0)', 'Gold'],
+      ['rgb(69, 69, 69)', 'Dim Gray'],
+      ['rgb(220, 20, 60)', 'Crimson'],
+      ['rgb(34, 139, 34)', 'Forest Green'],
+    ],
+    description: t('The color for points and clusters in RGB'),
+  },
+
+  color: {
+    type: 'ColorPickerControl',
+    label: t('Color'),
+    default: PRIMARY_COLOR,
+    description: t('Pick a color'),
+  },
+
+  ranges: {
+    type: 'TextControl',
+    label: t('Ranges'),
+    default: '',
+    description: t('Ranges to highlight with shading'),
+  },
+
+  range_labels: {
+    type: 'TextControl',
+    label: t('Range labels'),
+    default: '',
+    description: t('Labels for the ranges'),
+  },
+
+  markers: {
+    type: 'TextControl',
+    label: t('Markers'),
+    default: '',
+    description: t('List of values to mark with triangles'),
+  },
+
+  marker_labels: {
+    type: 'TextControl',
+    label: t('Marker labels'),
+    default: '',
+    description: t('Labels for the markers'),
+  },
+
+  marker_lines: {
+    type: 'TextControl',
+    label: t('Marker lines'),
+    default: '',
+    description: t('List of values to mark with lines'),
+  },
+
+  marker_line_labels: {
+    type: 'TextControl',
+    label: t('Marker line labels'),
+    default: '',
+    description: t('Labels for the marker lines'),
+  },
+
+  annotation_layers: {
+    type: 'AnnotationLayerControl',
+    label: '',
+    default: [],
+    description: 'Annotation Layers',
+    renderTrigger: true,
+    tabOverride: 'data',
+  },
+
+  adhoc_filters: {
+    type: 'AdhocFilterControl',
+    label: t('Filters'),
+    default: null,
+    description: '',
+    mapStateToProps: state => ({
+      columns: state.datasource ? state.datasource.columns : [],
+      savedMetrics: state.datasource ? state.datasource.metrics : [],
+      datasource: state.datasource,
+    }),
+    provideFormDataToProps: true,
+  },
+
+  filters: {
+    type: 'FilterPanel',
+  },
+
+  slice_id: {
+    type: 'HiddenControl',
+    label: t('Chart ID'),
+    hidden: true,
+    description: t('The id of the active chart'),
+  },
+
+  cache_timeout: {
+    type: 'HiddenControl',
+    label: t('Cache Timeout (seconds)'),
+    hidden: true,
+    description: t('The number of seconds before expiring the cache'),
+  },
+
+  url_params: {
+    type: 'HiddenControl',
+    label: t('URL Parameters'),
+    hidden: true,
+    description: t('Extra parameters for use in jinja templated queries'),
+  },
+
+  order_by_entity: {
+    type: 'CheckboxControl',
+    label: t('Order by entity id'),
+    description: t('Important! Select this if the table is not already sorted by entity id, ' +
+    'else there is no guarantee that all events for each entity are returned.'),
+    default: true,
+  },
+
+  min_leaf_node_event_count: {
+    type: 'SelectControl',
+    freeForm: false,
+    label: t('Minimum leaf node event count'),
+    default: 1,
+    choices: formatSelectOptionsForRange(1, 10),
+    description: t('Leaf nodes that represent fewer than this number of events will be initially ' +
+    'hidden in the visualization'),
+  },
+
+  color_scheme: {
+    type: 'ColorSchemeControl',
+    label: t('Color Scheme'),
+    default: 'bnbColors',
+    renderTrigger: true,
+    choices: () => categoricalSchemeRegistry.keys().map(s => ([s, s])),
+    description: t('The color scheme for rendering chart'),
+    schemes: () => categoricalSchemeRegistry.getMap(),
+  },
+
+  significance_level: {
+    type: 'TextControl',
+    label: t('Significance Level'),
+    default: 0.05,
+    description: t('Threshold alpha level for determining significance'),
+  },
+
+  pvalue_precision: {
+    type: 'TextControl',
+    label: t('p-value precision'),
+    default: 6,
+    description: t('Number of decimal places with which to display p-values'),
+  },
+
+  liftvalue_precision: {
+    type: 'TextControl',
+    label: t('Lift percent precision'),
+    default: 4,
+    description: t('Number of decimal places with which to display lift values'),
+  },
+
+  column_collection: {
+    type: 'CollectionControl',
+    label: t('Time Series Columns'),
+    validators: [v.nonEmpty],
+    controlName: 'TimeSeriesColumnControl',
+  },
 
     max_bubble_size: {
         type: 'SelectControl',

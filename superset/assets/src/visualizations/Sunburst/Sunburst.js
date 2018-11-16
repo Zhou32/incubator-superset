@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import d3 from 'd3';
 import PropTypes from 'prop-types';
-import { getScale } from '../../modules/CategoricalColorNamespace';
+import { getScale } from '../../modules/colors/CategoricalColorNamespace';
 import { wrapSvgText } from '../../modules/utils';
 import './Sunburst.css';
 
@@ -79,8 +79,8 @@ function Sunburst(element, props) {
     .innerRadius(d => Math.sqrt(d.y))
     .outerRadius(d => Math.sqrt(d.y + d.dy));
 
-  const formatNum = d3.format('.1s');
-  const formatPerc = d3.format('.1p');
+  const formatNum = d3.format('.3s');
+  const formatPerc = d3.format('.3p');
 
   container.select('svg').remove();
 

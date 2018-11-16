@@ -19,6 +19,7 @@ import ViewportControl from './ViewportControl';
 import VizTypeControl from './VizTypeControl';
 import MetricsControl from './MetricsControl';
 import AdhocFilterControl from './AdhocFilterControl';
+import FilterPanel from './FilterPanel';
 import AddressSearchControl from './AddressSearchControl';
 
 const controlMap = {
@@ -43,6 +44,7 @@ const controlMap = {
     VizTypeControl,
     MetricsControl,
     AdhocFilterControl,
-    AddressSearchControl
+    AddressSearchControl,
+    FilterPanel
 };
 export default controlMap;

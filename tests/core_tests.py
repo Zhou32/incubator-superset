@@ -1,10 +1,4 @@
-# -*- coding: utf-8 -*-
 """Unit tests for Superset"""
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
 import csv
 import datetime
 import doctest
@@ -20,22 +14,20 @@ import unittest
 import mock
 import pandas as pd
 import psycopg2
-from six import text_type
 import sqlalchemy as sqla
 
-from superset import dataframe, db, jinja_context, security_manager, sql_lab, utils
+from superset import dataframe, db, jinja_context, security_manager, sql_lab
 from superset.connectors.sqla.models import SqlaTable
 from superset.db_engine_specs import BaseEngineSpec
 from superset.models import core as models
 from superset.models.sql_lab import Query
-from superset.utils import get_main_database
+from superset.utils import core as utils
+from superset.utils.core import get_main_database
 from superset.views.core import DatabaseView
 from .base_tests import SupersetTestCase
 
 
 class CoreTests(SupersetTestCase):
-
-    requires_examples = True
 
     def __init__(self, *args, **kwargs):
         super(CoreTests, self).__init__(*args, **kwargs)
@@ -93,6 +85,29 @@ class CoreTests(SupersetTestCase):
 
         qobj['groupby'] = []
         self.assertNotEqual(cache_key, viz.cache_key(qobj))
+
+    def test_api_v1_query_endpoint(self):
+        self.login(username='admin')
+        slc = self.get_slice('Name Cloud', db.session)
+        form_data = slc.form_data
+        data = json.dumps({
+            'datasource': {
+                'id': slc.datasource_id,
+                'type': slc.datasource_type,
+            },
+            'queries': [{
+                'granularity': 'ds',
+                'groupby': ['name'],
+                'metrics': ['sum__num'],
+                'filters': [],
+                'time_range': '{} : {}'.format(form_data.get('since'),
+                                               form_data.get('until')),
+                'limit': 100,
+            }],
+        })
+        # TODO: update once get_data is implemented for QueryObject
+        with self.assertRaises(Exception):
+            self.get_resp('/api/v1/query/', {'query_context': data})
 
     def test_old_slice_json_endpoint(self):
         self.login(username='admin')
@@ -378,7 +393,7 @@ class CoreTests(SupersetTestCase):
 
         data = self.get_json_resp(
             '/superset/warm_up_cache?table_name=energy_usage&db_name=main')
-        assert len(data) == 4
+        assert len(data) > 0
 
     def test_shortner(self):
         self.login(username='admin')
@@ -655,7 +670,7 @@ class CoreTests(SupersetTestCase):
         clean_query = "SELECT '/* val 1 */' as c1, '-- val 2' as c2 FROM tbl"
         commented_query = '/* comment 1 */' + clean_query + '-- comment 2'
         table = SqlaTable(sql=commented_query)
-        rendered_query = text_type(table.get_from_clause())
+        rendered_query = str(table.get_from_clause())
         self.assertEqual(clean_query, rendered_query)
 
     def test_slice_payload_no_data(self):
@@ -723,9 +738,14 @@ class CoreTests(SupersetTestCase):
             id=db_id,
             extra=extra)
         data = self.get_json_resp(
-            url='/superset/schema_access_for_csv_upload?db_id={db_id}'
+            url='/superset/schemas_access_for_csv_upload?db_id={db_id}'
                 .format(db_id=dbobj.id))
         assert data == ['this_schema_is_allowed_too']
+
+    def test_select_star(self):
+        self.login(username='admin')
+        resp = self.get_resp('/superset/select_star/1/birth_names')
+        self.assertIn('gender', resp)
 
 
 if __name__ == '__main__':
