@@ -1,6 +1,4 @@
 import {t} from "@superset-ui/translation";
-import {nonEmpty} from "../validators";
-import timeGrainSqlaAnimationOverrides from "./timeGrainSqlaAnimationOverrides";
 
 export default {
     controlPanelSections: [
@@ -22,4 +20,9 @@ export default {
             ],
         },
     ],
+    controlOverrides: {
+    metrics: {
+      validators: [],
+    },
+  },
 };

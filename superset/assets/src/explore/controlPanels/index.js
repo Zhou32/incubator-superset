@@ -53,7 +53,7 @@ import DeckPath from './DeckPath';
 import DeckPolygon from './DeckPolygon';
 import DeckScatter from './DeckScatter';
 import DeckScreengrid from './DeckScreengrid';
-import SolarBI from './SolarBI'
+import SolarBI from './SolarBI';
 
 export const controlPanelConfigs = {
   area: Area,
@@ -104,7 +104,7 @@ export const controlPanelConfigs = {
   deck_polygon: DeckPolygon,
   deck_scatter: DeckScatter,
   deck_screengrid: DeckScreengrid,
-  solarBI:SolarBI
+  solarBI: SolarBI
 };
 
 export default controlPanelConfigs;
