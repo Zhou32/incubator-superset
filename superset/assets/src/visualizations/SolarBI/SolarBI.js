@@ -16,7 +16,6 @@ class SolarBI extends React.Component {
 
     constructor(props) {
         super(props);
-        console.log(props);
         const results = props.data;
         this.state = {
             center: {lat:results.lat,lng:results.lng},
@@ -31,7 +30,6 @@ class SolarBI extends React.Component {
 
     placeChanged(place) {
         if (place) {
-            console.log(place);
             this.setState({
                 center: place.geometry.location,
                 zoom: 16

@@ -1,8 +1,6 @@
-/* eslint global-require: 0 */
-import $ from 'jquery';
-import { t } from '../locales';
-
-const d3 = require('d3');
+import d3 from 'd3';
+import { SupersetClient } from '@superset-ui/connection';
+import getClientErrorObject from './getClientErrorObject';
 
 export const EARTH_CIRCUMFERENCE_KM = 40075.16;
 export const LUMINANCE_RED_WEIGHT = 0.2126;
@@ -17,17 +15,13 @@ export function kmToPixels(kilometers, latitude, zoomLevel) {
   // Algorithm from: http://wiki.openstreetmap.org/wiki/Zoom_levels
   const latitudeRad = latitude * (Math.PI / 180);
   // Seems like the zoomLevel is off by one
-  const kmPerPixel = EARTH_CIRCUMFERENCE_KM * Math.cos(latitudeRad) / Math.pow(2, zoomLevel + 9);
+  const kmPerPixel = (EARTH_CIRCUMFERENCE_KM * Math.cos(latitudeRad)) / Math.pow(2, zoomLevel + 9);
   return d3.round(kilometers / kmPerPixel, 2);
-}
-
-export function isNumeric(num) {
-  return !isNaN(parseFloat(num)) && isFinite(num);
 }
 
 export function rgbLuminance(r, g, b) {
   // Formula: https://en.wikipedia.org/wiki/Relative_luminance
-  return (LUMINANCE_RED_WEIGHT * r) + (LUMINANCE_GREEN_WEIGHT * g) + (LUMINANCE_BLUE_WEIGHT * b);
+  return LUMINANCE_RED_WEIGHT * r + LUMINANCE_GREEN_WEIGHT * g + LUMINANCE_BLUE_WEIGHT * b;
 }
 
 export function getParamFromQuery(query, param) {
@@ -41,19 +35,14 @@ export function getParamFromQuery(query, param) {
   return null;
 }
 
-export function storeQuery(query, callback) {
-  $.ajax({
-    type: 'POST',
-    url: '/kv/store/',
-    async: false,
-    data: {
-      data: JSON.stringify(query),
-    },
-    success: (data) => {
-      const baseUrl = window.location.origin + window.location.pathname;
-      const url = `${baseUrl}?id=${JSON.parse(data).id}`;
-      callback(url);
-    },
+export function storeQuery(query) {
+  return SupersetClient.post({
+    endpoint: '/kv/store/',
+    postPayload: { data: query },
+  }).then((response) => {
+    const baseUrl = window.location.origin + window.location.pathname;
+    const url = `${baseUrl}?id=${response.json.id}`;
+    return url;
   });
 }
 
@@ -69,22 +58,17 @@ export function getParamsFromUrl() {
   return newParams;
 }
 
-export function getShortUrl(longUrl, callback, onError) {
-  $.ajax({
-    type: 'POST',
-    url: '/r/shortner/',
-    async: false,
-    data: {
-      data: '/' + longUrl,
-    },
-    success: callback,
-    error: () => {
-      if (onError) {
-        onError('Error getting the short URL');
-      }
-      callback(longUrl);
-    },
-  });
+export function getShortUrl(longUrl) {
+  return SupersetClient.post({
+    endpoint: '/r/shortner/',
+    postPayload: { data: `/${longUrl}` }, // note: url should contain 2x '/' to redirect properly
+    parseMethod: 'text',
+    stringify: false, // the url saves with an extra set of string quotes without this
+  })
+    .then(({ text }) => text)
+    .catch(response =>
+      getClientErrorObject(response)
+        .then(({ error, statusText }) => Promise.reject(error || statusText)));
 }
 
 export function supersetURL(rootUrl, getParams = {}) {
@@ -130,8 +114,3 @@ export function optionFromValue(opt) {
   // From a list of options, handles special values & labels
   return { value: optionValue(opt), label: optionLabel(opt) };
 }
-
-// Error messages used in many places across applications
-export const COMMON_ERR_MESSAGES = {
-  SESSION_TIMED_OUT: t('Your session timed out, please refresh your page and try again.'),
-};

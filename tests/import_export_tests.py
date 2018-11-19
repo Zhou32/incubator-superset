@@ -1,31 +1,21 @@
-# -*- coding: utf-8 -*-
 """Unit tests for Superset"""
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
 import json
 import unittest
 
 from sqlalchemy.orm.session import make_transient
 
-from superset import dashboard_import_export_util, db, utils
+from superset import db
 from superset.connectors.druid.models import (
     DruidColumn, DruidDatasource, DruidMetric,
 )
 from superset.connectors.sqla.models import SqlaTable, SqlMetric, TableColumn
 from superset.models import core as models
+from superset.utils import core as utils
 from .base_tests import SupersetTestCase
 
 
 class ImportExportTests(SupersetTestCase):
     """Testing export import functionality for dashboards"""
-
-    requires_examples = True
-
-    def __init__(self, *args, **kwargs):
-        super(ImportExportTests, self).__init__(*args, **kwargs)
 
     @classmethod
     def delete_imports(cls):
@@ -48,6 +38,7 @@ class ImportExportTests(SupersetTestCase):
     @classmethod
     def setUpClass(cls):
         cls.delete_imports()
+        cls.create_druid_test_objects()
 
     @classmethod
     def tearDownClass(cls):
@@ -148,9 +139,6 @@ class ImportExportTests(SupersetTestCase):
     def get_table_by_name(self, name):
         return db.session.query(SqlaTable).filter_by(
             table_name=name).first()
-
-    def get_num_dashboards(self):
-        return db.session.query(models.Dashboard).count()
 
     def assert_dash_equals(self, expected_dash, actual_dash,
                            check_position=True):
@@ -549,34 +537,6 @@ class ImportExportTests(SupersetTestCase):
         self.assertEquals(imported_id, imported_id_copy)
         self.assert_datasource_equals(
             copy_datasource, self.get_datasource(imported_id))
-
-    def test_export_dashboards_util(self):
-        dashboards_json_dump = dashboard_import_export_util.export_dashboards(
-            db.session)
-        dashboards_objects = json.loads(
-            dashboards_json_dump,
-            object_hook=utils.decode_dashboards,
-        )
-
-        exported_dashboards = dashboards_objects['dashboards']
-        for dashboard in exported_dashboards:
-            id_ = dashboard.id
-            dash = self.get_dash(id_)
-            self.assert_dash_equals(dash, dashboard)
-            self.assertEquals(
-                dash.id, json.loads(
-                    dashboard.json_metadata,
-                    object_hook=utils.decode_dashboards,
-                )['remote_id'],
-            )
-        numDasboards = self.get_num_dashboards()
-        self.assertEquals(numDasboards, len(exported_dashboards))
-
-        exported_tables = dashboards_objects['datasources']
-        for exported_table in exported_tables:
-            id_ = exported_table.id
-            table = self.get_table(id_)
-            self.assert_table_equals(table, exported_table)
 
 
 if __name__ == '__main__':

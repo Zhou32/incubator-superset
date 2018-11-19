@@ -5,12 +5,11 @@ superset/bin/superset db upgrade
 superset/bin/superset load_test_users
 superset/bin/superset load_examples
 superset/bin/superset init
-superset/bin/superset runserver &
+flask run -p 8081 --with-threads --reload --debugger &
 
 cd "$(dirname "$0")"
 
-npm install -g yarn
-yarn
+yarn install --frozen-lockfile
 npm run build
-npm run cypress run --record
+npm run cypress run
 kill %1
