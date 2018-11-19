@@ -2128,6 +2128,17 @@ export const controls = {
     t('Maxium radius size of the circle, in pixels. As the zoom level changes, this ' +
       'insures that the circle respects this maximum radius.'),
   },
+  radius: {
+      type: 'TextControl',
+      label: t('Radius'),
+      isFloat: true,
+      validators: [v.nonEmpty],
+      renderTrigger: true,
+      default: 2,
+      description:
+          t('Radius size of the circle, in pixels. As the zoom level changes, this ' +
+              'insures that the circle respects this radius.'),
+  },
 
   partition_threshold: {
     type: 'TextControl',
