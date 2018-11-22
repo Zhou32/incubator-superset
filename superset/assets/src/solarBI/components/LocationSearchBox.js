@@ -1,5 +1,6 @@
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
+import classNames from 'classnames';
 
 export default class LocationSearchBox extends React.Component {
     componentDidMount() {
@@ -22,7 +23,6 @@ export default class LocationSearchBox extends React.Component {
         const input = this.locationSearch;
         if (input) {
 
-            input.setAttribute('placeholder', '');
 
             if (!input._autocomplete) {
                 input._autocomplete = new places.Autocomplete(input, options);
@@ -37,8 +37,17 @@ export default class LocationSearchBox extends React.Component {
 
     render() {
         return (
-            <TextField ref={ref => (this.locationSearch = ref ? ref.input : "")} placeholder="Search nearby"
-                       style={{width: '100%'}}/>
+            <div>
+                <TextField
+                    id="outlined-adornment-weight"
+                    variant="outlined"
+                    label="Search address"
+                    inputRef={ref => (this.locationSearch = ref)}
+                    style={{width: '100%', fontSize: '100px'}}
+                />
+                {/*<TextField inputRef={ref => (this.locationSearch = ref)} placeholder="Search nearby"*/}
+                           {/*style={{width: '100%', 'font-size': 'large'}}/>*/}
+            </div>
         );
     }
 }

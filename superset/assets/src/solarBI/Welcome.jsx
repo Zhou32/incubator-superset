@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Panel, Row, Col, Tabs, Tab, FormControl} from 'react-bootstrap';
 import LocationSearchBox from './components/LocationSearchBox';
+import MapView from "./components/MapView";
 
 const propTypes = {
     user: PropTypes.object.isRequired,
@@ -21,7 +21,11 @@ export default class Welcome extends React.PureComponent {
     }
 
     render() {
-        return <LocationSearchBox onSearchChange={(place) => this.onSearchChange(place)}/>
+        return (
+            <div>
+                <MapView/>
+            </div>
+        )
 
     }
 }

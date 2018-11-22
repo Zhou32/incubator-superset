@@ -2699,7 +2699,7 @@ class SolarBI(BaseViz):
         d = super(SolarBI, self).query_obj()
         fd = self.form_data
 
-        metric_1 = {'expressionType': 'SQL', 'sqlExpression': 'sum(radiation)', 'label': 'radiation'}
+        metric_1 = {'expressionType': 'SQL', 'sqlExpression': 'avg(radiation)', 'label': 'radiation'}
         # metric_2 = {'expressionType': 'SQL', 'sqlExpression': 'date', 'label': 'date'}
         # metric_3 = {'expressionType': 'SQL', 'sqlExpression': 'month', 'label': 'month'}
         # metric_4 = {'expressionType': 'SQL', 'sqlExpression': 'day', 'label': 'day'}
