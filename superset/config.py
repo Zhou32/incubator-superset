@@ -279,7 +279,7 @@ MAPBOX_API_KEY = os.environ.get('pk.eyJ1IjoiZHJ1bmtlbjIwMDIiLCJhIjoiY2ptdTh5eHpq
 # Maximum number of rows returned from a database
 # in async mode, no more than SQL_MAX_ROW will be returned and stored
 # in the results backend. This also becomes the limit when exporting CSVs
-SQL_MAX_ROW = 100000
+SQL_MAX_ROW = 10000000
 
 # Default row limit for SQL Lab queries
 DEFAULT_SQLLAB_LIMIT = 1000
@@ -295,19 +295,25 @@ WARNING_MSG = None
 # Default celery config is to use SQLA as a broker, in a production setting
 # you'll want to use a proper broker as specified here:
 # http://docs.celeryproject.org/en/latest/getting-started/brokers/index.html
-"""
+
 # Example:
 class CeleryConfig(object):
-  BROKER_URL = 'sqla+sqlite:///celerydb.sqlite'
-  CELERY_IMPORTS = ('superset.sql_lab', )
-  CELERY_RESULT_BACKEND = 'db+sqlite:///celery_results.sqlite'
-  CELERY_ANNOTATIONS = {'tasks.add': {'rate_limit': '10/s'}}
-  CELERYD_LOG_LEVEL = 'DEBUG'
-  CELERYD_PREFETCH_MULTIPLIER = 1
-  CELERY_ACKS_LATE = True
+    BROKER_URL = 'redis://localhost:6379/0'
+    CELERY_IMPORTS = ('superset.sql_lab', )
+    CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+    CELERY_ANNOTATIONS = {'tasks.add': {'rate_limit': '10/s'}}
 CELERY_CONFIG = CeleryConfig
-"""
-CELERY_CONFIG = None
+
+from s3cache.s3cache import S3Cache
+S3_CACHE_BUCKET = 'foobar-superset'
+S3_CACHE_KEY_PREFIX = 'sql_lab_result'
+RESULTS_BACKEND = S3Cache(S3_CACHE_BUCKET, S3_CACHE_KEY_PREFIX)
+
+# On Redis
+from werkzeug.contrib.cache import RedisCache
+RESULTS_BACKEND = RedisCache(
+    host='localhost', port=6379, key_prefix='superset_results')
+# CELERY_CONFIG = None
 
 # static http headers to be served by your Superset server.
 # This header prevents iFrames from other domains and
@@ -351,7 +357,9 @@ UPLOADED_CSV_HIVE_NAMESPACE = None
 # SQL Lab. The existing context gets updated with this dictionary,
 # meaning values for existing keys get overwritten by the content of this
 # dictionary.
-JINJA_CONTEXT_ADDONS = {}
+JINJA_CONTEXT_ADDONS = {
+    'my_crazy_macro': lambda x: x*2,
+}
 
 # Roles that are controlled by the API / Superset and should not be changes
 # by humans.
