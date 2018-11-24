@@ -304,11 +304,6 @@ class CeleryConfig(object):
     CELERY_ANNOTATIONS = {'tasks.add': {'rate_limit': '10/s'}}
 CELERY_CONFIG = CeleryConfig
 
-from s3cache.s3cache import S3Cache
-S3_CACHE_BUCKET = 'foobar-superset'
-S3_CACHE_KEY_PREFIX = 'sql_lab_result'
-RESULTS_BACKEND = S3Cache(S3_CACHE_BUCKET, S3_CACHE_KEY_PREFIX)
-
 # On Redis
 from werkzeug.contrib.cache import RedisCache
 RESULTS_BACKEND = RedisCache(
