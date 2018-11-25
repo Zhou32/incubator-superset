@@ -187,7 +187,11 @@ IMG_UPLOAD_URL = '/static/uploads/'
 # IMG_SIZE = (300, 200, True)
 
 CACHE_DEFAULT_TIMEOUT = 60 * 60 * 24
-CACHE_CONFIG = {'CACHE_TYPE': 'null'}
+CACHE_CONFIG = {'CACHE_TYPE': 'redis',
+    'CACHE_REDIS_HOST': 'redis://localhost',
+    'CACHE_REDIS_PORT': 6379,
+    'CACHE_REDIS_DB': 0,
+    'CACHE_REDIS_URL': 'redis://localhost:6379/0'}
 TABLE_NAMES_CACHE_CONFIG = {'CACHE_TYPE': 'null'}
 
 # CORS Options
@@ -302,12 +306,9 @@ class CeleryConfig(object):
     CELERY_IMPORTS = ('superset.sql_lab', )
     CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
     CELERY_ANNOTATIONS = {'tasks.add': {'rate_limit': '10/s'}}
+    CELERYD_LOG_LEVEL = 'DEBUG'
+    
 CELERY_CONFIG = CeleryConfig
-
-# On Redis
-from werkzeug.contrib.cache import RedisCache
-RESULTS_BACKEND = RedisCache(
-    host='localhost', port=6379, key_prefix='superset_results')
 # CELERY_CONFIG = None
 
 # static http headers to be served by your Superset server.
@@ -334,7 +335,11 @@ SQLLAB_ASYNC_TIME_LIMIT_SEC = 60 * 60 * 6
 # An instantiated derivative of werkzeug.contrib.cache.BaseCache
 # if enabled, it can be used to store the results of long-running queries
 # in SQL Lab by using the "Run Async" button/feature
-RESULTS_BACKEND = None
+
+# On Redis
+from werkzeug.contrib.cache import RedisCache
+RESULTS_BACKEND = RedisCache(
+    host='localhost', port=6379, key_prefix='superset_results')
 
 # The S3 bucket where you want to store your external hive tables created
 # from CSV files. For example, 'companyname-superset'
