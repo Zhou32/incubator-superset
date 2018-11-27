@@ -2,8 +2,11 @@
 import {SupersetClient} from '@superset-ui/connection';
 
 import {Logger, LOG_ACTIONS_LOAD_CHART} from '../../logger';
+import {getExploreUrlAndPayload, getURIDirectory} from "../../explore/exploreUtils";
+import {saveSliceFailed, saveSliceSuccess} from "../../explore/actions/saveModalActions";
+import URI from "urijs";
 
-export default function fetchSolarData(formData, force = false, timeout = 60, key, callback) {
+export function fetchSolarData(formData, force = false, timeout = 60, key, callback) {
     var url = '/superset/explore_json/';
 
     const logStart = Logger.getTimestamp();
@@ -28,7 +31,7 @@ export default function fetchSolarData(formData, force = false, timeout = 60, ke
                 has_extra_filters: formData.extra_filters && formData.extra_filters.length > 0,
                 viz_type: formData.viz_type,
             });
-            callback({status: 'success',data:json});
+            callback({status: 'success', data: json});
         })
         .catch((response) => {
             const appendErrorLog = (errorDetails) => {
@@ -51,4 +54,36 @@ export default function fetchSolarData(formData, force = false, timeout = 60, ke
             }
             callback({status: 'failed'});
         });
+}
+
+export function saveSlice(formData, requestParams, callback) {
+    var directory = '/superset/solar/';
+    const payload = {
+        ...formData,
+        endpointType: 'base',
+
+
+        requestParams,
+    };
+
+    let uri = new URI([location.protocol, '//', location.host].join(''));
+
+
+    // Building the querystring (search) part of the URI
+    const search = uri.search(true);
+
+    const paramNames = Object.keys(requestParams);
+    if (paramNames.length) {
+        paramNames.forEach((name) => {
+            if (requestParams.hasOwnProperty(name)) {
+                search[name] = requestParams[name];
+            }
+        });
+    }
+    uri = uri.search(search).directory(directory);
+
+    return SupersetClient.post({url:uri.toString(), postPayload: {form_data: payload}})
+        .then((json) => callback(json))
+        .catch((state) => callback(state));
+
 }

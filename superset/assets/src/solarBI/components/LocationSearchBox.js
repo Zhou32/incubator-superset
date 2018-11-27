@@ -1,8 +1,16 @@
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
-import classNames from 'classnames';
+
+
 
 export default class LocationSearchBox extends React.Component {
+     constructor(props) {
+         super(props);
+         this.state={
+             address:props.address
+         }
+     }
+
     componentDidMount() {
         if (typeof google === 'undefined') {
             console.warn('Google Places was not initialized. LocationSearchBox will not function.');
@@ -34,20 +42,27 @@ export default class LocationSearchBox extends React.Component {
         }
     }
 
-
     render() {
         return (
-            <div>
-                <TextField
-                    id="outlined-adornment-weight"
-                    variant="outlined"
-                    label="Search address"
-                    inputRef={ref => (this.locationSearch = ref)}
-                    style={{width: '100%', fontSize: '100px'}}
-                />
-                {/*<TextField inputRef={ref => (this.locationSearch = ref)} placeholder="Search nearby"*/}
-                           {/*style={{width: '100%', 'font-size': 'large'}}/>*/}
-            </div>
+            <TextField
+                label="Search address"
+                style={{width: '100%'}}
+                variant="outlined"
+                inputRef={ref => (this.locationSearch = ref)}
+                inputProps={{
+                    style: {
+                        fontSize: 18
+                    }
+                }}
+                InputLabelProps={{
+                    style: {
+                        fontSize: 16
+                    }
+                }}
+                disabled={!!this.state.address}
+                defaultValue={this.state.address}
+            />
+
         );
     }
 }

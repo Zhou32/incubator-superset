@@ -7,29 +7,16 @@ import { Provider } from 'react-redux';
 import messageToastReducer from '../messageToasts/reducers';
 import { initEnhancer } from '../reduxUtils';
 import setupApp from '../setup/setupApp';
-import Welcome from './Welcome';
+import MapView from './components/MapView';
 
 setupApp();
 
 const container = document.getElementById('app');
 const bootstrap = JSON.parse(container.getAttribute('data-bootstrap'));
-const user = { ...bootstrap.user };
 
-const store = createStore(
-  combineReducers({
-    messageToasts: messageToastReducer,
-  }),
-  {},
-  compose(
-    applyMiddleware(thunk),
-    initEnhancer(false),
-  ),
-);
 
 const App = () => (
-  <Provider store={store}>
-    <Welcome user={user} />
-  </Provider>
+    <MapView data = {bootstrap} />
 );
 
 export default hot(module)(App);

@@ -7,53 +7,73 @@ import ReactEcharts from 'echarts-for-react';
 import {Grid, Row, Col} from 'react-bootstrap';
 import Button from '@material-ui/core/Button';
 import DisplayQueryButton from '../../explore/components/DisplayQueryButton'
-import fetchSolarData from '../actions/SolarActions'
+import {fetchSolarData} from '../actions/SolarActions'
+import SaveModal from "./SaveModal";
 
 const defaultProps = {
     center: {
-        lat: 1,
-        lng: 1
+        lat: -37.8136276,
+        lng: 144.96305759999996
     },
-    zoom: 11
-};
-const defaultOptions = {
-
-    tooltip: {},
-
-    series: [],
-    animationEasing: 'elasticOut',
-    animationDelayUpdate: function (idx) {
-        return idx * 5;
-    }
+    radius: 3,
+    zoom: 11,
+    options: {}
 };
 
 
 class MapView extends React.Component {
-
     constructor(props) {
         super(props);
-
-        this.state = {
-            center: defaultProps.center,
-            zoom: defaultProps.zoom,
-            options: defaultOptions
-        };
+        console.log(this.props);
         this.placeChanged = this.placeChanged.bind(this);
         this.getOption = this.getOption.bind(this);
         this.requestData = this.requestData.bind(this);
         this.resultHandler = this.resultHandler.bind(this);
-    }
 
+        if (this.props.data.hasOwnProperty('form_data') && this.props.data.form_data.hasOwnProperty('spatial_address')) {
+            var form_data = this.props.data.form_data;
+            this.state = {
+                center: {
+                    lat: form_data['spatial_address']['lat'],
+                    lng: form_data['spatial_address']['lon']
+                },
+                radius: form_data['radius'],
+                data_source: form_data['datasource'],
+                zoom: defaultProps.zoom,
+                address:form_data['spatial_address']['address'],
+                options: defaultProps.options,
+                new_create: false,
+                visibility: 'hidden',
+                toggleModal: false
+            };
+
+            this.requestData();
+        } else {
+            this.state = {
+                center: defaultProps.center,
+                zoom: defaultProps.zoom,
+                options: defaultProps.options,
+                radius: defaultProps.radius,
+                new_create: false,
+                visibility: 'hidden',
+                data_source: this.props.data.form_data['datasource'],
+                toggleModal: false
+            };
+        }
+
+    }
 
     placeChanged(place) {
         if (place) {
             console.log(place);
             this.setState({
+                address: place.formatted_address,
                 center: {
                     lat: place.geometry.location.lat.call(),
                     lng: place.geometry.location.lng.call()
                 },
-                zoom: 14
+                zoom: 14,
+                visibility: 'visible'
             });
         }
     }
@@ -76,6 +96,9 @@ class MapView extends React.Component {
                     feature: {
                         saveAsImage: {
                             pixelRatio: 2
+                        },
+                        dataView:{
+                            show:true
                         }
                     }
                 },
@@ -106,15 +129,16 @@ class MapView extends React.Component {
 
             return option;
         }
-        return null;
+        return {};
     }
 
     requestData() {
         var formData = {
-            'datasource': '13__table',
+            'datasource': this.state.data_source,
             'viz_type': 'solarBI',
-            'radius': 3,
+            'radius': this.state.radius,
             'spatial_address': {
+                'address': this.state.address,
                 'lat': this.state.center.lat,
                 'lon': this.state.center.lng,
                 'latCol': 'longitude',
@@ -138,15 +162,37 @@ class MapView extends React.Component {
             });
         } else {
             this.setState({
-                options: defaultOptions,
+                options: defaultProps.options,
                 style: {marginTop: '2%', display: 'none'}
             });
         }
     };
 
     render() {
+
+
         return (
             <div>
+                <SaveModal
+                    onHide={this.state.toggleModal}
+                    actions={this.props.actions}
+                    form_data={
+                        {
+                            'datasource': this.state.data_source,
+                            'viz_type': 'solarBI',
+                            'radius': this.state.radius,
+                            'spatial_address': {
+                                'address': this.state.address,
+                                'lat': this.state.center.lat,
+                                'lon': this.state.center.lng,
+                                'latCol': 'longitude',
+                                'lonCol': 'latitude',
+                                'type': 'latlong'
+                            },
+                        }
+                    }
+                    userId={''}
+                />
                 <Grid>
                     <Row className="show-grid">
                         <Col md={4}>
@@ -162,8 +208,8 @@ class MapView extends React.Component {
                         <Col md={2}>
                         </Col>
                         <Col md={8}>
-                            <LocationSearchBox onPlaceChanged={(place) => this.placeChanged(place)}
-                                               style={{width: '100%'}}/>
+                            <LocationSearchBox address={this.state.address} onPlaceChanged={(place) => this.placeChanged(place) }
+                            />
                         </Col>
                         <Col md={2}>
 
@@ -177,16 +223,13 @@ class MapView extends React.Component {
                             <Map google={this.props.google}
                                  zoom={this.state.zoom}
 
-                                 initialCenter={{
-                                     lat: 40.854885,
-                                     lng: -88.081807
-                                 }}
+                                 initialCenter={this.state.center}
                                  center={this.state.center}
                             >
                                 <Marker position={this.state.center}
                                         name={'Current location'}/>
                                 <Circle
-                                    radius={1200}
+                                    radius={this.state.radius * 1000}
                                     center={this.state.center}
                                     strokeColor='transparent'
                                     strokeOpacity={0}
@@ -200,7 +243,7 @@ class MapView extends React.Component {
 
                         </Col>
                     </Row>
-                    <Row className="show-grid" style={{marginTop: '2%'}}>
+                    <Row className="show-grid" style={{marginTop: '2%', visibility: this.state.visibility}}>
                         <Col md={9}>
                         </Col>
 
@@ -210,7 +253,9 @@ class MapView extends React.Component {
                             </Button>
                         </Col>
                         <Col md={1}>
-                            <Button variant="contained" size="medium" onClick={this.requestData}>
+                            <Button variant="contained" size="medium" onClick={() => {
+                                this.setState({toggleModal: true})
+                            }}>
                                 save
                             </Button>
                         </Col>

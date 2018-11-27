@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import LocationSearchBox from './components/LocationSearchBox';
 import MapView from "./components/MapView";
 
 const propTypes = {
