@@ -9,7 +9,7 @@ import traceback
 from urllib import parse
 
 from flask import (
-    flash, g, Markup, redirect, render_template, request, Response, url_for,
+    abort, flash, g, Markup, redirect, render_template, request, Response, url_for,
 )
 from flask_appbuilder import expose, SimpleFormView
 from flask_appbuilder.actions import action
@@ -137,10 +137,10 @@ class DatabaseView(SupersetModelView, DeleteMixin, YamlExportMixin):  # noqa
 
     list_columns = [
         'database_name', 'backend', 'allow_run_sync', 'allow_run_async',
-        'allow_dml', 'allow_csv_upload', 'creator', 'modified']
+        'allow_dml', 'allow_csv_upload', 'expose_in_sqllab', 'creator', 'modified']
     order_columns = [
         'database_name', 'allow_run_sync', 'allow_run_async', 'allow_dml',
-        'modified', 'allow_csv_upload',
+        'modified', 'allow_csv_upload', 'expose_in_sqllab',
     ]
     add_columns = [
         'database_name', 'sqlalchemy_uri', 'cache_timeout', 'expose_in_sqllab',
@@ -905,9 +905,8 @@ class Superset(BaseSupersetView):
             for r in session.query(DAR).all():
                 datasource = ConnectorRegistry.get_datasource(
                     r.datasource_type, r.datasource_id, session)
-                user = security_manager.get_user_by_id(r.created_by_fk)
                 if not datasource or \
-                   security_manager.datasource_access(datasource, user):
+                   security_manager.datasource_access(datasource):
                     # datasource does not exist anymore
                     session.delete(r)
             session.commit()
@@ -1028,11 +1027,11 @@ class Superset(BaseSupersetView):
         # Include the slice_form_data if request from explore or slice calls
         # or if form_data only contains slice_id
         if slice_id and (use_slice_data or contains_only_slc_id):
-            slc = db.session.query(models.Slice).filter_by(id=slice_id).first()
-            slice_form_data = slc.form_data.copy()
-
-            slice_form_data.update(form_data)
-            form_data = slice_form_data
+            slc = db.session.query(models.Slice).filter_by(id=slice_id).one_or_none()
+            if slc:
+                slice_form_data = slc.form_data.copy()
+                slice_form_data.update(form_data)
+                form_data = slice_form_data
 
         update_time_range(form_data)
 
@@ -1068,6 +1067,8 @@ class Superset(BaseSupersetView):
     @expose('/slice/<slice_id>/')
     def slice(self, slice_id):
         form_data, slc = self.get_form_data(slice_id, use_slice_data=True)
+        if not slc:
+            abort(404)
         endpoint = '/superset/explore/?form_data={}'.format(
             parse.quote(json.dumps(form_data)),
         )
@@ -1119,7 +1120,7 @@ class Superset(BaseSupersetView):
             form_data=form_data,
             force=force,
         )
-        security_manager.assert_datasource_permission(viz_obj.datasource, g.user)
+        security_manager.assert_datasource_permission(viz_obj.datasource)
 
         if csv:
             return CsvResponse(
@@ -1632,7 +1633,7 @@ class Superset(BaseSupersetView):
         session.merge(dash)
         session.commit()
         session.close()
-        return 'SUCCESS'
+        return json_success(json.dumps({'status': 'SUCCESS'}))
 
     @staticmethod
     def _set_dash_metadata(dashboard, data):
@@ -2099,7 +2100,9 @@ class Superset(BaseSupersetView):
         else:
             qry = qry.filter_by(slug=dashboard_id)
 
-        dash = qry.one()
+        dash = qry.one_or_none()
+        if not dash:
+            abort(404)
         datasources = set()
         for slc in dash.slices:
             datasource = slc.datasource

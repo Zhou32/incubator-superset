@@ -55,7 +55,7 @@ setup(
     install_requires=[
         'bleach>=3.0.2, <4.0.0',
         'boto3>=1.4.7, <2.0.0',
-        'botocore>=1.7.0, <1.8.0',
+        'botocore>=1.12.48, <1.13.0',
         'celery>=4.2.0, <5.0.0',
         'click>=6.0, <7.0.0',  # click >=7 forces "-" instead of "_"
         'colorama',
@@ -93,6 +93,7 @@ setup(
         'thrift-sasl>=0.2.1',
         'unicodecsv',
         'unidecode>=0.04.21',
+        'redis'
     ],
     extras_require={
         'cors': ['flask-cors>=2.0.0'],
