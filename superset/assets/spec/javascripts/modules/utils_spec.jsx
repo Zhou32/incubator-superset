@@ -5,6 +5,7 @@ import {
   d3TimeFormatPreset,
   defaultNumberFormatter,
   mainMetric,
+  roundDecimal,
 } from '../../../src/modules/utils';
 
 describe('utils', () => {
@@ -29,7 +30,7 @@ describe('utils', () => {
       expect(d3format('.3s', 1234)).toBe('1.23k');
       expect(d3format('.3s', 1237)).toBe('1.24k');
       expect(d3format('', 1237)).toBe('1.24k');
-      expect(d3format('.2efd2.ef.2.e', 1237)).toBe('ERROR');
+      expect(d3format('.2efd2.ef.2.e', 1237)).toBe('1237 (Invalid format: .2efd2.ef.2.e)');
     });
   });
 
@@ -48,7 +49,7 @@ describe('utils', () => {
     });
     it('returns a working formatter', () => {
       expect(d3FormatPreset('smart_date')(0)).toBe('1970');
-      expect(d3FormatPreset('%%GIBBERISH')(0)).toBe('ERROR');
+      expect(d3FormatPreset('%%GIBBERISH')(0)).toBe('0 (Invalid format: %%GIBBERISH)');
     });
   });
 
@@ -97,6 +98,13 @@ describe('utils', () => {
         { metric_name: 'not_count' },
       ];
       expect(mainMetric(metrics)).toBe('foo');
+    });
+  });
+  describe('roundDecimal', () => {
+    it('rounding method to limit the number of decimal digits', () => {
+      expect(roundDecimal(1.139, 2)).toBe(1.14);
+      expect(roundDecimal(1.13929, 3)).toBe(1.139);
+      expect(roundDecimal(1.13929)).toBe(1);
     });
   });
 });
