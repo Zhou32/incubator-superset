@@ -187,11 +187,11 @@ IMG_UPLOAD_URL = '/static/uploads/'
 # IMG_SIZE = (300, 200, True)
 
 CACHE_DEFAULT_TIMEOUT = 60 * 60 * 24
-CACHE_CONFIG = {'CACHE_TYPE': 'redis',
-    'CACHE_REDIS_HOST': 'redis://localhost',
-    'CACHE_REDIS_PORT': 6379,
-    'CACHE_REDIS_DB': 0,
-    'CACHE_REDIS_URL': 'redis://localhost:6379/0'}
+# CACHE_CONFIG = {'CACHE_TYPE': 'redis',
+#     'CACHE_REDIS_HOST': 'redis://localhost',
+#     'CACHE_REDIS_PORT': 6379,
+#     'CACHE_REDIS_DB': 0,
+#     'CACHE_REDIS_URL': 'redis://localhost:6379/0'}
 TABLE_NAMES_CACHE_CONFIG = {'CACHE_TYPE': 'null'}
 
 # CORS Options
@@ -309,7 +309,7 @@ class CeleryConfig(object):
     CELERYD_LOG_LEVEL = 'DEBUG'
     CELERYD_PREFETCH_MULTIPLIER = 1
     CELERY_ACKS_LATE = True
-    
+
 CELERY_CONFIG = CeleryConfig
 # CELERY_CONFIG = None
 
