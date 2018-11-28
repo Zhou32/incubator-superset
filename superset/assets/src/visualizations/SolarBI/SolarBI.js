@@ -130,4 +130,5 @@ class SolarBI extends React.Component {
 
 
 export default GoogleApiWrapper({
+    apikey:""
 })(SolarBI)
