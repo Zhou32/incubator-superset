@@ -3,11 +3,11 @@ import { snakeCase } from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Tooltip } from 'react-bootstrap';
+import { ChartProps } from '@superset-ui/chart';
 import { Logger, LOG_ACTIONS_RENDER_CHART } from '../logger';
 import Loading from '../components/Loading';
 import RefreshChartOverlay from '../components/RefreshChartOverlay';
 import StackTraceMessage from '../components/StackTraceMessage';
-import ChartProps from '../visualizations/core/models/ChartProps';
 import SuperChart from '../visualizations/core/components/SuperChart';
 import ErrorBoundary from '../components/ErrorBoundary';
 import './chart.css';
@@ -79,7 +79,7 @@ class Chart extends React.PureComponent {
 
   handleRenderSuccess() {
     const { actions, chartStatus, chartId, vizType } = this.props;
-    if (chartStatus !== 'rendered') {
+    if (['loading', 'rendered'].indexOf(chartStatus) < 0) {
       actions.chartRenderingSucceeded(chartId);
     }
 
@@ -126,8 +126,7 @@ class Chart extends React.PureComponent {
 
   renderTooltip() {
     const { tooltip } = this.state;
-
-    if (tooltip) {
+    if (tooltip && tooltip.content) {
       return (
         <Tooltip
           className="chart-tooltip"
@@ -173,32 +172,31 @@ class Chart extends React.PureComponent {
     this.renderStartTime = Logger.getTimestamp();
 
     return (
-      <div
-        className={`chart-container ${isLoading ? 'is-loading' : ''}`}
-        style={containerStyles}
-      >
-        {this.renderTooltip()}
+      <ErrorBoundary onError={this.handleRenderFailure} showMessage={false}>
+        <div
+          className={`chart-container ${isLoading ? 'is-loading' : ''}`}
+          style={containerStyles}
+        >
+          {this.renderTooltip()}
 
-        {['loading', 'success'].indexOf(chartStatus) >= 0 && <Loading size={50} />}
+          {['loading', 'success'].indexOf(chartStatus) >= 0 && <Loading size={50} />}
 
-        {chartAlert && (
-          <StackTraceMessage
-            message={chartAlert}
-            link={queryResponse ? queryResponse.link : null}
-            stackTrace={chartStackTrace}
-          />
-        )}
+          {chartAlert && (
+            <StackTraceMessage
+              message={chartAlert}
+              link={queryResponse ? queryResponse.link : null}
+              stackTrace={chartStackTrace}
+            />
+          )}
 
-        {!isLoading && !chartAlert && isFaded && (
-          <RefreshChartOverlay
-            width={width}
-            height={height}
-            onQuery={onQuery}
-            onDismiss={onDismissRefreshOverlay}
-          />
-        )}
-
-        <ErrorBoundary onError={this.handleRenderFailure} showMessage={false}>
+          {!isLoading && !chartAlert && isFaded && (
+            <RefreshChartOverlay
+              width={width}
+              height={height}
+              onQuery={onQuery}
+              onDismiss={onDismissRefreshOverlay}
+            />
+          )}
           <SuperChart
             className={`slice_container ${snakeCase(vizType)} ${isFaded ? ' faded' : ''}`}
             chartType={vizType}
@@ -207,8 +205,8 @@ class Chart extends React.PureComponent {
             onRenderFailure={this.handleRenderFailure}
             skipRendering={skipChartRendering}
           />
-        </ErrorBoundary>
-      </div>
+        </div>
+      </ErrorBoundary>
     );
   }
 }
