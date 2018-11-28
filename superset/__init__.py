@@ -48,6 +48,7 @@ def parse_manifest_json():
             full_manifest = json.load(f)
             manifest = full_manifest.get('entrypoints', {})
     except Exception:
+        print(Exception)
         pass
 
 

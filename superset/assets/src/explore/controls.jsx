@@ -614,6 +614,15 @@ export const controls = {
       choices: (state.datasource) ? state.datasource.all_cols : [],
     }),
   },
+  spatial_address: {
+    type: 'AddressSearchControl',
+    label: t('Location Search'),
+    validators: [v.nonEmpty],
+    description: t('Search Location based on address'),
+    mapStateToProps: state => ({
+        choices: (state.datasource) ? state.datasource.all_cols : [],
+    }),
+},
 
   start_spatial: {
     type: 'SpatialControl',
@@ -2120,6 +2129,17 @@ export const controls = {
     description:
     t('Maxium radius size of the circle, in pixels. As the zoom level changes, this ' +
       'insures that the circle respects this maximum radius.'),
+  },
+  radius: {
+      type: 'TextControl',
+      label: t('Radius'),
+      isFloat: true,
+      validators: [v.nonEmpty],
+      renderTrigger: true,
+      default: 2,
+      description:
+          t('Radius size of the circle, in pixels. As the zoom level changes, this ' +
+              'insures that the circle respects this radius.'),
   },
 
   partition_threshold: {
