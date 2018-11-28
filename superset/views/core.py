@@ -15,6 +15,7 @@ from flask_appbuilder import expose, SimpleFormView
 from flask_appbuilder.actions import action
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder.security.decorators import has_access, has_access_api
+from flask_appbuilder.models.sqla.filters import FilterEqual, FilterNotEqual
 from flask_babel import gettext as __
 from flask_babel import lazy_gettext as _
 import pandas as pd
@@ -465,7 +466,7 @@ class SliceModelView(SupersetModelView, DeleteMixin):  # noqa
             'Duration (in seconds) of the caching timeout for this chart. '
             'Note this defaults to the datasource/table timeout if undefined.'),
     }
-    base_filters = [['id', SliceFilter, lambda: []]]
+    base_filters = [['id', SliceFilter, lambda: []],['viz_type', FilterNotEqual, 'solarBI']]
     label_columns = {
         'cache_timeout': _('Cache Timeout'),
         'creator': _('Creator'),
@@ -507,18 +508,20 @@ class SliceModelView(SupersetModelView, DeleteMixin):  # noqa
         )
 
 
-# appbuilder.add_view(
-#     SliceModelView,
-#     'Charts',
-#     label=__('Charts'),
-#     icon='fa-bar-chart',
-#     category='',
-#     category_icon='')
+appbuilder.add_view(
+    SliceModelView,
+    'Charts',
+    label=__('Charts'),
+    icon='fa-bar-chart',
+    category='',
+    category_icon='')
 
 
 class SolarBIModelView(SliceModelView):  # noqa
 
+    route_base = '/solar'
     datamodel = SQLAInterface(models.Slice)
+    base_filters = [['viz_type', FilterEqual, 'solarBI']]
 
     @expose('/list/')
     @has_access
