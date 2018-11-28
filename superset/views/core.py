@@ -523,29 +523,7 @@ class SolarBIModelView(SliceModelView):  # noqa
     datamodel = SQLAInterface(models.Slice)
     base_filters = [['viz_type', FilterEqual, 'solarBI']]
 
-    @expose('/list/')
-    @has_access
-    def list(self):
-        widgets = self._list()
-        return self.render_template(self.list_template,
-                                    title=self.list_title,
-                                    widgets=widgets)
-
-    @expose('/add', methods=['GET', 'POST'])
-    @has_access
-    def add(self):
-        datasources = ConnectorRegistry.get_all_datasources(db.session)
-        datasources = [
-            {'value': str(d.id) + '__' + d.type, 'label': repr(d)}
-            for d in datasources
-        ]
-        return self.render_template(
-            'superset/add_slice.html',
-            bootstrap_data=json.dumps({
-                'datasources': sorted(datasources, key=lambda d: d['label']),
-            }),
-        )
-
+    base_permissions = ['can_list', 'can_show', 'can_add', 'can_delete']
 
 appbuilder.add_view(
     SolarBIModelView,
