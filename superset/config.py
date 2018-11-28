@@ -192,6 +192,7 @@ CACHE_DEFAULT_TIMEOUT = 60 * 60 * 24
 #     'CACHE_REDIS_PORT': 6379,
 #     'CACHE_REDIS_DB': 0,
 #     'CACHE_REDIS_URL': 'redis://localhost:6379/0'}
+CACHE_CONFIG = {'CACHE_TYPE': 'null'}
 TABLE_NAMES_CACHE_CONFIG = {'CACHE_TYPE': 'null'}
 
 # CORS Options
