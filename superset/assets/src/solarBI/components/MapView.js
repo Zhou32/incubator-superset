@@ -98,7 +98,9 @@ class MapView extends React.Component {
                             pixelRatio: 2
                         },
                         dataView:{
-                            show:true
+                            show: true,
+                            title: 'View Data',
+                             "lang": ["Data View", "close", "refresh"]
                         }
                     }
                 },
