@@ -303,9 +303,9 @@ WARNING_MSG = None
 
 # Example:
 class CeleryConfig(object):
-    BROKER_URL = 'redis://redis-service:6379/1'
+    BROKER_URL = 'redis://localhost:6379/0'
     CELERY_IMPORTS = ('superset.sql_lab', )
-    CELERY_RESULT_BACKEND = 'redis://redis-service:6379/1'
+    CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
     CELERY_ANNOTATIONS = {'tasks.add': {'rate_limit': '10/s'}}
 
 CELERY_CONFIG = CeleryConfig
