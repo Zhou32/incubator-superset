@@ -101,6 +101,7 @@ const config = {
     sqllab: addPreamble('/src/SqlLab/index.jsx'),
     welcome: addPreamble('/src/welcome/index.jsx'),
     profile: addPreamble('/src/profile/index.jsx'),
+      solarBI: addPreamble('/src/solarBI/index.jsx'),
   },
   output,
   optimization: {

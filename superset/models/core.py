@@ -252,7 +252,12 @@ class Slice(Model, AuditMixinNullable, ImportMixin):
         update_time_range(form_data)
         return form_data
 
-    def get_explore_url(self, base_url='/superset/explore', overrides=None):
+    def get_explore_url(self, base_url=None, overrides=None):
+        if not base_url:
+            if self.viz_type == 'solarBI':
+                base_url = '/superset/solar'
+            else:
+                base_url = '/superset/explore'
         overrides = overrides or {}
         form_data = {'slice_id': self.id}
         form_data.update(overrides)
