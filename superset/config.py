@@ -143,7 +143,9 @@ AUTH_TYPE = AUTH_DB
 # Grant public role the same set of permissions as for the GAMMA role.
 # This is useful if one wants to enable anonymous users to view
 # dashboards. Explicit grant on specific datasets is still required.
-PUBLIC_ROLE_LIKE_GAMMA = False
+# PUBLIC_ROLE_LIKE_GAMMA = False
+PUBLIC_ROLE_LIKE_CUSTOM = True
+
 
 # ---------------------------------------------------
 # Babel config for translations
@@ -187,11 +189,12 @@ IMG_UPLOAD_URL = '/static/uploads/'
 # IMG_SIZE = (300, 200, True)
 
 CACHE_DEFAULT_TIMEOUT = 60 * 60 * 24
-CACHE_CONFIG = {'CACHE_TYPE': 'redis',
-    'CACHE_REDIS_HOST': 'redis://localhost',
-    'CACHE_REDIS_PORT': 6379,
-    'CACHE_REDIS_DB': 0,
-    'CACHE_REDIS_URL': 'redis://localhost:6379/0'}
+# CACHE_CONFIG = {'CACHE_TYPE': 'redis',
+#     'CACHE_REDIS_HOST': 'redis://localhost',
+#     'CACHE_REDIS_PORT': 6379,
+#     'CACHE_REDIS_DB': 0,
+#     'CACHE_REDIS_URL': 'redis://localhost:6379/0'}
+CACHE_CONFIG = {'CACHE_TYPE': 'null'}
 TABLE_NAMES_CACHE_CONFIG = {'CACHE_TYPE': 'null'}
 
 # CORS Options
@@ -309,7 +312,7 @@ class CeleryConfig(object):
     CELERYD_LOG_LEVEL = 'DEBUG'
     CELERYD_PREFETCH_MULTIPLIER = 1
     CELERY_ACKS_LATE = True
-    
+
 CELERY_CONFIG = CeleryConfig
 # CELERY_CONFIG = None
 

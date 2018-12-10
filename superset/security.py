@@ -319,8 +319,12 @@ class SupersetSecurityManager(SecurityManager):
         self.set_role('granter', self.is_granter_pvm)
         self.set_role('sql_lab', self.is_sql_lab_pvm)
 
-        if conf.get('PUBLIC_ROLE_LIKE_GAMMA', False):
-            self.set_role('Public', self.is_gamma_pvm)
+        # if conf.get('PUBLIC_ROLE_LIKE_GAMMA', False):
+        #     self.set_role('Public', self.is_gamma_pvm)
+
+        self.set_role('Custom', self.is_custom_pvm)
+        if conf.get('PUBLIC_ROLE_LIKE_CUSTOM', False):
+            self.set_role('Public', self.is_custom_pvm)
 
         self.create_missing_perms()
 
@@ -384,6 +388,11 @@ class SupersetSecurityManager(SecurityManager):
         return pvm.permission.name in {
             'can_override_role_permissions', 'can_approve',
         }
+
+    def is_custom_pvm(self, pvm):
+        # return not (self.is_user_defined_permission(pvm) or self.is_admin_only(pvm) or self.is_alpha_only(pvm)) or pvm.view_menu.name in {'MapView'}
+        # return not self.is_user_defined_permission(pvm)
+        return not (pvm.view_menu.name in {'SQL Editor'} or pvm.permission.name in {'can_list'})
 
     def set_perm(self, mapper, connection, target):  # noqa
         if target.perm != target.get_perm():
