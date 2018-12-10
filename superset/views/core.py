@@ -532,7 +532,6 @@ appbuilder.add_view(
     category_icon=''
 )
 
-
 class SliceAsync(SliceModelView):  # noqa
     route_base = '/sliceasync'
     list_columns = [
@@ -1772,6 +1771,7 @@ class Superset(BaseSupersetView):
                 connect_args['configuration'] = configuration
 
             engine = create_engine(uri, **engine_params)
+            # engine = create_engine(uri, connect_args={'protocol': 'https'})
             engine.connect()
             return json_success(json.dumps(engine.table_names(), indent=4))
         except Exception as e:

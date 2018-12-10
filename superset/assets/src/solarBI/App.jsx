@@ -1,22 +1,43 @@
-import React from 'react';
-import { hot } from 'react-hot-loader';
-import thunk from 'redux-thunk';
-import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
-import { Provider } from 'react-redux';
+import React from "react";
+import { hot } from "react-hot-loader";
+import thunk from "redux-thunk";
+import { createStore, applyMiddleware, compose } from "redux";
+import { Provider } from "react-redux";
 
-import messageToastReducer from '../messageToasts/reducers';
-import { initEnhancer } from '../reduxUtils';
-import setupApp from '../setup/setupApp';
-import MapView from './components/MapView';
+import MapView from "./components/MapView";
+import ToastPresenter from "../messageToasts/containers/ToastPresenter";
+import { initFeatureFlags } from "src/featureFlags";
+import { initEnhancer } from "../reduxUtils";
+import getInitialState from "./reducers/getInitialState";
+import rootReducer from "./reducers/index";
+
+import setupApp from "../setup/setupApp";
+import setupPlugins from "../setup/setupPlugins";
 
 setupApp();
+setupPlugins();
 
-const container = document.getElementById('app');
-const bootstrap = JSON.parse(container.getAttribute('data-bootstrap'));
+const container = document.getElementById("app");
+const bootstrapData = JSON.parse(container.getAttribute("data-bootstrap"));
+initFeatureFlags(bootstrapData.common.feature_flags);
+const initState = getInitialState(bootstrapData);
 
+const store = createStore(
+  rootReducer,
+  initState,
+  compose(
+    applyMiddleware(thunk),
+    initEnhancer(false)
+  )
+);
 
 const App = () => (
-    <MapView data = {bootstrap} />
+  <Provider store={store}>
+    <div>
+      <MapView />
+      <ToastPresenter />
+    </div>
+  </Provider>
 );
 
 export default hot(module)(App);
