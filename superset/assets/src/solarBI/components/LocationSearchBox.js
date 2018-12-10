@@ -29,8 +29,6 @@ export default class LocationSearchBox extends React.Component {
 
         const input = this.locationSearch;
         if (input) {
-
-
             if (!input._autocomplete) {
                 input._autocomplete = new places.Autocomplete(input, options);
 
