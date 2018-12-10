@@ -22,11 +22,10 @@ export default class LocationSearchBox extends React.Component {
 
         let options;
 
-        if (country) {
-            options = {
-                componentRestrictions: {country}
-            };
-        }
+
+        options = {
+            componentRestrictions: {'country':"AU"}
+        };
 
         const input = this.locationSearch;
         if (input) {
