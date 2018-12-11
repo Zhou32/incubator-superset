@@ -13,7 +13,7 @@ import ReactEcharts from "echarts-for-react";
 import { Grid, Row, Col, Alert } from "react-bootstrap";
 import Button from "@material-ui/core/Button";
 import DisplayQueryButton from "../../explore/components/DisplayQueryButton";
-import { fetchSolarData, addSuccessToast } from "../actions/SolarActions";
+import { fetchSolarData, addSuccessToast } from "../actions/solarActions";
 import SaveModal from "./SaveModal";
 import Loading from "./Loading";
 import { t } from "@superset-ui/translation";
