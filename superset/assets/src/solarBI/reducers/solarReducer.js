@@ -1,6 +1,6 @@
 import { t } from "@superset-ui/translation";
 import { now } from "../../modules/dates";
-import * as actions from "../actions/solarActions";
+import * as actions from "../actions/SolarActions";
 
 export default function(state = {}, action) {
   const actionHandlers = {
