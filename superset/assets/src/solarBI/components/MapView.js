@@ -163,7 +163,7 @@ class MapView extends React.Component {
 
   render() {
     let reactEcharts = null;
-    const { solarStatus, queryResponse } = this.props.solarBI;
+    const { solarStatus, queryResponse, solarAlert } = this.props.solarBI;
     if (solarStatus === "success" && queryResponse) {
       const newOptions = this.getOption(queryResponse["data"]["data"]);
       reactEcharts = <ReactEcharts option={newOptions} />;
@@ -181,7 +181,7 @@ class MapView extends React.Component {
       reactEcharts = (
         <Alert bsStyle="danger">
           <p style={{ textAlign: "center" }}>
-            <strong>Please try again!</strong>
+            <strong>{solarAlert}! Please try again!</strong>
           </p>
         </Alert>
       );
@@ -268,7 +268,7 @@ class MapView extends React.Component {
                   this.setState({ toggleModal: true });
                 }}
               >
-                save
+                Save
               </Button>
             </Col>
             <Col md={1} />

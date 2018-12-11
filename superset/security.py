@@ -390,9 +390,7 @@ class SupersetSecurityManager(SecurityManager):
         }
 
     def is_custom_pvm(self, pvm):
-        # return not (self.is_user_defined_permission(pvm) or self.is_admin_only(pvm) or self.is_alpha_only(pvm)) or pvm.view_menu.name in {'MapView'}
-        # return not self.is_user_defined_permission(pvm)
-        return not (pvm.view_menu.name in {'SQL Editor'} or pvm.permission.name in {'can_list'})
+        return pvm.permission.name in {'can_list'}
 
     def set_perm(self, mapper, connection, target):  # noqa
         if target.perm != target.get_perm():
