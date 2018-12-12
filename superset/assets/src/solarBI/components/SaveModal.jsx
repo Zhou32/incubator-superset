@@ -4,8 +4,7 @@ import PropTypes from "prop-types";
 import { Modal, Alert, Button, Radio } from "react-bootstrap";
 import Select from "react-select";
 import { t } from "@superset-ui/translation";
-// import {saveSlice} from '../actions/solarActions'
-import { saveSlice } from "../actions/SolarActions";
+import { saveSlice } from "../actions/solarActions";
 
 import { supersetURL } from "../../utils/common";
 
