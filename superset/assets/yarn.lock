@@ -393,7 +393,6 @@
   version "3.6.1"
   resolved "https://registry.yarnpkg.com/@material-ui/core/-/core-3.6.1.tgz#6f8259c64eaa34c9f977165f6b8d175d9eb1858a"
   integrity sha512-jmDtLQVXYHzvv6TljspaoHazGXkgmgnLUosFateBdB3Vva6WVJZ7WY5LaAGOqtuTEUW6KUKDumaGoOQs4xuJWA==
-
   dependencies:
     "@babel/runtime" "7.1.2"
     "@material-ui/utils" "^3.0.0-alpha.0"
@@ -456,12 +455,12 @@
     "@superset-ui/core" "^0.3.0"
     reselect "^4.0.0"
 
-"@superset-ui/color@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@superset-ui/color/-/color-0.5.0.tgz#3064bec063fdf43d568a39b4d9ded352d0aeed55"
-  integrity sha512-YzvxJY5MOn0EB1gjcjFF2oEKAoAVoi9FW4T43fyq2imgezDjzGGqTsneycjx7kK0+zFHLsVGribt0/VJ8oDyqg==
+"@superset-ui/color@^0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@superset-ui/color/-/color-0.7.0.tgz#9d3eca8da493e1241a047f88b06d668b2cd20e3c"
+  integrity sha512-3mxbdJfC3vwp2VUGyg3BwNtRAbIBp0yme3mUWwtGHIae2mcM7LCBoeGg5z5T1p4eOxwW231jzQZDgpptXBycWg==
   dependencies:
-    "@superset-ui/core" "^0.5.0"
+    "@superset-ui/core" "^0.7.0"
     d3-scale "^2.1.2"
 
 "@superset-ui/connection@^0.5.0":
@@ -474,13 +473,6 @@
 "@superset-ui/core@^0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@superset-ui/core/-/core-0.3.0.tgz#99b5281457201eb9781eab71ac8189a5ce3ccce4"
-  dependencies:
-    lodash "^4.17.11"
-
-"@superset-ui/core@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@superset-ui/core/-/core-0.5.0.tgz#8784465e312cac5015df28d8540d27a2fd6060ba"
-  integrity sha512-HlcbZNd958tlW+l3MH5gIJ7atxRzYkw14bDNS3wCUxGgthjB5Au6inFEDJwB24H7nIkj+ISfwH4L7MRI057l2Q==
   dependencies:
     lodash "^4.17.11"
 
@@ -5695,13 +5687,6 @@ hoist-non-react-statics@^2.1.0, hoist-non-react-statics@^2.3.1, hoist-non-react-
   version "2.5.5"
   resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-2.5.5.tgz#c5903cf409c0dfd908f388e619d86b9c1174cb47"
   integrity sha512-rqcy4pJo55FTTLWt+bU8ukscqHeE/e9KWvsOW2b/a3afxQZhwkQdT1rPPCJ0rYXdj4vNcasY8zHTH+jF/qStxw==
-
-hoist-non-react-statics@^3.0.0:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-3.2.1.tgz#c09c0555c84b38a7ede6912b61efddafd6e75e1e"
-  integrity sha512-TFsu3TV3YLY+zFTZDrN8L2DTFanObwmBLpWvJs1qfUuEQ5bTAdFcwfx2T/bsCXfM9QHSLvjfP+nihEl0yvozxw==
-  dependencies:
-    react-is "^16.3.2"
 
 hoist-non-react-statics@^3.0.0:
   version "3.2.0"
