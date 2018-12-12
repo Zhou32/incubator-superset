@@ -44,7 +44,6 @@ SUPERSET_WEBSERVER_ADDRESS = '0.0.0.0'
 SUPERSET_WEBSERVER_PORT = 8088
 SUPERSET_WEBSERVER_TIMEOUT = 60  # deprecated
 SUPERSET_DASHBOARD_POSITION_DATA_LIMIT = 65535
-EMAIL_NOTIFICATIONS = False
 CUSTOM_SECURITY_MANAGER = None
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 # ---------------------------------------------------------
@@ -122,10 +121,16 @@ AUTH_TYPE = AUTH_DB
 # AUTH_ROLE_PUBLIC = 'Public'
 
 # Will allow user self registration
-# AUTH_USER_REGISTRATION = True
+AUTH_USER_REGISTRATION = True
 
 # The default user self registration role
-# AUTH_USER_REGISTRATION_ROLE = "Public"
+AUTH_USER_REGISTRATION_ROLE = "Public"
+
+RECAPTCHA_DISABLE = True
+RECAPTCHA_USE_SSL = False
+RECAPTCHA_PUBLIC_KEY = 'public'
+RECAPTCHA_PRIVATE_KEY = 'private'
+RECAPTCHA_HTML ='<h1>yes</h1>'
 
 # When using LDAP Auth, setup the ldap server
 # AUTH_LDAP_SERVER = "ldap://ldapserver.new"
@@ -387,14 +392,16 @@ FLASK_APP_MUTATOR = None
 ENABLE_ACCESS_REQUEST = False
 
 # smtp server configuration
-EMAIL_NOTIFICATIONS = False  # all the emails are sent using dryrun
-SMTP_HOST = 'localhost'
+EMAIL_NOTIFICATIONS = True  # all the emails are sent using dryrun
+SMTP_HOST = 'email-smtp.us-west-2.amazonaws.com'
 SMTP_STARTTLS = True
-SMTP_SSL = False
-SMTP_USER = 'superset'
-SMTP_PORT = 25
-SMTP_PASSWORD = 'superset'
-SMTP_MAIL_FROM = 'superset@superset.com'
+SMTP_SSL = True
+SMTP_USER = 'AKIAISTP2VVSMYG7X62A'
+SMTP_PORT = 465
+SMTP_PASSWORD = 'AhDOJ0gw1xam5CCNOuDkK0g0mxrlS6yJB0DNFX6GieRI'
+SMTP_MAIL_FROM = 'testing@savvyplus.com.au'
+
+MAIL_SENDER = 'testing@savvyplus.com.au'
 
 if not CACHE_DEFAULT_TIMEOUT:
     CACHE_DEFAULT_TIMEOUT = CACHE_CONFIG.get('CACHE_DEFAULT_TIMEOUT')
