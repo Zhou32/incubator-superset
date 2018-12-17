@@ -532,6 +532,7 @@ appbuilder.add_view(
     category_icon=''
 )
 
+
 class SliceAsync(SliceModelView):  # noqa
     route_base = '/sliceasync'
     list_columns = [

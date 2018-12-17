@@ -1,10 +1,11 @@
 /* eslint camelcase: 0 */
 import React from "react";
 import PropTypes from "prop-types";
+import { connect } from "react-redux";
 import { Modal, Alert, Button, Radio } from "react-bootstrap";
 import Select from "react-select";
 import { t } from "@superset-ui/translation";
-import { saveSlice } from "../actions/solarActions";
+import { saveSolarData } from "../actions/solarActions";
 
 import { supersetURL } from "../../utils/common";
 
@@ -85,12 +86,14 @@ class SaveModal extends React.Component {
       sliceParams.slice_name = this.props.slice.slice_name;
     }
 
-    saveSlice(this.props.form_data, sliceParams, data => {
-      // Go to new slice url or dashboard url
-      if (data.json.slice) {
-        window.location = data.json.slice.slice_url;
-      }
-    });
+    this.props
+      .saveSolarData(this.props.form_data, sliceParams)
+      .then(({ data }) => {
+        // Go to new slice url or dashboard url
+        if (gotodash) {
+          window.location = data.json.slice.slice_url;
+        }
+      });
     this.setState({ show: false });
   }
 
@@ -172,4 +175,7 @@ function mapStateToProps({ explore, saveModal }) {
   };
 }
 
-export default SaveModal;
+export default connect(
+  mapStateToProps,
+  { saveSolarData }
+)(SaveModal);

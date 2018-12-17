@@ -319,12 +319,12 @@ class SupersetSecurityManager(SecurityManager):
         self.set_role('granter', self.is_granter_pvm)
         self.set_role('sql_lab', self.is_sql_lab_pvm)
 
-        if conf.get('PUBLIC_ROLE_LIKE_GAMMA', False):
-            self.set_role('Public', self.is_gamma_pvm)
+        # if conf.get('PUBLIC_ROLE_LIKE_GAMMA', False):
+        #     self.set_role('Public', self.is_gamma_pvm)
 
-        # self.set_role('Custom', self.is_custom_pvm)
-        # if conf.get('PUBLIC_ROLE_LIKE_CUSTOM', False):
-        #     self.set_role('Public', self.is_custom_pvm)
+        self.set_role('Custom', self.is_custom_pvm)
+        if conf.get('PUBLIC_ROLE_LIKE_CUSTOM', False):
+            self.set_role('Public', self.is_custom_pvm)
 
         self.create_missing_perms()
 
@@ -390,7 +390,7 @@ class SupersetSecurityManager(SecurityManager):
         }
 
     def is_custom_pvm(self, pvm):
-        return pvm.permission.name in {'can_list'}
+        return None
 
     def set_perm(self, mapper, connection, target):  # noqa
         if target.perm != target.get_perm():
