@@ -39,15 +39,19 @@ class MapView extends React.Component {
       options: {},
       new_create: false,
       visibility: "hidden",
-      toggleModal: false
+      showModal: false,
+      searching: true,
+      showingMap: false
     };
 
     this.onPlaceChanged = this.onPlaceChanged.bind(this);
+    this.onGoBackClick = this.onGoBackClick.bind(this);
     this.getOption = this.getOption.bind(this);
     this.requestData = this.requestData.bind(this);
+    this.toggleModal = this.toggleModal.bind(this);
   }
 
-  componentDidMount() {
+  componentWillMount() {
     const { solarBI } = this.props;
     const { form_data } = solarBI;
     if (
@@ -61,28 +65,49 @@ class MapView extends React.Component {
         },
         radius: form_data["radius"],
         data_source: form_data["datasource"],
-        address: form_data["spatial_address"]["address"]
+        address: form_data["spatial_address"]["address"],
+        showingMap: true,
+        searching: false
       });
-
-      this.requestData();
     } else {
       this.setState({ data_source: form_data["datasource"] });
     }
   }
 
+  componentDidMount() {
+    const { solarBI } = this.props;
+    const { form_data } = solarBI;
+    if (
+      solarBI.hasOwnProperty("form_data") &&
+      form_data.hasOwnProperty("spatial_address")
+    ) {
+      this.requestData();
+    }
+    // if (this.state.showingMap && !this.state.searching) {
+    //   this.requestData();
+    // }
+  }
+
   onPlaceChanged(place) {
     if (place) {
-      console.log(place);
+      // console.log(place);
       this.setState({
         address: place.formatted_address,
         center: {
           lat: place.geometry.location.lat.call(),
           lng: place.geometry.location.lng.call()
         },
-        zoom: 14,
-        visibility: "visible"
+        zoom: 12,
+        visibility: "visible",
+        searching: false,
+        showingMap: true
       });
     }
+    this.requestData();
+  }
+
+  toggleModal() {
+    this.setState({ showModal: !this.state.showModal });
   }
 
   getOption(data) {
@@ -161,6 +186,13 @@ class MapView extends React.Component {
     this.props.fetchSolarData(formData, false, 60, "");
   }
 
+  onGoBackClick() {
+    this.setState({
+      searching: true,
+      showingMap: false
+    });
+  }
+
   render() {
     let reactEcharts = null;
     const { solarStatus, queryResponse, solarAlert } = this.props.solarBI;
@@ -169,14 +201,6 @@ class MapView extends React.Component {
       reactEcharts = <ReactEcharts option={newOptions} />;
     } else if (solarStatus === "loading") {
       reactEcharts = <Loading size={50} />;
-    } else if (solarStatus === "waiting") {
-      reactEcharts = (
-        <Alert bsStyle="info">
-          <p style={{ textAlign: "center" }}>
-            <strong>Please enter an address in above to allow search</strong>
-          </p>
-        </Alert>
-      );
     } else if (solarStatus === "failed") {
       reactEcharts = (
         <Alert bsStyle="danger">
@@ -186,100 +210,130 @@ class MapView extends React.Component {
         </Alert>
       );
     }
+
+    // else if (solarStatus === "waiting") {
+    //   reactEcharts = (
+    //     <Alert bsStyle="info">
+    //       <p style={{ textAlign: "center" }}>
+    //         <strong>Please enter an address in above to allow search</strong>
+    //       </p>
+    //     </Alert>
+    //   );
+    // } else if (solarStatus === "failed") {
+    //   reactEcharts = (
+    //     <Alert bsStyle="danger">
+    //       <p style={{ textAlign: "center" }}>
+    //         <strong>{solarAlert}! Please try again!</strong>
+    //       </p>
+    //     </Alert>
+    //   );
+    // }
     return (
       <div>
-        <SaveModal
-          onHide={this.state.toggleModal}
-          actions={this.props.actions}
-          form_data={{
-            datasource: this.state.data_source,
-            viz_type: "solarBI",
-            radius: this.state.radius,
-            spatial_address: {
-              address: this.state.address,
-              lat: this.state.center.lat,
-              lon: this.state.center.lng,
-              latCol: "longitude",
-              lonCol: "latitude",
-              type: "latlong"
-            }
-          }}
-          userId={""}
-        />
-        <Grid>
-          <Row className="show-grid">
-            <Col md={4} mdOffset={4}>
-              <h2>{"Solar Business Intelligence"}</h2>
-            </Col>
-          </Row>
+        {this.state.showModal && (
+          <SaveModal
+            onHide={this.toggleModal}
+            actions={this.props.actions}
+            form_data={{
+              datasource: this.state.data_source,
+              viz_type: "solarBI",
+              radius: this.state.radius,
+              spatial_address: {
+                address: this.state.address,
+                lat: this.state.center.lat,
+                lon: this.state.center.lng,
+                latCol: "longitude",
+                lonCol: "latitude",
+                type: "latlong"
+              }
+            }}
+            userId={""}
+          />
+        )}
 
-          <Row className="show-grid" style={{ marginTop: "3%" }}>
-            <Col md={8} mdOffset={2}>
-              <LocationSearchBox
-                address={this.state.address}
-                onPlaceChanged={place => this.onPlaceChanged(place)}
-              />
-            </Col>
-          </Row>
-
-          <Row className="show-grid" style={{ marginTop: "2%" }}>
-            <Col md={10} mdOffset={1}>
-              <Map
-                google={this.props.google}
-                zoom={this.state.zoom}
-                initialCenter={this.state.center}
-                center={this.state.center}
-              >
-                <Marker
-                  position={this.state.center}
-                  name={"Current location"}
+        {this.state.searching && (
+          <Grid>
+            <Row className="show-grid" style={{ marginTop: "30%" }}>
+              <Col md={10} mdOffset={1}>
+                <LocationSearchBox
+                  address={this.state.address}
+                  onPlaceChanged={place => this.onPlaceChanged(place)}
                 />
-                <Circle
-                  radius={this.state.radius * 1000}
+              </Col>
+            </Row>
+          </Grid>
+        )}
+
+        {this.state.showingMap && (
+          <Grid>
+            <Row className="show-grid" style={{ marginTop: "10%" }}>
+              <Col md={10} mdOffset={1}>
+                <Map
+                  google={this.props.google}
+                  zoom={this.state.zoom}
+                  initialCenter={this.state.center}
                   center={this.state.center}
-                  strokeColor="transparent"
-                  strokeOpacity={0}
-                  strokeWeight={5}
-                  fillColor={"#FF0000"}
-                  fillOpacity={0.2}
-                />
-              </Map>
-            </Col>
-          </Row>
+                  style={{
+                    boxShadow:
+                      "0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)",
+                    borderRadius: "2em",
+                    height: "100%",
+                    width: "100%"
+                  }}
+                >
+                  <Marker
+                    position={this.state.center}
+                    name={"Current location"}
+                  />
+                  <Circle
+                    radius={this.state.radius * 1000}
+                    center={this.state.center}
+                    strokeColor="transparent"
+                    strokeOpacity={0}
+                    strokeWeight={5}
+                    fillColor={"#FF0000"}
+                    fillOpacity={0.2}
+                  />
+                </Map>
+              </Col>
+            </Row>
 
-          <Row
-            className="show-grid"
-            style={{ marginTop: "2%", visibility: this.state.visibility }}
-          >
-            <Col md={1} mdOffset={9}>
-              <Button
-                variant="contained"
-                size="medium"
-                onClick={this.requestData}
-              >
-                Run
-              </Button>
-            </Col>
-            <Col md={1}>
-              <Button
-                variant="contained"
-                size="medium"
-                onClick={() => {
-                  this.setState({ toggleModal: true });
-                }}
-              >
-                Save
-              </Button>
-            </Col>
-            <Col md={1} />
-          </Row>
+            <Row
+              className="show-grid"
+              style={{ marginTop: "2%", visibility: this.state.visibility }}
+            >
+              <Col md={1} mdOffset={1}>
+                <Button
+                  variant="contained"
+                  size="medium"
+                  onClick={this.onGoBackClick}
+                >
+                  Go Back
+                </Button>
+              </Col>
+              <Col md={1} mdOffset={7}>
+                <Button
+                  variant="contained"
+                  size="medium"
+                  onClick={this.toggleModal}
+                >
+                  Save
+                </Button>
+              </Col>
+              <Col md={1}>
+                <Button variant="contained" size="medium">
+                  Export
+                </Button>
+              </Col>
+            </Row>
 
-          <Row className="show-grid" style={{ marginTop: "2%" }}>
-            <Col md={10} mdOffset={1}>
-              {reactEcharts}
-            </Col>
-          </Row>
-        </Grid>
+            <Row className="show-grid" style={{ marginTop: "2%" }}>
+              <Col md={10} mdOffset={1}>
+                {reactEcharts}
+              </Col>
+            </Row>
+          </Grid>
+        )}
       </div>
     );
   }
