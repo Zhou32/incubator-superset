@@ -17,6 +17,7 @@ import pickle as pkl
 import re
 import traceback
 import uuid
+import os
 
 from dateutil import relativedelta as rdelta
 from flask import request
@@ -2690,18 +2691,85 @@ class SolarBI(BaseViz):
     is_timeseries = False
     partition = ['year', 'month']
 
+    lat_list679 = None
+    lng_list839 = None
+
+    def load_data(self, name):
+        file = open(name, 'rb')
+        print("file '" + name + "' has been loaded successfully.")
+        return pkl.load(file)
+
+    def get_closest_point(self, coordinate_lat_lng, lat_list, lng_list):
+        from math import fabs
+        """
+        Reture a list of one closest point tuple(lat, lng) in the in the radius=5km
+        """
+        r = 5
+        point = []  # [(lat, lng, distance),(...),...]
+
+        threshold_lat = r / 100  # 110km/degree
+        threshold_lng = r / 75  # 80-105km/degree for AU
+
+        for lng in lng_list:
+            if fabs(coordinate_lat_lng[1] - lng) < threshold_lng:
+                for lat in lat_list:
+                    if fabs(coordinate_lat_lng[0] - lat) < threshold_lat:
+                        dist = self.haversine(coordinate_lat_lng[0], coordinate_lat_lng[1], lat, lng)
+                        if dist < r:
+                            point.append((lat, lng, dist))
+
+        point.sort(key=lambda x: x[2])
+        return [(point[0][0], point[0][1])]
+
+    # give coordinate and radius, return all points inside
+    def get_legal_point(self, coordinate_lat_lng, r, lat_list, lng_list):
+        from math import fabs
+        """
+        Reture a list of all possible points tuple(lat, lng) in the radius
+        """
+        point = []
+        count = 0
+        count_s = 0
+        threshold_lat = r / 100  # 110km/degree
+        threshold_lng = r / 75  # 80-105km/degree for AU
+        for lng in lng_list:
+            if fabs(coordinate_lat_lng[1] - lng) < threshold_lng:
+                for lat in lat_list:
+                    if fabs(coordinate_lat_lng[0] - lat) < threshold_lat:
+                        count += 1
+                        if self.haversine(coordinate_lat_lng[0], coordinate_lat_lng[1], lat, lng) < r:
+                            point.append((lat, lng))
+                            count_s += 1
+        print(f"invoke count={count}, legal points count={count_s}")
+        return point
+
+    # distance calculator
+    def haversine(self, lat1, lon1, lat2, lon2):  # decimal number
+        from math import radians, cos, sin, asin, sqrt
+        """
+        Calculate the great circle distance between two points 
+        on the earth (specified in decimal degrees)
+        """
+        # convert dec to rad
+        lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+
+        # Haversine formula
+        dlon = lon2 - lon1
+        dlat = lat2 - lat1
+        a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+        c = 2 * asin(sqrt(a))
+        r = 6371  # Average Earth radius /km
+        return c * r  # * 1000
+
     def search_address(self):
         lat = self.form_data['spatial_address']['lat']
         lng = self.form_data['spatial_address']['lon']
         radius = self.form_data['radius']
-        where = """ (((ACOS( SIN(RADIANS(""" + str(
-            lat) + """)) * SIN(RADIANS(latitude)) + COS(RADIANS(""" + str(
-            lat) + """)) * COS(RADIANS(latitude)) * COS(RADIANS(longitude) - RADIANS(""" + str(
-            lng) + """)) ) * 6384.0999) <= """ + str(radius) + """ )
-            OR (latitude = """ + str(lat) + """
-            AND longitude = """ + str(lng) + """))
-            AND radiation != -999       
-            """
+        self.lat_list679 = [float(x) for x in self.load_data('superset/solar_locations/lat679.pk')]
+        self.lng_list839 = [float(x) for x in self.load_data('superset/solar_locations/lng839.pk')]
+
+        lat, lng = self.get_closest_point((float(lat), float(lng)),self.lat_list679,self.lng_list839)[0]
+        where = f"latitude = '{lat}' and longitude = '{lng}' AND radiation != -999"
         return where
 
     def query_obj(self):
