@@ -124,7 +124,7 @@ AUTH_TYPE = AUTH_DB
 AUTH_USER_REGISTRATION = True
 
 # The default user self registration role
-AUTH_USER_REGISTRATION_ROLE = "Public"
+AUTH_USER_REGISTRATION_ROLE = "solar_default"
 
 RECAPTCHA_DISABLE = False
 RECAPTCHA_USE_SSL = False
@@ -149,7 +149,7 @@ RECAPTCHA_PRIVATE_KEY = '6LfkdoEUAAAAAOEGECGPA0BwBhVoxDSCyJUifWGi'
 # This is useful if one wants to enable anonymous users to view
 # dashboards. Explicit grant on specific datasets is still required.
 # PUBLIC_ROLE_LIKE_GAMMA = False
-PUBLIC_ROLE_LIKE_CUSTOM = True
+# PUBLIC_ROLE_LIKE_CUSTOM = True
 
 
 # ---------------------------------------------------

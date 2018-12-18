@@ -76,6 +76,15 @@ OBJECT_SPEC_PERMISSIONS = set([
     'metric_access',
 ])
 
+SOLAR_VIEW_MENUS=['SolarBI']
+SOLAR_VIEW = ['SolarBIModelView']
+SOLAR_PERMISSIONS = {
+    'can_show',
+    'can_list',
+    'can_delete',
+    'can_add'
+}
+
 
 class SupersetSecurityManager(SecurityManager):
 
@@ -318,12 +327,13 @@ class SupersetSecurityManager(SecurityManager):
         self.set_role('Gamma', self.is_gamma_pvm)
         self.set_role('granter', self.is_granter_pvm)
         self.set_role('sql_lab', self.is_sql_lab_pvm)
+        self.set_role('solar_default',self.is_solar_pvm)
 
         # if conf.get('PUBLIC_ROLE_LIKE_GAMMA', False):
         #     self.set_role('Public', self.is_gamma_pvm)
 
         self.set_role('Custom', self.is_custom_pvm)
-        if conf.get('PUBLIC_ROLE_LIKE_CUSTOM', False):
+        if conf.get('PUBLIC_ROLE_LIKE_SOLAR', False):
             self.set_role('Public', self.is_custom_pvm)
 
         self.create_missing_perms()
@@ -371,6 +381,11 @@ class SupersetSecurityManager(SecurityManager):
     def is_gamma_pvm(self, pvm):
         return not (self.is_user_defined_permission(pvm) or self.is_admin_only(pvm) or
                     self.is_alpha_only(pvm))
+
+    def is_solar_pvm(self, pvm):
+        result = pvm.view_menu.name in SOLAR_VIEW_MENUS and pvm.permission.name in {'menu_access'}
+        result = result or (pvm.view_menu.name in SOLAR_VIEW and pvm.permission.name in SOLAR_PERMISSIONS)
+        return result
 
     def is_sql_lab_pvm(self, pvm):
         return (

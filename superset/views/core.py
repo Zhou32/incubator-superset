@@ -2762,6 +2762,8 @@ class Superset(BaseSupersetView):
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
 
+
+
         welcome_dashboard_id = (
             db.session
                 .query(UserAttribute.welcome_dashboard_id)
@@ -2778,7 +2780,7 @@ class Superset(BaseSupersetView):
 
         return self.render_template(
             'superset/basic.html',
-            entry='welcome',
+            entry='solarBI',
             title='Superset',
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
         )
