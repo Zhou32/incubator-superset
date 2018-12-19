@@ -76,13 +76,15 @@ OBJECT_SPEC_PERMISSIONS = set([
     'metric_access',
 ])
 
-SOLAR_VIEW_MENUS=['SolarBI']
-SOLAR_VIEW = ['SolarBIModelView']
+
 SOLAR_PERMISSIONS = {
-    'can_show',
-    'can_list',
-    'can_delete',
-    'can_add'
+    'can_show': 'SolarBIModelView',
+    'can_list': 'SolarBIModelView',
+    'can_delete': 'SolarBIModelView',
+    'can_add': 'SolarBIModelView',
+    'menu_access': 'SolarBI',
+    'can_explore_json': 'Superset'
+
 }
 
 
@@ -383,8 +385,9 @@ class SupersetSecurityManager(SecurityManager):
                     self.is_alpha_only(pvm))
 
     def is_solar_pvm(self, pvm):
-        result = pvm.view_menu.name in SOLAR_VIEW_MENUS and pvm.permission.name in {'menu_access'}
-        result = result or (pvm.view_menu.name in SOLAR_VIEW and pvm.permission.name in SOLAR_PERMISSIONS)
+        result = False
+        for key in SOLAR_PERMISSIONS:
+            result = result or (pvm.view_menu.name == SOLAR_PERMISSIONS[key] and pvm.permission.name == key)
         return result
 
     def is_sql_lab_pvm(self, pvm):

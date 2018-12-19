@@ -15,7 +15,7 @@ from flask_appbuilder import expose, SimpleFormView
 from flask_appbuilder.actions import action
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder.security.decorators import has_access, has_access_api
-from flask_appbuilder.models.sqla.filters import FilterEqual, FilterNotEqual
+from flask_appbuilder.models.sqla.filters import FilterEqual, FilterNotEqual,FilterEqualFunction
 from flask_babel import gettext as __
 from flask_babel import lazy_gettext as _
 import pandas as pd
@@ -515,13 +515,34 @@ appbuilder.add_view(
     category_icon='')
 
 
+def get_user():
+    return g.user
+
+
 class SolarBIModelView(SliceModelView):  # noqa
 
     route_base = '/solar'
     datamodel = SQLAInterface(models.Slice)
-    base_filters = [['viz_type', FilterEqual, 'solarBI']]
+    base_filters = [['viz_type', FilterEqual, 'solarBI'],['created_by', FilterEqualFunction, get_user]]
+    base_permissions = ['can_list', 'can_show', 'can_add', 'can_delete', 'can_edit']
 
-    base_permissions = ['can_list', 'can_show', 'can_add', 'can_delete']
+
+    @expose('/add', methods=['GET', 'POST'])
+    @has_access
+    def add(self):
+        return redirect('/superset/welcome')
+
+    @expose('/list/')
+    @has_access
+    def list(self):
+        # for role in g.user.roles:
+        #     if role.name == 'Admin':
+        #         del self.base_filters[1]
+        #         break
+        widgets = self._list()
+        return self.render_template(self.list_template,
+                                    title=self.list_title,
+                                    widgets=widgets)
 
 appbuilder.add_view(
     SolarBIModelView,
@@ -1188,6 +1209,8 @@ class Superset(BaseSupersetView):
         payload = viz_obj.get_payload()
         return data_payload_response(*viz_obj.payload_json_and_has_error(payload))
 
+    count = 0
+
     @log_this
     @api
     @has_access_api
@@ -1209,6 +1232,12 @@ class Superset(BaseSupersetView):
         results = request.args.get('results') == 'true'
         samples = request.args.get('samples') == 'true'
         force = request.args.get('force') == 'true'
+
+        if self.count == 1:
+            csv = True
+
+        self.count += 1
+        print(self.count)
 
         form_data = self.get_form_data()[0]
         datasource_id, datasource_type = self.datasource_info(
@@ -2759,9 +2788,22 @@ class Superset(BaseSupersetView):
     @expose('/welcome')
     def welcome(self):
         """Personalized welcome page"""
+
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
 
+        entry_point = 'solarBI'
+
+        datasource_id=''
+        for role in g.user.roles:
+            if role.name == 'Admin':
+                entry_point ='welcome'
+                break
+
+            for permission in role.permissions:
+                if permission.permission.name == 'datasource_access':
+                    datasource_id = permission.view_menu.name.split(':')[1].replace(')', '')
+                    break
 
 
         welcome_dashboard_id = (
@@ -2776,24 +2818,32 @@ class Superset(BaseSupersetView):
         payload = {
             'user': bootstrap_user_data(),
             'common': self.common_bootsrap_payload(),
+            'datasource_id': datasource_id,
+            'datasource_type': 'table',
         }
 
         return self.render_template(
             'superset/basic.html',
-            entry='solarBI',
+            entry=entry_point,
             title='Superset',
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
         )
 
     @expose('/solar/', methods=('GET', 'POST'))
     def solar(self):
+
+
+
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
 
         user_id = g.user.get_id() if g.user else None
         form_data, slc = self.get_form_data(use_slice_data=True)
 
-        datasource_id, datasource_type = self.datasource_info(None, None, form_data)
+        datasource_id, datasource_type = self.datasource_info(
+            form_data['datasource_id'] if 'datasource_id' in form_data.keys() else None,
+            form_data['datasource_type'] if 'datasource_type' in form_data.keys() else None,
+            form_data)
 
         error_redirect = '/chart/list/'
         datasource = ConnectorRegistry.get_datasource(
@@ -2858,7 +2908,6 @@ class Superset(BaseSupersetView):
             'can_add': slice_add_perm,
             'can_download': slice_download_perm,
             'can_overwrite': slice_overwrite_perm,
-            'datasource': datasource.data,
             'form_data': form_data,
             'datasource_id': datasource_id,
             'datasource_type': datasource_type,
