@@ -5,6 +5,7 @@ import {
   Map,
   Marker,
   Circle,
+  InfoWindow,
   GoogleApiWrapper
 } from "../../visualizations/SolarBI/google_maps_react";
 import { connect } from "react-redux";
@@ -16,11 +17,24 @@ import DisplayQueryButton from "../../explore/components/DisplayQueryButton";
 import { fetchSolarData, addSuccessToast } from "../actions/solarActions";
 import SaveModal from "./SaveModal";
 import Loading from "./Loading";
+import classNames from "classnames";
+import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
 import { t } from "@superset-ui/translation";
 
 const propTypes = {
   solarBI: PropTypes.object.isRequired
 };
+
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: "#489795"
+    }
+  },
+  typography: {
+    useNextVariants: true
+  }
+});
 
 class MapView extends React.Component {
   constructor(props) {
@@ -34,14 +48,15 @@ class MapView extends React.Component {
       },
       radius: 3,
       data_source: "",
-      zoom: 11,
+      zoom: 13,
       address: "",
       options: {},
-      new_create: false,
+      closestPoint: { lat: -37.818276, lng: 144.96707 },
       visibility: "hidden",
       showModal: false,
       searching: true,
-      showingMap: false
+      showingMap: false,
+      showingInfoWindow: true
     };
 
     this.onPlaceChanged = this.onPlaceChanged.bind(this);
@@ -83,9 +98,6 @@ class MapView extends React.Component {
     ) {
       this.requestData();
     }
-    // if (this.state.showingMap && !this.state.searching) {
-    //   this.requestData();
-    // }
   }
 
   onPlaceChanged(place) {
@@ -97,13 +109,14 @@ class MapView extends React.Component {
           lat: place.geometry.location.lat.call(),
           lng: place.geometry.location.lng.call()
         },
-        zoom: 12,
+        zoom: 13,
         visibility: "visible",
         searching: false,
-        showingMap: true
+        showingMap: true,
+        showingInfoWindow: true
       });
     }
-    this.requestData();
+    // this.requestData();
   }
 
   toggleModal() {
@@ -211,23 +224,17 @@ class MapView extends React.Component {
       );
     }
 
-    // else if (solarStatus === "waiting") {
-    //   reactEcharts = (
-    //     <Alert bsStyle="info">
-    //       <p style={{ textAlign: "center" }}>
-    //         <strong>Please enter an address in above to allow search</strong>
-    //       </p>
-    //     </Alert>
-    //   );
-    // } else if (solarStatus === "failed") {
-    //   reactEcharts = (
-    //     <Alert bsStyle="danger">
-    //       <p style={{ textAlign: "center" }}>
-    //         <strong>{solarAlert}! Please try again!</strong>
-    //       </p>
-    //     </Alert>
-    //   );
-    // }
+    const closestPointIcon = {
+      url: "https://img.icons8.com/color/48/000000/marker.png"
+      // scaledSize: new this.props.google.maps.Size(20, 30) // scaled size
+    };
+    const defaultIcon = {
+      url:
+        "https://s3-ap-southeast-2.amazonaws.com/public-asset-test/icons8-marker-48.png"
+      // url: "https://netteser-cdn.sirv.com/Images/icons8-marker-48%20(1).png"
+      // scaledSize: new this.props.google.maps.Size(20, 30) // scaled size
+    };
+
     return (
       <div>
         {this.state.showModal && (
@@ -253,7 +260,7 @@ class MapView extends React.Component {
 
         {this.state.searching && (
           <Grid>
-            <Row className="show-grid" style={{ marginTop: "30%" }}>
+            <Row className="show-grid" style={{ marginTop: "15%" }}>
               <Col md={10} mdOffset={1}>
                 <LocationSearchBox
                   address={this.state.address}
@@ -266,7 +273,7 @@ class MapView extends React.Component {
 
         {this.state.showingMap && (
           <Grid>
-            <Row className="show-grid" style={{ marginTop: "10%" }}>
+            <Row className="show-grid" style={{ marginTop: "5%" }}>
               <Col md={10} mdOffset={1}>
                 <Map
                   google={this.props.google}
@@ -275,15 +282,30 @@ class MapView extends React.Component {
                   center={this.state.center}
                   style={{
                     boxShadow:
-                      "0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)",
-                    borderRadius: "2em",
-                    height: "100%",
+                      "0 1px 3px rgba(0,0,0,0.12), 0 4px 6px rgba(29,114,12,0.24)",
+                    borderRadius: "1em",
+                    height: "120%",
                     width: "100%"
                   }}
                 >
+                  <InfoWindow
+                    visible={this.state.showingMap}
+                    style={{ height: "50%", width: "50%" }}
+                    position={this.state.center}
+                  >
+                    <div>
+                      <h1>Current</h1>
+                    </div>
+                  </InfoWindow>
                   <Marker
                     position={this.state.center}
                     name={"Current location"}
+                    icon={defaultIcon}
+                  />
+                  <Marker
+                    position={this.state.closestPoint}
+                    name={"Closest point"}
+                    icon={closestPointIcon}
                   />
                   <Circle
                     radius={this.state.radius * 1000}
@@ -300,30 +322,56 @@ class MapView extends React.Component {
 
             <Row
               className="show-grid"
-              style={{ marginTop: "2%", visibility: this.state.visibility }}
+              style={{ marginTop: "11.5%", visibility: this.state.visibility }}
             >
               <Col md={1} mdOffset={1}>
-                <Button
-                  variant="contained"
-                  size="medium"
-                  onClick={this.onGoBackClick}
-                >
-                  Go Back
-                </Button>
+                <MuiThemeProvider theme={theme}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={this.onGoBackClick}
+                    style={{
+                      width: 100,
+                      fontSize: 12,
+                      color: "white"
+                    }}
+                  >
+                    Back
+                  </Button>
+                </MuiThemeProvider>
               </Col>
-              <Col md={1} mdOffset={7}>
-                <Button
-                  variant="contained"
-                  size="medium"
-                  onClick={this.toggleModal}
-                >
-                  Save
-                </Button>
+              <Col md={1} mdOffset={6}>
+                <MuiThemeProvider theme={theme}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={this.toggleModal}
+                    style={{
+                      marginLeft: 30,
+                      width: 100,
+                      fontSize: 12,
+                      color: "white"
+                    }}
+                  >
+                    Save
+                  </Button>
+                </MuiThemeProvider>
               </Col>
               <Col md={1}>
-                <Button variant="contained" size="medium">
-                  Export
-                </Button>
+                <MuiThemeProvider theme={theme}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    style={{
+                      width: 100,
+                      marginLeft: 70,
+                      fontSize: 12,
+                      color: "white"
+                    }}
+                  >
+                    Export
+                  </Button>
+                </MuiThemeProvider>
               </Col>
             </Row>
 

@@ -3,7 +3,6 @@ import classNames from "classnames";
 import { withStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
-import { loadCSS } from "fg-loadcss/src/loadCSS";
 import Icon from "@material-ui/core/Icon";
 import IconButton from "@material-ui/core/IconButton";
 import Fab from "@material-ui/core/Fab";
@@ -35,12 +34,6 @@ const styles = theme => ({
     marginRight: theme.spacing.unit,
     width: 750
   },
-  dense: {
-    marginTop: 19
-  },
-  menu: {
-    width: 200
-  },
   button: {
     margin: "4px",
     fontSize: "13px"
@@ -56,6 +49,7 @@ const styles = theme => ({
     marginTop: 70,
     height: 60,
     width: 750,
+    backgroundColor: "#f6f6f6",
     borderRadius: "3em",
     border: "1px solid dimgray",
     "&:focus": {
