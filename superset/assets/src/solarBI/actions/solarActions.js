@@ -125,7 +125,7 @@ export function saveSolarDataFailed() {
   return { type: SAVE_SOLAR_DATA_FAILED };
 }
 
-export function saveSolarData(formData, requestParams, callback) {
+export function saveSolarData(formData, requestParams) {
   return dispatch => {
     const directory = "/superset/solar/";
     const payload = {

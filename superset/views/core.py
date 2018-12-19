@@ -527,10 +527,10 @@ class SolarBIModelView(SliceModelView):  # noqa
     base_permissions = ['can_list', 'can_show', 'can_add', 'can_delete', 'can_edit']
 
 
-    @expose('/add', methods=['GET', 'POST'])
-    @has_access
-    def add(self):
-        return redirect('/superset/welcome')
+    # @expose('/add', methods=['GET', 'POST'])
+    # @has_access
+    # def add(self):
+    #     return redirect('/superset/welcome')
 
     @expose('/list/')
     @has_access

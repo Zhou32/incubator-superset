@@ -1,23 +1,24 @@
 /* eslint camelcase: 0 */
 import React from "react";
 import PropTypes from "prop-types";
+import { connect } from "react-redux";
 import { Modal, Alert, Button, Radio } from "react-bootstrap";
 import Select from "react-select";
 import { t } from "@superset-ui/translation";
-import { saveSlice } from "../actions/solarActions";
+import { saveSolarData } from "../actions/solarActions";
 
 import { supersetURL } from "../../utils/common";
 
 const propTypes = {
-  can_overwrite: PropTypes.bool,
-  onHide: PropTypes.bool.isRequired,
-  actions: PropTypes.object,
-  form_data: PropTypes.object,
-  userId: PropTypes.string.isRequired,
-  dashboards: PropTypes.array,
-  alert: PropTypes.string,
-  slice: PropTypes.object,
-  datasource: PropTypes.object
+  // can_overwrite: PropTypes.bool,
+  onHide: PropTypes.func.isRequired
+  // actions: PropTypes.object,
+  // form_data: PropTypes.object,
+  // userId: PropTypes.string.isRequired,
+  // dashboards: PropTypes.array,
+  // alert: PropTypes.string
+  // slice: PropTypes.object,
+  // datasource: PropTypes.object
 };
 
 class SaveModal extends React.Component {
@@ -31,13 +32,8 @@ class SaveModal extends React.Component {
       alert: null,
       action: props.can_overwrite ? "overwrite" : "saveas",
       addToDash: "noSave",
-      vizType: props.form_data.viz_type,
-      show: this.props.onHide
+      vizType: props.form_data.viz_type
     };
-  }
-
-  componentWillReceiveProps(nextProps, nextContext) {
-    this.setState({ show: nextProps.onHide });
   }
 
   onChange(name, event) {
@@ -85,13 +81,15 @@ class SaveModal extends React.Component {
       sliceParams.slice_name = this.props.slice.slice_name;
     }
 
-    saveSlice(this.props.form_data, sliceParams, data => {
-      // Go to new slice url or dashboard url
-      if (data.json.slice) {
-        window.location = data.json.slice.slice_url;
-      }
-    });
-    this.setState({ show: false });
+    this.props
+      .saveSolarData(this.props.form_data, sliceParams)
+      .then(({ data }) => {
+        // Go to new slice url or dashboard url
+        if (gotodash) {
+          window.location = data.slice.slice_url;
+        }
+      });
+    this.props.onHide();
   }
 
   removeAlert() {
@@ -101,7 +99,7 @@ class SaveModal extends React.Component {
   render() {
     const canNotSaveToDash = true;
     return (
-      <Modal show={this.state.show} bsStyle="large">
+      <Modal show onHide={this.props.onHide} bsStyle="large">
         <Modal.Header closeButton>
           <Modal.Title>{t("Save A Chart")}</Modal.Title>
         </Modal.Header>
@@ -149,7 +147,7 @@ class SaveModal extends React.Component {
             type="button"
             id="btn_modal_save"
             className="btn pull-left"
-            onClick={this.saveOrOverwrite.bind(this, false)}
+            onClick={this.saveOrOverwrite.bind(this, true)}
           >
             {t("Save")}
           </Button>
@@ -163,13 +161,17 @@ SaveModal.propTypes = propTypes;
 
 function mapStateToProps({ explore, saveModal }) {
   return {
-    datasource: explore.datasource,
-    slice: explore.slice,
-    can_overwrite: explore.can_overwrite,
-    userId: explore.user_id,
-    dashboards: saveModal.dashboards,
-    alert: saveModal.saveModalAlert
+    // datasource: explore.datasource,
+    // slice: explore.slice,
+    // can_overwrite: explore.can_overwrite,
+    // userId: explore.user_id,
+    // dashboards: saveModal.dashboards,
+    // alert: saveModal.saveModalAlert
   };
 }
 
-export default SaveModal;
+export { SaveModal };
+export default connect(
+  mapStateToProps,
+  { saveSolarData }
+)(SaveModal);
