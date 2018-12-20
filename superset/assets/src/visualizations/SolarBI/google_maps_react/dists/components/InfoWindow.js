@@ -195,7 +195,6 @@
       {
         key: "renderInfoWindow",
         value: function renderInfoWindow() {
-          console.log("error");
           var _props2 = this.props,
             map = _props2.map,
             google = _props2.google,
