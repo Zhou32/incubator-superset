@@ -526,15 +526,19 @@ class SolarBIModelView(SliceModelView):  # noqa
     base_filters = [['viz_type', FilterEqual, 'solarBI'],['created_by', FilterEqualFunction, get_user]]
     base_permissions = ['can_list', 'can_show', 'can_add', 'can_delete', 'can_edit']
 
-
     @expose('/add', methods=['GET', 'POST'])
     @has_access
     def add(self):
+        for role in g.user.roles:
+            if role.name == 'Admin':
+                return super(SolarBIModelView, self).add();
         return redirect('/superset/welcome')
+
 
     @expose('/list/')
     @has_access
     def list(self):
+        # self._base_filters = self.datamodel.get_filters().add_filter_list(self.base_filters)
         # for role in g.user.roles:
         #     if role.name == 'Admin':
         #         del self.base_filters[1]
@@ -1209,7 +1213,6 @@ class Superset(BaseSupersetView):
         payload = viz_obj.get_payload()
         return data_payload_response(*viz_obj.payload_json_and_has_error(payload))
 
-    count = 0
 
     @log_this
     @api
@@ -1233,11 +1236,6 @@ class Superset(BaseSupersetView):
         samples = request.args.get('samples') == 'true'
         force = request.args.get('force') == 'true'
 
-        if self.count == 1:
-            csv = True
-
-        self.count += 1
-        print(self.count)
 
         form_data = self.get_form_data()[0]
         datasource_id, datasource_type = self.datasource_info(

@@ -8,18 +8,18 @@ import {
   InfoWindow,
   GoogleApiWrapper
 } from "../../visualizations/SolarBI/google_maps_react";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
 import ReactEcharts from "echarts-for-react";
-import { Grid, Row, Col, Alert } from "react-bootstrap";
+import {Grid, Row, Col, Alert} from "react-bootstrap";
 import Button from "@material-ui/core/Button";
 import DisplayQueryButton from "../../explore/components/DisplayQueryButton";
-import { fetchSolarData, addSuccessToast } from "../actions/solarActions";
+import {fetchSolarData, addSuccessToast} from "../actions/solarActions";
 import SaveModal from "./SaveModal";
 import Loading from "./Loading";
 import classNames from "classnames";
-import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
-import { t } from "@superset-ui/translation";
+import {createMuiTheme, MuiThemeProvider} from "@material-ui/core/styles";
+import URI from "urijs";
 
 const propTypes = {
   solarBI: PropTypes.object.isRequired
@@ -37,7 +37,7 @@ const theme = createMuiTheme({
 });
 
 class MapView extends React.Component {
-  constructor(props) {
+  constructor(props){
     super(props);
     console.log(this.props);
 
@@ -65,9 +65,11 @@ class MapView extends React.Component {
     this.getOption = this.getOption.bind(this);
     this.requestData = this.requestData.bind(this);
     this.toggleModal = this.toggleModal.bind(this);
+    this.getFormData = this.getFormData.bind(this);
+    this.getCSVURL = this.getCSVURL.bind(this);
   }
 
-  componentWillMount() {
+  componentWillMount(){
     const { solarBI } = this.props;
     const { form_data } = solarBI;
     if (
@@ -86,71 +88,30 @@ class MapView extends React.Component {
         searching: false
       });
     } else {
-      this.setState({ data_source: form_data["datasource"] });
-    }
-  }
-
-  componentDidMount() {
-    const { solarBI } = this.props;
-    const { form_data } = solarBI;
-    if (
-      solarBI.hasOwnProperty("form_data") &&
-      form_data.hasOwnProperty("spatial_address")
-    ) {
-      this.requestData();
-    }
-  }
-
-  onPlaceChanged(place) {
-    if (place) {
-      // console.log(place);
       this.setState({
-        address: place.formatted_address,
-        center: {
-          lat: place.geometry.location.lat.call(),
-          lng: place.geometry.location.lng.call()
-        },
-        zoom: 13,
-        visibility: "visible",
-        searching: false,
-        showingMap: true,
-        showingInfoWindow: true
+        datasource_id: solarBI["datasource_id"],
+        datasource_type: solarBI["datasource_type"],
       });
     }
-    // this.requestData();
   }
 
-  toggleModal() {
+  // componentDidMount() {
+  //   const { solarBI } = this.props;
+  //   const { form_data } = solarBI;
+  //   if (
+  //     solarBI.hasOwnProperty("form_data") &&
+  //     form_data.hasOwnProperty("spatial_address")
+  //   ) {
+  //     this.requestData();
+  //   }
+  // }
+
+  toggleModal(){
     this.setState({ showModal: !this.state.showModal });
   }
 
-  componentDidMount() {
-    const { solarBI } = this.props;
-    const { form_data } = solarBI;
-    if (
-      solarBI.hasOwnProperty("form_data") &&
-      form_data.hasOwnProperty("spatial_address")
-    ) {
-      this.setState({
-        center: {
-          lat: form_data["spatial_address"]["lat"],
-          lng: form_data["spatial_address"]["lon"]
-        },
-        radius: form_data["radius"],
-        data_source: form_data["datasource"],
-        address: form_data["spatial_address"]["address"]
-      });
 
-      this.requestData();
-    } else {
-      this.setState({
-        datasource_id: solarBI["datasource_id"],
-        datasource_type: solarBI["datasource_type"]
-      });
-    }
-  }
-
-  onPlaceChanged(place) {
+  onPlaceChanged(place){
     if (place) {
       console.log(place);
       this.setState({
@@ -166,9 +127,10 @@ class MapView extends React.Component {
         showingInfoWindow: true
       });
     }
+    this.requestData();
   }
 
-  getOption(data) {
+  getOption(data){
     if (data) {
       var data1 = data[1];
       var xAxisData = data[0];
@@ -210,13 +172,13 @@ class MapView extends React.Component {
             name: "☀️ Irradiance ☀️ (W/m²)",
             type: "bar",
             data: data1,
-            animationDelay: function(idx) {
+            animationDelay: function (idx){
               return idx * 10;
             }
           }
         ],
         animationEasing: "elasticOut",
-        animationDelayUpdate: function(idx) {
+        animationDelayUpdate: function (idx){
           return idx * 5;
         }
       };
@@ -226,8 +188,8 @@ class MapView extends React.Component {
     return {};
   }
 
-  requestData() {
-    const formData = {
+  getFormData(){
+    return {
       datasource_id: this.state.datasource_id,
       datasource_type: this.state.datasource_type,
       viz_type: "solarBI",
@@ -240,24 +202,45 @@ class MapView extends React.Component {
         lonCol: "latitude",
         type: "latlong"
       }
-    };
+    }
   }
 
-  onGoBackClick() {
+  requestData(){
+    const formData = this.getFormData();
+    this.props.fetchSolarData(formData, false, 60, "");
+  }
+
+  getCSVURL(){
+    const formData = this.getFormData();
+    const uri = new URI('/');
+    const directory = "/superset/explore_json/" + formData['datasource_type'] + '/' + formData['datasource_id'] + "/";
+    const search = uri.search(true);
+    search.form_data = JSON.stringify(formData);
+    search.standalone = 'true';
+    search.csv = 'true';
+    const part_uri = uri.directory(directory).search(search).toString();
+    return (
+      window.location.origin + part_uri +
+      `&height=${this.state.height}`
+    );
+  }
+
+
+  onGoBackClick(){
     this.setState({
       searching: true,
       showingMap: false
     });
   }
 
-  render() {
+  render(){
     let reactEcharts = null;
     const { solarStatus, queryResponse, solarAlert } = this.props.solarBI;
     if (solarStatus === "success" && queryResponse) {
       const newOptions = this.getOption(queryResponse["data"]["data"]);
-      reactEcharts = <ReactEcharts option={newOptions} />;
+      reactEcharts = <ReactEcharts option={newOptions}/>;
     } else if (solarStatus === "loading") {
-      reactEcharts = <Loading size={50} />;
+      reactEcharts = <Loading size={50}/>;
     } else if (solarStatus === "failed") {
       reactEcharts = (
         <Alert bsStyle="danger">
@@ -413,6 +396,7 @@ class MapView extends React.Component {
                       fontSize: 12,
                       color: "white"
                     }}
+                    href={this.getCSVURL()}
                   >
                     Export
                   </Button>
