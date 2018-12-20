@@ -8,36 +8,38 @@ import {
   InfoWindow,
   GoogleApiWrapper
 } from "../../visualizations/SolarBI/google_maps_react";
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import ReactEcharts from "echarts-for-react";
-import {Grid, Row, Col, Alert} from "react-bootstrap";
+import { Grid, Row, Col, Alert } from "react-bootstrap";
 import Button from "@material-ui/core/Button";
 import DisplayQueryButton from "../../explore/components/DisplayQueryButton";
-import {fetchSolarData, addSuccessToast} from "../actions/solarActions";
+import { fetchSolarData, addSuccessToast } from "../actions/solarActions";
 import SaveModal from "./SaveModal";
 import Loading from "./Loading";
 import classNames from "classnames";
-import {createMuiTheme, MuiThemeProvider} from "@material-ui/core/styles";
 import URI from "urijs";
+import withWidth from "@material-ui/core/withWidth";
+import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
+import { t } from "@superset-ui/translation";
 
 const propTypes = {
   solarBI: PropTypes.object.isRequired
 };
 
 const theme = createMuiTheme({
+  typography: {
+    useNextVariants: true
+  },
   palette: {
     primary: {
       main: "#489795"
     }
-  },
-  typography: {
-    useNextVariants: true
   }
 });
 
 class MapView extends React.Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     console.log(this.props);
 
@@ -47,6 +49,7 @@ class MapView extends React.Component {
         lng: 144.96305759999996
       },
       radius: 3,
+      // data_source: "",
       datasource_id: "",
       datasource_type: "",
       zoom: 13,
@@ -56,8 +59,7 @@ class MapView extends React.Component {
       visibility: "hidden",
       showModal: false,
       searching: true,
-      showingMap: false,
-      showingInfoWindow: true
+      showingMap: false
     };
 
     this.onPlaceChanged = this.onPlaceChanged.bind(this);
@@ -69,7 +71,7 @@ class MapView extends React.Component {
     this.getCSVURL = this.getCSVURL.bind(this);
   }
 
-  componentWillMount(){
+  componentWillMount() {
     const { solarBI } = this.props;
     const { form_data } = solarBI;
     if (
@@ -82,15 +84,16 @@ class MapView extends React.Component {
           lng: form_data["spatial_address"]["lon"]
         },
         radius: form_data["radius"],
-        data_source: form_data["datasource"],
+        // data_source: form_data["datasource"],
         address: form_data["spatial_address"]["address"],
         showingMap: true,
         searching: false
       });
     } else {
       this.setState({
+        // data_source: form_data["datasource"],
         datasource_id: solarBI["datasource_id"],
-        datasource_type: solarBI["datasource_type"],
+        datasource_type: solarBI["datasource_type"]
       });
     }
   }
@@ -106,12 +109,11 @@ class MapView extends React.Component {
   //   }
   // }
 
-  toggleModal(){
+  toggleModal() {
     this.setState({ showModal: !this.state.showModal });
   }
 
-
-  onPlaceChanged(place){
+  onPlaceChanged(place) {
     if (place) {
       console.log(place);
       this.setState({
@@ -130,7 +132,7 @@ class MapView extends React.Component {
     this.requestData();
   }
 
-  getOption(data){
+  getOption(data) {
     if (data) {
       var data1 = data[1];
       var xAxisData = data[0];
@@ -172,13 +174,13 @@ class MapView extends React.Component {
             name: "☀️ Irradiance ☀️ (W/m²)",
             type: "bar",
             data: data1,
-            animationDelay: function (idx){
+            animationDelay: function(idx) {
               return idx * 10;
             }
           }
         ],
         animationEasing: "elasticOut",
-        animationDelayUpdate: function (idx){
+        animationDelayUpdate: function(idx) {
           return idx * 5;
         }
       };
@@ -188,8 +190,9 @@ class MapView extends React.Component {
     return {};
   }
 
-  getFormData(){
+  getFormData() {
     return {
+      // datasource: this.state.data_source,
       datasource_id: this.state.datasource_id,
       datasource_type: this.state.datasource_type,
       viz_type: "solarBI",
@@ -202,45 +205,60 @@ class MapView extends React.Component {
         lonCol: "latitude",
         type: "latlong"
       }
-    }
+    };
   }
 
-  requestData(){
+  requestData() {
     const formData = this.getFormData();
     this.props.fetchSolarData(formData, false, 60, "");
   }
 
-  getCSVURL(){
+  getCSVURL() {
     const formData = this.getFormData();
-    const uri = new URI('/');
-    const directory = "/superset/explore_json/" + formData['datasource_type'] + '/' + formData['datasource_id'] + "/";
+    const uri = new URI("/");
+    const directory =
+      "/superset/explore_json/" +
+      formData["datasource_type"] +
+      "/" +
+      formData["datasource_id"] +
+      "/";
     const search = uri.search(true);
     search.form_data = JSON.stringify(formData);
-    search.standalone = 'true';
-    search.csv = 'true';
-    const part_uri = uri.directory(directory).search(search).toString();
-    return (
-      window.location.origin + part_uri +
-      `&height=${this.state.height}`
-    );
+    search.standalone = "true";
+    search.csv = "true";
+    const part_uri = uri
+      .directory(directory)
+      .search(search)
+      .toString();
+    return window.location.origin + part_uri + `&height=${this.state.height}`;
   }
 
-
-  onGoBackClick(){
+  onGoBackClick() {
     this.setState({
       searching: true,
       showingMap: false
     });
   }
 
-  render(){
+  render() {
+    const { width } = this.props;
+    // let buttonProps = { size: "large" };
+    // if (width === "xs" || width === "md" || width === "sm") {
+    //   buttonProps = {
+    //     size: "medium"
+    //   };
+    // }
+    const isSmallScreen = /xs|sm|md/.test(width);
+    const buttonProps = {
+      size: isSmallScreen ? "medium" : "large"
+    };
     let reactEcharts = null;
     const { solarStatus, queryResponse, solarAlert } = this.props.solarBI;
     if (solarStatus === "success" && queryResponse) {
       const newOptions = this.getOption(queryResponse["data"]["data"]);
-      reactEcharts = <ReactEcharts option={newOptions}/>;
+      reactEcharts = <ReactEcharts option={newOptions} />;
     } else if (solarStatus === "loading") {
-      reactEcharts = <Loading size={50}/>;
+      reactEcharts = <Loading size={50} />;
     } else if (solarStatus === "failed") {
       reactEcharts = (
         <Alert bsStyle="danger">
@@ -264,31 +282,9 @@ class MapView extends React.Component {
 
     return (
       <div>
-        {this.state.showModal && (
-          <SaveModal
-            onHide={this.toggleModal}
-            actions={this.props.actions}
-            form_data={{
-              datasource_id: this.state.datasource_id,
-              datasource_type: this.state.datasource_type,
-              viz_type: "solarBI",
-              radius: this.state.radius,
-              spatial_address: {
-                address: this.state.address,
-                lat: this.state.center.lat,
-                lon: this.state.center.lng,
-                latCol: "longitude",
-                lonCol: "latitude",
-                type: "latlong"
-              }
-            }}
-            userId={""}
-          />
-        )}
-
         {this.state.searching && (
           <Grid>
-            <Row className="show-grid" style={{ marginTop: "15%" }}>
+            <Row className="show-grid" style={{ marginTop: "20%" }}>
               <Col md={10} mdOffset={1}>
                 <LocationSearchBox
                   address={this.state.address}
@@ -299,118 +295,152 @@ class MapView extends React.Component {
           </Grid>
         )}
 
-        {this.state.showingMap && (
-          <Grid>
-            <Row className="show-grid" style={{ marginTop: "5%" }}>
-              <Col md={10} mdOffset={1}>
-                <Map
-                  google={this.props.google}
-                  zoom={this.state.zoom}
-                  initialCenter={this.state.center}
+        <Grid>
+          <Row className="show-grid" style={{ marginTop: "6%" }}>
+            <Col xs={10} xsOffset={1} md={10} mdOffset={1}>
+              <Map
+                visible={this.state.showingMap}
+                google={this.props.google}
+                zoom={this.state.zoom}
+                initialCenter={this.state.center}
+                center={this.state.center}
+                style={{
+                  boxShadow:
+                    "0 1px 3px rgba(0,0,0,0.12), 0 4px 6px rgba(29,114,12,0.24)",
+                  borderRadius: "1em",
+                  height: "110%",
+                  width: "100%"
+                }}
+              >
+                <Marker
+                  position={this.state.center}
+                  name={"Current location"}
+                  icon={defaultIcon}
+                />
+                <InfoWindow
+                  visible={this.state.showingMap}
+                  style={{ height: "20%", width: "20%" }}
+                  position={this.state.center}
+                >
+                  <div>
+                    <p>Current Location</p>
+                  </div>
+                </InfoWindow>
+                <Marker
+                  position={this.state.closestPoint}
+                  name={"Closest point"}
+                  icon={closestPointIcon}
+                />
+                <InfoWindow
+                  visible={this.state.showingMap}
+                  style={{ height: "20%", width: "20%" }}
+                  position={this.state.closestPoint}
+                >
+                  <div>
+                    <p>Closest Point</p>
+                  </div>
+                </InfoWindow>
+                <Circle
+                  radius={this.state.radius * 1000}
                   center={this.state.center}
+                  strokeColor="transparent"
+                  strokeOpacity={0}
+                  strokeWeight={5}
+                  fillColor={"#FF0000"}
+                  fillOpacity={0.2}
+                />
+              </Map>
+            </Col>
+          </Row>
+
+          <Row
+            className="show-grid"
+            style={{
+              marginTop: "8%",
+              visibility: this.state.visibility
+            }}
+          >
+            <Col md={1} mdOffset={1}>
+              <MuiThemeProvider theme={theme}>
+                <Button
+                  // size="large"
+                  {...buttonProps}
+                  variant="contained"
+                  color="primary"
+                  onClick={this.onGoBackClick}
                   style={{
-                    boxShadow:
-                      "0 1px 3px rgba(0,0,0,0.12), 0 4px 6px rgba(29,114,12,0.24)",
-                    borderRadius: "1em",
-                    height: "120%",
-                    width: "100%"
+                    // width: 100,
+                    fontSize: 12,
+                    color: "white"
                   }}
                 >
-                  <InfoWindow
-                    visible={this.state.showingMap}
-                    style={{ height: "50%", width: "50%" }}
-                    position={this.state.center}
-                  >
-                    <div>
-                      <h1>Current</h1>
-                    </div>
-                  </InfoWindow>
-                  <Marker
-                    position={this.state.center}
-                    name={"Current location"}
-                    icon={defaultIcon}
-                  />
-                  <Marker
-                    position={this.state.closestPoint}
-                    name={"Closest point"}
-                    icon={closestPointIcon}
-                  />
-                  <Circle
-                    radius={this.state.radius * 1000}
-                    center={this.state.center}
-                    strokeColor="transparent"
-                    strokeOpacity={0}
-                    strokeWeight={5}
-                    fillColor={"#FF0000"}
-                    fillOpacity={0.2}
-                  />
-                </Map>
-              </Col>
-            </Row>
+                  Back
+                </Button>
+              </MuiThemeProvider>
+            </Col>
+            <Col xs={1} xsOffset={4} md={1} mdOffset={6}>
+              <MuiThemeProvider theme={theme}>
+                <Button
+                  {...buttonProps}
+                  variant="contained"
+                  color="primary"
+                  onClick={this.toggleModal}
+                  style={{
+                    // marginLeft: 30,
+                    // width: "1vw",
+                    fontSize: 12,
+                    color: "white"
+                  }}
+                >
+                  Save
+                </Button>
+              </MuiThemeProvider>
+            </Col>
+            <Col xs={1} md={1}>
+              <MuiThemeProvider theme={theme}>
+                <Button
+                  {...buttonProps}
+                  variant="contained"
+                  color="primary"
+                  style={{
+                    // width: 100,
+                    marginLeft: "5em",
+                    fontSize: 12,
+                    color: "white"
+                  }}
+                  href={this.getCSVURL()}
+                >
+                  Export
+                </Button>
+              </MuiThemeProvider>
+            </Col>
+          </Row>
 
-            <Row
-              className="show-grid"
-              style={{ marginTop: "11.5%", visibility: this.state.visibility }}
-            >
-              <Col md={1} mdOffset={1}>
-                <MuiThemeProvider theme={theme}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={this.onGoBackClick}
-                    style={{
-                      width: 100,
-                      fontSize: 12,
-                      color: "white"
-                    }}
-                  >
-                    Back
-                  </Button>
-                </MuiThemeProvider>
-              </Col>
-              <Col md={1} mdOffset={6}>
-                <MuiThemeProvider theme={theme}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={this.toggleModal}
-                    style={{
-                      marginLeft: 30,
-                      width: 100,
-                      fontSize: 12,
-                      color: "white"
-                    }}
-                  >
-                    Save
-                  </Button>
-                </MuiThemeProvider>
-              </Col>
-              <Col md={1}>
-                <MuiThemeProvider theme={theme}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    style={{
-                      width: 100,
-                      marginLeft: 70,
-                      fontSize: 12,
-                      color: "white"
-                    }}
-                    href={this.getCSVURL()}
-                  >
-                    Export
-                  </Button>
-                </MuiThemeProvider>
-              </Col>
-            </Row>
-
-            <Row className="show-grid" style={{ marginTop: "2%" }}>
-              <Col md={10} mdOffset={1}>
-                {reactEcharts}
-              </Col>
-            </Row>
-          </Grid>
-        )}
+          <Row className="show-grid" style={{ marginTop: "2%" }}>
+            <Col md={10} mdOffset={1}>
+              {reactEcharts}
+            </Col>
+          </Row>
+        </Grid>
+        <SaveModal
+          open={this.state.showModal}
+          onHide={this.toggleModal}
+          actions={this.props.actions}
+          form_data={{
+            datasource: this.state.data_source,
+            viz_type: "solarBI",
+            radius: this.state.radius,
+            spatial_address: {
+              address: this.state.address,
+              lat: this.state.center.lat,
+              lon: this.state.center.lng,
+              latCol: "longitude",
+              lonCol: "latitude",
+              type: "latlong"
+            }
+          }}
+          userId={""}
+        />
       </div>
     );
   }
@@ -422,11 +452,13 @@ const mapStateToProps = state => ({
   solarBI: state.solarBI
 });
 
-export default connect(
-  mapStateToProps,
-  { fetchSolarData }
-)(
-  GoogleApiWrapper({
-    apiKey: "AIzaSyBhxmH4h8k0ZaUN713RVCb9T1uGTfsIX9k"
-  })(MapView)
+export default withWidth()(
+  connect(
+    mapStateToProps,
+    { fetchSolarData }
+  )(
+    GoogleApiWrapper({
+      apiKey: "AIzaSyBhxmH4h8k0ZaUN713RVCb9T1uGTfsIX9k"
+    })(MapView)
+  )
 );
