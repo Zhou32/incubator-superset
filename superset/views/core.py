@@ -2867,10 +2867,10 @@ class Superset(BaseSupersetView):
             return redirect(datasource.default_endpoint)
 
         # slc perms
-        slice_add_perm = security_manager.can_access('can_add', 'SliceModelView')
+        slice_add_perm = security_manager.can_access('can_add', 'SolarBIModelView')
         slice_overwrite_perm = is_owner(slc, g.user)
         slice_download_perm = security_manager.can_access(
-            'can_download', 'SliceModelView')
+            'can_download', 'SolarBIModelView')
 
         form_data['datasource'] = str(datasource_id) + '__' + datasource_type
 
