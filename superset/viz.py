@@ -2788,8 +2788,7 @@ class SolarBI(BaseViz):
         return d
 
     def get_data(self, df):
-        lat = self.form_data['spatial_address']['lat']
-        lng = self.form_data['spatial_address']['lon']
+        lat, lng = self.get_closest_point((float(lat), float(lng)), self.lat_list679, self.lng_list839)[0]
         radius = self.form_data['radius']
         results = df.to_dict()
         x = []
