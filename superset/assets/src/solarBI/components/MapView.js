@@ -39,7 +39,7 @@ const theme = createMuiTheme({
 });
 
 class MapView extends React.Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     console.log(this.props);
 
@@ -51,14 +51,17 @@ class MapView extends React.Component {
       radius: 3,
       datasource_id: "",
       datasource_type: "",
-      zoom: 13,
+      zoom: 15,
       address: "",
       options: {},
       closestPoint: { lat: -37.818276, lng: 144.96707 },
       visibility: "hidden",
       showModal: false,
       searching: true,
-      showingMap: false
+      showingMap: false,
+      activeMarker: {},
+      selectedPlace: {},
+      showingInfoWindow: false
     };
 
     this.onPlaceChanged = this.onPlaceChanged.bind(this);
@@ -68,9 +71,12 @@ class MapView extends React.Component {
     this.toggleModal = this.toggleModal.bind(this);
     this.getFormData = this.getFormData.bind(this);
     this.getCSVURL = this.getCSVURL.bind(this);
+    this.onMarkerClick = this.onMarkerClick.bind(this);
+    this.onInfoWindowClose = this.onInfoWindowClose.bind(this);
+    this.onMapClicked = this.onMapClicked.bind(this);
   }
 
-  componentWillMount(){
+  componentWillMount() {
     const { solarBI } = this.props;
     const { form_data } = solarBI;
     if (
@@ -97,22 +103,11 @@ class MapView extends React.Component {
     }
   }
 
-  // componentDidMount() {
-  //   const { solarBI } = this.props;
-  //   const { form_data } = solarBI;
-  //   if (
-  //     solarBI.hasOwnProperty("form_data") &&
-  //     form_data.hasOwnProperty("spatial_address")
-  //   ) {
-  //     this.requestData();
-  //   }
-  // }
-
-  toggleModal(){
+  toggleModal() {
     this.setState({ showModal: !this.state.showModal });
   }
 
-  onPlaceChanged(place){
+  onPlaceChanged(place) {
     if (place) {
       console.log(place);
       this.setState({
@@ -121,17 +116,16 @@ class MapView extends React.Component {
           lat: place.geometry.location.lat.call(),
           lng: place.geometry.location.lng.call()
         },
-        zoom: 14,
+        zoom: 15,
         visibility: "visible",
         searching: false,
-        showingMap: true,
-        showingInfoWindow: true
+        showingMap: true
       });
     }
     this.requestData();
   }
 
-  getOption(data){
+  getOption(data) {
     if (data) {
       var data1 = data[1];
       var xAxisData = data[0];
@@ -173,13 +167,13 @@ class MapView extends React.Component {
             name: "☀️ Irradiance ☀️ (W/m²)",
             type: "bar",
             data: data1,
-            animationDelay: function (idx){
+            animationDelay: function(idx) {
               return idx * 10;
             }
           }
         ],
         animationEasing: "elasticOut",
-        animationDelayUpdate: function (idx){
+        animationDelayUpdate: function(idx) {
           return idx * 5;
         }
       };
@@ -189,7 +183,7 @@ class MapView extends React.Component {
     return {};
   }
 
-  getFormData(){
+  getFormData() {
     return {
       // datasource: this.state.data_source,
       datasource_id: this.state.datasource_id,
@@ -207,12 +201,12 @@ class MapView extends React.Component {
     };
   }
 
-  requestData(){
+  requestData() {
     const formData = this.getFormData();
     this.props.fetchSolarData(formData, false, 60, "");
   }
 
-  getCSVURL(){
+  getCSVURL() {
     const formData = this.getFormData();
     const uri = new URI("/");
     const directory =
@@ -232,14 +226,37 @@ class MapView extends React.Component {
     return window.location.origin + part_uri + `&height=${this.state.height}`;
   }
 
-  onGoBackClick(){
+  onGoBackClick() {
     this.setState({
       searching: true,
       showingMap: false
     });
   }
 
-  render(){
+  onMarkerClick(props, marker) {
+    this.setState({
+      activeMarker: marker,
+      selectedPlace: props,
+      showingInfoWindow: true
+    });
+  }
+
+  onInfoWindowClose() {
+    this.setState({
+      activeMarker: null,
+      showingInfoWindow: false
+    });
+  }
+
+  onMapClicked() {
+    if (this.state.showingInfoWindow)
+      this.setState({
+        activeMarker: null,
+        showingInfoWindow: false
+      });
+  }
+
+  render() {
     const { width } = this.props;
     // let buttonProps = { size: "large" };
     // if (width === "xs" || width === "md" || width === "sm") {
@@ -255,9 +272,9 @@ class MapView extends React.Component {
     const { solarStatus, queryResponse, solarAlert } = this.props.solarBI;
     if (solarStatus === "success" && queryResponse) {
       const newOptions = this.getOption(queryResponse["data"]["data"]);
-      reactEcharts = <ReactEcharts option={newOptions}/>;
+      reactEcharts = <ReactEcharts option={newOptions} />;
     } else if (solarStatus === "loading") {
-      reactEcharts = <Loading size={50}/>;
+      reactEcharts = <Loading size={50} />;
     } else if (solarStatus === "failed") {
       reactEcharts = (
         <Alert bsStyle="danger">
@@ -301,6 +318,7 @@ class MapView extends React.Component {
                 visible={this.state.showingMap}
                 google={this.props.google}
                 zoom={this.state.zoom}
+                onClick={this.onMapClicked}
                 initialCenter={this.state.center}
                 center={this.state.center}
                 style={{
@@ -313,24 +331,29 @@ class MapView extends React.Component {
               >
                 <Marker
                   position={this.state.center}
-                  name={"Current location"}
+                  name="Current location"
                   icon={defaultIcon}
+                  onClick={this.onMarkerClick}
                 />
                 <InfoWindow
-                  visible={this.state.showingMap}
-                  style={{ height: "20%", width: "20%" }}
-                  position={this.state.center}
+                  marker={this.state.activeMarker}
+                  onClose={this.onInfoWindowClose}
+                  visible={this.state.showingInfoWindow}
+                  // visible={this.state.showingMap}
+                  // style={{ height: "20%", width: "20%" }}
+                  // position={this.state.center}
                 >
                   <div>
-                    <p>Current Location</p>
+                    <p>{this.state.selectedPlace.name}</p>
                   </div>
                 </InfoWindow>
                 <Marker
                   position={this.state.closestPoint}
-                  name={"Closest point"}
+                  name="Closest point"
                   icon={closestPointIcon}
+                  onClick={this.onMarkerClick}
                 />
-                <InfoWindow
+                {/* <InfoWindow
                   visible={this.state.showingMap}
                   style={{ height: "20%", width: "20%" }}
                   position={this.state.closestPoint}
@@ -338,10 +361,10 @@ class MapView extends React.Component {
                   <div>
                     <p>Closest Point</p>
                   </div>
-                </InfoWindow>
+                </InfoWindow> */}
                 <Circle
                   radius={this.state.radius * 1000}
-                  center={this.state.center}
+                  center={this.state.closestPoint}
                   strokeColor="transparent"
                   strokeOpacity={0}
                   strokeWeight={5}
