@@ -48,13 +48,12 @@ class MapView extends React.Component {
         lat: -37.8136276,
         lng: 144.96305759999996
       },
-      radius: 3,
+      radius: 2.7,
       datasource_id: "",
       datasource_type: "",
-      zoom: 13,
+      zoom: 16,
       address: "",
       options: {},
-      closestPoint: { lat: -37.818276, lng: 144.96707 },
       visibility: "hidden",
       showModal: false,
       searching: true,
@@ -83,7 +82,6 @@ class MapView extends React.Component {
           lng: form_data["spatial_address"]["lon"]
         },
         radius: form_data["radius"],
-        // data_source: form_data["datasource"],
         address: form_data["spatial_address"]["address"],
         showingMap: true,
         searching: false
@@ -127,8 +125,8 @@ class MapView extends React.Component {
         showingMap: true,
         showingInfoWindow: true
       });
+      this.requestData();
     }
-    this.requestData();
   }
 
   getOption(data){
@@ -209,6 +207,7 @@ class MapView extends React.Component {
 
   requestData(){
     const formData = this.getFormData();
+    console.log(formData);
     this.props.fetchSolarData(formData, false, 60, "");
   }
 
@@ -236,7 +235,7 @@ class MapView extends React.Component {
     this.setState({
       searching: true,
       showingMap: false
-    });
+    })
   }
 
   render(){
@@ -247,14 +246,26 @@ class MapView extends React.Component {
     //     size: "medium"
     //   };
     // }
+    //let closestPoint ={};
     const isSmallScreen = /xs|sm|md/.test(width);
     const buttonProps = {
       size: isSmallScreen ? "medium" : "large"
     };
     let reactEcharts = null;
+    let closestMarker = null;
     const { solarStatus, queryResponse, solarAlert } = this.props.solarBI;
     if (solarStatus === "success" && queryResponse) {
+      console.log(queryResponse);
       const newOptions = this.getOption(queryResponse["data"]["data"]);
+      const closestPoint={lat:queryResponse["data"]["lat"],lng:queryResponse["data"]["lng"]};
+      //console.log(this.state.center);
+      console.log("render closest:", closestPoint);
+      // console.log(queryResponse);
+      closestMarker = (<Marker
+                  position={closestPoint}
+                  name={"Closest point"}
+                  // icon={closestPointIcon}
+                />);
       reactEcharts = <ReactEcharts option={newOptions}/>;
     } else if (solarStatus === "loading") {
       reactEcharts = <Loading size={50}/>;
@@ -325,20 +336,21 @@ class MapView extends React.Component {
                     <p>Current Location</p>
                   </div>
                 </InfoWindow>
-                <Marker
-                  position={this.state.closestPoint}
-                  name={"Closest point"}
-                  icon={closestPointIcon}
-                />
-                <InfoWindow
-                  visible={this.state.showingMap}
-                  style={{ height: "20%", width: "20%" }}
-                  position={this.state.closestPoint}
-                >
-                  <div>
-                    <p>Closest Point</p>
-                  </div>
-                </InfoWindow>
+                {/*<Marker*/}
+                  {/*position={{lat:this.props.solarBI.queryResponse["data"]["lat"],lng:this.props.solarBI.queryResponse["data"]["lng"]}}*/}
+                  {/*name={"Closest point"}*/}
+                  {/*icon={closestPointIcon}*/}
+                {/*/>*/}
+                {closestMarker}
+                {/*<InfoWindow*/}
+                  {/*visible={this.state.showingMap}*/}
+                  {/*style={{ height: "20%", width: "20%" }}*/}
+                  {/*position={{lat:this.props.solarBI.queryResponse["data"]["lat"],lng:this.props.solarBI.queryResponse["data"]["lng"]}}*/}
+                {/*>*/}
+                  {/*<div>*/}
+                    {/*<p>Closest Point</p>*/}
+                  {/*</div>*/}
+                {/*</InfoWindow>*/}
                 <Circle
                   radius={this.state.radius * 1000}
                   center={this.state.center}

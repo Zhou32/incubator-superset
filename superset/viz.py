@@ -2694,6 +2694,9 @@ class SolarBI(BaseViz):
     lat_list679 = None
     lng_list839 = None
 
+    nearest_lat = None
+    nearest_lng = None
+
     def load_data(self, name):
         file = open(name, 'rb')
         print("file '" + name + "' has been loaded successfully.")
@@ -2701,10 +2704,11 @@ class SolarBI(BaseViz):
 
     def get_closest_point(self, coordinate_lat_lng, lat_list, lng_list):
         from math import fabs
+        print(coordinate_lat_lng)
         """
-        Reture a list of one closest point tuple(lat, lng) in the in the radius=5km
+        Return a list of one closest point tuple(lat, lng) in the in the radius=5km
         """
-        r = 5
+        r = 4
         point = []  # [(lat, lng, distance),(...),...]
 
         threshold_lat = r / 100  # 110km/degree
@@ -2719,13 +2723,16 @@ class SolarBI(BaseViz):
                             point.append((lat, lng, dist))
 
         point.sort(key=lambda x: x[2])
-        return [(point[0][0], point[0][1])]
+        self.nearest_lat = point[0][0]
+        self.nearest_lng = point[0][1]
+        print([(point[0][0], point[0][1])])
+        # return [(point[0][0], point[0][1])]
 
     # give coordinate and radius, return all points inside
     def get_legal_point(self, coordinate_lat_lng, r, lat_list, lng_list):
         from math import fabs
         """
-        Reture a list of all possible points tuple(lat, lng) in the radius
+        Return a list of all possible points tuple(lat, lng) in the radius
         """
         point = []
         count = 0
@@ -2765,11 +2772,12 @@ class SolarBI(BaseViz):
         lat = self.form_data['spatial_address']['lat']
         lng = self.form_data['spatial_address']['lon']
         radius = self.form_data['radius']
-        self.lat_list679 = [float(x) for x in self.load_data('superset/solar_locations/lat679.pk')]
-        self.lng_list839 = [float(x) for x in self.load_data('superset/solar_locations/lng839.pk')]
+        if not self.lng_list839:
+            self.lat_list679 = [float(x) for x in self.load_data('superset/solar_locations/lat679.pk')]
+            self.lng_list839 = [float(x) for x in self.load_data('superset/solar_locations/lng839.pk')]
 
-        lat, lng = self.get_closest_point((float(lat), float(lng)),self.lat_list679,self.lng_list839)[0]
-        where = f"latitude = '{lat}' and longitude = '{lng}' AND radiation != -999"
+        self.get_closest_point((float(lat), float(lng)), self.lat_list679, self.lng_list839)
+        where = f"latitude = '{self.nearest_lat}' and longitude = '{self.nearest_lng}' AND radiation != -999"
         return where
 
     def query_obj(self):
@@ -2788,7 +2796,7 @@ class SolarBI(BaseViz):
         return d
 
     def get_data(self, df):
-        lat, lng = self.get_closest_point((float(lat), float(lng)), self.lat_list679, self.lng_list839)[0]
+
         radius = self.form_data['radius']
         results = df.to_dict()
         x = []
@@ -2801,7 +2809,7 @@ class SolarBI(BaseViz):
                     x_axis += '/' + str(results[self.partition[j]][i])
             x.append(x_axis)
             y.append(results['radiation'][i])
-        data = {'lat': lat, 'lng': lng, 'radius': radius, 'data': [x, y]}
+        data = {'lat': self.nearest_lat, 'lng': self.nearest_lng, 'radius': radius, 'data': [x, y]}
         return data
 
 
