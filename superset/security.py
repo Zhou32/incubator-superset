@@ -337,12 +337,13 @@ class SupersetSecurityManager(SecurityManager):
         self.set_role('sql_lab', self.is_sql_lab_pvm)
         self.set_role('solar_default',self.is_solar_pvm)
 
-        # if conf.get('PUBLIC_ROLE_LIKE_GAMMA', False):
-        #     self.set_role('Public', self.is_gamma_pvm)
+        if conf.get('PUBLIC_ROLE_LIKE_GAMMA', False):
+            self.set_role('Public', self.is_gamma_pvm)
 
-        self.set_role('Custom', self.is_custom_pvm)
-        if conf.get('PUBLIC_ROLE_LIKE_SOLAR', False):
-            self.set_role('Public', self.is_custom_pvm)
+
+        # self.set_role('Custom', self.is_custom_pvm)
+        # if conf.get('PUBLIC_ROLE_LIKE_CUSTOM', False):
+        #     self.set_role('Public', self.is_custom_pvm)
 
         self.create_missing_perms()
 
