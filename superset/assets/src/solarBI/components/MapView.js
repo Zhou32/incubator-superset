@@ -257,6 +257,8 @@ class MapView extends React.Component {
   }
 
   render() {
+    console.log("active marker:", this.state.activeMarker);
+    console.log(this.state.selectedPlace.name);
     const { width } = this.props;
     // let buttonProps = { size: "large" };
     // if (width === "xs" || width === "md" || width === "sm") {
@@ -350,7 +352,7 @@ class MapView extends React.Component {
                 <Marker
                   position={this.state.closestPoint}
                   name="Closest point"
-                  icon={closestPointIcon}
+                  // icon={closestPointIcon}
                   onClick={this.onMarkerClick}
                 />
                 {/* <InfoWindow
