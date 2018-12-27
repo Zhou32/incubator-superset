@@ -90,7 +90,7 @@ SOLAR_PERMISSIONS = {
     'can_this_form_post': 'UserInfoEditView',
     'can_this_form_get': 'UserInfoEditView',
     'can_userinfo': 'UserDBModelView',
-    'userinfo_edit':'UserDBModelView'
+    'userinfoedit': 'UserDBModelView'
 }
 
 
