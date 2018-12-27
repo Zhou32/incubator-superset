@@ -83,8 +83,14 @@ SOLAR_PERMISSIONS = {
     'can_delete': 'SolarBIModelView',
     'can_add': 'SolarBIModelView',
     'menu_access': 'SolarBI',
-    'can_explore_json': 'Superset'
-
+    'can_explore_json': 'Superset',
+    'resetmypassword': 'UserDBModelView',
+    'can_this_form_post': 'ResetMyPasswordView',
+    'can_this_form_get': 'ResetMyPasswordView',
+    'can_this_form_post': 'UserInfoEditView',
+    'can_this_form_get': 'UserInfoEditView',
+    'can_userinfo': 'UserDBModelView',
+    'userinfo_edit':'UserDBModelView'
 }
 
 

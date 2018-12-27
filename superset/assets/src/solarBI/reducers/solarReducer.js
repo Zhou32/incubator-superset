@@ -20,6 +20,7 @@ export default function(state = {}, action) {
         ...state,
         solarStatus: "success",
         queryResponse: action.queryResponse,
+        visibility: "visible",
         chartUpdateEndTime: now()
       };
     },

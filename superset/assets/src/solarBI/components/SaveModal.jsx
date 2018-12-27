@@ -168,12 +168,22 @@ class SaveModal extends React.Component {
                 Save Chart
               </Typography>
               <Divider light className={classes.divider} />
-              <Input
-                placeholder="Chart Name"
+              <TextField
+                label="Chart Name"
                 className={classes.input}
                 onChange={this.onChange.bind(this, "newSliceName")}
                 inputProps={{
                   "aria-label": "Save"
+                }}
+                InputLabelProps={{
+                  style: {
+                    fontSize: 16
+                  }
+                }}
+                InputProps={{
+                  style: {
+                    fontSize: 16
+                  }
                 }}
               />
               {/* <TextField

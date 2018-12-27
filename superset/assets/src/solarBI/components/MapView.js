@@ -38,6 +38,7 @@ const theme = createMuiTheme({
   }
 });
 
+
 class MapView extends React.Component {
   constructor(props){
     super(props);
@@ -48,16 +49,18 @@ class MapView extends React.Component {
         lat: -37.8136276,
         lng: 144.96305759999996
       },
-      radius: 2.7,
+      radius: 3.5,
       datasource_id: "",
       datasource_type: "",
-      zoom: 16,
+      zoom: 13,
       address: "",
       options: {},
       visibility: "hidden",
       showModal: false,
       searching: true,
-      showingMap: false
+      showingMap: false,
+      // showingCurrentInfo: false,
+      // showingClosestInfo: false
     };
 
     this.onPlaceChanged = this.onPlaceChanged.bind(this);
@@ -67,6 +70,7 @@ class MapView extends React.Component {
     this.toggleModal = this.toggleModal.bind(this);
     this.getFormData = this.getFormData.bind(this);
     this.getCSVURL = this.getCSVURL.bind(this);
+    // this.showingCurrentInfo = false
   }
 
   componentWillMount(){
@@ -84,13 +88,21 @@ class MapView extends React.Component {
         radius: form_data["radius"],
         address: form_data["spatial_address"]["address"],
         showingMap: true,
-        searching: false
+        searching: false,
+        datasource_id: solarBI["datasource_id"],
+        datasource_type: solarBI["datasource_type"],
+        button_visiable: false
+
+      },function (){
+          this.requestData();
       });
+
     } else {
       this.setState({
         // data_source: form_data["datasource"],
         datasource_id: solarBI["datasource_id"],
-        datasource_type: solarBI["datasource_type"]
+        datasource_type: solarBI["datasource_type"],
+        button_visiable: true
       });
     }
   }
@@ -113,19 +125,21 @@ class MapView extends React.Component {
   onPlaceChanged(place){
     if (place) {
       console.log(place);
+      const lat = place.geometry.location.lat.call();
+      const lng = place.geometry.location.lng.call();
       this.setState({
         address: place.formatted_address,
         center: {
-          lat: place.geometry.location.lat.call(),
-          lng: place.geometry.location.lng.call()
+          lat,lng
         },
-        zoom: 14,
-        visibility: "visible",
+        zoom: 13,
         searching: false,
         showingMap: true,
         showingInfoWindow: true
+      },function (){
+        this.requestData();
       });
-      this.requestData();
+
     }
   }
 
@@ -234,9 +248,14 @@ class MapView extends React.Component {
   onGoBackClick(){
     this.setState({
       searching: true,
-      showingMap: false
+      showingMap: false,
+      // visibility: "hidden",
+      // showingCurrentInfo: false,
+      // showingClosestInfo: false
     })
   }
+
+
 
   render(){
     const { width } = this.props;
@@ -246,29 +265,31 @@ class MapView extends React.Component {
     //     size: "medium"
     //   };
     // }
-    //let closestPoint ={};
     const isSmallScreen = /xs|sm|md/.test(width);
     const buttonProps = {
       size: isSmallScreen ? "medium" : "large"
     };
     let reactEcharts = null;
     let closestMarker = null;
-    const { solarStatus, queryResponse, solarAlert } = this.props.solarBI;
+    let closestPoint = null;
+    let { solarStatus, queryResponse, solarAlert, visibility} = this.props.solarBI;
+    if(!visibility)
+      visibility = 'hidden';
     if (solarStatus === "success" && queryResponse) {
       console.log(queryResponse);
       const newOptions = this.getOption(queryResponse["data"]["data"]);
-      const closestPoint={lat:queryResponse["data"]["lat"],lng:queryResponse["data"]["lng"]};
+      closestPoint={lat:queryResponse["data"]["lat"],lng:queryResponse["data"]["lng"]};
       //console.log(this.state.center);
       console.log("render closest:", closestPoint);
       // console.log(queryResponse);
-      closestMarker = (<Marker
-                  position={closestPoint}
-                  name={"Closest point"}
-                  // icon={closestPointIcon}
-                />);
+      // closestMarker = (<Marker
+      //             position={closestPoint}
+      //             name={"Closest point"}
+      //             // icon={closestPointIcon}
+      //           />);
       reactEcharts = <ReactEcharts option={newOptions}/>;
     } else if (solarStatus === "loading") {
-      reactEcharts = <Loading size={50}/>;
+      reactEcharts = <Loading size={50} style={{ marginTop: "20%" }}/>;
     } else if (solarStatus === "failed") {
       reactEcharts = (
         <Alert bsStyle="danger">
@@ -306,7 +327,7 @@ class MapView extends React.Component {
         )}
 
         <Grid>
-          <Row className="show-grid" style={{ marginTop: "6%" }}>
+          <Row className="show-grid" style={{ marginTop: "1%" }}>
             <Col xs={10} xsOffset={1} md={10} mdOffset={1}>
               <Map
                 visible={this.state.showingMap}
@@ -326,26 +347,31 @@ class MapView extends React.Component {
                   position={this.state.center}
                   name={"Current location"}
                   icon={defaultIcon}
-                />
-                <InfoWindow
-                  visible={this.state.showingMap}
-                  style={{ height: "20%", width: "20%" }}
-                  position={this.state.center}
+                  // onClick={()=>{this.showingCurrentInfo=!this.showingCurrentInfo}}
                 >
-                  <div>
-                    <p>Current Location</p>
-                  </div>
-                </InfoWindow>
-                {/*<Marker*/}
-                  {/*position={{lat:this.props.solarBI.queryResponse["data"]["lat"],lng:this.props.solarBI.queryResponse["data"]["lng"]}}*/}
-                  {/*name={"Closest point"}*/}
-                  {/*icon={closestPointIcon}*/}
-                {/*/>*/}
-                {closestMarker}
+                  {/*<InfoWindow*/}
+                    {/*visible= {true}*/}
+                    {/*style={{ height: "20%", width: "20%" }}*/}
+                    {/*marker={this.parent}*/}
+                  {/*>*/}
+                    {/*<div>*/}
+                      {/*<p>Current Location</p>*/}
+                    {/*</div>*/}
+                  {/*</InfoWindow>*/}
+
+                </Marker>
+
+                <Marker
+                  position={closestPoint}
+                  name={"Closest point"}
+                  icon={closestPointIcon}
+                  // onClick={()=>{this.setState({showingClosestInfo:!this.state.showingClosestInfo})}}
+                />
+                {/*/!*{closestMarker}*!/*/}
                 {/*<InfoWindow*/}
-                  {/*visible={this.state.showingMap}*/}
+                  {/*visible={this.state.showingClosestInfo}*/}
                   {/*style={{ height: "20%", width: "20%" }}*/}
-                  {/*position={{lat:this.props.solarBI.queryResponse["data"]["lat"],lng:this.props.solarBI.queryResponse["data"]["lng"]}}*/}
+                  {/*position={closestPoint}*/}
                 {/*>*/}
                   {/*<div>*/}
                     {/*<p>Closest Point</p>*/}
@@ -364,11 +390,18 @@ class MapView extends React.Component {
             </Col>
           </Row>
 
-          <Row
+
+
+          <Row className="show-grid" style={{ marginTop: "8%" }}>
+            <Col md={10} mdOffset={1}>
+              {reactEcharts}
+            </Col>
+          </Row>
+
+           <Row
             className="show-grid"
             style={{
-              marginTop: "8%",
-              visibility: this.state.visibility
+              visibility: this.state.button_visiable ? visibility:'hidden'
             }}
           >
             <Col md={1} mdOffset={1}>
@@ -424,12 +457,6 @@ class MapView extends React.Component {
                   Export
                 </Button>
               </MuiThemeProvider>
-            </Col>
-          </Row>
-
-          <Row className="show-grid" style={{ marginTop: "2%" }}>
-            <Col md={10} mdOffset={1}>
-              {reactEcharts}
             </Col>
           </Row>
         </Grid>
