@@ -531,22 +531,30 @@ class SolarBIModelView(SliceModelView):  # noqa
     def add(self):
         for role in g.user.roles:
             if role.name == 'Admin':
-                return super(SolarBIModelView, self).add();
+                return super(SolarBIModelView, self).add()
         return redirect('/superset/welcome')
-
 
     @expose('/list/')
     @has_access
     def list(self):
-        # self._base_filters = self.datamodel.get_filters().add_filter_list(self.base_filters)
-        # for role in g.user.roles:
-        #     if role.name == 'Admin':
-        #         del self.base_filters[1]
-        #         break
+        for role in g.user.roles:
+            if role.name == 'Admin':
+                self.remove_filters_for_role(role.name)
+                break
         widgets = self._list()
         return self.render_template(self.list_template,
                                     title=self.list_title,
                                     widgets=widgets)
+
+    def remove_filters_for_role(self, role_name):
+        if role_name == 'Admin':
+            self.remove_filter('created_by')
+
+    def remove_filter(self, filter_name):
+        for f in self._base_filters.filters:
+            if f.column_name == filter_name:
+                self._base_filters.filters.remove(f)
+
 
 appbuilder.add_view(
     SolarBIModelView,
@@ -556,6 +564,7 @@ appbuilder.add_view(
     category='',
     category_icon=''
 )
+
 
 class SliceAsync(SliceModelView):  # noqa
     route_base = '/sliceasync'
@@ -2829,9 +2838,6 @@ class Superset(BaseSupersetView):
 
     @expose('/solar/', methods=('GET', 'POST'))
     def solar(self):
-
-
-
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
 
@@ -2843,7 +2849,7 @@ class Superset(BaseSupersetView):
             form_data['datasource_type'] if 'datasource_type' in form_data.keys() else None,
             form_data)
 
-        error_redirect = '/chart/list/'
+        error_redirect = '/solar/list/'
         datasource = ConnectorRegistry.get_datasource(
             datasource_type, datasource_id, db.session)
         if not datasource:
