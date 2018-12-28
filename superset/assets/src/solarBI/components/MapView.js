@@ -38,7 +38,6 @@ const theme = createMuiTheme({
   }
 });
 
-
 class MapView extends React.Component {
   constructor(props) {
     super(props);
@@ -83,23 +82,24 @@ class MapView extends React.Component {
       solarBI.hasOwnProperty("form_data") &&
       form_data.hasOwnProperty("spatial_address")
     ) {
-      this.setState({
-        center: {
-          lat: form_data["spatial_address"]["lat"],
-          lng: form_data["spatial_address"]["lon"]
+      this.setState(
+        {
+          center: {
+            lat: form_data["spatial_address"]["lat"],
+            lng: form_data["spatial_address"]["lon"]
+          },
+          radius: form_data["radius"],
+          address: form_data["spatial_address"]["address"],
+          showingMap: true,
+          searching: false,
+          datasource_id: solarBI["datasource_id"],
+          datasource_type: solarBI["datasource_type"],
+          button_visiable: false
         },
-        radius: form_data["radius"],
-        address: form_data["spatial_address"]["address"],
-        showingMap: true,
-        searching: false,
-        datasource_id: solarBI["datasource_id"],
-        datasource_type: solarBI["datasource_type"],
-        button_visiable: false
-
-      },function (){
+        function() {
           this.requestData();
-      });
-
+        }
+      );
     } else {
       this.setState({
         // data_source: form_data["datasource"],
@@ -119,19 +119,22 @@ class MapView extends React.Component {
       console.log(place);
       const lat = place.geometry.location.lat.call();
       const lng = place.geometry.location.lng.call();
-      this.setState({
-        address: place.formatted_address,
-        center: {
-          lat,lng
+      this.setState(
+        {
+          address: place.formatted_address,
+          center: {
+            lat,
+            lng
+          },
+          zoom: 13,
+          searching: false,
+          showingMap: true
+          // showingInfoWindow: true
         },
-        zoom: 13,
-        searching: false,
-        showingMap: true,
-        showingInfoWindow: true
-      },function (){
-        this.requestData();
-      });
-
+        function() {
+          this.requestData();
+        }
+      );
     }
   }
 
@@ -240,14 +243,15 @@ class MapView extends React.Component {
   onGoBackClick() {
     this.setState({
       searching: true,
-      showingMap: false,
+      showingMap: false
       // visibility: "hidden",
       // showingCurrentInfo: false,
       // showingClosestInfo: false
-    })
+    });
   }
 
   onMarkerClick(props, marker) {
+    console.log("marker");
     this.setState({
       activeMarker: marker,
       selectedPlace: props,
@@ -286,25 +290,44 @@ class MapView extends React.Component {
     };
     let reactEcharts = null;
     let closestMarker = null;
-    let closestPoint = {};
-    let { solarStatus, queryResponse, solarAlert, visibility} = this.props.solarBI;
-    if(!visibility)
-      visibility = 'hidden';
+    let infoWindow = null;
+    let {
+      solarStatus,
+      queryResponse,
+      solarAlert,
+      visibility
+    } = this.props.solarBI;
+    if (!visibility) visibility = "hidden";
     if (solarStatus === "success" && queryResponse) {
-      console.log(queryResponse);
-      const newOptions = this.getOption(queryResponse["data"]["data"]);
-      closestPoint={lat:queryResponse["data"]["lat"],lng:queryResponse["data"]["lng"]};
-      //console.log(this.state.center);
-      console.log("render closest:", closestPoint);
       // console.log(queryResponse);
-      // closestMarker = (<Marker
-      //             position={closestPoint}
-      //             name={"Closest point"}
-      //             // icon={closestPointIcon}
-      //           />);
-      reactEcharts = <ReactEcharts option={newOptions}/>;
+      const newOptions = this.getOption(queryResponse["data"]["data"]);
+      const closestPoint = {
+        lat: queryResponse["data"]["lat"],
+        lng: queryResponse["data"]["lng"]
+      };
+      closestMarker = (
+        <Marker
+          position={closestPoint}
+          name="Closest point"
+          onClick={this.onMarkerClick}
+        />
+      );
+      infoWindow = (
+        <InfoWindow
+          marker={this.state.activeMarker}
+          onClose={this.onInfoWindowClose}
+          visible={this.state.showingInfoWindow}
+        >
+          <div>
+            <p>{this.state.selectedPlace.name}</p>
+          </div>
+        </InfoWindow>
+      );
+      console.log(this.state.center);
+      console.log("render closest:", closestPoint);
+      reactEcharts = <ReactEcharts option={newOptions} />;
     } else if (solarStatus === "loading") {
-      reactEcharts = <Loading size={50} style={{ marginTop: "20%" }}/>;
+      reactEcharts = <Loading size={50} style={{ marginTop: "20%" }} />;
     } else if (solarStatus === "failed") {
       reactEcharts = (
         <Alert bsStyle="danger">
@@ -322,7 +345,6 @@ class MapView extends React.Component {
     const defaultIcon = {
       url:
         "https://s3-ap-southeast-2.amazonaws.com/public-asset-test/icons8-marker-48.png"
-      // url: "https://netteser-cdn.sirv.com/Images/icons8-marker-48%20(1).png"
       // scaledSize: new this.props.google.maps.Size(20, 30) // scaled size
     };
 
@@ -365,33 +387,23 @@ class MapView extends React.Component {
                   icon={defaultIcon}
                   onClick={this.onMarkerClick}
                 />
-                <InfoWindow
+                {/* <InfoWindow
                   marker={this.state.activeMarker}
                   onClose={this.onInfoWindowClose}
                   visible={this.state.showingInfoWindow}
-                  // visible={this.state.showingMap}
-                  // style={{ height: "20%", width: "20%" }}
-                  // position={this.state.center}
                 >
                   <div>
                     <p>{this.state.selectedPlace.name}</p>
                   </div>
-                </InfoWindow>
-                <Marker
-                  position={closestPoint}
-                  name="Closest point"
-                  // icon={closestPointIcon}
-                  onClick={this.onMarkerClick}
-                />
-                {/* <InfoWindow
-                  visible={this.state.showingMap}
-                  style={{ height: "20%", width: "20%" }}
-                  position={this.state.closestPoint}
-                >
-                  <div>
-                    <p>Closest Point</p>
-                  </div>
                 </InfoWindow> */}
+                {closestMarker}
+                {infoWindow}
+                {/* <Marker
+                    position={closestPoint}
+                    name="Closest point"
+                    onClick={this.onMarkerClick}
+                  /> */}
+
                 <Circle
                   radius={this.state.radius * 1000}
                   center={this.state.center}
@@ -405,18 +417,16 @@ class MapView extends React.Component {
             </Col>
           </Row>
 
-
-
           <Row className="show-grid" style={{ marginTop: "8%" }}>
             <Col md={10} mdOffset={1}>
               {reactEcharts}
             </Col>
           </Row>
 
-           <Row
+          <Row
             className="show-grid"
             style={{
-              visibility: this.state.button_visiable ? visibility:'hidden'
+              visibility: this.state.button_visiable ? visibility : "hidden"
             }}
           >
             <Col md={1} mdOffset={1}>
