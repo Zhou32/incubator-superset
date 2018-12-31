@@ -51,7 +51,7 @@ class MapView extends React.Component {
       radius: 3.5,
       datasource_id: "",
       datasource_type: "",
-      zoom: 15,
+      zoom: 13,
       address: "",
       options: {},
       showModal: false,
@@ -385,22 +385,8 @@ class MapView extends React.Component {
                   icon={defaultIcon}
                   onClick={this.onMarkerClick}
                 />
-                {/* <InfoWindow
-                  marker={this.state.activeMarker}
-                  onClose={this.onInfoWindowClose}
-                  visible={this.state.showingInfoWindow}
-                >
-                  <div>
-                    <p>{this.state.selectedPlace.name}</p>
-                  </div>
-                </InfoWindow> */}
                 {closestMarker}
                 {infoWindow}
-                {/* <Marker
-                    position={closestPoint}
-                    name="Closest point"
-                    onClick={this.onMarkerClick}
-                  /> */}
 
                 <Circle
                   radius={this.state.radius * 1000}
