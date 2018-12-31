@@ -54,7 +54,6 @@ class MapView extends React.Component {
       zoom: 15,
       address: "",
       options: {},
-      visibility: "hidden",
       showModal: false,
       searching: true,
       showingMap: false,
@@ -94,7 +93,9 @@ class MapView extends React.Component {
           searching: false,
           datasource_id: solarBI["datasource_id"],
           datasource_type: solarBI["datasource_type"],
-          button_visiable: false
+          solar_new: false,
+          can_save: false,
+          can_export: false
         },
         function() {
           this.requestData();
@@ -105,7 +106,9 @@ class MapView extends React.Component {
         // data_source: form_data["datasource"],
         datasource_id: solarBI["datasource_id"],
         datasource_type: solarBI["datasource_type"],
-        button_visiable: true
+        solar_new: true,
+        can_save: false,
+        can_export: false
       });
     }
   }
@@ -129,7 +132,6 @@ class MapView extends React.Component {
           zoom: 13,
           searching: false,
           showingMap: true
-          // showingInfoWindow: true
         },
         function() {
           this.requestData();
@@ -198,7 +200,6 @@ class MapView extends React.Component {
 
   getFormData() {
     return {
-      // datasource: this.state.data_source,
       datasource_id: this.state.datasource_id,
       datasource_type: this.state.datasource_type,
       viz_type: "solarBI",
@@ -243,10 +244,9 @@ class MapView extends React.Component {
   onGoBackClick() {
     this.setState({
       searching: true,
-      showingMap: false
-      // visibility: "hidden",
-      // showingCurrentInfo: false,
-      // showingClosestInfo: false
+      showingMap: false,
+      can_save: false,
+      can_export: false
     });
   }
 
@@ -294,10 +294,8 @@ class MapView extends React.Component {
     let {
       solarStatus,
       queryResponse,
-      solarAlert,
-      visibility
+      solarAlert
     } = this.props.solarBI;
-    if (!visibility) visibility = "hidden";
     if (solarStatus === "success" && queryResponse) {
       // console.log(queryResponse);
       const newOptions = this.getOption(queryResponse["data"]["data"]);
@@ -425,12 +423,9 @@ class MapView extends React.Component {
 
           <Row
             className="show-grid"
-            style={{
-              visibility: this.state.button_visiable ? visibility : "hidden"
-            }}
           >
             <Col md={1} mdOffset={1}>
-              <MuiThemeProvider theme={theme}>
+              {(this.state.solar_new && this.props.solarBI.can_save) && (<MuiThemeProvider theme={theme}>
                 <Button
                   // size="large"
                   {...buttonProps}
@@ -445,10 +440,10 @@ class MapView extends React.Component {
                 >
                   Back
                 </Button>
-              </MuiThemeProvider>
+              </MuiThemeProvider>)}
             </Col>
-            <Col xs={1} xsOffset={4} md={1} mdOffset={6}>
-              <MuiThemeProvider theme={theme}>
+           <Col xs={1} xsOffset={4} md={1} mdOffset={6}>
+              {(this.state.solar_new && this.props.solarBI.can_save) && (<MuiThemeProvider theme={theme}>
                 <Button
                   {...buttonProps}
                   variant="contained"
@@ -463,10 +458,10 @@ class MapView extends React.Component {
                 >
                   Save
                 </Button>
-              </MuiThemeProvider>
+              </MuiThemeProvider>)}
             </Col>
             <Col xs={1} md={1}>
-              <MuiThemeProvider theme={theme}>
+              {this.props.solarBI.can_export && (<MuiThemeProvider theme={theme}>
                 <Button
                   {...buttonProps}
                   variant="contained"
@@ -481,7 +476,7 @@ class MapView extends React.Component {
                 >
                   Export
                 </Button>
-              </MuiThemeProvider>
+              </MuiThemeProvider>)}
             </Col>
           </Row>
         </Grid>

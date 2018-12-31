@@ -12,6 +12,8 @@ export default function(state = {}, action) {
         solarAlert: null,
         solarUpdateEndTime: null,
         solarUpdateStartTime: now(),
+        can_save: false,
+        can_export: false,
         queryController: action.queryController
       };
     },
@@ -20,7 +22,8 @@ export default function(state = {}, action) {
         ...state,
         solarStatus: "success",
         queryResponse: action.queryResponse,
-        visibility: "visible",
+        can_export: true,
+        can_save: true,
         chartUpdateEndTime: now()
       };
     },
