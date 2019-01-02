@@ -41,7 +41,6 @@ const theme = createMuiTheme({
 class MapView extends React.Component {
   constructor(props) {
     super(props);
-    console.log(this.props);
 
     this.state = {
       center: {
@@ -119,7 +118,6 @@ class MapView extends React.Component {
 
   onPlaceChanged(place) {
     if (place) {
-      console.log(place);
       const lat = place.geometry.location.lat.call();
       const lng = place.geometry.location.lng.call();
       this.setState(
@@ -217,7 +215,6 @@ class MapView extends React.Component {
 
   requestData() {
     const formData = this.getFormData();
-    console.log(formData);
     this.props.fetchSolarData(formData, false, 60, "");
   }
 
@@ -251,7 +248,6 @@ class MapView extends React.Component {
   }
 
   onMarkerClick(props, marker) {
-    console.log("marker");
     this.setState({
       activeMarker: marker,
       selectedPlace: props,
@@ -291,11 +287,7 @@ class MapView extends React.Component {
     let reactEcharts = null;
     let closestMarker = null;
     let infoWindow = null;
-    let {
-      solarStatus,
-      queryResponse,
-      solarAlert
-    } = this.props.solarBI;
+    let { solarStatus, queryResponse, solarAlert } = this.props.solarBI;
     if (solarStatus === "success" && queryResponse) {
       // console.log(queryResponse);
       const newOptions = this.getOption(queryResponse["data"]["data"]);
@@ -308,6 +300,10 @@ class MapView extends React.Component {
           position={closestPoint}
           name="Closest point"
           onClick={this.onMarkerClick}
+          icon={{
+            url:
+              "https://s3-ap-southeast-2.amazonaws.com/public-asset-test/red_marker.png"
+          }}
         />
       );
       infoWindow = (
@@ -321,8 +317,6 @@ class MapView extends React.Component {
           </div>
         </InfoWindow>
       );
-      console.log(this.state.center);
-      console.log("render closest:", closestPoint);
       reactEcharts = <ReactEcharts option={newOptions} />;
     } else if (solarStatus === "loading") {
       reactEcharts = <Loading size={50} style={{ marginTop: "20%" }} />;
@@ -337,7 +331,8 @@ class MapView extends React.Component {
     }
 
     const closestPointIcon = {
-      url: "https://img.icons8.com/color/48/000000/marker.png"
+      url:
+        "https://s3-ap-southeast-2.amazonaws.com/public-asset-test/red_marker.png"
       // scaledSize: new this.props.google.maps.Size(20, 30) // scaled size
     };
     const defaultIcon = {
@@ -351,7 +346,7 @@ class MapView extends React.Component {
         {this.state.searching && (
           <Grid>
             <Row className="show-grid" style={{ marginTop: "20%" }}>
-              <Col md={10} mdOffset={1}>
+              <Col xs={10} xsOffset={1} md={10} mdOffset={1}>
                 <LocationSearchBox
                   address={this.state.address}
                   onPlaceChanged={place => this.onPlaceChanged(place)}
@@ -363,7 +358,7 @@ class MapView extends React.Component {
 
         <Grid>
           <Row className="show-grid" style={{ marginTop: "1%" }}>
-            <Col xs={10} xsOffset={1} md={10} mdOffset={1}>
+            <Col xs={10} xsOffset={1}>
               <Map
                 visible={this.state.showingMap}
                 google={this.props.google}
@@ -401,70 +396,77 @@ class MapView extends React.Component {
             </Col>
           </Row>
 
-          <Row className="show-grid" style={{ marginTop: "8%" }}>
-            <Col md={10} mdOffset={1}>
-              {reactEcharts}
-            </Col>
-          </Row>
+          {this.state.showingMap && (
+            <Row className="show-grid" style={{ marginTop: "6.5em" }}>
+              <Col md={10} mdOffset={1}>
+                {reactEcharts}
+              </Col>
+            </Row>
+          )}
 
-          <Row
-            className="show-grid"
-          >
-            <Col md={1} mdOffset={1}>
-              {(this.state.solar_new && this.props.solarBI.can_save) && (<MuiThemeProvider theme={theme}>
-                <Button
-                  // size="large"
-                  {...buttonProps}
-                  variant="contained"
-                  color="primary"
-                  onClick={this.onGoBackClick}
-                  style={{
-                    // width: 100,
-                    fontSize: 12,
-                    color: "white"
-                  }}
-                >
-                  Back
-                </Button>
-              </MuiThemeProvider>)}
-            </Col>
-           <Col xs={1} xsOffset={4} md={1} mdOffset={6}>
-              {(this.state.solar_new && this.props.solarBI.can_save) && (<MuiThemeProvider theme={theme}>
-                <Button
-                  {...buttonProps}
-                  variant="contained"
-                  color="primary"
-                  onClick={this.toggleModal}
-                  style={{
-                    // marginLeft: 30,
-                    // width: "1vw",
-                    fontSize: 12,
-                    color: "white"
-                  }}
-                >
-                  Save
-                </Button>
-              </MuiThemeProvider>)}
-            </Col>
-            <Col xs={1} md={1}>
-              {this.props.solarBI.can_export && (<MuiThemeProvider theme={theme}>
-                <Button
-                  {...buttonProps}
-                  variant="contained"
-                  color="primary"
-                  style={{
-                    // width: 100,
-                    marginLeft: "5em",
-                    fontSize: 12,
-                    color: "white"
-                  }}
-                  href={this.getCSVURL()}
-                >
-                  Export
-                </Button>
-              </MuiThemeProvider>)}
-            </Col>
-          </Row>
+          {this.state.showingMap && (
+            <Row className="show-grid">
+              <Col xsOffset={1} xs={1} md={1} mdOffset={1}>
+                {this.state.solar_new &&
+                  this.props.solarBI.can_save && (
+                    <MuiThemeProvider theme={theme}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={this.onGoBackClick}
+                        style={{
+                          width: 80,
+                          fontSize: 12,
+                          color: "white"
+                        }}
+                        {...buttonProps}
+                      >
+                        Back
+                      </Button>
+                    </MuiThemeProvider>
+                  )}
+              </Col>
+              <Col xs={1} xsOffset={6} md={1} mdOffset={6}>
+                {this.state.solar_new &&
+                  this.props.solarBI.can_save && (
+                    <MuiThemeProvider theme={theme}>
+                      <Button
+                        {...buttonProps}
+                        variant="contained"
+                        color="primary"
+                        onClick={this.toggleModal}
+                        style={{
+                          width: 80,
+                          fontSize: 12,
+                          color: "white"
+                        }}
+                      >
+                        Save
+                      </Button>
+                    </MuiThemeProvider>
+                  )}
+              </Col>
+              <Col xs={1} md={1}>
+                {this.props.solarBI.can_export && (
+                  <MuiThemeProvider theme={theme}>
+                    <Button
+                      {...buttonProps}
+                      variant="contained"
+                      color="primary"
+                      style={{
+                        marginLeft: "5em",
+                        fontSize: 12,
+                        color: "white"
+                      }}
+                      href={this.getCSVURL()}
+                    >
+                      Export
+                    </Button>
+                  </MuiThemeProvider>
+                )}
+              </Col>
+            </Row>
+          )}
         </Grid>
         <SaveModal
           open={this.state.showModal}

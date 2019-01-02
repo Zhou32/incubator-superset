@@ -48,7 +48,8 @@ const styles = theme => ({
     marginLeft: 20,
     marginTop: 70,
     height: 60,
-    width: 750,
+    // width: 750,
+    width: "90%",
     backgroundColor: "#f6f6f6",
     borderRadius: "3em",
     border: "1px solid dimgray",
@@ -58,12 +59,12 @@ const styles = theme => ({
     }
   },
   inputFocused: {
-    width: 750,
+    // width: 750,
+    width: "90%",
     borderColor: "#80bdff",
     boxShadow: "0 0 0 0.2rem rgba(0,123,255,.25)"
   },
   card: {
-    width: 850,
     minHeight: 250
   }
 });
@@ -107,19 +108,6 @@ class LocationSearchBox extends React.Component {
         );
       }
     }
-
-    // if (input) {
-    //   if (!input._autocomplete) {
-    //     input._autocomplete = new places.Autocomplete(input, options);
-
-    //     input._autocomplete.addListener(
-    //       "place_changed",
-    //       (() => {
-    //         onPlaceChanged && onPlaceChanged(input._autocomplete.getPlace());
-    //       }).bind(input._autocomplete)
-    //     );
-    //   }
-    // }
   }
 
   handlePlaceSelect(addressObject) {
@@ -144,6 +132,7 @@ class LocationSearchBox extends React.Component {
 
   render() {
     const { classes } = this.props;
+    const { width } = this.props;
 
     return (
       <Card className={classes.card}>
@@ -181,55 +170,6 @@ class LocationSearchBox extends React.Component {
         </CardContent>
       </Card>
     );
-
-    {
-      /* <TextField
-          label="Address"
-          className={classes.textField}
-          // variant="outlined"
-          inputRef={ref => (this.locationSearch = ref)}
-          inputProps={{
-            style: {
-              fontSize: 18,
-              paddingLeft: 10
-            }
-          }}
-          InputProps={{
-            disableUnderline: true,
-            endAdornment: (
-              <MuiThemeProvider theme={theme}>
-                <InputAdornment position="end">
-                  <Fab
-                    size="medium"
-                    color="primary"
-                    aria-label="Add"
-                    className={classes.fab}
-                  >
-                    <Icon
-                      className={classNames(classes.icon, "fas fa-search")}
-                      color="secondary"
-                    />
-                  </Fab>
-                </InputAdornment>
-              </MuiThemeProvider>
-            ),
-            style: {
-              height: 60,
-              borderRadius: "3em",
-              border: "1px solid black"
-              // boxShadow:
-              //   "0 4px 4px -5px hsl(0, 0%, 40%), inset 0px 4px 6px -5px black"
-            }
-          }}
-          InputLabelProps={{
-            style: {
-              fontSize: 16
-            }
-          }}
-          // disabled={!!this.state.address}
-          // defaultValue={this.state.address}
-        /> */
-    }
   }
 }
 
