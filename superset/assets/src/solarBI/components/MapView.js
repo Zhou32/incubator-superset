@@ -23,10 +23,6 @@ import withWidth from "@material-ui/core/withWidth";
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
 import { t } from "@superset-ui/translation";
 
-const propTypes = {
-  solarBI: PropTypes.object.isRequired
-};
-
 const theme = createMuiTheme({
   typography: {
     useNextVariants: true
@@ -37,6 +33,10 @@ const theme = createMuiTheme({
     }
   }
 });
+
+const propTypes = {
+  solarBI: PropTypes.object.isRequired
+};
 
 class MapView extends React.Component {
   constructor(props) {
@@ -58,7 +58,8 @@ class MapView extends React.Component {
       showingMap: false,
       activeMarker: {},
       selectedPlace: {},
-      showingInfoWindow: false
+      showingInfoWindow: false,
+      showingAlert: false
     };
 
     this.onPlaceChanged = this.onPlaceChanged.bind(this);
@@ -71,6 +72,7 @@ class MapView extends React.Component {
     this.onMarkerClick = this.onMarkerClick.bind(this);
     this.onInfoWindowClose = this.onInfoWindowClose.bind(this);
     this.onMapClicked = this.onMapClicked.bind(this);
+    this.handleClickShowAlert = this.handleClickShowAlert.bind(this);
   }
 
   componentWillMount() {
@@ -117,7 +119,7 @@ class MapView extends React.Component {
   }
 
   onPlaceChanged(place) {
-    if (place) {
+    if (place && place.geometry) {
       const lat = place.geometry.location.lat.call();
       const lng = place.geometry.location.lng.call();
       this.setState(
@@ -135,7 +137,21 @@ class MapView extends React.Component {
           this.requestData();
         }
       );
+    } else {
+      this.handleClickShowAlert();
     }
+  }
+
+  handleClickShowAlert() {
+    this.setState({
+      showingAlert: true
+    });
+
+    setTimeout(() => {
+      this.setState({
+        showingAlert: false
+      });
+    }, 3000);
   }
 
   getOption(data) {
@@ -271,7 +287,6 @@ class MapView extends React.Component {
   }
 
   render() {
-    // console.log(this.state.selectedPlace.name);
     const { width } = this.props;
     const isSmallScreen = /xs|sm|md/.test(width);
     const buttonProps = {
@@ -336,6 +351,11 @@ class MapView extends React.Component {
 
     return (
       <div>
+        {this.state.showingAlert && (
+          <Alert bsStyle="danger" style={{ width: "90vw", margin: "auto" }}>
+            Please Enter a Valid Address
+          </Alert>
+        )}
         {this.state.searching && (
           <Grid>
             <Row className="show-grid" style={{ marginTop: "20%" }}>
@@ -398,11 +418,11 @@ class MapView extends React.Component {
           )}
 
           {this.state.showingMap && (
-            <Row className="show-grid">
-              <Col xsOffset={1} xs={1} md={1} mdOffset={1}>
-                {this.state.solar_new &&
-                  this.props.solarBI.can_save && (
-                    <MuiThemeProvider theme={theme}>
+            <MuiThemeProvider theme={theme}>
+              <Row className="show-grid">
+                <Col xsOffset={1} xs={1} md={1} mdOffset={1}>
+                  {this.state.solar_new &&
+                    this.props.solarBI.can_save && (
                       <Button
                         variant="contained"
                         color="primary"
@@ -416,13 +436,11 @@ class MapView extends React.Component {
                       >
                         Back
                       </Button>
-                    </MuiThemeProvider>
-                  )}
-              </Col>
-              <Col xs={1} xsOffset={6} md={1} mdOffset={6}>
-                {this.state.solar_new &&
-                  this.props.solarBI.can_save && (
-                    <MuiThemeProvider theme={theme}>
+                    )}
+                </Col>
+                <Col xs={1} xsOffset={6} md={1} mdOffset={6}>
+                  {this.state.solar_new &&
+                    this.props.solarBI.can_save && (
                       <Button
                         {...buttonProps}
                         variant="contained"
@@ -436,12 +454,10 @@ class MapView extends React.Component {
                       >
                         Save
                       </Button>
-                    </MuiThemeProvider>
-                  )}
-              </Col>
-              <Col xs={1} md={1}>
-                {this.props.solarBI.can_export && (
-                  <MuiThemeProvider theme={theme}>
+                    )}
+                </Col>
+                <Col xs={1} md={1}>
+                  {this.props.solarBI.can_export && (
                     <Button
                       {...buttonProps}
                       variant="contained"
@@ -455,12 +471,13 @@ class MapView extends React.Component {
                     >
                       Export
                     </Button>
-                  </MuiThemeProvider>
-                )}
-              </Col>
-            </Row>
+                  )}
+                </Col>
+              </Row>
+            </MuiThemeProvider>
           )}
         </Grid>
+
         <SaveModal
           open={this.state.showModal}
           onHide={this.toggleModal}
