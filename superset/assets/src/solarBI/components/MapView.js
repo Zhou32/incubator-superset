@@ -271,15 +271,8 @@ class MapView extends React.Component {
   }
 
   render() {
-    console.log("active marker:", this.state.activeMarker);
-    console.log(this.state.selectedPlace.name);
+    // console.log(this.state.selectedPlace.name);
     const { width } = this.props;
-    // let buttonProps = { size: "large" };
-    // if (width === "xs" || width === "md" || width === "sm") {
-    //   buttonProps = {
-    //     size: "medium"
-    //   };
-    // }
     const isSmallScreen = /xs|sm|md/.test(width);
     const buttonProps = {
       size: isSmallScreen ? "medium" : "large"

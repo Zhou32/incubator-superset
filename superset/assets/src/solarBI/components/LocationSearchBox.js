@@ -45,8 +45,7 @@ const styles = theme => ({
     margin: theme.spacing.unit
   },
   input: {
-    marginLeft: 20,
-    marginTop: 70,
+    margin: "70 40",
     height: 60,
     // width: 750,
     width: "90%",
