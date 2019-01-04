@@ -7,7 +7,7 @@ import sqlSyntax from 'react-syntax-highlighter/languages/hljs/sql';
 import jsonSyntax from 'react-syntax-highlighter/languages/hljs/json';
 import github from 'react-syntax-highlighter/styles/hljs/github';
 import { DropdownButton, MenuItem, Row, Col, FormControl } from 'react-bootstrap';
-import { Table } from 'reactable';
+import { Table } from 'reactable-arc';
 import { t } from '@superset-ui/translation';
 import { SupersetClient } from '@superset-ui/connection';
 
@@ -19,6 +19,7 @@ import Loading from '../../components/Loading';
 import ModalTrigger from './../../components/ModalTrigger';
 import Button from '../../components/Button';
 import RowCountLabel from './RowCountLabel';
+import { prepareCopyToClipboardTabularData } from '../../utils/common';
 
 registerLanguage('markdown', markdownSyntax);
 registerLanguage('html', htmlSyntax);
@@ -130,6 +131,15 @@ export default class DisplayQueryButton extends React.PureComponent {
         <Row>
           <Col md={9}>
             <RowCountLabel rowcount={data.length} suffix={t('rows retrieved')} />
+            <CopyToClipboard
+              text={prepareCopyToClipboardTabularData(data)}
+              wrapped={false}
+              copyNode={
+                <Button style={{ padding: '2px 10px', fontSize: '11px' }}>
+                  <i className="fa fa-clipboard" />
+                </Button>
+              }
+            />
           </Col>
           <Col md={3}>
             <FormControl
