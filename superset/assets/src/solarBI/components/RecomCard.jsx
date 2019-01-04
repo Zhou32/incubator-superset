@@ -7,10 +7,8 @@ import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import TextField from "@material-ui/core/TextField";
 import InputAdornment from "@material-ui/core/InputAdornment";
-import IconButton from "@material-ui/core/IconButton";
-import InfoIcon from "@material-ui/icons/Info";
-import Popover from "@material-ui/core/Popover";
 import { Grid, Row, Col } from "react-bootstrap";
+import IconBtn from "./IconBtn";
 
 const styles = theme => ({
   root: {
@@ -25,9 +23,6 @@ const styles = theme => ({
   textField: {
     marginLeft: 20,
     marginRight: 20
-  },
-  icon: {
-    float: "right"
   }
 });
 
@@ -36,29 +31,14 @@ class RecomCard extends React.Component {
     super(props);
 
     this.state = {
-      value: 50,
-      anchorEl: null
+      value: 50
     };
 
     this.handleChange = this.handleChange.bind(this);
-    this.handleClick = this.handleClick.bind(this);
-    this.handleClose = this.handleClose.bind(this);
   }
 
   handleChange(event, value) {
     this.setState({ value });
-  }
-
-  handleClick(even) {
-    this.setState({
-      anchorEl: event.currentTarget
-    });
-  }
-
-  handleClose() {
-    this.setState({
-      anchorEl: null
-    });
   }
 
   render() {
@@ -69,9 +49,7 @@ class RecomCard extends React.Component {
       <div className={classes.root}>
         <Card className={classes.card}>
           <CardContent style={{ margin: "0 20" }}>
-            <IconButton className={classes.icon}>
-              <InfoIcon />
-            </IconButton>
+            <IconBtn content="Based on your usage, Project Sunroof can recommend the optimal solar installation size that can fit on your roof." />
             <Typography variant="h4" id="label">
               What's your average monthly electric bill?
             </Typography>
@@ -86,7 +64,6 @@ class RecomCard extends React.Component {
               variant="filled"
               label="Bill Price"
               value={Math.round(value * 5)}
-              // disabled
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">$</InputAdornment>
@@ -108,9 +85,7 @@ class RecomCard extends React.Component {
 
         <Card className={classes.card}>
           <CardContent style={{ margin: "0 20" }}>
-            <IconButton className={classes.icon}>
-              <InfoIcon />
-            </IconButton>
+            <IconBtn content="Based on your usage, Project Sunroof can recommend the optimal solar installation size that can fit on your roof." />
             <Typography variant="h4" id="label">
               Your recommended solar installation size
             </Typography>
