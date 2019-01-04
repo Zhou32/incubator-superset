@@ -16,6 +16,7 @@ import Button from "@material-ui/core/Button";
 import DisplayQueryButton from "../../explore/components/DisplayQueryButton";
 import { fetchSolarData, addSuccessToast } from "../actions/solarActions";
 import SaveModal from "./SaveModal";
+import BillSlider from "./BillSlider";
 import Loading from "./Loading";
 import classNames from "classnames";
 import URI from "urijs";
@@ -364,6 +365,11 @@ class MapView extends React.Component {
                   address={this.state.address}
                   onPlaceChanged={place => this.onPlaceChanged(place)}
                 />
+              </Col>
+            </Row>
+            <Row>
+              <Col xs={4}>
+                <BillSlider />
               </Col>
             </Row>
           </Grid>
