@@ -16,7 +16,7 @@ import Button from "@material-ui/core/Button";
 import DisplayQueryButton from "../../explore/components/DisplayQueryButton";
 import { fetchSolarData, addSuccessToast } from "../actions/solarActions";
 import SaveModal from "./SaveModal";
-import RecomCard from "./RecomCard";
+import RecomCards from "./RecomCards";
 import Loading from "./Loading";
 import classNames from "classnames";
 import URI from "urijs";
@@ -369,7 +369,7 @@ class MapView extends React.Component {
             </Row>
             <Row>
               <Col xs={4}>
-                <RecomCard />
+                <RecomCards />
               </Col>
             </Row>
           </Grid>

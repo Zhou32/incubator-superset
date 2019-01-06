@@ -26,7 +26,7 @@ const styles = theme => ({
   }
 });
 
-class RecomCard extends React.Component {
+class RecomCards extends React.Component {
   constructor(props) {
     super(props);
 
@@ -104,8 +104,8 @@ class RecomCard extends React.Component {
   }
 }
 
-RecomCard.propTypes = {
+RecomCards.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(RecomCard);
+export default withStyles(styles)(RecomCards);
