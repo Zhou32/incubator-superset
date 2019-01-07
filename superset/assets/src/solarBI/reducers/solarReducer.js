@@ -63,7 +63,7 @@ export default function(state = {}, action) {
           ? action.queryResponse.error
           : t("Nextwork error"),
         solarUpdateEndTime: now(),
-        queryResponse: actions.queryResponse,
+        queryResponse: action.queryResponse,
         solarStackTrace: action.queryResponse
           ? action.queryResponse.stacktrace
           : null
