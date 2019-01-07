@@ -60,7 +60,8 @@ class MapView extends React.Component {
       activeMarker: {},
       selectedPlace: {},
       showingInfoWindow: false,
-      showingAlert: false
+      showingEmptyAlert: false,
+      showingWrongAlert: false
     };
 
     this.onPlaceChanged = this.onPlaceChanged.bind(this);
@@ -73,7 +74,8 @@ class MapView extends React.Component {
     this.onMarkerClick = this.onMarkerClick.bind(this);
     this.onInfoWindowClose = this.onInfoWindowClose.bind(this);
     this.onMapClicked = this.onMapClicked.bind(this);
-    this.handleClickShowAlert = this.handleClickShowAlert.bind(this);
+    this.handleEmptyErrorAlert = this.handleEmptyErrorAlert.bind(this);
+    this.handleWrongErrorAlert = this.handleWrongErrorAlert.bind(this);
   }
 
   componentWillMount() {
@@ -138,19 +140,33 @@ class MapView extends React.Component {
           this.requestData();
         }
       );
+    } else if (place === "") {
+      this.handleEmptyErrorAlert();
     } else {
-      this.handleClickShowAlert();
+      this.handleWrongErrorAlert();
     }
   }
 
-  handleClickShowAlert() {
+  handleEmptyErrorAlert() {
     this.setState({
-      showingAlert: true
+      showingEmptyAlert: true
     });
 
     setTimeout(() => {
       this.setState({
-        showingAlert: false
+        showingEmptyAlert: false
+      });
+    }, 3000);
+  }
+
+  handleWrongErrorAlert() {
+    this.setState({
+      showingWrongAlert: true
+    });
+
+    setTimeout(() => {
+      this.setState({
+        showingWrongAlert: false
       });
     }, 3000);
   }
@@ -298,7 +314,6 @@ class MapView extends React.Component {
     let infoWindow = null;
     let { solarStatus, queryResponse, solarAlert } = this.props.solarBI;
     if (solarStatus === "success" && queryResponse) {
-      // console.log(queryResponse);
       const newOptions = this.getOption(queryResponse["data"]["data"]);
       const closestPoint = {
         lat: queryResponse["data"]["lat"],
@@ -339,11 +354,6 @@ class MapView extends React.Component {
       );
     }
 
-    const closestPointIcon = {
-      url:
-        "https://s3-ap-southeast-2.amazonaws.com/public-asset-test/red_marker.png"
-      // scaledSize: new this.props.google.maps.Size(20, 30) // scaled size
-    };
     const defaultIcon = {
       url:
         "https://s3-ap-southeast-2.amazonaws.com/public-asset-test/icons8-marker-48.png"
@@ -352,10 +362,27 @@ class MapView extends React.Component {
 
     return (
       <div>
-        {this.state.showingAlert && (
-          <Alert bsStyle="danger" style={{ width: "90vw", margin: "auto" }}>
-            Please Enter a Valid Address
-          </Alert>
+        {this.state.showingEmptyAlert && (
+          <Grid>
+            <Row className="show-grid" xs={12}>
+              <Col>
+                <Alert bsStyle="danger" style={{ margin: "auto" }}>
+                  Please Enter An Address
+                </Alert>
+              </Col>
+            </Row>
+          </Grid>
+        )}
+        {this.state.showingWrongAlert && (
+          <Grid>
+            <Row className="show-grid" xs={12}>
+              <Col>
+                <Alert bsStyle="danger" style={{ margin: "auto" }}>
+                  Please Select An Address From The Pop-up Window
+                </Alert>
+              </Col>
+            </Row>
+          </Grid>
         )}
         {this.state.searching && (
           <Grid>
@@ -367,11 +394,11 @@ class MapView extends React.Component {
                 />
               </Col>
             </Row>
-            <Row>
-              <Col xs={4}>
+            {/* <Row className="show-grid" style={{ marginTop: "10%" }}>
+              <Col xs={4} xsOffset={1}>
                 <RecomCards />
               </Col>
-            </Row>
+            </Row> */}
           </Grid>
         )}
 
@@ -444,7 +471,7 @@ class MapView extends React.Component {
                       </Button>
                     )}
                 </Col>
-                <Col xs={1} xsOffset={6} md={1} mdOffset={6}>
+                <Col xs={1} xsOffset={6}>
                   {this.state.solar_new &&
                     this.props.solarBI.can_save && (
                       <Button
@@ -471,7 +498,8 @@ class MapView extends React.Component {
                       style={{
                         marginLeft: "5em",
                         fontSize: 12,
-                        color: "white"
+                        color: "white",
+                        width: 80
                       }}
                       href={this.getCSVURL()}
                     >
