@@ -16,6 +16,7 @@ import Button from "@material-ui/core/Button";
 import DisplayQueryButton from "../../explore/components/DisplayQueryButton";
 import { fetchSolarData, addSuccessToast } from "../actions/solarActions";
 import SaveModal from "./SaveModal";
+import ExportModal from "./ExportModal";
 import RecomCards from "./RecomCards";
 import Loading from "./Loading";
 import classNames from "classnames";
@@ -55,6 +56,7 @@ class MapView extends React.Component {
       address: "",
       options: {},
       showModal: false,
+      showExportModal: false,
       searching: true,
       showingMap: false,
       activeMarker: {},
@@ -69,6 +71,7 @@ class MapView extends React.Component {
     this.getOption = this.getOption.bind(this);
     this.requestData = this.requestData.bind(this);
     this.toggleModal = this.toggleModal.bind(this);
+    this.toggleExportModal = this.toggleExportModal.bind(this);
     this.getFormData = this.getFormData.bind(this);
     this.getCSVURL = this.getCSVURL.bind(this);
     this.onMarkerClick = this.onMarkerClick.bind(this);
@@ -119,6 +122,10 @@ class MapView extends React.Component {
 
   toggleModal() {
     this.setState({ showModal: !this.state.showModal });
+  }
+
+  toggleExportModal() {
+    this.setState({ showExportModal: !this.state.showExportModal });
   }
 
   onPlaceChanged(place) {
@@ -394,11 +401,11 @@ class MapView extends React.Component {
                 />
               </Col>
             </Row>
-            {/* <Row className="show-grid" style={{ marginTop: "10%" }}>
+            <Row className="show-grid" style={{ marginTop: "8%" }}>
               <Col xs={4} xsOffset={1}>
                 <RecomCards />
               </Col>
-            </Row> */}
+            </Row>
           </Grid>
         )}
 
@@ -417,7 +424,8 @@ class MapView extends React.Component {
                     "0 1px 3px rgba(0,0,0,0.12), 0 4px 6px rgba(29,114,12,0.24)",
                   borderRadius: "1em",
                   height: "110%",
-                  width: "100%"
+                  width: "100%",
+                  position: "relative"
                 }}
               >
                 <Marker
@@ -495,6 +503,7 @@ class MapView extends React.Component {
                       {...buttonProps}
                       variant="contained"
                       color="primary"
+                      onClick={this.toggleExportModal}
                       style={{
                         marginLeft: "5em",
                         fontSize: 12,
@@ -531,6 +540,10 @@ class MapView extends React.Component {
             }
           }}
           userId={""}
+        />
+        <ExportModal
+          open={this.state.showExportModal}
+          onHide={this.toggleExportModal}
         />
       </div>
     );

@@ -2,19 +2,20 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-// import { Alert, Radio } from "react-bootstrap";
 import Select from "react-select";
 import { t } from "@superset-ui/translation";
 import { saveSolarData } from "../actions/solarActions";
 import { supersetURL } from "../../utils/common";
 import { withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
-import Modal from "@material-ui/core/Modal";
 import Slide from "@material-ui/core/Slide";
-import Input from "@material-ui/core/Input";
 import Button from "@material-ui/core/Button";
-import Divider from "@material-ui/core/Divider";
 import TextField from "@material-ui/core/TextField";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
 
 const theme = createMuiTheme({
@@ -31,13 +32,7 @@ const theme = createMuiTheme({
 const propTypes = {
   // can_overwrite: PropTypes.bool,
   onHide: PropTypes.func.isRequired
-  // actions: PropTypes.object,
-  // form_data: PropTypes.object,
-  // userId: PropTypes.string.isRequired,
-  // dashboards: PropTypes.array,
-  // alert: PropTypes.string
-  // slice: PropTypes.object,
-  // datasource: PropTypes.object
+  // actions: PropTypes.object
 };
 
 const styles = theme => ({
@@ -48,31 +43,24 @@ const styles = theme => ({
     boxShadow: "0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)",
     padding: theme.spacing.unit * 4
   },
-  input: {
-    width: "100%",
-    height: 40,
-    fontSize: 20
-  },
   button: {
-    marginTop: 20,
-    fontSize: 12,
-    color: "white",
-    float: "right"
+    fontSize: "1.2em"
   },
-  divider: {
-    marginTop: 15,
-    marginBottom: 12
+  dialog: {
+    width: "80%",
+    padding: 10
   },
-  textField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit
-    // marginTop: 40,
-    // width: "100%"
+  title: {
+    fontSize: "1.6em"
   },
   resize: {
     fontSize: 20
   }
 });
+
+function Transition(props) {
+  return <Slide direction="up" {...props} />;
+}
 
 class SaveModal extends React.Component {
   constructor(props) {
@@ -82,11 +70,15 @@ class SaveModal extends React.Component {
       newDashboardName: "",
       newSliceName: "",
       dashboards: [],
-      alert: null,
+      alert: false,
       action: props.can_overwrite ? "overwrite" : "saveas",
       addToDash: "noSave",
       vizType: props.form_data.viz_type
     };
+
+    this.removeAlert = this.removeAlert.bind(this);
+    this.handleClose = this.handleClose.bind(this);
+    this.saveOrOverwrite = this.saveOrOverwrite.bind(this);
   }
 
   onChange(name, event) {
@@ -115,7 +107,7 @@ class SaveModal extends React.Component {
   }
 
   saveOrOverwrite(gotodash) {
-    this.setState({ alert: null });
+    this.setState({ alert: false });
     const sliceParams = {};
 
     let sliceName = null;
@@ -126,7 +118,7 @@ class SaveModal extends React.Component {
     if (sliceParams.action === "saveas") {
       sliceName = this.state.newSliceName;
       if (sliceName === "") {
-        this.setState({ alert: t("Please enter a chart name") });
+        this.setState({ alert: true });
         return;
       }
       sliceParams.slice_name = sliceName;
@@ -148,7 +140,12 @@ class SaveModal extends React.Component {
   }
 
   removeAlert() {
-    this.setState({ alert: null });
+    this.setState({ alert: false });
+  }
+
+  handleClose() {
+    this.removeAlert();
+    this.props.onHide();
   }
 
   render() {
@@ -156,127 +153,64 @@ class SaveModal extends React.Component {
     const canNotSaveToDash = true;
     return (
       <div>
-        <Modal
-          aria-describedby="simple-modal-description"
-          open={this.props.open}
-          onClose={this.props.onHide}
-          disableAutoFocus
-        >
-          <Slide direction="up" in={this.props.open} mountOnEnter unmountOnExit>
-            <div style={{ top: "35%", left: "35%" }} className={classes.modal}>
-              <Typography variant="h4" id="modal-title">
-                Save Chart
-              </Typography>
-              <Divider light className={classes.divider} />
+        <MuiThemeProvider theme={theme}>
+          <Dialog
+            classes={{ paper: classes.dialog }}
+            open={this.props.open}
+            onClose={this.props.onHide}
+            TransitionComponent={Transition}
+            keepMounted
+          >
+            <DialogTitle
+              disableTypography
+              className={classes.title}
+              id="form-dialog-title"
+            >
+              Save Chart
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText style={{ fontSize: "1.2em" }}>
+                To save the chart, please enter a name here.
+              </DialogContentText>
               <TextField
+                error={this.state.alert}
+                autoFocus
+                margin="dense"
+                id="name"
                 label="Chart Name"
-                className={classes.input}
+                fullWidth
                 onChange={this.onChange.bind(this, "newSliceName")}
-                inputProps={{
-                  "aria-label": "Save"
-                }}
                 InputLabelProps={{
                   style: {
-                    fontSize: 16
+                    fontSize: "1.2em"
                   }
                 }}
                 InputProps={{
                   style: {
-                    fontSize: 16
+                    fontSize: "1.2em"
                   }
                 }}
               />
-              {/* <TextField
-                id="outlined-email-input"
-                label="Email"
-                className={classes.textField}
-                margin="normal"
-                // inputProps={{
-                //   style: {
-                //     fontSize: "1.5rem"
-                //   }
-                // }}
-                // InputProps={{
-                //   classes: {
-                //     input: classes.resize
-                //   }
-                // }}
-                // InputLabelProps={{
-                //   classes: {
-                //     root: classes.resize
-                //   }
-                // }}
-                name="email"
-                variant="outlined" */}
-              <MuiThemeProvider theme={theme}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={this.saveOrOverwrite.bind(this, true)}
-                  className={classes.button}
-                >
-                  Save
-                </Button>
-              </MuiThemeProvider>
-            </div>
-          </Slide>
-        </Modal>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                className={classes.button}
+                onClick={this.handleClose}
+                color="primary"
+              >
+                Cancel
+              </Button>
+              <Button
+                className={classes.button}
+                onClick={() => this.saveOrOverwrite(true)}
+                color="primary"
+              >
+                Save
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </MuiThemeProvider>
       </div>
-
-      // <Modal show onHide={this.props.onHide} bsStyle="large">
-      //   <Modal.Header closeButton>
-      //     <Modal.Title>{t("Save A Chart")}</Modal.Title>
-      //   </Modal.Header>
-      //   <Modal.Body>
-      //     {(this.state.alert || this.props.alert) && (
-      //       <Alert>
-      //         {this.state.alert ? this.state.alert : this.props.alert}
-      //         <i
-      //           className="fa fa-close pull-right"
-      //           onClick={this.removeAlert.bind(this)}
-      //           style={{ cursor: "pointer" }}
-      //         />
-      //       </Alert>
-      //     )}
-      //     {this.props.slice && (
-      //       <Radio
-      //         id="overwrite-radio"
-      //         disabled={!this.props.can_overwrite}
-      //         checked={this.state.action === "overwrite"}
-      //         onChange={this.changeAction.bind(this, "overwrite")}
-      //       >
-      //         {t("Overwrite chart %s", this.props.slice.slice_name)}
-      //       </Radio>
-      //     )}
-
-      //     <Radio
-      //       id="saveas-radio"
-      //       inline
-      //       checked={this.state.action === "saveas"}
-      //       onChange={this.changeAction.bind(this, "saveas")}
-      //     >
-      //       {" "}
-      //       {t("Save as")} &nbsp;
-      //     </Radio>
-      //     <input
-      //       name="new_slice_name"
-      //       placeholder={t("[chart name]")}
-      //       onChange={this.onChange.bind(this, "newSliceName")}
-      //       onFocus={this.changeAction.bind(this, "saveas")}
-      //     />
-      //   </Modal.Body>
-
-      //   <Modal.Footer>
-      //     <Button
-      //       type="button"
-      //       id="btn_modal_save"
-      //       className="btn pull-left"
-      //       onClick={this.saveOrOverwrite.bind(this, true)}
-      //     >
-      //       {t("Save")}
-      //     </Button>
-      //   </Modal.Footer>
-      // </Modal>
     );
   }
 }
@@ -294,7 +228,6 @@ function mapStateToProps({ explore, saveModal }) {
   };
 }
 
-export { SaveModal };
 export default withStyles(styles)(
   connect(
     mapStateToProps,
