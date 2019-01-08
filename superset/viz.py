@@ -2773,8 +2773,8 @@ class SolarBI(BaseViz):
         lng = self.form_data['spatial_address']['lon']
         radius = self.form_data['radius']
         if not self.lng_list839:
-            self.lat_list679 = [float(x) for x in self.load_data('superset/solar_locations/lat679.pk')]
-            self.lng_list839 = [float(x) for x in self.load_data('superset/solar_locations/lng839.pk')]
+            self.lat_list679 = [float(x) for x in self.load_data('./superset/solar_locations/lat679.pk')]
+            self.lng_list839 = [float(x) for x in self.load_data('./superset/solar_locations/lng839.pk')]
 
         self.get_closest_point((float(lat), float(lng)), self.lat_list679, self.lng_list839)
         where = f"latitude = '{self.nearest_lat}' and longitude = '{self.nearest_lng}' AND radiation != -999"
