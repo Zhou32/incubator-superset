@@ -88,31 +88,6 @@ class ExportModal extends React.Component {
             </DialogActions>
           </Dialog>
         </MuiThemeProvider>
-
-        {/* <Modal
-          aria-describedby="simple-modal-description"
-          open={this.props.open}
-          onClose={this.props.onHide}
-          disableAutoFocus
-        >
-          <Slide direction="up" in={this.props.open} mountOnEnter unmountOnExit>
-            <div style={{ top: "35%", left: "35%" }} className={classes.modal}>
-              <Typography variant="h4" id="modal-title">
-                Your download will start in just a second
-              </Typography>
-              <MuiThemeProvider theme={theme}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={this.props.onHide}
-                  className={classes.button}
-                >
-                  Close
-                </Button>
-              </MuiThemeProvider>
-            </div>
-          </Slide>
-        </Modal> */}
       </div>
     );
   }

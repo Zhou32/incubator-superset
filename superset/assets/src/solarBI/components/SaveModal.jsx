@@ -76,7 +76,6 @@ class SaveModal extends React.Component {
       vizType: props.form_data.viz_type
     };
 
-    this.removeAlert = this.removeAlert.bind(this);
     this.handleClose = this.handleClose.bind(this);
     this.saveOrOverwrite = this.saveOrOverwrite.bind(this);
   }
@@ -139,12 +138,8 @@ class SaveModal extends React.Component {
     this.props.onHide();
   }
 
-  removeAlert() {
-    this.setState({ alert: false });
-  }
-
   handleClose() {
-    this.removeAlert();
+    this.setState({ alert: false });
     this.props.onHide();
   }
 
