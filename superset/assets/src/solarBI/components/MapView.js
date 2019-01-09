@@ -17,7 +17,7 @@ import DisplayQueryButton from "../../explore/components/DisplayQueryButton";
 import { fetchSolarData, addSuccessToast } from "../actions/solarActions";
 import SaveModal from "./SaveModal";
 import ExportModal from "./ExportModal";
-import RecomCards from "./RecomCards";
+import InfoWidgets from "./InfoWidgets";
 import Loading from "./Loading";
 import classNames from "classnames";
 import URI from "urijs";
@@ -403,7 +403,7 @@ class MapView extends React.Component {
             </Row>
             <Row className="show-grid" style={{ marginTop: "8%" }}>
               <Col xs={4} xsOffset={1}>
-                <RecomCards />
+                <InfoWidgets />
               </Col>
             </Row>
           </Grid>
