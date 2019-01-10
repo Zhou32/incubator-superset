@@ -526,6 +526,9 @@ class SolarBIModelView(SliceModelView):  # noqa
     base_filters = [['viz_type', FilterEqual, 'solarBI'],['created_by', FilterEqualFunction, get_user]]
     base_permissions = ['can_list', 'can_show', 'can_add', 'can_delete', 'can_edit']
 
+    filters_not_for_admin = {}
+
+
     @expose('/add', methods=['GET', 'POST'])
     @has_access
     def add(self):
@@ -541,6 +544,8 @@ class SolarBIModelView(SliceModelView):  # noqa
             if role.name == 'Admin':
                 self.remove_filters_for_role(role.name)
                 break
+            else:
+                self.add_filters_for_role(role.name)
         widgets = self._list()
         return self.render_template(self.list_template,
                                     title=self.list_title,
@@ -550,10 +555,26 @@ class SolarBIModelView(SliceModelView):  # noqa
         if role_name == 'Admin':
             self.remove_filter('created_by')
 
+    def add_filters_for_role(self, role_name):
+        if role_name != 'Admin':
+            self.add_filters('created_by')
+
+    def add_filters(self, filter_name):
+        for f in self.filters_not_for_admin:
+            if f.column_name == filter_name:
+                self._base_filters.filters.append(f)
+                self._base_filters.values.append(self.filters_not_for_admin[f])
+                del self.filters_not_for_admin[f]
+                break
+
     def remove_filter(self, filter_name):
         for f in self._base_filters.filters:
             if f.column_name == filter_name:
+                index_filter = self._base_filters.filters.index(f)
+                value = self._base_filters.values[index_filter]
+                self.filters_not_for_admin[f] = value
                 self._base_filters.filters.remove(f)
+                self._base_filters.values.remove(value)
 
 
 appbuilder.add_view(
