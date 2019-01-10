@@ -291,7 +291,7 @@ class MapView extends React.Component {
       closestMarker = (
         <Marker
           position={closestPoint}
-          name="Closest point"
+          name="Nearest Data Collection Point"
           onClick={this.onMarkerClick}
           icon={{
             url:
@@ -306,7 +306,14 @@ class MapView extends React.Component {
           visible={this.state.showingInfoWindow}
         >
           <div>
-            <p>{this.state.selectedPlace.name}</p>
+            <p
+              style={{
+                fontFamily: "Helvetica,Arial,sans-serif",
+                margin: "auto"
+              }}
+            >
+              {this.state.selectedPlace.name}
+            </p>
           </div>
         </InfoWindow>
       );
@@ -369,7 +376,7 @@ class MapView extends React.Component {
               >
                 <Marker
                   position={this.state.center}
-                  name="Current location"
+                  name={this.state.address}
                   icon={defaultIcon}
                   onClick={this.onMarkerClick}
                 />
