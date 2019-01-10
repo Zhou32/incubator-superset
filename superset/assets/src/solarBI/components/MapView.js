@@ -69,6 +69,7 @@ class MapView extends React.Component {
     this.onPlaceChanged = this.onPlaceChanged.bind(this);
     this.onGoBackClick = this.onGoBackClick.bind(this);
     this.getOption = this.getOption.bind(this);
+    this.getHeatmapOption = this.getHeatmapOption.bind(this);
     this.requestData = this.requestData.bind(this);
     this.toggleModal = this.toggleModal.bind(this);
     this.toggleExportModal = this.toggleExportModal.bind(this);
@@ -178,6 +179,153 @@ class MapView extends React.Component {
     }, 3000);
   }
 
+  getHeatmapOption() {
+    var hours = [
+      "12a",
+      "1a",
+      "2a",
+      "3a",
+      "4a",
+      "5a",
+      "6a",
+      "7a",
+      "8a",
+      "9a",
+      "10a",
+      "11a",
+      "12p",
+      "1p"
+    ];
+    var days = [
+      "Saturday",
+      "Friday",
+      "Thursday",
+      "Wednesday",
+      "Tuesday",
+      "Monday",
+      "Sunday"
+    ];
+
+    var data = [
+      [0, 0, 5],
+      [0, 1, 1],
+      [0, 2, 0],
+      [0, 3, 0],
+      [0, 4, 0],
+      [0, 5, 0],
+      [0, 6, 0],
+      [0, 7, 0],
+      [0, 8, 0],
+      [0, 9, 0],
+      [0, 10, 0],
+      [0, 11, 2],
+      [0, 12, 4],
+      [0, 13, 1],
+      [1, 0, 7],
+      [1, 1, 0],
+      [1, 2, 0],
+      [1, 3, 0],
+      [1, 4, 0],
+      [1, 5, 0],
+      [1, 6, 0],
+      [1, 7, 0],
+      [1, 8, 0],
+      [1, 9, 0],
+      [1, 10, 5],
+      [1, 11, 2],
+      [1, 12, 2],
+      [1, 13, 6],
+      [2, 0, 1],
+      [2, 1, 1],
+      [2, 2, 0],
+      [2, 3, 0],
+      [2, 4, 0],
+      [2, 5, 0],
+      [2, 6, 0],
+      [2, 7, 0],
+      [2, 8, 0],
+      [2, 9, 0],
+      [2, 10, 3],
+      [2, 11, 2],
+      [2, 12, 1],
+      [2, 13, 9],
+      [3, 0, 7],
+      [3, 1, 3],
+      [3, 2, 0],
+      [3, 3, 0],
+      [3, 4, 0],
+      [3, 5, 0],
+      [3, 6, 0],
+      [3, 7, 0],
+      [3, 8, 1],
+      [3, 9, 0],
+      [3, 10, 5],
+      [3, 11, 4],
+      [3, 12, 7],
+      [3, 13, 14]
+    ];
+
+    data = data.map(function(item) {
+      return [item[1], item[0], item[2] || "-"];
+    });
+
+    var option = {
+      tooltip: {
+        position: "top"
+      },
+      animation: false,
+      grid: {
+        height: "50%",
+        y: "10%"
+      },
+      xAxis: {
+        type: "category",
+        data: hours,
+        splitArea: {
+          show: true
+        }
+      },
+      yAxis: {
+        type: "category",
+        data: days,
+        splitArea: {
+          show: true
+        }
+      },
+      visualMap: {
+        min: 0,
+        max: 10,
+        calculable: true,
+        orient: "horizontal",
+        left: "center",
+        bottom: "15%",
+        inRange: {
+          color: ["#adfff1", "#22c3aa", "#489795"]
+        }
+      },
+      series: [
+        {
+          name: "Punch Card",
+          type: "heatmap",
+          data: data,
+          label: {
+            normal: {
+              show: true
+            }
+          },
+          itemStyle: {
+            emphasis: {
+              shadowBlur: 10,
+              shadowColor: "rgba(0, 0, 0, 0.5)"
+            },
+            color: "rgb(128, 128, 0)"
+          }
+        }
+      ]
+    };
+    return option;
+  }
+
   getOption(data) {
     if (data) {
       var data1 = data[1];
@@ -214,6 +362,9 @@ class MapView extends React.Component {
         },
         yAxis: {
           name: "(W/m²)"
+        },
+        itemStyle: {
+          color: "#489795"
         },
         series: [
           {
@@ -322,6 +473,7 @@ class MapView extends React.Component {
     let { solarStatus, queryResponse, solarAlert } = this.props.solarBI;
     if (solarStatus === "success" && queryResponse) {
       const newOptions = this.getOption(queryResponse["data"]["data"]);
+      const heatmapOptions = this.getHeatmapOption();
       const closestPoint = {
         lat: queryResponse["data"]["lat"],
         lng: queryResponse["data"]["lng"]
@@ -348,7 +500,12 @@ class MapView extends React.Component {
           </div>
         </InfoWindow>
       );
-      reactEcharts = <ReactEcharts option={newOptions} />;
+      reactEcharts = (
+        <div style={{ display: "flex" }}>
+          <ReactEcharts style={{ width: "100%" }} option={heatmapOptions} />
+          <ReactEcharts style={{ width: "100%" }} option={newOptions} />
+        </div>
+      );
     } else if (solarStatus === "loading") {
       reactEcharts = <Loading size={50} style={{ marginTop: "20%" }} />;
     } else if (solarStatus === "failed") {
@@ -409,8 +566,48 @@ class MapView extends React.Component {
           </Grid>
         )}
 
+        <Map
+          visible={this.state.showingMap}
+          google={this.props.google}
+          zoom={this.state.zoom}
+          onClick={this.onMapClicked}
+          initialCenter={this.state.center}
+          center={this.state.center}
+          style={{
+            boxShadow:
+              "0 1px 3px rgba(0,0,0,0.12), 0 4px 6px rgba(29,114,12,0.24)",
+            borderRadius: "1em",
+            height: "110%",
+            width: "100%",
+            position: "relative"
+          }}
+        >
+          <Marker
+            position={this.state.center}
+            name="Current location"
+            icon={defaultIcon}
+            onClick={this.onMarkerClick}
+          />
+          {closestMarker}
+          {infoWindow}
+
+          <Circle
+            radius={this.state.radius * 1000}
+            center={this.state.center}
+            strokeColor="transparent"
+            strokeOpacity={0}
+            strokeWeight={5}
+            fillColor={"#FF0000"}
+            fillOpacity={0.2}
+          />
+        </Map>
+
+        {this.state.showingMap && (
+          <div style={{ marginTop: "6.5em" }}>{reactEcharts}</div>
+        )}
+
         <Grid>
-          <Row className="show-grid" style={{ marginTop: "1%" }}>
+          {/* <Row className="show-grid" style={{ marginTop: "1%" }}>
             <Col xs={10} xsOffset={1}>
               <Map
                 visible={this.state.showingMap}
@@ -448,15 +645,13 @@ class MapView extends React.Component {
                 />
               </Map>
             </Col>
-          </Row>
+          </Row> */}
 
-          {this.state.showingMap && (
+          {/* {this.state.showingMap && (
             <Row className="show-grid" style={{ marginTop: "6.5em" }}>
-              <Col md={10} mdOffset={1}>
-                {reactEcharts}
-              </Col>
+              <Col xs={12}>{reactEcharts}</Col>
             </Row>
-          )}
+          )} */}
 
           {this.state.showingMap && (
             <MuiThemeProvider theme={theme}>
