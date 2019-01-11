@@ -2678,7 +2678,7 @@ class PartitionViz(NVD3TimeSeriesViz):
             levels = self.levels_for('agg_sum', [DTTM_ALIAS] + groups, df)
         return self.nest_values(levels)
 
-
+import sys
 class SolarBI(BaseViz):
     """deck.gl's ScreenGridLayer"""
 
@@ -2695,7 +2695,13 @@ class SolarBI(BaseViz):
     nearest_lng = None
 
     def load_data(self, name):
+        print(sys.path)
+
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        name = os.path.join(base_path, name)
+
         file = open(name, 'rb')
+        # file = open(os.environ['PWD']+name, 'rb')
         print("file '" + name + "' has been loaded successfully.")
         return pkl.load(file)
 
@@ -2770,8 +2776,8 @@ class SolarBI(BaseViz):
         lng = self.form_data['spatial_address']['lon']
         radius = self.form_data['radius']
         if not self.lng_list839:
-            self.lat_list679 = [float(x) for x in self.load_data('superset/solar_locations/lat679.pk')]
-            self.lng_list839 = [float(x) for x in self.load_data('superset/solar_locations/lng839.pk')]
+            self.lat_list679 = [float(x) for x in self.load_data('solar_locations/lat679.pk')]
+            self.lng_list839 = [float(x) for x in self.load_data('solar_locations/lng839.pk')]
 
         self.get_closest_point((float(lat), float(lng)), self.lat_list679, self.lng_list839)
         where = f"latitude = '{self.nearest_lat}' and longitude = '{self.nearest_lng}' AND radiation != -999"
