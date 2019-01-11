@@ -10,7 +10,6 @@ import {
 } from "../../visualizations/SolarBI/google_maps_react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import ReactEcharts from "echarts-for-react";
 import { Grid, Row, Col, Alert } from "react-bootstrap";
 import Button from "@material-ui/core/Button";
 import DisplayQueryButton from "../../explore/components/DisplayQueryButton";
@@ -18,6 +17,7 @@ import { fetchSolarData, addSuccessToast } from "../actions/solarActions";
 import SaveModal from "./SaveModal";
 import ExportModal from "./ExportModal";
 import InfoWidgets from "./InfoWidgets";
+import SolarCharts from "./SolarCharts";
 import Loading from "./Loading";
 import classNames from "classnames";
 import URI from "urijs";
@@ -52,7 +52,7 @@ class MapView extends React.Component {
       radius: 3.5,
       datasource_id: "",
       datasource_type: "",
-      zoom: 13,
+      zoom: 14,
       address: "",
       options: {},
       showModal: false,
@@ -68,8 +68,6 @@ class MapView extends React.Component {
 
     this.onPlaceChanged = this.onPlaceChanged.bind(this);
     this.onGoBackClick = this.onGoBackClick.bind(this);
-    this.getOption = this.getOption.bind(this);
-    this.getHeatmapOption = this.getHeatmapOption.bind(this);
     this.requestData = this.requestData.bind(this);
     this.toggleModal = this.toggleModal.bind(this);
     this.toggleExportModal = this.toggleExportModal.bind(this);
@@ -140,7 +138,7 @@ class MapView extends React.Component {
             lat,
             lng
           },
-          zoom: 13,
+          zoom: 14,
           searching: false,
           showingMap: true
         },
@@ -177,214 +175,6 @@ class MapView extends React.Component {
         showingWrongAlert: false
       });
     }, 3000);
-  }
-
-  getHeatmapOption() {
-    var hours = [
-      "12a",
-      "1a",
-      "2a",
-      "3a",
-      "4a",
-      "5a",
-      "6a",
-      "7a",
-      "8a",
-      "9a",
-      "10a",
-      "11a",
-      "12p",
-      "1p"
-    ];
-    var days = [
-      "Saturday",
-      "Friday",
-      "Thursday",
-      "Wednesday",
-      "Tuesday",
-      "Monday",
-      "Sunday"
-    ];
-
-    var data = [
-      [0, 0, 5],
-      [0, 1, 1],
-      [0, 2, 0],
-      [0, 3, 0],
-      [0, 4, 0],
-      [0, 5, 0],
-      [0, 6, 0],
-      [0, 7, 0],
-      [0, 8, 0],
-      [0, 9, 0],
-      [0, 10, 0],
-      [0, 11, 2],
-      [0, 12, 4],
-      [0, 13, 1],
-      [1, 0, 7],
-      [1, 1, 0],
-      [1, 2, 0],
-      [1, 3, 0],
-      [1, 4, 0],
-      [1, 5, 0],
-      [1, 6, 0],
-      [1, 7, 0],
-      [1, 8, 0],
-      [1, 9, 0],
-      [1, 10, 5],
-      [1, 11, 2],
-      [1, 12, 2],
-      [1, 13, 6],
-      [2, 0, 1],
-      [2, 1, 1],
-      [2, 2, 0],
-      [2, 3, 0],
-      [2, 4, 0],
-      [2, 5, 0],
-      [2, 6, 0],
-      [2, 7, 0],
-      [2, 8, 0],
-      [2, 9, 0],
-      [2, 10, 3],
-      [2, 11, 2],
-      [2, 12, 1],
-      [2, 13, 9],
-      [3, 0, 7],
-      [3, 1, 3],
-      [3, 2, 0],
-      [3, 3, 0],
-      [3, 4, 0],
-      [3, 5, 0],
-      [3, 6, 0],
-      [3, 7, 0],
-      [3, 8, 1],
-      [3, 9, 0],
-      [3, 10, 5],
-      [3, 11, 4],
-      [3, 12, 7],
-      [3, 13, 14]
-    ];
-
-    data = data.map(function(item) {
-      return [item[1], item[0], item[2] || "-"];
-    });
-
-    var option = {
-      tooltip: {
-        position: "top"
-      },
-      animation: false,
-      grid: {
-        height: "50%",
-        y: "10%"
-      },
-      xAxis: {
-        type: "category",
-        data: hours,
-        splitArea: {
-          show: true
-        }
-      },
-      yAxis: {
-        type: "category",
-        data: days,
-        splitArea: {
-          show: true
-        }
-      },
-      visualMap: {
-        min: 0,
-        max: 10,
-        calculable: true,
-        orient: "horizontal",
-        left: "center",
-        bottom: "15%",
-        inRange: {
-          color: ["#adfff1", "#22c3aa", "#489795"]
-        }
-      },
-      series: [
-        {
-          name: "Punch Card",
-          type: "heatmap",
-          data: data,
-          label: {
-            normal: {
-              show: true
-            }
-          },
-          itemStyle: {
-            emphasis: {
-              shadowBlur: 10,
-              shadowColor: "rgba(0, 0, 0, 0.5)"
-            },
-            color: "rgb(128, 128, 0)"
-          }
-        }
-      ]
-    };
-    return option;
-  }
-
-  getOption(data) {
-    if (data) {
-      var data1 = data[1];
-      var xAxisData = data[0];
-
-      var option = {
-        title: {
-          text: "Irradiance Data"
-        },
-        legend: {
-          data: ["☀️ Irradiance ☀️ (W/m²)"],
-          align: "left"
-        },
-        toolbox: {
-          showTitle: false,
-          feature: {
-            saveAsImage: {
-              pixelRatio: 2
-            },
-            dataView: {
-              show: true,
-              title: "View Data",
-              lang: ["Data View", "close", "refresh"]
-            }
-          }
-        },
-        tooltip: {},
-        xAxis: {
-          data: xAxisData,
-          silent: false,
-          splitLine: {
-            show: false
-          }
-        },
-        yAxis: {
-          name: "(W/m²)"
-        },
-        itemStyle: {
-          color: "#489795"
-        },
-        series: [
-          {
-            name: "☀️ Irradiance ☀️ (W/m²)",
-            type: "bar",
-            data: data1,
-            animationDelay: function(idx) {
-              return idx * 10;
-            }
-          }
-        ],
-        animationEasing: "elasticOut",
-        animationDelayUpdate: function(idx) {
-          return idx * 5;
-        }
-      };
-
-      return option;
-    }
-    return {};
   }
 
   getFormData() {
@@ -472,8 +262,6 @@ class MapView extends React.Component {
     let infoWindow = null;
     let { solarStatus, queryResponse, solarAlert } = this.props.solarBI;
     if (solarStatus === "success" && queryResponse) {
-      const newOptions = this.getOption(queryResponse["data"]["data"]);
-      const heatmapOptions = this.getHeatmapOption();
       const closestPoint = {
         lat: queryResponse["data"]["lat"],
         lng: queryResponse["data"]["lng"]
@@ -481,7 +269,7 @@ class MapView extends React.Component {
       closestMarker = (
         <Marker
           position={closestPoint}
-          name="Closest point"
+          name="Nearest Data Collection Point"
           onClick={this.onMarkerClick}
           icon={{
             url:
@@ -496,18 +284,24 @@ class MapView extends React.Component {
           visible={this.state.showingInfoWindow}
         >
           <div>
-            <p>{this.state.selectedPlace.name}</p>
+            <p
+              style={{
+                fontFamily: "Helvetica,Arial,sans-serif",
+                margin: "auto"
+              }}
+            >
+              {this.state.selectedPlace.name}
+            </p>
           </div>
         </InfoWindow>
       );
       reactEcharts = (
         <div style={{ display: "flex" }}>
-          <ReactEcharts style={{ width: "100%" }} option={heatmapOptions} />
-          <ReactEcharts style={{ width: "100%" }} option={newOptions} />
+          <SolarCharts queryData={queryResponse["data"]["data"]} />
         </div>
       );
     } else if (solarStatus === "loading") {
-      reactEcharts = <Loading size={50} style={{ marginTop: "20%" }} />;
+      reactEcharts = <Loading size={80} />;
     } else if (solarStatus === "failed") {
       reactEcharts = (
         <Alert bsStyle="danger">
@@ -574,17 +368,18 @@ class MapView extends React.Component {
           initialCenter={this.state.center}
           center={this.state.center}
           style={{
+            marginTop: "-19px",
             boxShadow:
               "0 1px 3px rgba(0,0,0,0.12), 0 4px 6px rgba(29,114,12,0.24)",
             borderRadius: "1em",
-            height: "110%",
+            height: "495px",
             width: "100%",
             position: "relative"
           }}
         >
           <Marker
             position={this.state.center}
-            name="Current location"
+            name={this.state.address}
             icon={defaultIcon}
             onClick={this.onMarkerClick}
           />
@@ -602,56 +397,23 @@ class MapView extends React.Component {
           />
         </Map>
 
-        {this.state.showingMap && (
-          <div style={{ marginTop: "6.5em" }}>{reactEcharts}</div>
-        )}
-
         <Grid>
-          {/* <Row className="show-grid" style={{ marginTop: "1%" }}>
-            <Col xs={10} xsOffset={1}>
-              <Map
-                visible={this.state.showingMap}
-                google={this.props.google}
-                zoom={this.state.zoom}
-                onClick={this.onMapClicked}
-                initialCenter={this.state.center}
-                center={this.state.center}
-                style={{
-                  boxShadow:
-                    "0 1px 3px rgba(0,0,0,0.12), 0 4px 6px rgba(29,114,12,0.24)",
-                  borderRadius: "1em",
-                  height: "110%",
-                  width: "100%",
-                  position: "relative"
-                }}
-              >
-                <Marker
-                  position={this.state.center}
-                  name="Current location"
-                  icon={defaultIcon}
-                  onClick={this.onMarkerClick}
-                />
-                {closestMarker}
-                {infoWindow}
+          {this.state.showingMap && (
+            <Row className="show-grid" style={{ marginTop: "6.5em" }}>
+              <Col xs={12}>
+                <p>
+                  Based on your location find below data from Jan 2017 until the
+                  latest satellite update.
+                </p>
+              </Col>
+            </Row>
+          )}
 
-                <Circle
-                  radius={this.state.radius * 1000}
-                  center={this.state.center}
-                  strokeColor="transparent"
-                  strokeOpacity={0}
-                  strokeWeight={5}
-                  fillColor={"#FF0000"}
-                  fillOpacity={0.2}
-                />
-              </Map>
-            </Col>
-          </Row> */}
-
-          {/* {this.state.showingMap && (
+          {this.state.showingMap && (
             <Row className="show-grid" style={{ marginTop: "6.5em" }}>
               <Col xs={12}>{reactEcharts}</Col>
             </Row>
-          )} */}
+          )}
 
           {this.state.showingMap && (
             <MuiThemeProvider theme={theme}>

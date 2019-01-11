@@ -15,10 +15,10 @@ export default function Loading({ size }) {
       alt="Loading..."
       src="/static/assets/images/loading.gif"
       style={{
-        width: Math.min(size, 50),
+        width: Math.min(size, 80),
         // height is auto
         padding: 0,
-        margin: 0,
+        margin: 30,
         position: "absolute",
         left: "50%",
         top: "50%",
