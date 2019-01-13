@@ -296,8 +296,22 @@ class MapView extends React.Component {
         </InfoWindow>
       );
       reactEcharts = (
-        <div style={{ display: "flex" }}>
-          <SolarCharts queryData={queryResponse["data"]["data"]} />
+        <div>
+          <p
+            style={{
+              fontSize: 23,
+              textAlign: "center",
+              color: "#8E44AD",
+              marginBottom: 50
+            }}
+          >
+            Based on your location find below data from Jan 2017 until the
+            latest satellite update.
+          </p>
+
+          <div style={{ display: "flex" }}>
+            <SolarCharts queryData={queryResponse["data"]["data"]} />
+          </div>
         </div>
       );
     } else if (solarStatus === "loading") {
@@ -352,11 +366,11 @@ class MapView extends React.Component {
                 />
               </Col>
             </Row>
-            <Row className="show-grid" style={{ marginTop: "8%" }}>
+            {/* <Row className="show-grid" style={{ marginTop: "8%" }}>
               <Col xs={4} xsOffset={1}>
                 <InfoWidgets />
               </Col>
-            </Row>
+            </Row> */}
           </Grid>
         )}
 
@@ -399,18 +413,7 @@ class MapView extends React.Component {
 
         <Grid>
           {this.state.showingMap && (
-            <Row className="show-grid" style={{ marginTop: "6.5em" }}>
-              <Col xs={12}>
-                <p>
-                  Based on your location find below data from Jan 2017 until the
-                  latest satellite update.
-                </p>
-              </Col>
-            </Row>
-          )}
-
-          {this.state.showingMap && (
-            <Row className="show-grid" style={{ marginTop: "6.5em" }}>
+            <Row className="show-grid" style={{ marginTop: "2em" }}>
               <Col xs={12}>{reactEcharts}</Col>
             </Row>
           )}
