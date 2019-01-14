@@ -18,6 +18,7 @@ import SaveModal from "./SaveModal";
 import ExportModal from "./ExportModal";
 import InfoWidgets from "./InfoWidgets";
 import SolarCharts from "./SolarCharts";
+import MoreInfoWidget from "./MoreInfoWidget";
 import Loading from "./Loading";
 import classNames from "classnames";
 import URI from "urijs";
@@ -312,6 +313,7 @@ class MapView extends React.Component {
           <div style={{ display: "flex" }}>
             <SolarCharts queryData={queryResponse["data"]["data"]} />
           </div>
+          <MoreInfoWidget />
         </div>
       );
     } else if (solarStatus === "loading") {
@@ -414,7 +416,9 @@ class MapView extends React.Component {
         <Grid>
           {this.state.showingMap && (
             <Row className="show-grid" style={{ marginTop: "2em" }}>
-              <Col xs={12}>{reactEcharts}</Col>
+              <Col xs={8} md={12}>
+                {reactEcharts}
+              </Col>
             </Row>
           )}
 
