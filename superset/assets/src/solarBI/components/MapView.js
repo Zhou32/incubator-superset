@@ -17,6 +17,7 @@ import { fetchSolarData, addSuccessToast } from "../actions/solarActions";
 import SaveModal from "./SaveModal";
 import ExportModal from "./ExportModal";
 import InfoWidgets from "./InfoWidgets";
+import InfoTabs from "./InfoTabs";
 import SolarCharts from "./SolarCharts";
 import MoreInfoWidget from "./MoreInfoWidget";
 import Loading from "./Loading";
@@ -33,6 +34,9 @@ const theme = createMuiTheme({
   palette: {
     primary: {
       main: "#489795"
+    },
+    secondary: {
+      main: "#8E44AD"
     }
   }
 });
@@ -303,6 +307,7 @@ class MapView extends React.Component {
               fontSize: 23,
               textAlign: "center",
               color: "#8E44AD",
+              marginTop: 50,
               marginBottom: 50
             }}
           >
@@ -313,7 +318,7 @@ class MapView extends React.Component {
           <div style={{ display: "flex" }}>
             <SolarCharts queryData={queryResponse["data"]["data"]} />
           </div>
-          <MoreInfoWidget />
+          <InfoTabs />
         </div>
       );
     } else if (solarStatus === "loading") {
