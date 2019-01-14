@@ -32,7 +32,10 @@ const theme = createMuiTheme({
   },
   palette: {
     primary: {
-      main: "#489795"
+      main: '#489795',
+    },
+    secondary:{
+      main: '#8E44AD',
     }
   }
 });
@@ -303,6 +306,7 @@ class MapView extends React.Component {
               fontSize: 23,
               textAlign: "center",
               color: "#8E44AD",
+              marginTop: 50,
               marginBottom: 50
             }}
           >

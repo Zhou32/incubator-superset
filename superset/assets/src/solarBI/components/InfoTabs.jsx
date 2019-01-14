@@ -11,6 +11,7 @@ import AppBar from "@material-ui/core/AppBar";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import { Grid, Row, Col } from "react-bootstrap";
+import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
 import IconBtn from "./IconBtn";
 
 const styles = theme => ({
@@ -45,9 +46,24 @@ const styles = theme => ({
   }
 });
 
+const tabHeadStyles = {
+  fontSize: 20,
+}
+
+const theme = createMuiTheme({
+  palette: {
+    primary:{
+      main: '#489795',
+    },
+    secondary: {
+      main: '#8E44AD',
+    },
+  },
+});
+
 function TabContainer(props) {
   return (
-    <Typography component="div" style={{ padding: 8 * 3 }}>
+    <Typography component="div" style={{ padding: 8 * 3, fontSize: 25}}>
       {props.children}
     </Typography>
   );
@@ -62,10 +78,6 @@ class InfoTabs extends React.Component {
     this.handleTabChange = this.handleTabChange.bind(this);
   }
 
-  componentDidMount(){
-    console.log("Loading Info tabs");
-  }
-
   handleTabChange(event, tabValue) {
     this.setState({ tabValue });
   }
@@ -75,30 +87,37 @@ class InfoTabs extends React.Component {
     let tabValue = this.state.tabValue;
     return(
       <div>
-      <Card className={classes.financeCard}>
+      <MuiThemeProvider theme={theme}>
+      <Card className={classes.financeCard} md={6} xs={3}>
         <CardContent className={classes.cardContent}>
           <IconBtn content="Based on your usage, Project Sunroof can recommend the optimal solar installation size that can fit on your roof." />
-          <Typography variant="h4" id="label" className={classes.typography}>
-            Your potential environmental impact
+          <Typography variant="h3" id="label" className={classes.typography}>
+            Need more?
           </Typography>
           <AppBar position="static" color="default">
             <Tabs
               value={tabValue}
               variant="fullWidth"
               onChange={this.handleTabChange}
-              inkBarStyle={{background: 'green'}}
-              // centered
+              indicatorColor="secondary"
             >
-              <Tab label="Item One" />
-              <Tab label="Item Two" />
-              <Tab label="Item Three" />
+              <Tab label="Solar Solution" style = {tabHeadStyles}/>
+              <Tab label="Energy Profile" style = {tabHeadStyles}/>
+              <Tab label="Business Case" style = {tabHeadStyles}/>
             </Tabs>
           </AppBar>
-          {tabValue === 0 && <TabContainer>Item One</TabContainer>}
-          {tabValue === 1 && <TabContainer>Item Two</TabContainer>}
-          {tabValue === 2 && <TabContainer>Item Three</TabContainer>}
+          {tabValue === 0 && <TabContainer>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus felis nulla, feugiat non efficitur et, pharetra sed orci. Donec commodo sapien in nisi scelerisque dignissim. Nullam ut orci eu ligula blandit aliquam. Sed eget convallis dolor. Donec vulputate elit at elit tincidunt convallis. Etiam porttitor, lacus vel pretium porta, dolor ante aliquam magna, sed accumsan arcu purus pulvinar metus.
+            </TabContainer>}
+          {tabValue === 1 && <TabContainer>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce rutrum quam sem, ut vulputate nulla faucibus eu. Sed eu augue sed magna luctus iaculis placerat et neque. Nulla sed quam ut libero semper vestibulum vel ut sapien. Integer rutrum metus sed velit aliquam viverra. Sed consequat sit amet ligula sed laoreet.
+            </TabContainer>}
+          {tabValue === 2 && <TabContainer>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sit amet egestas nibh, nec ornare lectus. Donec tristique justo sit amet placerat placerat. Maecenas et eros non est tincidunt aliquet. Suspendisse euismod consectetur odio. Nullam fermentum sem vel turpis faucibus iaculis.
+            </TabContainer>}
         </CardContent>
       </Card>
+      </MuiThemeProvider>
       </div>
     )
   }
