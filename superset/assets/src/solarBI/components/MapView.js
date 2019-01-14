@@ -18,6 +18,7 @@ import SaveModal from "./SaveModal";
 import ExportModal from "./ExportModal";
 import InfoWidgets from "./InfoWidgets";
 import SolarCharts from "./SolarCharts";
+import WelcomePage from "./WelcomePage";
 import Loading from "./Loading";
 import classNames from "classnames";
 import URI from "urijs";
@@ -356,7 +357,14 @@ class MapView extends React.Component {
             </Row>
           </Grid>
         )}
+
         {this.state.searching && (
+          <div>
+            <WelcomePage />
+          </div>
+        )}
+
+        {/* {this.state.searching && (
           <Grid>
             <Row className="show-grid" style={{ marginTop: "20%" }}>
               <Col xs={10} xsOffset={1} md={10} mdOffset={1}>
@@ -366,13 +374,13 @@ class MapView extends React.Component {
                 />
               </Col>
             </Row>
-            {/* <Row className="show-grid" style={{ marginTop: "8%" }}>
+            <Row className="show-grid" style={{ marginTop: "8%" }}>
               <Col xs={4} xsOffset={1}>
                 <InfoWidgets />
               </Col>
-            </Row> */}
-          </Grid>
-        )}
+            </Row>
+            </Grid>
+        )} */}
 
         <Map
           visible={this.state.showingMap}
