@@ -19,7 +19,6 @@ import ExportModal from "./ExportModal";
 import InfoWidgets from "./InfoWidgets";
 import InfoTabs from "./InfoTabs";
 import SolarCharts from "./SolarCharts";
-import MoreInfoWidget from "./MoreInfoWidget";
 import Loading from "./Loading";
 import classNames from "classnames";
 import URI from "urijs";
