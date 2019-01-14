@@ -17,6 +17,7 @@ import { fetchSolarData, addSuccessToast } from "../actions/solarActions";
 import SaveModal from "./SaveModal";
 import ExportModal from "./ExportModal";
 import InfoWidgets from "./InfoWidgets";
+import InfoTabs from "./InfoTabs";
 import SolarCharts from "./SolarCharts";
 import Loading from "./Loading";
 import classNames from "classnames";
@@ -312,7 +313,9 @@ class MapView extends React.Component {
           <div style={{ display: "flex" }}>
             <SolarCharts queryData={queryResponse["data"]["data"]} />
           </div>
+            <InfoTabs />
         </div>
+
       );
     } else if (solarStatus === "loading") {
       reactEcharts = <Loading size={80} />;
