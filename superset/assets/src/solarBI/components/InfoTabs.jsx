@@ -13,6 +13,13 @@ import Tab from "@material-ui/core/Tab";
 import { Grid, Row, Col } from "react-bootstrap";
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
 import IconBtn from "./IconBtn";
+import SaveModal from "./SaveModal";
+import ExportModal from "./ExportModal";
+import Tooltip from "@material-ui/core/Tooltip";
+import IconButton from "@material-ui/core/IconButton";
+import KeyboardBackspaceIcon from "@material-ui/icons/KeyboardBackspace";
+import SaveIcon from "@material-ui/icons/Save";
+import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 
 const styles = theme => ({
   root: {
@@ -24,9 +31,10 @@ const styles = theme => ({
   card: {
     minWidth: 450
   },
-  financeCard: {
+  infoCard: {
     minHeight: 200,
-    marginTop: 10
+    marginTop: 10,
+    marginBottom: 100
   },
   cardContent: {
     margin: "0 20"
@@ -35,6 +43,15 @@ const styles = theme => ({
     textAlign: "center",
     marginTop: 10,
     marginBottom: 30
+  },
+  icon: {
+    color: "#09290f",
+    backgroundColor: "#489795",
+    transform: "scale(1.4)",
+    margin: "15 20"
+  },
+  tooltip: {
+    fontSize: 14
   }
 });
 
@@ -72,10 +89,30 @@ class InfoTabs extends React.Component {
       tabValue: 0
     };
     this.handleTabChange = this.handleTabChange.bind(this);
+    this.onBackClick = this.onBackClick.bind(this);
+    this.onSaveClick = this.onSaveClick.bind(this);
+    this.onExportClick = this.onExportClick.bind(this);
   }
 
   handleTabChange(event, tabValue) {
     this.setState({ tabValue });
+  }
+
+  onBackClick() {
+    console.log("clicked back");
+    this.props.onBackClick();
+  }
+
+  onSaveClick() {
+    this.props.onSaveClick();
+  }
+
+  onExportClick() {
+    this.props.onExportClick();
+  }
+
+  getCSVURL() {
+    return this.props.getCSVURL();
   }
 
   render() {
@@ -83,69 +120,95 @@ class InfoTabs extends React.Component {
     let tabValue = this.state.tabValue;
     return (
       <div>
-        <MuiThemeProvider theme={theme}>
-          <Card className={classes.financeCard} md={6} xs={3}>
-            <CardContent className={classes.cardContent}>
-              <IconBtn content="Based on your usage, Project Sunroof can recommend the optimal solar installation size that can fit on your roof." />
-              <Typography
-                variant="h3"
-                id="label"
-                className={classes.typography}
+        {/* <MuiThemeProvider theme={theme}> */}
+        <Card className={classes.infoCard} md={6} xs={3}>
+          <CardContent className={classes.cardContent}>
+            <IconBtn content="Based on your usage, Project Sunroof can recommend the optimal solar installation size that can fit on your roof." />
+            <Typography
+              variant="h3"
+              id="label"
+              className={classes.typography}
+              style={{ marginBottom: "35px" }}
+            >
+              Need more?
+            </Typography>
+            <AppBar position="static" color="default">
+              <Tabs
+                value={tabValue}
+                variant="fullWidth"
+                onChange={this.handleTabChange}
+                indicatorColor="secondary"
               >
-                Need more?
-              </Typography>
-              <AppBar position="static" color="default">
-                <Tabs
-                  value={tabValue}
-                  variant="fullWidth"
-                  onChange={this.handleTabChange}
-                  indicatorColor="secondary"
+                <Tab label="Solar Solution" style={tabHeadStyles} />
+                <Tab label="Energy Profile" style={tabHeadStyles} />
+                <Tab label="Business Case" style={tabHeadStyles} />
+              </Tabs>
+            </AppBar>
+            {tabValue === 0 && (
+              <TabContainer>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
+                felis nulla, feugiat non efficitur et, pharetra sed orci. Donec
+                commodo sapien in nisi scelerisque dignissim. Nullam ut orci eu
+                ligula blandit aliquam. Sed eget convallis dolor. Donec
+                vulputate elit at elit tincidunt convallis. Etiam porttitor,
+                lacus vel pretium porta, dolor ante aliquam magna, sed accumsan
+                arcu purus pulvinar metus.
+              </TabContainer>
+            )}
+            {tabValue === 1 && (
+              <TabContainer>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce
+                rutrum quam sem, ut vulputate nulla faucibus eu. Sed eu augue
+                sed magna luctus iaculis placerat et neque. Nulla sed quam ut
+                libero semper vestibulum vel ut sapien. Integer rutrum metus sed
+                velit aliquam viverra. Sed consequat sit amet ligula sed
+                laoreet.
+              </TabContainer>
+            )}
+            {tabValue === 2 && (
+              <TabContainer>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
+                sit amet egestas nibh, nec ornare lectus. Donec tristique justo
+                sit amet placerat placerat. Maecenas et eros non est tincidunt
+                aliquet. Suspendisse euismod consectetur odio. Nullam fermentum
+                sem vel turpis faucibus iaculis.
+              </TabContainer>
+            )}
+            <Tooltip title="Go Back" classes={{ tooltip: classes.tooltip }}>
+              <IconButton className={classes.icon} onClick={this.onBackClick}>
+                <KeyboardBackspaceIcon />
+              </IconButton>
+            </Tooltip>
+            <div style={{ float: "right" }}>
+              <Tooltip title="Save">
+                <IconButton className={classes.icon} onClick={this.onSaveClick}>
+                  <SaveIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Export As CSV">
+                <IconButton
+                  className={classes.icon}
+                  href={this.getCSVURL()}
+                  onClick={this.onExportClick}
                 >
-                  <Tab label="Solar Solution" style={tabHeadStyles} />
-                  <Tab label="Energy Profile" style={tabHeadStyles} />
-                  <Tab label="Business Case" style={tabHeadStyles} />
-                </Tabs>
-              </AppBar>
-              {tabValue === 0 && (
-                <TabContainer>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  Vivamus felis nulla, feugiat non efficitur et, pharetra sed
-                  orci. Donec commodo sapien in nisi scelerisque dignissim.
-                  Nullam ut orci eu ligula blandit aliquam. Sed eget convallis
-                  dolor. Donec vulputate elit at elit tincidunt convallis. Etiam
-                  porttitor, lacus vel pretium porta, dolor ante aliquam magna,
-                  sed accumsan arcu purus pulvinar metus.
-                </TabContainer>
-              )}
-              {tabValue === 1 && (
-                <TabContainer>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce
-                  rutrum quam sem, ut vulputate nulla faucibus eu. Sed eu augue
-                  sed magna luctus iaculis placerat et neque. Nulla sed quam ut
-                  libero semper vestibulum vel ut sapien. Integer rutrum metus
-                  sed velit aliquam viverra. Sed consequat sit amet ligula sed
-                  laoreet.
-                </TabContainer>
-              )}
-              {tabValue === 2 && (
-                <TabContainer>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
-                  sit amet egestas nibh, nec ornare lectus. Donec tristique
-                  justo sit amet placerat placerat. Maecenas et eros non est
-                  tincidunt aliquet. Suspendisse euismod consectetur odio.
-                  Nullam fermentum sem vel turpis faucibus iaculis.
-                </TabContainer>
-              )}
-            </CardContent>
-          </Card>
-        </MuiThemeProvider>
+                  <CloudDownloadIcon />
+                </IconButton>
+              </Tooltip>
+            </div>
+          </CardContent>
+        </Card>
+        {/* </MuiThemeProvider> */}
       </div>
     );
   }
 }
 
 InfoTabs.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  onBackClick: PropTypes.func.isRequired,
+  onSaveClick: PropTypes.func.isRequired,
+  onExportClick: PropTypes.func.isRequired,
+  getCSVURL: PropTypes.func.isRequired
 };
 
 export default withStyles(styles)(InfoTabs);
