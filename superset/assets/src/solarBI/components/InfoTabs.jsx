@@ -13,6 +13,9 @@ import Tab from "@material-ui/core/Tab";
 import { Grid, Row, Col } from "react-bootstrap";
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
 import IconBtn from "./IconBtn";
+import SaveModal from "./SaveModal";
+import ExportModal from "./ExportModal";
+import Button from "@material-ui/core/Button";
 
 const styles = theme => ({
   root: {
@@ -51,6 +54,9 @@ const tabHeadStyles = {
 }
 
 const theme = createMuiTheme({
+  typography: {
+    useNextVariants: true,
+  },
   palette: {
     primary:{
       main: '#489795',
@@ -73,13 +79,33 @@ class InfoTabs extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      tabValue:0
+      tabValue:0,
     }
     this.handleTabChange = this.handleTabChange.bind(this);
+    this.onBackClick=this.onBackClick.bind(this);
+    this.onSaveClick=this.onSaveClick.bind(this);
+    this.onExportClick=this.onExportClick.bind(this);
   }
 
   handleTabChange(event, tabValue) {
     this.setState({ tabValue });
+  }
+
+  onBackClick(){
+    console.log("clicked back");
+    this.props.onBackClick();
+  }
+
+  onSaveClick(){
+    this.props.onSaveClick();
+  }
+
+  onExportClick(){
+    this.props.onExportClick();
+  }
+
+  getCSVURL(){
+    return this.props.getCSVURL();
   }
 
   render(){
@@ -87,11 +113,11 @@ class InfoTabs extends React.Component {
     let tabValue = this.state.tabValue;
     return(
       <div>
-      <MuiThemeProvider theme={theme}>
+      {/* <MuiThemeProvider theme={theme}> */}
       <Card className={classes.financeCard} md={6} xs={3}>
         <CardContent className={classes.cardContent}>
           <IconBtn content="Based on your usage, Project Sunroof can recommend the optimal solar installation size that can fit on your roof." />
-          <Typography variant="h3" id="label" className={classes.typography}>
+          <Typography variant="h3" id="label" className={classes.typography} style={{marginBottom:"35px"}}>
             Need more?
           </Typography>
           <AppBar position="static" color="default">
@@ -115,16 +141,61 @@ class InfoTabs extends React.Component {
           {tabValue === 2 && <TabContainer>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sit amet egestas nibh, nec ornare lectus. Donec tristique justo sit amet placerat placerat. Maecenas et eros non est tincidunt aliquet. Suspendisse euismod consectetur odio. Nullam fermentum sem vel turpis faucibus iaculis.
             </TabContainer>}
+            <Col xsOffset={1} xs={1} md={1} mdOffset={1}>
+              <Button
+                variant="contained"
+                color="primary"
+                style={{
+                  width: 80,
+                  fontSize: 12,
+                  color: "white",}}
+                  onClick={this.onBackClick}
+              >
+              Back
+              </Button>
+            </Col>
+            <Col xs={1} xsOffset={6}>
+              <Button
+                variant="contained"
+                color="primary"
+                style={{
+                  width: 80,
+                  fontSize: 12,
+                  color: "white",}}
+                onClick={this.onSaveClick}
+              >
+                Save
+              </Button>
+            </Col>
+            <Col xsOffset={2}>
+              <Button
+                variant="contained"
+                  color="primary"
+                  style={{
+                    width: 80,
+                    fontSize: 12,
+                    color: "white",
+                    marginLeft:30,}}
+                  href={this.getCSVURL()}
+                  onClick={this.onExportClick}
+              >
+              Export
+              </Button>
+            </Col>
         </CardContent>
       </Card>
-      </MuiThemeProvider>
+      {/* </MuiThemeProvider> */}
       </div>
     )
   }
 }
 
 InfoTabs.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  onBackClick: PropTypes.func.isRequired,
+  onSaveClick: PropTypes.func.isRequired,
+  onExportClick: PropTypes.func.isRequired,
+  getCSVURL: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(InfoTabs);

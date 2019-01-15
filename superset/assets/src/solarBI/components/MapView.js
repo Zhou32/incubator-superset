@@ -318,7 +318,11 @@ class MapView extends React.Component {
           <div style={{ display: "flex" }}>
             <SolarCharts queryData={queryResponse["data"]["data"]} />
           </div>
-          <InfoTabs />
+          <InfoTabs 
+            onBackClick={this.onGoBackClick}
+            onSaveClick={this.toggleModal}
+            onExportClick={this.toggleExportModal}
+            getCSVURL={this.getCSVURL}/>
         </div>
       );
     } else if (solarStatus === "loading") {
@@ -341,6 +345,7 @@ class MapView extends React.Component {
 
     return (
       <div>
+        <MuiThemeProvider theme={theme}>
         {this.state.showingEmptyAlert && (
           <Grid>
             <Row className="show-grid" xs={12}>
@@ -428,7 +433,7 @@ class MapView extends React.Component {
           )}
 
           {this.state.showingMap && (
-            <MuiThemeProvider theme={theme}>
+            
               <Row className="show-grid">
                 <Col xsOffset={1} xs={1} md={1} mdOffset={1}>
                   {this.state.solar_new &&
@@ -466,7 +471,7 @@ class MapView extends React.Component {
                       </Button>
                     )}
                 </Col>
-                <Col xs={1} md={1}>
+                <Col>
                   {this.props.solarBI.can_export && (
                     <Button
                       {...buttonProps}
@@ -486,7 +491,7 @@ class MapView extends React.Component {
                   )}
                 </Col>
               </Row>
-            </MuiThemeProvider>
+            
           )}
         </Grid>
 
@@ -514,6 +519,7 @@ class MapView extends React.Component {
           open={this.state.showExportModal}
           onHide={this.toggleExportModal}
         />
+        </MuiThemeProvider>
       </div>
     );
   }
