@@ -200,6 +200,7 @@ CACHE_CONFIG = {'CACHE_TYPE': 'redis',
     'CACHE_DEFAULT_TIMEOUT': CACHE_DEFAULT_TIMEOUT,
     'CACHE_KEY_PREFIX': 'superset_results',
     'CACHE_REDIS_URL': 'redis://redis:6379/0'}
+# CACHE_CONFIG = {'CACHE_TYPE': 'null'}
 TABLE_NAMES_CACHE_CONFIG = {'CACHE_TYPE': 'null'}
 
 # CORS Options

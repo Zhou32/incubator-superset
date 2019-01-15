@@ -25,13 +25,8 @@ const styles = theme => ({
     minWidth: 450
   },
   financeCard: {
-    // minWidth: 850,
     minHeight: 200,
-    marginTop: 20
-  },
-  textField: {
-    marginLeft: 20,
-    marginRight: 20
+    marginTop: 10
   },
   cardContent: {
     margin: "0 20"
