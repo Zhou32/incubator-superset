@@ -180,12 +180,15 @@ class InfoTabs extends React.Component {
               </IconButton>
             </Tooltip>
             <div style={{ float: "right" }}>
-              <Tooltip title="Save">
+              <Tooltip title="Save" classes={{ tooltip: classes.tooltip }}>
                 <IconButton className={classes.icon} onClick={this.onSaveClick}>
                   <SaveIcon />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Export As CSV">
+              <Tooltip
+                title="Export As CSV"
+                classes={{ tooltip: classes.tooltip }}
+              >
                 <IconButton
                   className={classes.icon}
                   href={this.getCSVURL()}
