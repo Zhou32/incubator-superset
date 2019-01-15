@@ -307,16 +307,14 @@ class MapView extends React.Component {
               textAlign: "center",
               color: "#8E44AD",
               marginTop: 50,
-              marginBottom: 50
+              marginBottom: 30
             }}
           >
             Based on your location find below data from Jan 2017 until the
             latest satellite update.
           </p>
 
-          <div style={{ display: "flex" }}>
-            <SolarCharts queryData={queryResponse["data"]["data"]} />
-          </div>
+          <SolarCharts queryData={queryResponse["data"]["data"]} />
           <InfoTabs />
         </div>
       );
@@ -420,7 +418,7 @@ class MapView extends React.Component {
         <Grid>
           {this.state.showingMap && (
             <Row className="show-grid" style={{ marginTop: "2em" }}>
-              <Col xs={8} md={12}>
+              <Col xsOffset={1} xs={10} md={12} mdOffset={0}>
                 {reactEcharts}
               </Col>
             </Row>

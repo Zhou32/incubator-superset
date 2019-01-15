@@ -24,13 +24,8 @@ const styles = theme => ({
   card: {
     minWidth: 450
   },
-  envCard: {
-    minWidth: 850,
-    minHeight: 180,
-    marginTop: 20
-  },
   financeCard: {
-    minWidth: 850,
+    // minWidth: 850,
     minHeight: 200,
     marginTop: 20
   },
@@ -42,12 +37,15 @@ const styles = theme => ({
     margin: "0 20"
   },
   typography: {
-    textAlign: "center"
+    textAlign: "center",
+    marginTop: 10,
+    marginBottom: 30
   }
 });
 
 const tabHeadStyles = {
-  fontSize: 20
+  fontSize: 20,
+  textTransform: "none"
 };
 
 const theme = createMuiTheme({
@@ -66,7 +64,7 @@ const theme = createMuiTheme({
 
 function TabContainer(props) {
   return (
-    <Typography component="div" style={{ padding: 8 * 3, fontSize: 25 }}>
+    <Typography component="div" style={{ padding: 8 * 3, fontSize: 20 }}>
       {props.children}
     </Typography>
   );
