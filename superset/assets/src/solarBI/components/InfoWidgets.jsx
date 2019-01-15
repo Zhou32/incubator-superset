@@ -181,7 +181,7 @@ class InfoWidgets extends React.Component {
                 value={tabValue}
                 variant="fullWidth"
                 onChange={this.handleTabChange}
-                indicatorColor="secondary"
+                indicatorColor="primary"
                 // centered
               >
                 <Tab label="Item One" />

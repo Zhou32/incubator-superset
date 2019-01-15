@@ -10,16 +10,15 @@ import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import Popover from "@material-ui/core/Popover";
 import InfoIcon from "@material-ui/icons/Info";
+import withWidth from "@material-ui/core/withWidth";
 
 const styles = theme => ({
-  root: {
-    display: "flex"
-  },
   card: {
-    minWidth: 550,
+    minWidth: 565,
     minHeight: 330,
     padding: 0,
-    margin: "0 10"
+    margin: "20 10",
+    marginLeft: 0
   },
   cardContent: {
     padding: 0
@@ -248,7 +247,7 @@ class SolarCharts extends React.Component {
   }
 
   render() {
-    const { classes, queryData } = this.props;
+    const { classes, queryData, width } = this.props;
     const { heatmapAnchor, barchartAnchor } = this.state;
     const openHeatmap = Boolean(heatmapAnchor);
     const openBarchart = Boolean(barchartAnchor);
@@ -256,8 +255,13 @@ class SolarCharts extends React.Component {
     const barchartOptions = this.getBarchartOption(queryData);
     const heatmapOptions = this.getHeatmapOption(queryData);
 
+    const isSmallScreen = /xs|sm|md/.test(width);
+    const rootStyle = {
+      display: isSmallScreen ? "initial" : "flex"
+    };
+
     return (
-      <div className={classes.root}>
+      <div style={{ ...rootStyle }}>
         <Card className={classes.card}>
           <CardHeader
             action={
@@ -340,4 +344,4 @@ SolarCharts.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(SolarCharts);
+export default withWidth()(withStyles(styles)(SolarCharts));
