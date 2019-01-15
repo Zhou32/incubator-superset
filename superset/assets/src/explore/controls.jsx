@@ -338,7 +338,7 @@ export const controls = {
     label: t('Linear Color Scheme'),
     choices: () => sequentialSchemeRegistry
       .values()
-      .map(value => [value.name, value.label]),
+      .map(value => [value.id, value.label]),
     default: 'blue_white_yellow',
     clearable: false,
     description: '',
@@ -1455,7 +1455,7 @@ export const controls = {
     label: t('Search Box'),
     renderTrigger: true,
     default: false,
-    description: t('Whether to include a client side search box'),
+    description: t('Whether to include a client-side search box'),
   },
 
   table_filter: {
@@ -1858,7 +1858,7 @@ export const controls = {
     type: 'CheckboxControl',
     label: t('Live render'),
     default: true,
-    description: t('Points and clusters will update as viewport is being changed'),
+    description: t('Points and clusters will update as the viewport is being changed'),
   },
 
   mapbox_color: {
@@ -2287,6 +2287,15 @@ export const controls = {
     renderTrigger: true,
     description: t('Whether to fill the objects'),
     default: true,
+  },
+
+  filter_configs: {
+    type: 'CollectionControl',
+    label: 'Filters',
+    description: t('Filter configuration for the filter box'),
+    validators: [v.nonEmpty],
+    controlName: 'FilterBoxItemControl',
+    mapStateToProps: ({ datasource }) => ({ datasource }),
   },
 
   normalized: {
