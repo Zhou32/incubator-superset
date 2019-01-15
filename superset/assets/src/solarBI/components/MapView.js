@@ -315,11 +315,12 @@ class MapView extends React.Component {
           </p>
 
             <SolarCharts queryData={queryResponse["data"]["data"]} />
+            <InfoTabs 
             onBackClick={this.onGoBackClick}
             onSaveClick={this.toggleModal}
             onExportClick={this.toggleExportModal}
             getCSVURL={this.getCSVURL}/>
-          <InfoTabs 
+          
         </div>
       );
     } else if (solarStatus === "loading") {
@@ -427,68 +428,6 @@ class MapView extends React.Component {
                 {reactEcharts}
               </Col>
             </Row>
-          )}
-
-          {this.state.showingMap && (
-            
-              <Row className="show-grid">
-                <Col xsOffset={1} xs={1} md={1} mdOffset={1}>
-                  {this.state.solar_new &&
-                    this.props.solarBI.can_save && (
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={this.onGoBackClick}
-                        style={{
-                          width: 80,
-                          fontSize: 12,
-                          color: "white"
-                        }}
-                        {...buttonProps}
-                      >
-                        Back
-                      </Button>
-                    )}
-                </Col>
-                <Col xs={1} xsOffset={6}>
-                  {this.state.solar_new &&
-                    this.props.solarBI.can_save && (
-                      <Button
-                        {...buttonProps}
-                        variant="contained"
-                        color="primary"
-                        onClick={this.toggleModal}
-                        style={{
-                          width: 80,
-                          fontSize: 12,
-                          color: "white"
-                        }}
-                      >
-                        Save
-                      </Button>
-                    )}
-                </Col>
-                <Col>
-                  {this.props.solarBI.can_export && (
-                    <Button
-                      {...buttonProps}
-                      variant="contained"
-                      color="primary"
-                      onClick={this.toggleExportModal}
-                      style={{
-                        marginLeft: "5em",
-                        fontSize: 12,
-                        color: "white",
-                        width: 80
-                      }}
-                      href={this.getCSVURL()}
-                    >
-                      Export
-                    </Button>
-                  )}
-                </Col>
-              </Row>
-            
           )}
         </Grid>
 
