@@ -533,10 +533,45 @@ class SolarBIModelView(SliceModelView):  # noqa
     @expose('/add', methods=['GET', 'POST'])
     @has_access
     def add(self):
+        if not g.user or not g.user.get_id():
+            return redirect(appbuilder.get_url_for_login)
+
         for role in g.user.roles:
             if role.name == 'Admin':
                 return super(SolarBIModelView, self).add()
-        return redirect('/superset/welcome')
+
+        entry_point = 'solarBI'
+
+        datasource_id = ''
+        for role in g.user.roles:
+            for permission in role.permissions:
+                if permission.permission.name == 'datasource_access':
+                    datasource_id = permission.view_menu.name.split(':')[1].replace(')', '')
+                    break
+
+        welcome_dashboard_id = (
+            db.session
+                .query(UserAttribute.welcome_dashboard_id)
+                .filter_by(user_id=g.user.get_id())
+                .scalar()
+        )
+        if welcome_dashboard_id:
+            return self.dashboard(str(welcome_dashboard_id))
+
+        payload = {
+            'user': bootstrap_user_data(),
+            'common': BaseSupersetView().common_bootsrap_payload(),
+            'datasource_id': datasource_id,
+            'datasource_type': 'table',
+            'entry': 'add'
+        }
+
+        return self.render_template(
+            'superset/basic.html',
+            entry=entry_point,
+            title='Superset',
+            bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
+        )
 
     @expose('/list/')
     @has_access
@@ -576,6 +611,46 @@ class SolarBIModelView(SliceModelView):  # noqa
                 self.filters_not_for_admin[f] = value
                 self._base_filters.filters.remove(f)
                 self._base_filters.values.remove(value)
+
+    @expose('/welcome')
+    def welcome(self):
+        """Personalized welcome page"""
+
+        if not g.user or not g.user.get_id():
+            return redirect(appbuilder.get_url_for_login)
+
+        entry_point = 'solarBI'
+
+        datasource_id = ''
+        for role in g.user.roles:
+            for permission in role.permissions:
+                if permission.permission.name == 'datasource_access':
+                    datasource_id = permission.view_menu.name.split(':')[1].replace(')', '')
+                    break
+
+        welcome_dashboard_id = (
+            db.session
+                .query(UserAttribute.welcome_dashboard_id)
+                .filter_by(user_id=g.user.get_id())
+                .scalar()
+        )
+        if welcome_dashboard_id:
+            return self.dashboard(str(welcome_dashboard_id))
+
+        payload = {
+            'user': bootstrap_user_data(),
+            'common': BaseSupersetView().common_bootsrap_payload(),
+            'datasource_id': datasource_id,
+            'datasource_type': 'table',
+            'entry': 'welcome'
+        }
+
+        return self.render_template(
+            'superset/basic.html',
+            entry=entry_point,
+            title='Superset',
+            bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
+        )
 
 
 appbuilder.add_view(

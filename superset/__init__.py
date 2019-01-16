@@ -5,7 +5,7 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
 
-from flask import Flask, redirect
+from flask import Flask, redirect, g
 from flask_appbuilder import AppBuilder, IndexView, SQLA
 from flask_appbuilder.baseviews import expose
 from flask_compress import Compress
@@ -170,7 +170,16 @@ for middleware in app.config.get('ADDITIONAL_MIDDLEWARE'):
 class MyIndexView(IndexView):
     @expose('/')
     def index(self):
-        return redirect('/superset/welcome')
+        entry_point = 'solar'
+        if hasattr(g.user, 'roles'):
+            for role in g.user.roles:
+                if role.name == 'Admin':
+                    entry_point ='superset'
+                    break
+        else:
+            return redirect('/login')
+
+        return redirect(f'/{entry_point}/welcome')
 
 
 custom_sm = app.config.get('CUSTOM_SECURITY_MANAGER') or SupersetSecurityManager
