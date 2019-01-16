@@ -258,6 +258,7 @@ class MapView extends React.Component {
 
   render() {
     const { width } = this.props;
+    const { entry } = this.props.solarBI;
     const isSmallScreen = /xs|sm|md/.test(width);
     const buttonProps = {
       size: isSmallScreen ? "medium" : "large"
@@ -368,28 +369,30 @@ class MapView extends React.Component {
             </Grid>
           )}
 
-          {this.state.searching && (
-            <div>
-              <WelcomePage />
-            </div>
-          )}
-          {this.state.searching && (
-            <Grid>
-              <Row className="show-grid" style={{ marginTop: "20%" }}>
-                <Col xs={10} xsOffset={1} md={10} mdOffset={1}>
-                  <LocationSearchBox
-                    address={this.state.address}
-                    onPlaceChanged={place => this.onPlaceChanged(place)}
-                  />
-                </Col>
-              </Row>
-              {/* <Row className="show-grid" style={{ marginTop: "8%" }}>
+          {this.state.searching &&
+            entry === "welcome" && (
+              <div>
+                <WelcomePage />
+              </div>
+            )}
+          {this.state.searching &&
+            entry === "add" && (
+              <Grid>
+                <Row className="show-grid" style={{ marginTop: "20%" }}>
+                  <Col xs={10} xsOffset={1} md={10} mdOffset={1}>
+                    <LocationSearchBox
+                      address={this.state.address}
+                      onPlaceChanged={place => this.onPlaceChanged(place)}
+                    />
+                  </Col>
+                </Row>
+                {/* <Row className="show-grid" style={{ marginTop: "8%" }}>
               <Col xs={4} xsOffset={1}>
                 <InfoWidgets />
               </Col>
             </Row> */}
-            </Grid>
-          )}
+              </Grid>
+            )}
 
           <Map
             visible={this.state.showingMap}

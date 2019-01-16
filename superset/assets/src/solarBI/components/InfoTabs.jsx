@@ -99,7 +99,6 @@ class InfoTabs extends React.Component {
   }
 
   onBackClick() {
-    console.log("clicked back");
     this.props.onBackClick();
   }
 

@@ -86,7 +86,8 @@ const styles = theme => ({
   solarMap: {
     display: "block",
     marginLeft: "auto",
-    marginRight: "auto"
+    marginRight: "auto",
+    width: 1200
   }
 });
 
@@ -95,6 +96,12 @@ class WelcomePage extends React.Component {
     super(props);
 
     this.state = {};
+
+    this.handleClickGo = this.handleClickGo.bind(this);
+  }
+
+  handleClickGo() {
+    window.location = "/solar/add";
   }
 
   render() {
@@ -116,7 +123,12 @@ class WelcomePage extends React.Component {
             your project's location
           </p>
           <div style={{ textAlign: "center" }}>
-            <Button variant="contained" size="large" className={classes.button}>
+            <Button
+              className={classes.button}
+              variant="contained"
+              size="large"
+              onClick={this.handleClickGo}
+            >
               let's go
             </Button>
           </div>
@@ -187,10 +199,12 @@ class WelcomePage extends React.Component {
         </div>
 
         <p className={classes.head}>Country-wide solar potential</p>
-        <div style={{ backgroundColor: "white" }}>
+        <div
+          style={{ backgroundColor: "white", marginTop: 30, marginBottom: 200 }}
+        >
           <img
             className={classes.solarMap}
-            src="/static/assets/images/solar_map.png"
+            src="/static/assets/images/aus_map.png"
             alt="solar map"
           />
         </div>
