@@ -161,6 +161,7 @@ class SolarCharts extends React.Component {
 
   getBarchartOption(data) {
     if (data) {
+      console.log()
       var data1 = data[1];
       var xAxisData = data[0];
 
