@@ -20,31 +20,32 @@ import VizTypeControl from './VizTypeControl';
 import MetricsControl from './MetricsControl';
 import AdhocFilterControl from './AdhocFilterControl';
 import FilterPanel from './FilterPanel';
+import FilterBoxItemControl from './FilterBoxItemControl';
 import AddressSearchControl from './AddressSearchControl';
-
 const controlMap = {
-    AnnotationLayerControl,
-    BoundsControl,
-    CheckboxControl,
-    CollectionControl,
-    ColorPickerControl,
-    ColorSchemeControl,
-    DatasourceControl,
-    DateFilterControl,
-    FixedOrMetricControl,
-    HiddenControl,
-    SelectAsyncControl,
-    SelectControl,
-    SliderControl,
-    SpatialControl,
-    TextAreaControl,
-    TextControl,
-    TimeSeriesColumnControl,
-    ViewportControl,
-    VizTypeControl,
-    MetricsControl,
-    AdhocFilterControl,
-    AddressSearchControl,
-    FilterPanel
+  AnnotationLayerControl,
+  BoundsControl,
+  CheckboxControl,
+  CollectionControl,
+  ColorPickerControl,
+  ColorSchemeControl,
+  DatasourceControl,
+  DateFilterControl,
+  FixedOrMetricControl,
+  HiddenControl,
+  SelectAsyncControl,
+  SelectControl,
+  SliderControl,
+  SpatialControl,
+  TextAreaControl,
+  TextControl,
+  TimeSeriesColumnControl,
+  ViewportControl,
+  VizTypeControl,
+  MetricsControl,
+  AdhocFilterControl,
+  AddressSearchControl,
+  FilterPanel,
+  FilterBoxItemControl
 };
 export default controlMap;

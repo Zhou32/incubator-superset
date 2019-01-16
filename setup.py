@@ -60,6 +60,7 @@ setup(
         'click>=6.0, <7.0.0',  # click >=7 forces "-" instead of "_"
         'colorama',
         'contextlib2',
+        'croniter>=0.3.26',
         'cryptography>=2.4.2',
         'flask>=1.0.0, <2.0.0',
         'flask-appbuilder>=1.12.1, <2.0.0',
@@ -69,7 +70,7 @@ setup(
         'flask-wtf',
         'flower',  # deprecated
         'geopy',
-        'gsheetsdb>=0.1.8',
+        'gsheetsdb>=0.1.9',
         'gunicorn',  # deprecated
         'humanize',
         'idna',
@@ -85,6 +86,8 @@ setup(
         'python-geohash',
         'pyyaml>=3.13',
         'requests>=2.20.0',
+        'retry>=0.9.2',
+        'selenium>=3.141.0',
         'simplejson>=3.15.0',
         'sqlalchemy',
         'sqlalchemy-utils',
@@ -95,16 +98,16 @@ setup(
         'unicodecsv',
         'unidecode>=0.04.21',
         'redis',
-        'croniter==0.3.25',
-        'selenium==3.14.0',
+        'croniter==0.3.26',
+        'selenium==3.141.0',
         'retry==0.9.2',
     ],
     extras_require={
         'cors': ['flask-cors>=2.0.0'],
         'console_log': ['console_log==0.2.10'],
     },
-    author='Maxime Beauchemin',
-    author_email='maximebeauchemin@gmail.com',
+    author='Apache Superset Dev',
+    author_email='dev@superset.incubator.apache.org',
     url='https://github.com/apache/incubator-superset',
     download_url=(
         'https://github.com'
