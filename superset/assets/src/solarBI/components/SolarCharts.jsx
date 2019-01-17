@@ -11,7 +11,6 @@ import IconButton from "@material-ui/core/IconButton";
 import Popover from "@material-ui/core/Popover";
 import InfoIcon from "@material-ui/icons/Info";
 import withWidth from "@material-ui/core/withWidth";
-import { constants } from 'zlib';
 
 const styles = theme => ({
   card: {
@@ -96,7 +95,7 @@ class SolarCharts extends React.Component {
     const minSolarValue = Math.min(...solarValues);
     const maxSolarValue = Math.max(...solarValues);
 
-    solarData = solarData.map( function(item) {
+    solarData = solarData.map(function(item) {
       return [item[1], item[0], item[2] || "-"];
     });
 
@@ -162,8 +161,8 @@ class SolarCharts extends React.Component {
 
   getBarchartOption(data) {
     if (data) {
-      const data1 = data[1].map(x => x.toNumber());
-
+      // const data1 = data[1].map(x => x.toNumber());
+      const data1 = data[1];
       const xAxisData = data[0];
 
       const option = {
@@ -203,13 +202,13 @@ class SolarCharts extends React.Component {
             data: data1,
             animationDelay(idx) {
               return idx * 10;
-            },
-          },
+            }
+          }
         ],
         animationEasing: "elasticOut",
         animationDelayUpdate(idx) {
           return idx * 5;
-        },
+        }
       };
 
       return option;
@@ -219,25 +218,25 @@ class SolarCharts extends React.Component {
 
   handleHeatmapClick(event) {
     this.setState({
-      heatmapAnchor: event.currentTarget,
+      heatmapAnchor: event.currentTarget
     });
   }
 
   handleBarchartClick(event) {
     this.setState({
-      barchartAnchor: event.currentTarget,
+      barchartAnchor: event.currentTarget
     });
   }
 
   handleHeatmapClose() {
     this.setState({
-      heatmapAnchor: null,
+      heatmapAnchor: null
     });
   }
 
   handleBarchartClose() {
     this.setState({
-      barchartAnchor: null,
+      barchartAnchor: null
     });
   }
 
