@@ -375,8 +375,8 @@ class MapView extends React.Component {
                 <WelcomePage />
               </div>
             )}
-          {this.state.searching &&
-            entry === "add" && (
+          {this.state.searching && 
+            entry !== "welcome" && (
               <Grid>
                 <Row className="show-grid" style={{ marginTop: "20%" }}>
                   <Col xs={10} xsOffset={1} md={10} mdOffset={1}>

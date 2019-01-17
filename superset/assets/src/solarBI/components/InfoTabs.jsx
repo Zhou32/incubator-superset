@@ -114,7 +114,7 @@ class InfoTabs extends React.Component {
     return this.props.getCSVURL();
   }
 
-  render(){
+  render() {
     const {classes} = this.props;
     let tabValue = this.state.tabValue;
     return (
@@ -210,7 +210,7 @@ InfoTabs.propTypes = {
   onBackClick: PropTypes.func.isRequired,
   onSaveClick: PropTypes.func.isRequired,
   onExportClick: PropTypes.func.isRequired,
-  getCSVURL: PropTypes.func.isRequired
+  getCSVURL: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(InfoTabs);

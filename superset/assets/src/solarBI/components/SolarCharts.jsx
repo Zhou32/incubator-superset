@@ -11,6 +11,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Popover from "@material-ui/core/Popover";
 import InfoIcon from "@material-ui/icons/Info";
 import withWidth from "@material-ui/core/withWidth";
+import { constants } from 'zlib';
 
 const styles = theme => ({
   card: {
@@ -48,7 +49,7 @@ class SolarCharts extends React.Component {
   }
 
   getHeatmapOption(data) {
-    var months = [
+    const months = [
       "1",
       "2",
       "3",
@@ -62,9 +63,9 @@ class SolarCharts extends React.Component {
       "11",
       "12"
     ];
-    var years = ["2018", "2017"];
+    const years = ["2018", "2017"];
 
-    var solarData = [
+    let solarData = [
       [0, 0, Math.round(data[1][12])],
       [0, 1, Math.round(data[1][13])],
       [0, 2, Math.round(data[1][14])],
@@ -95,11 +96,11 @@ class SolarCharts extends React.Component {
     const minSolarValue = Math.min(...solarValues);
     const maxSolarValue = Math.max(...solarValues);
 
-    solarData = solarData.map(function(item) {
+    solarData = solarData.map( function(item) {
       return [item[1], item[0], item[2] || "-"];
     });
 
-    var option = {
+    const option = {
       tooltip: {
         position: "top"
       },
@@ -161,21 +162,11 @@ class SolarCharts extends React.Component {
 
   getBarchartOption(data) {
     if (data) {
-      var data1 = data[1].map(x => x.toNumber());
+      const data1 = data[1].map(x => x.toNumber());
 
-      //Eric Debug
-      console.log(data1);
+      const xAxisData = data[0];
 
-      var xAxisData = data[0];
-
-      var option = {
-        // title: {
-        //   text: "Irradiance Data"
-        // },
-        // legend: {
-        //   data: ["☀️ Irradiance ☀️ (W/m²)"],
-        //   align: "left"
-        // },
+      const option = {
         toolbox: {
           // showTitle: true,
           feature: {
@@ -210,15 +201,15 @@ class SolarCharts extends React.Component {
             name: "☀️ Irradiance ☀️ (W/m²)",
             type: "bar",
             data: data1,
-            animationDelay: function(idx) {
+            animationDelay(idx) {
               return idx * 10;
-            }
-          }
+            },
+          },
         ],
         animationEasing: "elasticOut",
-        animationDelayUpdate: function(idx) {
+        animationDelayUpdate(idx) {
           return idx * 5;
-        }
+        },
       };
 
       return option;
@@ -228,25 +219,25 @@ class SolarCharts extends React.Component {
 
   handleHeatmapClick(event) {
     this.setState({
-      heatmapAnchor: event.currentTarget
+      heatmapAnchor: event.currentTarget,
     });
   }
 
   handleBarchartClick(event) {
     this.setState({
-      barchartAnchor: event.currentTarget
+      barchartAnchor: event.currentTarget,
     });
   }
 
   handleHeatmapClose() {
     this.setState({
-      heatmapAnchor: null
+      heatmapAnchor: null,
     });
   }
 
   handleBarchartClose() {
     this.setState({
-      barchartAnchor: null
+      barchartAnchor: null,
     });
   }
 
