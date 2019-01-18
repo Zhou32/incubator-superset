@@ -52,6 +52,9 @@ const styles = theme => ({
   },
   tooltip: {
     fontSize: 14
+  },
+  tabContainer: {
+    fontWeight: 300
   }
 });
 
@@ -62,7 +65,7 @@ const tabHeadStyles = {
 
 const theme = createMuiTheme({
   typography: {
-    useNextVariants: true,
+    useNextVariants: true
   },
   palette: {
     primary: {
@@ -86,8 +89,8 @@ class InfoTabs extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      tabValue:0,
-    }
+      tabValue: 0
+    };
     this.handleTabChange = this.handleTabChange.bind(this);
     this.onBackClick = this.onBackClick.bind(this);
     this.onSaveClick = this.onSaveClick.bind(this);
@@ -115,7 +118,7 @@ class InfoTabs extends React.Component {
   }
 
   render() {
-    const {classes} = this.props;
+    const { classes } = this.props;
     let tabValue = this.state.tabValue;
     return (
       <div>
@@ -143,34 +146,40 @@ class InfoTabs extends React.Component {
                 <Tab id="tab3" label="Business Case" style={tabHeadStyles} />
               </Tabs>
             </AppBar>
-            {this.state.tabValue === 0 && (
-              <TabContainer id="tab1Content">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-                felis nulla, feugiat non efficitur et, pharetra sed orci. Donec
-                commodo sapien in nisi scelerisque dignissim. Nullam ut orci eu
-                ligula blandit aliquam. Sed eget convallis dolor. Donec
-                vulputate elit at elit tincidunt convallis. Etiam porttitor,
-                lacus vel pretium porta, dolor ante aliquam magna, sed accumsan
-                arcu purus pulvinar metus.
+            {tabValue === 0 && (
+              <TabContainer>
+                <p style={{ fontWeight: 300 }}>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  Vivamus felis nulla, feugiat non efficitur et, pharetra sed
+                  orci. Donec commodo sapien in nisi scelerisque dignissim.
+                  Nullam ut orci eu ligula blandit aliquam. Sed eget convallis
+                  dolor. Donec vulputate elit at elit tincidunt convallis. Etiam
+                  porttitor, lacus vel pretium porta, dolor ante aliquam magna,
+                  sed accumsan arcu purus pulvinar metus.
+                </p>
               </TabContainer>
             )}
-            {this.state.tabValue === 1 && (
-              <TabContainer id="tab2Content">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce
-                rutrum quam sem, ut vulputate nulla faucibus eu. Sed eu augue
-                sed magna luctus iaculis placerat et neque. Nulla sed quam ut
-                libero semper vestibulum vel ut sapien. Integer rutrum metus sed
-                velit aliquam viverra. Sed consequat sit amet ligula sed
-                laoreet.
+            {tabValue === 1 && (
+              <TabContainer>
+                <p style={{ fontWeight: 300 }}>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce
+                  rutrum quam sem, ut vulputate nulla faucibus eu. Sed eu augue
+                  sed magna luctus iaculis placerat et neque. Nulla sed quam ut
+                  libero semper vestibulum vel ut sapien. Integer rutrum metus
+                  sed velit aliquam viverra. Sed consequat sit amet ligula sed
+                  laoreet.
+                </p>
               </TabContainer>
             )}
-            {this.state.tabValue === 2 && (
-              <TabContainer id="tab3Content">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
-                sit amet egestas nibh, nec ornare lectus. Donec tristique justo
-                sit amet placerat placerat. Maecenas et eros non est tincidunt
-                aliquet. Suspendisse euismod consectetur odio. Nullam fermentum
-                sem vel turpis faucibus iaculis.
+            {tabValue === 2 && (
+              <TabContainer>
+                <p style={{ fontWeight: 300 }}>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
+                  sit amet egestas nibh, nec ornare lectus. Donec tristique
+                  justo sit amet placerat placerat. Maecenas et eros non est
+                  tincidunt aliquet. Suspendisse euismod consectetur odio.
+                  Nullam fermentum sem vel turpis faucibus iaculis.
+                </p>
               </TabContainer>
             )}
             <Tooltip title="Go Back" classes={{ tooltip: classes.tooltip }}>
