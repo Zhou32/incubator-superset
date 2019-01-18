@@ -54,7 +54,11 @@ class IconBtn extends React.Component {
 
     return (
       <div className={classes.root}>
-        <IconButton className={classes.icon} onClick={this.handleClick}>
+        <IconButton 
+          id="iconButton"
+          className={classes.icon}
+          onClick={this.handleClick}
+        >
           <InfoIcon />
         </IconButton>
         <Popover
@@ -71,7 +75,9 @@ class IconBtn extends React.Component {
             horizontal: "center"
           }}
         >
-          <Typography className={classes.typography}>
+          <Typography
+            id='popContent'
+            className={classes.typography}>
             {this.props.content}
           </Typography>
         </Popover>
