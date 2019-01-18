@@ -100,6 +100,10 @@ class SolarCharts extends React.Component {
     });
 
     const option = {
+      title: {
+        text: "2017-2018 Solar Heatmap",
+        show: false
+      },
       toolbox: {
         feature: {
           saveAsImage: {
@@ -176,7 +180,10 @@ class SolarCharts extends React.Component {
 
       const option = {
         toolbox: {
-          // showTitle: true,
+          title: {
+            text: "2017-2018 Solar Bar Chart",
+            show: false
+          },
           feature: {
             saveAsImage: {
               pixelRatio: 2,
