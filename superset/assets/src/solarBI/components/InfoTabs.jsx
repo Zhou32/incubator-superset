@@ -52,6 +52,9 @@ const styles = theme => ({
   },
   tooltip: {
     fontSize: 14
+  },
+  tabContainer: {
+    fontWeight: 300
   }
 });
 
@@ -145,32 +148,38 @@ class InfoTabs extends React.Component {
             </AppBar>
             {tabValue === 0 && (
               <TabContainer>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-                felis nulla, feugiat non efficitur et, pharetra sed orci. Donec
-                commodo sapien in nisi scelerisque dignissim. Nullam ut orci eu
-                ligula blandit aliquam. Sed eget convallis dolor. Donec
-                vulputate elit at elit tincidunt convallis. Etiam porttitor,
-                lacus vel pretium porta, dolor ante aliquam magna, sed accumsan
-                arcu purus pulvinar metus.
+                <p style={{ fontWeight: 300 }}>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  Vivamus felis nulla, feugiat non efficitur et, pharetra sed
+                  orci. Donec commodo sapien in nisi scelerisque dignissim.
+                  Nullam ut orci eu ligula blandit aliquam. Sed eget convallis
+                  dolor. Donec vulputate elit at elit tincidunt convallis. Etiam
+                  porttitor, lacus vel pretium porta, dolor ante aliquam magna,
+                  sed accumsan arcu purus pulvinar metus.
+                </p>
               </TabContainer>
             )}
             {tabValue === 1 && (
               <TabContainer>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce
-                rutrum quam sem, ut vulputate nulla faucibus eu. Sed eu augue
-                sed magna luctus iaculis placerat et neque. Nulla sed quam ut
-                libero semper vestibulum vel ut sapien. Integer rutrum metus sed
-                velit aliquam viverra. Sed consequat sit amet ligula sed
-                laoreet.
+                <p style={{ fontWeight: 300 }}>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce
+                  rutrum quam sem, ut vulputate nulla faucibus eu. Sed eu augue
+                  sed magna luctus iaculis placerat et neque. Nulla sed quam ut
+                  libero semper vestibulum vel ut sapien. Integer rutrum metus
+                  sed velit aliquam viverra. Sed consequat sit amet ligula sed
+                  laoreet.
+                </p>
               </TabContainer>
             )}
             {tabValue === 2 && (
               <TabContainer>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
-                sit amet egestas nibh, nec ornare lectus. Donec tristique justo
-                sit amet placerat placerat. Maecenas et eros non est tincidunt
-                aliquet. Suspendisse euismod consectetur odio. Nullam fermentum
-                sem vel turpis faucibus iaculis.
+                <p style={{ fontWeight: 300 }}>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
+                  sit amet egestas nibh, nec ornare lectus. Donec tristique
+                  justo sit amet placerat placerat. Maecenas et eros non est
+                  tincidunt aliquet. Suspendisse euismod consectetur odio.
+                  Nullam fermentum sem vel turpis faucibus iaculis.
+                </p>
               </TabContainer>
             )}
             <Tooltip title="Go Back" classes={{ tooltip: classes.tooltip }}>
