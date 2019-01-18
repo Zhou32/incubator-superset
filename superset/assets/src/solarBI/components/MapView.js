@@ -322,6 +322,9 @@ class MapView extends React.Component {
             onSaveClick={this.toggleModal}
             onExportClick={this.toggleExportModal}
             getCSVURL={this.getCSVURL}
+            can_save={this.props.solarBI.can_save}
+            can_export={this.props.solarBI.can_export}
+            solar_new={this.state.solar_new}
           />
         </div>
       );

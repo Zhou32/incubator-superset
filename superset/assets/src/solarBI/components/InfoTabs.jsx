@@ -97,10 +97,6 @@ class InfoTabs extends React.Component {
     this.onExportClick = this.onExportClick.bind(this);
   }
 
-  handleTabChange(event, tabValue) {
-    this.setState({ tabValue });
-  }
-
   onBackClick() {
     this.props.onBackClick();
   }
@@ -117,12 +113,15 @@ class InfoTabs extends React.Component {
     return this.props.getCSVURL();
   }
 
+  handleTabChange(event, tabValue) {
+    this.setState({ tabValue });
+  }
+
   render() {
     const { classes } = this.props;
     let tabValue = this.state.tabValue;
     return (
       <div>
-        {/* <MuiThemeProvider theme={theme}> */}
         <Card className={classes.infoCard} md={6} xs={3}>
           <CardContent className={classes.cardContent}>
             <IconBtn content="Based on your usage, Project Sunroof can recommend the optimal solar installation size that can fit on your roof." />
@@ -136,14 +135,15 @@ class InfoTabs extends React.Component {
             </Typography>
             <AppBar position="static" color="default">
               <Tabs
+                id="tabs"
                 value={tabValue}
                 variant="fullWidth"
                 onChange={this.handleTabChange}
                 indicatorColor="secondary"
               >
-                <Tab label="Solar Solution" style={tabHeadStyles} />
-                <Tab label="Energy Profile" style={tabHeadStyles} />
-                <Tab label="Business Case" style={tabHeadStyles} />
+                <Tab id="tab1" label="Solar Solution" style={tabHeadStyles} />
+                <Tab id="tab2" label="Energy Profile" style={tabHeadStyles} />
+                <Tab id="tab3" label="Business Case" style={tabHeadStyles} />
               </Tabs>
             </AppBar>
             {tabValue === 0 && (
@@ -183,32 +183,44 @@ class InfoTabs extends React.Component {
               </TabContainer>
             )}
             <Tooltip title="Go Back" classes={{ tooltip: classes.tooltip }}>
-              <IconButton className={classes.icon} onClick={this.onBackClick}>
+              <IconButton
+                id="backIcon"
+                className={classes.icon}
+                onClick={this.onBackClick}
+              >
                 <KeyboardBackspaceIcon />
               </IconButton>
             </Tooltip>
             <div style={{ float: "right" }}>
-              <Tooltip title="Save" classes={{ tooltip: classes.tooltip }}>
-                <IconButton className={classes.icon} onClick={this.onSaveClick}>
-                  <SaveIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip
-                title="Export As CSV"
-                classes={{ tooltip: classes.tooltip }}
-              >
-                <IconButton
-                  className={classes.icon}
-                  href={this.getCSVURL()}
-                  onClick={this.onExportClick}
+              {this.props.can_save && this.props.solar_new && (
+                <Tooltip title="Save" classes={{ tooltip: classes.tooltip }}>
+                  <IconButton
+                    id="saveIcon"
+                    className={classes.icon}
+                    onClick={this.onSaveClick}
+                  >
+                    <SaveIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+              {this.props.can_export && (
+                <Tooltip
+                  title="Export As CSV"
+                  classes={{ tooltip: classes.tooltip }}
                 >
-                  <CloudDownloadIcon />
-                </IconButton>
-              </Tooltip>
+                  <IconButton
+                    id="exportIcon"
+                    className={classes.icon}
+                    href={this.getCSVURL()}
+                    onClick={this.onExportClick}
+                  >
+                    <CloudDownloadIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
             </div>
           </CardContent>
         </Card>
-        {/* </MuiThemeProvider> */}
       </div>
     );
   }
@@ -219,7 +231,10 @@ InfoTabs.propTypes = {
   onBackClick: PropTypes.func.isRequired,
   onSaveClick: PropTypes.func.isRequired,
   onExportClick: PropTypes.func.isRequired,
-  getCSVURL: PropTypes.func.isRequired
+  getCSVURL: PropTypes.func.isRequired,
+  can_save: PropTypes.bool.isRequired,
+  can_export: PropTypes.bool.isRequired,
+  solar_new: PropTypes.bool.isRequired
 };
 
 export default withStyles(styles)(InfoTabs);
