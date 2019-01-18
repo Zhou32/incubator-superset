@@ -62,7 +62,7 @@ const tabHeadStyles = {
 
 const theme = createMuiTheme({
   typography: {
-    useNextVariants: true,
+    useNextVariants: true
   },
   palette: {
     primary: {
@@ -86,8 +86,8 @@ class InfoTabs extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      tabValue:0,
-    }
+      tabValue: 0
+    };
     this.handleTabChange = this.handleTabChange.bind(this);
     this.onBackClick = this.onBackClick.bind(this);
     this.onSaveClick = this.onSaveClick.bind(this);
@@ -98,7 +98,7 @@ class InfoTabs extends React.Component {
     this.setState({ tabValue });
   }
 
-  onBackClick(){
+  onBackClick() {
     this.props.onBackClick();
   }
 
@@ -115,7 +115,7 @@ class InfoTabs extends React.Component {
   }
 
   render() {
-    const {classes} = this.props;
+    const { classes } = this.props;
     let tabValue = this.state.tabValue;
     return (
       <div>
@@ -210,7 +210,7 @@ InfoTabs.propTypes = {
   onBackClick: PropTypes.func.isRequired,
   onSaveClick: PropTypes.func.isRequired,
   onExportClick: PropTypes.func.isRequired,
-  getCSVURL: PropTypes.func.isRequired,
+  getCSVURL: PropTypes.func.isRequired
 };
 
 export default withStyles(styles)(InfoTabs);

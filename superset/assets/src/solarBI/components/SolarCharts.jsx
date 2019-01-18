@@ -100,6 +100,15 @@ class SolarCharts extends React.Component {
     });
 
     const option = {
+      toolbox: {
+        feature: {
+          saveAsImage: {
+            pixelRatio: 2,
+            title: "Save As Image"
+          }
+        },
+        left: "middle"
+      },
       tooltip: {
         position: "top"
       },
@@ -172,12 +181,12 @@ class SolarCharts extends React.Component {
             saveAsImage: {
               pixelRatio: 2,
               title: "Save As Image"
-            },
-            dataView: {
-              show: true,
-              title: "View Data",
-              lang: ["Data View", "close", "refresh"]
             }
+            // dataView: {
+            //   show: true,
+            //   title: "View Data",
+            //   lang: ["Data View", "close", "refresh"]
+            // }
           },
           left: "middle"
         },
@@ -269,7 +278,7 @@ class SolarCharts extends React.Component {
           />
           <CardContent className={classes.cardContent}>
             <ReactEcharts
-              style={{ width: "100%", height: 350, marginTop: -85 }}
+              style={{ width: "100%", height: 350, marginTop: -65 }}
               option={heatmapOptions}
             />
           </CardContent>
@@ -335,7 +344,8 @@ class SolarCharts extends React.Component {
 }
 
 SolarCharts.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  queryData: PropTypes.array.isRequired
 };
 
 export default withWidth()(withStyles(styles)(SolarCharts));
