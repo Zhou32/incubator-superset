@@ -529,48 +529,7 @@ class SolarBIModelView(SliceModelView):  # noqa
     filters_not_for_admin = {}
 
 
-    @expose('/add', methods=['GET', 'POST'])
-    @has_access
-    def add(self):
-        if not g.user or not g.user.get_id():
-            return redirect(appbuilder.get_url_for_login)
 
-        for role in g.user.roles:
-            if role.name == 'Admin':
-                return super(SolarBIModelView, self).add()
-
-        entry_point = 'solarBI'
-
-        datasource_id = ''
-        for role in g.user.roles:
-            for permission in role.permissions:
-                if permission.permission.name == 'datasource_access':
-                    datasource_id = permission.view_menu.name.split(':')[1].replace(')', '')
-                    break
-
-        welcome_dashboard_id = (
-            db.session
-                .query(UserAttribute.welcome_dashboard_id)
-                .filter_by(user_id=g.user.get_id())
-                .scalar()
-        )
-        if welcome_dashboard_id:
-            return self.dashboard(str(welcome_dashboard_id))
-
-        payload = {
-            'user': bootstrap_user_data(),
-            'common': BaseSupersetView().common_bootsrap_payload(),
-            'datasource_id': datasource_id,
-            'datasource_type': 'table',
-            'entry': 'add'
-        }
-
-        return self.render_template(
-            'superset/basic.html',
-            entry=entry_point,
-            title='Superset',
-            bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
-        )
 
     @expose('/list/')
     @has_access
@@ -610,6 +569,9 @@ class SolarBIModelView(SliceModelView):  # noqa
                 self.filters_not_for_admin[f] = value
                 self._base_filters.filters.remove(f)
                 self._base_filters.values.remove(value)
+
+
+class SolarBIModelWelcomeView(SolarBIModelView):
 
     @expose('/welcome')
     def welcome(self):
@@ -652,13 +614,80 @@ class SolarBIModelView(SliceModelView):  # noqa
         )
 
 
+class SolarBIModelAddView(SolarBIModelView):
+
+    @expose('/add', methods=['GET', 'POST'])
+    @has_access
+    def add(self):
+        if not g.user or not g.user.get_id():
+            return redirect(appbuilder.get_url_for_login)
+
+        for role in g.user.roles:
+            if role.name == 'Admin':
+                return super(SolarBIModelAddView, self).add()
+
+        entry_point = 'solarBI'
+
+        datasource_id = ''
+        for role in g.user.roles:
+            for permission in role.permissions:
+                if permission.permission.name == 'datasource_access':
+                    datasource_id = permission.view_menu.name.split(':')[1].replace(')', '')
+                    break
+
+        welcome_dashboard_id = (
+            db.session
+                .query(UserAttribute.welcome_dashboard_id)
+                .filter_by(user_id=g.user.get_id())
+                .scalar()
+        )
+        if welcome_dashboard_id:
+            return self.dashboard(str(welcome_dashboard_id))
+
+        payload = {
+            'user': bootstrap_user_data(),
+            'common': BaseSupersetView().common_bootsrap_payload(),
+            'datasource_id': datasource_id,
+            'datasource_type': 'table',
+            'entry': 'add'
+        }
+
+        return self.render_template(
+            'superset/basic.html',
+            entry=entry_point,
+            title='Superset',
+            bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
+        )
+
+appbuilder.add_view(
+    SolarBIModelAddView,
+    'Search your Location',
+    href='/solar/add',
+    label=__('Search your Location'),
+    icon='fa-search',
+    category='SolarBI',
+    category_label=__('SolarBI'),
+    category_icon='fa-sun-o'
+)
+appbuilder.add_view(
+    SolarBIModelWelcomeView,
+    'Introduction',
+    href='/solar/welcome',
+    label=__('Introduction'),
+    icon='fa-home',
+    category='SolarBI',
+    category_label=__('SolarBI'),
+    category_icon='fa-sun-o'
+)
+
 appbuilder.add_view(
     SolarBIModelView,
-    'SolarBI',
-    label=__('SolarBI'),
-    icon='fa-sun-o',
-    category='',
-    category_icon=''
+    'Saved Solar Data',
+    label=__('Saved Solar Data'),
+    icon='fa-save',
+    category='SolarBI',
+    category_label=__('SolarBI'),
+    category_icon='fa-sun-o'
 )
 
 
