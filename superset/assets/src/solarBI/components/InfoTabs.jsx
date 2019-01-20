@@ -149,13 +149,12 @@ class InfoTabs extends React.Component {
             {tabValue === 0 && (
               <TabContainer>
                 <p style={{ fontWeight: 300 }}>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  Vivamus felis nulla, feugiat non efficitur et, pharetra sed
-                  orci. Donec commodo sapien in nisi scelerisque dignissim.
-                  Nullam ut orci eu ligula blandit aliquam. Sed eget convallis
-                  dolor. Donec vulputate elit at elit tincidunt convallis. Etiam
-                  porttitor, lacus vel pretium porta, dolor ante aliquam magna,
-                  sed accumsan arcu purus pulvinar metus.
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce
+                  rutrum quam sem, ut vulputate nulla faucibus eu. Sed eu augue
+                  sed magna luctus iaculis placerat et neque. Nulla sed quam ut
+                  libero semper vestibulum vel ut sapien. Integer rutrum metus
+                  sed velit aliquam viverra. Sed consequat sit amet ligula sed
+                  laoreet.
                 </p>
               </TabContainer>
             )}

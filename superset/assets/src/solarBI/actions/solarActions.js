@@ -55,7 +55,12 @@ export function solarUpdateFailed(queryResponse, key) {
 export const FETCH_SOLAR_DATA = "FETCH_SOLAR_DATA";
 export function fetchSolarData(formData, force = false, timeout = 60, key) {
   return dispatch => {
-    const url = "/superset/explore_json/"+formData['datasource_type']+'/'+formData['datasource_id']+"/";
+    const url =
+      "/superset/explore_json/" +
+      formData["datasource_type"] +
+      "/" +
+      formData["datasource_id"] +
+      "/";
     const logStart = Logger.getTimestamp();
     const controller = new AbortController();
     const { signal } = controller;
