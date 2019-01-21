@@ -45,7 +45,7 @@ const propTypes = {
   solarBI: PropTypes.object.isRequired
 };
 
-class MapView extends React.Component {
+export class MapView extends React.Component {
   constructor(props) {
     super(props);
 
@@ -334,7 +334,7 @@ class MapView extends React.Component {
       reactEcharts = (
         <Alert bsStyle="danger">
           <p style={{ textAlign: "center" }}>
-            <strong>{solarAlert}! Please try again!</strong>
+            <strong id="failAlert">{solarAlert}! Please try again!</strong>
           </p>
         </Alert>
       );

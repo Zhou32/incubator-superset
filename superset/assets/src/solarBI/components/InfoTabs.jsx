@@ -147,7 +147,8 @@ class InfoTabs extends React.Component {
               </Tabs>
             </AppBar>
             {tabValue === 0 && (
-              <TabContainer>
+              <TabContainer 
+                id='tab1Content'>
                 <p style={{ fontWeight: 300 }}>
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                   Vivamus felis nulla, feugiat non efficitur et, pharetra sed
@@ -160,7 +161,8 @@ class InfoTabs extends React.Component {
               </TabContainer>
             )}
             {tabValue === 1 && (
-              <TabContainer>
+              <TabContainer
+                id='tab2Content'>
                 <p style={{ fontWeight: 300 }}>
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce
                   rutrum quam sem, ut vulputate nulla faucibus eu. Sed eu augue

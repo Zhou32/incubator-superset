@@ -52,7 +52,7 @@ class EnvironmentImpact extends React.Component {
       <div>
         <div className={classes.row}>
           <div className={classes.topCenter}>
-            <Typography variant="subtitle1">Carbon dioxide</Typography>
+            <Typography id='subtitle1' variant="subtitle1">Carbon dioxide</Typography>
           </div>
         </div>
         <div className={classes.row}>
@@ -63,12 +63,12 @@ class EnvironmentImpact extends React.Component {
             />
           </div>
           <div className={classes.middleCenter}>
-            <Typography variant="h4">2</Typography>
+            <Typography id='subtitle2' variant="h4">2</Typography>
           </div>
         </div>
         <div className={classes.row}>
           <div className={classes.bottomCenter}>
-            <Typography variant="subtitle1">Carbon dioxide</Typography>
+            <Typography id='subtitle3' variant="subtitle1">Carbon dioxide</Typography>
           </div>
         </div>
       </div>
