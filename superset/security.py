@@ -26,24 +26,24 @@ USER_MODEL_VIEWS = {
 }
 
 GAMMA_READ_ONLY_MODEL_VIEWS = {
-    'SqlMetricInlineView',
-    'TableColumnInlineView',
-    'TableModelView',
-    'DruidColumnInlineView',
-    'DruidDatasourceModelView',
-    'DruidMetricInlineView',
-} | READ_ONLY_MODEL_VIEWS
+                                  'SqlMetricInlineView',
+                                  'TableColumnInlineView',
+                                  'TableModelView',
+                                  'DruidColumnInlineView',
+                                  'DruidDatasourceModelView',
+                                  'DruidMetricInlineView',
+                              } | READ_ONLY_MODEL_VIEWS
 
 ADMIN_ONLY_VIEW_MENUS = {
-    'AccessRequestsModelView',
-    'Manage',
-    'SQL Lab',
-    'Queries',
-    'Refresh Druid Metadata',
-    'ResetPasswordView',
-    'RoleModelView',
-    'Security',
-} | USER_MODEL_VIEWS
+                            'AccessRequestsModelView',
+                            'Manage',
+                            'SQL Lab',
+                            'Queries',
+                            'Refresh Druid Metadata',
+                            'ResetPasswordView',
+                            'RoleModelView',
+                            'Security',
+                        } | USER_MODEL_VIEWS
 
 ALPHA_ONLY_VIEW_MENUS = {
     'Upload a CSV',
@@ -76,13 +76,7 @@ OBJECT_SPEC_PERMISSIONS = set([
     'metric_access',
 ])
 
-
 SOLAR_PERMISSIONS = {
-    'can_show': 'SolarBIModelView',
-    'can_list': 'SolarBIModelView',
-    'can_delete': 'SolarBIModelView',
-    'can_add': 'SolarBIModelView',
-    'menu_access': 'SolarBI',
     'can_explore_json': 'Superset',
     'resetmypassword': 'UserDBModelView',
     'can_this_form_post': 'ResetMyPasswordView',
@@ -92,6 +86,10 @@ SOLAR_PERMISSIONS = {
     'can_userinfo': 'UserDBModelView',
     'userinfoedit': 'UserDBModelView'
 }
+
+SOLAR_PERMISSIONS_COMMON = ['can_show', 'can_list', 'can_delete', 'can_add']
+SOLAR_PERMISSIONS_VIEW = ['SolarBIModelAddView', 'SolarBIModelWelcomeView', 'SolarBIModelView']
+SOLAR_PERMISSIONS_MENU = ['SolarBI', 'Search your Location', 'Saved Solar Data', 'Introduction']
 
 
 class SupersetSecurityManager(SecurityManager):
@@ -113,22 +111,22 @@ class SupersetSecurityManager(SecurityManager):
 
     def database_access(self, database):
         return (
-            self.can_access(
-                'all_database_access', 'all_database_access') or
-            self.can_access('database_access', database.perm)
+                self.can_access(
+                    'all_database_access', 'all_database_access') or
+                self.can_access('database_access', database.perm)
         )
 
     def schema_access(self, datasource):
         return (
-            self.database_access(datasource.database) or
-            self.all_datasource_access() or
-            self.can_access('schema_access', datasource.schema_perm)
+                self.database_access(datasource.database) or
+                self.all_datasource_access() or
+                self.can_access('schema_access', datasource.schema_perm)
         )
 
     def datasource_access(self, datasource):
         return (
-            self.schema_access(datasource) or
-            self.can_access('datasource_access', datasource.perm)
+                self.schema_access(datasource) or
+                self.can_access('datasource_access', datasource.perm)
         )
 
     def get_datasource_access_error_msg(self, datasource):
@@ -215,11 +213,11 @@ class SupersetSecurityManager(SecurityManager):
         if perms:
             tables = (
                 db.session.query(SqlaTable)
-                .filter(
+                    .filter(
                     SqlaTable.perm.in_(perms),
                     SqlaTable.database_id == database.id,
                 )
-                .all()
+                    .all()
             )
             for t in tables:
                 if t.schema:
@@ -312,7 +310,7 @@ class SupersetSecurityManager(SecurityManager):
         sesh = self.get_session
         pvms = (
             sesh.query(ab_models.PermissionView)
-            .filter(or_(
+                .filter(or_(
                 ab_models.PermissionView.permission == None,  # NOQA
                 ab_models.PermissionView.view_menu == None,  # NOQA
             ))
@@ -335,11 +333,10 @@ class SupersetSecurityManager(SecurityManager):
         self.set_role('Gamma', self.is_gamma_pvm)
         self.set_role('granter', self.is_granter_pvm)
         self.set_role('sql_lab', self.is_sql_lab_pvm)
-        self.set_role('solar_default',self.is_solar_pvm)
+        self.set_role('solar_default', self.is_solar_pvm)
 
         if conf.get('PUBLIC_ROLE_LIKE_GAMMA', False):
             self.set_role('Public', self.is_gamma_pvm)
-
 
         # self.set_role('Custom', self.is_custom_pvm)
         # if conf.get('PUBLIC_ROLE_LIKE_CUSTOM', False):
@@ -368,8 +365,8 @@ class SupersetSecurityManager(SecurityManager):
                 pvm.permission.name not in READ_ONLY_PERMISSION):
             return True
         return (
-            pvm.view_menu.name in ADMIN_ONLY_VIEW_MENUS or
-            pvm.permission.name in ADMIN_ONLY_PERMISSIONS
+                pvm.view_menu.name in ADMIN_ONLY_VIEW_MENUS or
+                pvm.permission.name in ADMIN_ONLY_PERMISSIONS
         )
 
     def is_alpha_only(self, pvm):
@@ -377,8 +374,8 @@ class SupersetSecurityManager(SecurityManager):
                 pvm.permission.name not in READ_ONLY_PERMISSION):
             return True
         return (
-            pvm.view_menu.name in ALPHA_ONLY_VIEW_MENUS or
-            pvm.permission.name in ALPHA_ONLY_PERMISSIONS
+                pvm.view_menu.name in ALPHA_ONLY_VIEW_MENUS or
+                pvm.permission.name in ALPHA_ONLY_PERMISSIONS
         )
 
     def is_admin_pvm(self, pvm):
@@ -395,19 +392,24 @@ class SupersetSecurityManager(SecurityManager):
         result = False
         for key in SOLAR_PERMISSIONS:
             result = result or (pvm.view_menu.name == SOLAR_PERMISSIONS[key] and pvm.permission.name == key)
+        for permission in SOLAR_PERMISSIONS_COMMON:
+            for view in SOLAR_PERMISSIONS_VIEW:
+                result = result or (pvm.view_menu.name == view and pvm.permission.name == permission)
+        for menu in SOLAR_PERMISSIONS_MENU:
+            result = result or (pvm.view_menu.name == menu and pvm.permission.name == 'menu_access')
         return result
 
     def is_sql_lab_pvm(self, pvm):
         return (
-            pvm.view_menu.name in {
-                'SQL Lab', 'SQL Editor', 'Query Search', 'Saved Queries',
-            } or
-            pvm.permission.name in {
-                'can_sql_json', 'can_csv', 'can_search_queries', 'can_sqllab_viz',
-                'can_sqllab',
-            } or
-            (pvm.view_menu.name in USER_MODEL_VIEWS and
-             pvm.permission.name == 'can_list'))
+                pvm.view_menu.name in {
+            'SQL Lab', 'SQL Editor', 'Query Search', 'Saved Queries',
+        } or
+                pvm.permission.name in {
+                    'can_sql_json', 'can_csv', 'can_search_queries', 'can_sqllab_viz',
+                    'can_sqllab',
+                } or
+                (pvm.view_menu.name in USER_MODEL_VIEWS and
+                 pvm.permission.name == 'can_list'))
 
     def is_granter_pvm(self, pvm):
         return pvm.permission.name in {
@@ -422,8 +424,8 @@ class SupersetSecurityManager(SecurityManager):
             link_table = target.__table__
             connection.execute(
                 link_table.update()
-                .where(link_table.c.id == target.id)
-                .values(perm=target.get_perm()),
+                    .where(link_table.c.id == target.id)
+                    .values(perm=target.get_perm()),
             )
 
         # add to view menu if not already exists
@@ -437,14 +439,14 @@ class SupersetSecurityManager(SecurityManager):
             permission_table = self.permission_model.__table__  # noqa: E501 pylint: disable=no-member
             connection.execute(
                 permission_table.insert()
-                .values(name=permission_name),
+                    .values(name=permission_name),
             )
             permission = self.find_permission(permission_name)
         if not view_menu:
             view_menu_table = self.viewmenu_model.__table__  # pylint: disable=no-member
             connection.execute(
                 view_menu_table.insert()
-                .values(name=view_menu_name),
+                    .values(name=view_menu_name),
             )
             view_menu = self.find_view_menu(view_menu_name)
 
@@ -455,7 +457,7 @@ class SupersetSecurityManager(SecurityManager):
             permission_view_table = self.permissionview_model.__table__  # noqa: E501 pylint: disable=no-member
             connection.execute(
                 permission_view_table.insert()
-                .values(
+                    .values(
                     permission_id=permission.id,
                     view_menu_id=view_menu.id,
                 ),

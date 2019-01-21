@@ -191,33 +191,32 @@ class InfoTabs extends React.Component {
                 <KeyboardBackspaceIcon />
               </IconButton>
             </Tooltip>
-            <div style={{ float: 'right' }}>
-              {this.props.can_save &&
-                this.props.solar_new && (
-              <Tooltip title="Save" classes={{ tooltip: classes.tooltip }}>
-                <IconButton
-                  id="saveIcon"
-                  className={classes.icon}
-                  onClick={this.onSaveClick}
-                >
-                  <SaveIcon />
-                </IconButton>
-              </Tooltip>
+            <div style={{ float: "right" }}>
+              {this.props.can_save && this.props.solar_new && (
+                <Tooltip title="Save" classes={{ tooltip: classes.tooltip }}>
+                  <IconButton
+                    id="saveIcon"
+                    className={classes.icon}
+                    onClick={this.onSaveClick}
+                  >
+                    <SaveIcon />
+                  </IconButton>
+                </Tooltip>
               )}
               {this.props.can_export && (
-              <Tooltip
-                title="Export As CSV"
-                classes={{ tooltip: classes.tooltip }}
-              >
-                <IconButton
-                  id="exportIcon"
-                  className={classes.icon}
-                  href={this.getCSVURL()}
-                  onClick={this.onExportClick}
+                <Tooltip
+                  title="Export As CSV"
+                  classes={{ tooltip: classes.tooltip }}
                 >
-                  <CloudDownloadIcon />
-                </IconButton>
-              </Tooltip>
+                  <IconButton
+                    id="exportIcon"
+                    className={classes.icon}
+                    href={this.getCSVURL()}
+                    onClick={this.onExportClick}
+                  >
+                    <CloudDownloadIcon />
+                  </IconButton>
+                </Tooltip>
               )}
             </div>
           </CardContent>
