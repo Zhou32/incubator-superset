@@ -18,7 +18,9 @@ export default function Loading({ size }) {
         width: Math.min(size, 80),
         // height is auto
         padding: 0,
-        margin: 30,
+        // margin: 30,
+        margin: "auto",
+        marginTop: 200,
         position: "absolute",
         left: "50%",
         top: "50%",

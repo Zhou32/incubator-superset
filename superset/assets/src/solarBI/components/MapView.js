@@ -224,13 +224,18 @@ class MapView extends React.Component {
     return window.location.origin + part_uri + `&height=${this.state.height}`;
   }
 
-  onGoBackClick() {
-    this.setState({
-      searching: true,
-      showingMap: false,
-      can_save: false,
-      can_export: false
-    });
+  onGoBackClick(gotodash) {
+    if (gotodash) {
+      console.log("dash");
+      window.location = "/solar/list";
+    } else {
+      this.setState({
+        searching: true,
+        showingMap: false,
+        can_save: false,
+        can_export: false
+      });
+    }
   }
 
   onMarkerClick(props, marker) {
@@ -435,7 +440,7 @@ class MapView extends React.Component {
           <Grid>
             {this.state.showingMap && (
               <Row className="show-grid" style={{ marginTop: "2em" }}>
-                <Col xsOffset={1} xs={10} md={12} mdOffset={0}>
+                <Col xsOffset={0} xs={10} md={12} mdOffset={0}>
                   {reactEcharts}
                 </Col>
               </Row>

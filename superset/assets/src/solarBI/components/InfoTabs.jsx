@@ -23,7 +23,7 @@ import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 
 const styles = theme => ({
   root: {
-    display: "flex"
+    marginBottom: 40
   },
   slider: {
     padding: "22px 0px"
@@ -98,7 +98,11 @@ class InfoTabs extends React.Component {
   }
 
   onBackClick() {
-    this.props.onBackClick();
+    if (this.props.can_save && this.props.solar_new) {
+      this.props.onBackClick(false);
+    } else {
+      this.props.onBackClick(true);
+    }
   }
 
   onSaveClick() {
@@ -121,8 +125,45 @@ class InfoTabs extends React.Component {
     const { classes } = this.props;
     let tabValue = this.state.tabValue;
     return (
-      <div>
-        <Card className={classes.infoCard} md={6} xs={3}>
+      <div className={classes.root}>
+        <Tooltip title="Go Back" classes={{ tooltip: classes.tooltip }}>
+          <IconButton
+            id="backIcon"
+            className={classes.icon}
+            onClick={this.onBackClick}
+          >
+            <KeyboardBackspaceIcon />
+          </IconButton>
+        </Tooltip>
+        <div style={{ float: "right" }}>
+          {this.props.can_save && this.props.solar_new && (
+            <Tooltip title="Save" classes={{ tooltip: classes.tooltip }}>
+              <IconButton
+                id="saveIcon"
+                className={classes.icon}
+                onClick={this.onSaveClick}
+              >
+                <SaveIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+          {this.props.can_export && (
+            <Tooltip
+              title="Export As CSV"
+              classes={{ tooltip: classes.tooltip }}
+            >
+              <IconButton
+                id="exportIcon"
+                className={classes.icon}
+                href={this.getCSVURL()}
+                onClick={this.onExportClick}
+              >
+                <CloudDownloadIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+        </div>
+        {/* <Card className={classes.infoCard} md={6} xs={3}>
           <CardContent className={classes.cardContent}>
             <IconBtn content="Based on your usage, Project Sunroof can recommend the optimal solar installation size that can fit on your roof." />
             <Typography
@@ -219,7 +260,7 @@ class InfoTabs extends React.Component {
               )}
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     );
   }
