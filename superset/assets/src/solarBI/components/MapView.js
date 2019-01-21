@@ -226,7 +226,6 @@ class MapView extends React.Component {
 
   onGoBackClick(gotodash) {
     if (gotodash) {
-      console.log("dash");
       window.location = "/solar/list";
     } else {
       this.setState({
@@ -440,7 +439,7 @@ class MapView extends React.Component {
           <Grid>
             {this.state.showingMap && (
               <Row className="show-grid" style={{ marginTop: "2em" }}>
-                <Col xsOffset={0} xs={10} md={12} mdOffset={0}>
+                <Col xsOffset={1} xs={10} md={12} mdOffset={0}>
                   {reactEcharts}
                 </Col>
               </Row>
