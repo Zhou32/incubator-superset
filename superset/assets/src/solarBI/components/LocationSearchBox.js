@@ -138,6 +138,7 @@ class LocationSearchBox extends React.Component {
         <CardContent>
           <Input
             autoFocus
+            id='inputBox'
             placeholder="Address"
             className={classes.input}
             classes={{ focused: classes.inputFocused }}
@@ -154,6 +155,7 @@ class LocationSearchBox extends React.Component {
               <MuiThemeProvider theme={theme}>
                 <InputAdornment position="end">
                   <Fab
+                    id="searchFab"
                     size="medium"
                     color="primary"
                     aria-label="Search"
