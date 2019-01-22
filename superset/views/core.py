@@ -578,9 +578,16 @@ class SolarBIModelWelcomeView(SolarBIModelView):
             return redirect(appbuilder.get_url_for_login)
 
         entry_point = 'solarBI'
+        is_solar = False
 
         datasource_id = ''
         for role in g.user.roles:
+            if role.name == 'Admin':
+                is_solar = False
+                break
+            if role.name == 'solar_default':
+                is_solar = True
+
             for permission in role.permissions:
                 if permission.permission.name == 'datasource_access':
                     datasource_id = permission.view_menu.name.split(':')[1].replace(')', '')
@@ -608,10 +615,8 @@ class SolarBIModelWelcomeView(SolarBIModelView):
             entry=entry_point,
             title='Superset',
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
+            is_solar=is_solar,
         )
-
-
-class SolarBIModelAddView(SolarBIModelView):
 
     @expose('/add', methods=['GET', 'POST'])
     @has_access
@@ -624,9 +629,16 @@ class SolarBIModelAddView(SolarBIModelView):
         #         return super(SolarBIModelAddView, self).add()
 
         entry_point = 'solarBI'
+        is_solar = False
 
         datasource_id = ''
         for role in g.user.roles:
+            if role.name == 'Admin':
+                is_solar = False
+                break
+            if role.name == 'solar_default':
+                is_solar = True
+
             if 'solar' in role.name:
                 for permission in role.permissions:
                     if permission.permission.name == 'datasource_access':
@@ -655,23 +667,19 @@ class SolarBIModelAddView(SolarBIModelView):
             entry=entry_point,
             title='Superset',
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
+            is_solar=is_solar,
         )
 
-appbuilder.add_view(
-    SolarBIModelAddView,
-    'Search your Location',
-    href='/solar/add',
-    label=__('Search your Location'),
-    icon='fa-search',
-    category='SolarBI',
-    category_label=__('SolarBI'),
-    category_icon='fa-sun-o'
-)
+
+class SolarBIModelAddView(SolarBIModelView):
+    pass
+
+
 appbuilder.add_view(
     SolarBIModelWelcomeView,
     'Introduction',
     href='/solar/welcome',
-    label=__('Introduction'),
+    label=__('Welcome'),
     icon='fa-home',
     category='SolarBI',
     category_label=__('SolarBI'),
@@ -679,9 +687,21 @@ appbuilder.add_view(
 )
 
 appbuilder.add_view(
+    SolarBIModelAddView,
+    'Search your Location',
+    href='/solar/add',
+    label=__('Search'),
+    icon='fa-search',
+    category='SolarBI',
+    category_label=__('SolarBI'),
+    category_icon='fa-sun-o'
+)
+
+
+appbuilder.add_view(
     SolarBIModelView,
     'Saved Solar Data',
-    label=__('Saved Solar Data'),
+    label=__('Saved'),
     icon='fa-save',
     category='SolarBI',
     category_label=__('SolarBI'),
@@ -1523,12 +1543,14 @@ class Superset(BaseSupersetView):
             title = slc.slice_name
         else:
             title = _('Explore - %(table)s', table=table_name)
+
         return self.render_template(
             'superset/basic.html',
             bootstrap_data=json.dumps(bootstrap_data),
             entry='explore',
             title=title,
-            standalone_mode=standalone)
+            standalone_mode=standalone,
+        )
 
     @api
     @handle_api_exception
@@ -2938,9 +2960,6 @@ class Superset(BaseSupersetView):
 
         datasource_id=''
         for role in g.user.roles:
-            if role.name == 'Admin':
-                entry_point ='welcome'
-                break
 
             for permission in role.permissions:
                 if permission.permission.name == 'datasource_access':
@@ -2961,7 +2980,7 @@ class Superset(BaseSupersetView):
             'user': bootstrap_user_data(),
             'common': self.common_bootsrap_payload(),
             'datasource_id': datasource_id,
-            'datasource_type': 'table',
+            'datasource_type': 'table'
         }
 
         return self.render_template(
@@ -3064,12 +3083,22 @@ class Superset(BaseSupersetView):
         else:
             title = _('Explore - %(table)s', table=table_name)
 
+        is_solar = False
+
+        for role in g.user.roles:
+            if role.name == 'Admin':
+                is_solar = False
+                break
+            if role.name == 'solar_default':
+                is_solar = True
+
         return self.render_template(
             'superset/basic.html',
             entry='solarBI',
             title=title,
             bootstrap_data=json.dumps(bootstrap_data),
-            standalone_mode=standalone
+            standalone_mode=standalone,
+            is_solar=is_solar,
         )
 
     @has_access
@@ -3099,6 +3128,7 @@ class Superset(BaseSupersetView):
             'defaultDbId': config.get('SQLLAB_DEFAULT_DBID'),
             'common': self.common_bootsrap_payload(),
         }
+
         return self.render_template(
             'superset/basic.html',
             entry='sqllab',

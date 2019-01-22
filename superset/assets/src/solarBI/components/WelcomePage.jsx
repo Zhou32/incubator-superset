@@ -87,7 +87,7 @@ const styles = theme => ({
     display: "block",
     marginLeft: "auto",
     marginRight: "auto",
-    width: 1200
+    width: "100%"
   }
 });
 
