@@ -19,7 +19,7 @@
       </a>
     </div>
     <div class="navbar-collapse collapse">
-      {% if is_admin %}
+      {% if not is_solar %}
         <ul class="nav navbar-nav">
           {% if WARNING_MSG %}
             <li class="alert alert-danger">
