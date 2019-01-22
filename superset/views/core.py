@@ -2939,11 +2939,13 @@ class Superset(BaseSupersetView):
             return redirect(appbuilder.get_url_for_login)
 
         entry_point = 'solarBI'
+        is_admin = False
 
         datasource_id=''
         for role in g.user.roles:
             if role.name == 'Admin':
                 entry_point ='welcome'
+                is_admin = True
                 break
 
             for permission in role.permissions:
@@ -2965,7 +2967,7 @@ class Superset(BaseSupersetView):
             'user': bootstrap_user_data(),
             'common': self.common_bootsrap_payload(),
             'datasource_id': datasource_id,
-            'datasource_type': 'table',
+            'datasource_type': 'table'
         }
 
         return self.render_template(
@@ -2973,6 +2975,7 @@ class Superset(BaseSupersetView):
             entry=entry_point,
             title='Superset',
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
+            is_admin=is_admin
         )
 
     @expose('/solar/', methods=('GET', 'POST'))

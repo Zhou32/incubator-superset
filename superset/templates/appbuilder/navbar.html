@@ -19,17 +19,23 @@
       </a>
     </div>
     <div class="navbar-collapse collapse">
-      <ul class="nav navbar-nav">
-        {% if WARNING_MSG %}
-          <li class="alert alert-danger">
-            {{ WARNING_MSG | safe }}
-          </li>
-        {% endif %}
-        {% include 'appbuilder/navbar_menu.html' %}
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-        {% include 'appbuilder/navbar_right.html' %}
-      </ul>
+      {% if is_admin %}
+        <ul class="nav navbar-nav">
+          {% if WARNING_MSG %}
+            <li class="alert alert-danger">
+              {{ WARNING_MSG | safe }}
+            </li>
+          {% endif %}
+          {% include 'appbuilder/navbar_menu.html' %}
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          {% include 'appbuilder/navbar_right.html' %}
+        </ul>
+      {% else %}
+        <ul class="nav navbar-nav navbar-right">
+          {% include 'appbuilder/navbar_solarbi.html' %}
+        </ul>
+      {% endif %}
     </div>
   </div>
 </div>
