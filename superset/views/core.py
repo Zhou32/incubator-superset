@@ -610,9 +610,6 @@ class SolarBIModelWelcomeView(SolarBIModelView):
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
         )
 
-
-class SolarBIModelAddView(SolarBIModelView):
-
     @expose('/add', methods=['GET', 'POST'])
     @has_access
     def add(self):
@@ -657,21 +654,16 @@ class SolarBIModelAddView(SolarBIModelView):
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
         )
 
-appbuilder.add_view(
-    SolarBIModelAddView,
-    'Search your Location',
-    href='/solar/add',
-    label=__('Search your Location'),
-    icon='fa-search',
-    category='SolarBI',
-    category_label=__('SolarBI'),
-    category_icon='fa-sun-o'
-)
+
+class SolarBIModelAddView(SolarBIModelView):
+    pass
+
+
 appbuilder.add_view(
     SolarBIModelWelcomeView,
     'Introduction',
     href='/solar/welcome',
-    label=__('Introduction'),
+    label=__('Welcome'),
     icon='fa-home',
     category='SolarBI',
     category_label=__('SolarBI'),
@@ -679,9 +671,21 @@ appbuilder.add_view(
 )
 
 appbuilder.add_view(
+    SolarBIModelAddView,
+    'Search your Location',
+    href='/solar/add',
+    label=__('Search'),
+    icon='fa-search',
+    category='SolarBI',
+    category_label=__('SolarBI'),
+    category_icon='fa-sun-o'
+)
+
+
+appbuilder.add_view(
     SolarBIModelView,
     'Saved Solar Data',
-    label=__('Saved Solar Data'),
+    label=__('Saved'),
     icon='fa-save',
     category='SolarBI',
     category_label=__('SolarBI'),
