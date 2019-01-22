@@ -12,7 +12,7 @@ export default class MapChartPreset extends Preset {
                 new CountryMapChartPlugin().configure({key: 'country_map'}),
                 new MapBoxChartPlugin().configure({key: 'mapbox'}),
                 new WorldMapChartPlugin().configure({key: 'world_map'}),
-                new SolarBIChartPlugin().configure({key: 'solarBI'})
+                // new SolarBIChartPlugin().configure({key: 'solarBI'})
             ],
         });
     }

@@ -528,9 +528,6 @@ class SolarBIModelView(SliceModelView):  # noqa
 
     filters_not_for_admin = {}
 
-
-
-
     @expose('/list/')
     @has_access
     def list(self):
@@ -622,18 +619,19 @@ class SolarBIModelAddView(SolarBIModelView):
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
 
-        for role in g.user.roles:
-            if role.name == 'Admin':
-                return super(SolarBIModelAddView, self).add()
+        # for role in g.user.roles:
+        #     if role.name == 'Admin':
+        #         return super(SolarBIModelAddView, self).add()
 
         entry_point = 'solarBI'
 
         datasource_id = ''
         for role in g.user.roles:
-            for permission in role.permissions:
-                if permission.permission.name == 'datasource_access':
-                    datasource_id = permission.view_menu.name.split(':')[1].replace(')', '')
-                    break
+            if 'solar' in role.name:
+                for permission in role.permissions:
+                    if permission.permission.name == 'datasource_access':
+                        datasource_id = permission.view_menu.name.split(':')[1].replace(')', '')
+                        break
 
         welcome_dashboard_id = (
             db.session
