@@ -16,14 +16,14 @@ describe('MapView', () => {
         can_download: true,
         can_export: true,
         can_overwrite: true,
-        solarStatus: "loading",
-        form_data: {
-            datasource: "13_table",
-            spatial_address: {
-                lat: -37,
-                lng: 144,
-            }
-        }
+        solarStatus: "waiting",
+        // form_data: {
+        //     datasource: "13_table",
+        //     spatial_address: {
+        //         lat: -37,
+        //         lng: 144,
+        //     }
+        // }
     }
     let wrapper;
     const fetchSolarData = jest.fn();
@@ -40,6 +40,8 @@ describe('MapView', () => {
         // console.log(connectedComponent)
         // console.log(wrapper.debug());
         expect(wrapper.find('Map').length).toBe(1);
+        expect(wrapper.find('Marker').length).toBe(1);
+        expect(wrapper.find('Circle').length).toBe(1);
     })
 
     it('show loading icon on loading data', () => {
@@ -48,9 +50,23 @@ describe('MapView', () => {
 
     it('show alert if fail to fetch data', () => {
         wrapper.setState({solarStatus: "failed"});
-        wrapper.update();
         expect(wrapper.find('strong#failAlert').length).toBe(1);
     })
 
+    // it('fetchSolarData should be called', () => {
+    //     expect(fetchSolarData).toHaveBeenCalled();
+    // })
+    it('call fetch on place change', () => {
+        wrapper.setProps({
+            form_data: {
+            datasource: "13_table",
+            spatial_address: {
+                lat: -37,
+                lng: 144,
+            }
+        }
+        });
+        expect(fetchSolarData).toHaveBeenCalled();
+    })
 
 })
