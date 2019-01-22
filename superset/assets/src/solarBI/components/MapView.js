@@ -224,13 +224,17 @@ export class MapView extends React.Component {
     return window.location.origin + part_uri + `&height=${this.state.height}`;
   }
 
-  onGoBackClick() {
-    this.setState({
-      searching: true,
-      showingMap: false,
-      can_save: false,
-      can_export: false
-    });
+  onGoBackClick(gotodash) {
+    if (gotodash) {
+      window.location = "/solar/list";
+    } else {
+      this.setState({
+        searching: true,
+        showingMap: false,
+        can_save: false,
+        can_export: false
+      });
+    }
   }
 
   onMarkerClick(props, marker) {
