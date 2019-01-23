@@ -76,6 +76,14 @@ def get_unloaded_chunks(files, loaded_chunks):
 parse_manifest_json()
 
 
+def is_solar_user():
+    if not g.user.is_anonymous:
+        for role in g.user.roles:
+            if 'solar' in role.name:
+                return True
+    return False
+
+
 @app.context_processor
 def get_manifest():
     return dict(
@@ -83,6 +91,7 @@ def get_manifest():
         get_unloaded_chunks=get_unloaded_chunks,
         js_manifest=get_js_manifest_files,
         css_manifest=get_css_manifest_files,
+        is_solar=is_solar_user()
     )
 
 
@@ -180,6 +189,7 @@ class MyIndexView(IndexView):
             return redirect('/login')
 
         return redirect(f'/{entry_point}/welcome')
+
 
 
 custom_sm = app.config.get('CUSTOM_SECURITY_MANAGER') or SupersetSecurityManager

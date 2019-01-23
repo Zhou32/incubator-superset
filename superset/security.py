@@ -11,7 +11,6 @@ from superset import sql_parse
 from superset.connectors.connector_registry import ConnectorRegistry
 from superset.exceptions import SupersetSecurityException
 from superset.solar.register import SolarRegisterUserDBView
-from superset.solar.userinfo import SolarUserDBModelView
 
 READ_ONLY_MODEL_VIEWS = {
     'DatabaseAsync',
@@ -80,13 +79,13 @@ OBJECT_SPEC_PERMISSIONS = set([
 
 SOLAR_PERMISSIONS = [
     ('can_explore_json', 'Superset'),
-    ('resetmypassword', 'SolarUserDBModelView'),
+    ('resetmypassword', 'UserDBModelView'),
     ('can_this_form_post', 'ResetMyPasswordView'),
     ('can_this_form_get', 'ResetMyPasswordView'),
     ('can_this_form_post', 'UserInfoEditView'),
     ('can_this_form_get', 'UserInfoEditView'),
-    ('can_userinfo', 'SolarUserDBModelView'),
-    ('userinfoedit', 'SolarUserDBModelView')
+    ('can_userinfo', 'UserDBModelView'),
+    ('userinfoedit', 'UserDBModelView')
 ]
 
 SOLAR_PERMISSIONS_COMMON = ['can_show', 'can_list', 'can_delete', 'can_add']
@@ -95,7 +94,6 @@ SOLAR_PERMISSIONS_MENU = ['SolarBI', 'Search your Location', 'Saved Solar Data',
 
 
 class SupersetSecurityManager(SecurityManager):
-    userdbmodelview = SolarUserDBModelView
     registeruserdbview = SolarRegisterUserDBView
 
     def get_schema_perm(self, database, schema):

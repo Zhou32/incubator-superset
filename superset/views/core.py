@@ -538,21 +538,17 @@ class SolarBIModelAddView(SolarBIModelView):
     @expose('/list/')
     @has_access
     def list(self):
-        is_solar = False
 
         for role in g.user.roles:
             if role.name == 'Admin':
-                is_solar = False
                 self.remove_filters_for_role(role.name)
                 break
             else:
-                is_solar = True
                 self.add_filters_for_role(role.name)
         widgets = self._list()
         return self.render_template(self.list_template,
                                     title=self.list_title,
-                                    widgets=widgets,
-                                    is_solar=is_solar)
+                                    widgets=widgets)
 
     def remove_filters_for_role(self, role_name):
         if role_name == 'Admin':
@@ -586,16 +582,9 @@ class SolarBIModelAddView(SolarBIModelView):
             return redirect(appbuilder.get_url_for_login)
 
         entry_point = 'solarBI'
-        is_solar = False
 
         datasource_id = self.get_solar_datasource()
-        for role in g.user.roles:
-            if role.name == 'Admin':
-                is_solar = False
-                break
-            if role.name == 'solar_default':
-                is_solar = True
-                break
+
 
         welcome_dashboard_id = (
             db.session
@@ -619,7 +608,6 @@ class SolarBIModelAddView(SolarBIModelView):
             entry=entry_point,
             title='Search - SolarBI',
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
-            is_solar=is_solar,
         )
 
     def get_solar_datasource(self):
@@ -638,16 +626,8 @@ class SolarBIModelAddView(SolarBIModelView):
             return redirect(appbuilder.get_url_for_login)
 
         entry_point = 'solarBI'
-        is_solar = False
 
         datasource_id = self.get_solar_datasource()
-        for role in g.user.roles:
-            if role.name == 'Admin':
-                is_solar = False
-                break
-            if role.name == 'solar_default':
-                is_solar = True
-                break
 
         welcome_dashboard_id = (
             db.session
@@ -671,7 +651,6 @@ class SolarBIModelAddView(SolarBIModelView):
             entry=entry_point,
             title='Welcome - SolarBI',
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
-            is_solar=is_solar,
         )
 
 
