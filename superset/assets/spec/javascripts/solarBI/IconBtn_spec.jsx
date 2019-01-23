@@ -8,8 +8,8 @@ describe('Location Search Box', () => {
   it('click shows content', () => {
       wrapper = mount(<IconBtn />);
       wrapper.find('IconButton#iconButton').simulate('click');
-      expect(wrapper.find('Popover#simple-popover')).toHaveLength(1);
-      expect(wrapper.find('Typography#popContent')).toHaveLength(1);
+      expect(wrapper.find('Popover#simple-popper').length).toBe(1);
+      expect(wrapper.find('Typography#popContent').length).toBe(1);
   });
 
 

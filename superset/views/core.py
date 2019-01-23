@@ -520,7 +520,14 @@ def get_user():
 
 
 class SolarBIModelView(SliceModelView):  # noqa
+    pass
 
+    
+class SolarBIModelWelcomeView(SolarBIModelView):
+    pass
+
+
+class SolarBIModelAddView(SolarBIModelView):
     route_base = '/solar'
     datamodel = SQLAInterface(models.Slice)
     base_filters = [['viz_type', FilterEqual, 'solarBI'],['created_by', FilterEqualFunction, get_user]]
@@ -531,16 +538,21 @@ class SolarBIModelView(SliceModelView):  # noqa
     @expose('/list/')
     @has_access
     def list(self):
+        is_solar = False
+
         for role in g.user.roles:
             if role.name == 'Admin':
+                is_solar = False
                 self.remove_filters_for_role(role.name)
                 break
             else:
+                is_solar = True
                 self.add_filters_for_role(role.name)
         widgets = self._list()
         return self.render_template(self.list_template,
                                     title=self.list_title,
-                                    widgets=widgets)
+                                    widgets=widgets,
+                                    is_solar=is_solar)
 
     def remove_filters_for_role(self, role_name):
         if role_name == 'Admin':
@@ -567,8 +579,56 @@ class SolarBIModelView(SliceModelView):  # noqa
                 self._base_filters.filters.remove(f)
                 self._base_filters.values.remove(value)
 
+    @expose('/add', methods=['GET', 'POST'])
+    @has_access
+    def add(self):
+        if not g.user or not g.user.get_id():
+            return redirect(appbuilder.get_url_for_login)
 
-class SolarBIModelWelcomeView(SolarBIModelView):
+        entry_point = 'solarBI'
+        is_solar = False
+
+        datasource_id = self.get_solar_datasource()
+        for role in g.user.roles:
+            if role.name == 'Admin':
+                is_solar = False
+                break
+            if role.name == 'solar_default':
+                is_solar = True
+                break
+
+        welcome_dashboard_id = (
+            db.session
+                .query(UserAttribute.welcome_dashboard_id)
+                .filter_by(user_id=g.user.get_id())
+                .scalar()
+        )
+        if welcome_dashboard_id:
+            return self.dashboard(str(welcome_dashboard_id))
+
+        payload = {
+            'user': bootstrap_user_data(),
+            'common': BaseSupersetView().common_bootsrap_payload(),
+            'datasource_id': datasource_id,
+            'datasource_type': 'table',
+            'entry': 'add'
+        }
+
+        return self.render_template(
+            'superset/basic.html',
+            entry=entry_point,
+            title='Search - SolarBI',
+            bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
+            is_solar=is_solar,
+        )
+
+    def get_solar_datasource(self):
+        for role in g.user.roles:
+            if 'solar' in role.name:
+                for permission in role.permissions:
+                    if permission.permission.name == 'datasource_access':
+                        datasource_id = permission.view_menu.name.split(':')[1].replace(')', '')
+                        return datasource_id
 
     @expose('/welcome')
     def welcome(self):
@@ -609,66 +669,22 @@ class SolarBIModelWelcomeView(SolarBIModelView):
         return self.render_template(
             'superset/basic.html',
             entry=entry_point,
-            title='Superset',
+            title='Welcome - SolarBI',
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
             is_solar=is_solar,
         )
 
-    @expose('/add', methods=['GET', 'POST'])
-    @has_access
-    def add(self):
-        if not g.user or not g.user.get_id():
-            return redirect(appbuilder.get_url_for_login)
 
-        entry_point = 'solarBI'
-        is_solar = False
-
-        datasource_id = self.get_solar_datasource()
-        for role in g.user.roles:
-            if role.name == 'Admin':
-                is_solar = False
-                break
-            if role.name == 'solar_default':
-                is_solar = True
-                break
-
-
-        welcome_dashboard_id = (
-            db.session
-                .query(UserAttribute.welcome_dashboard_id)
-                .filter_by(user_id=g.user.get_id())
-                .scalar()
-        )
-        if welcome_dashboard_id:
-            return self.dashboard(str(welcome_dashboard_id))
-
-        payload = {
-            'user': bootstrap_user_data(),
-            'common': BaseSupersetView().common_bootsrap_payload(),
-            'datasource_id': datasource_id,
-            'datasource_type': 'table',
-            'entry': 'add'
-        }
-
-        return self.render_template(
-            'superset/basic.html',
-            entry=entry_point,
-            title='Superset',
-            bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
-            is_solar=is_solar,
-        )
-
-    def get_solar_datasource(self):
-        for role in g.user.roles:
-            if 'solar' in role.name:
-                for permission in role.permissions:
-                    if permission.permission.name == 'datasource_access':
-                        datasource_id = permission.view_menu.name.split(':')[1].replace(')', '')
-                        return datasource_id
-
-
-class SolarBIModelAddView(SolarBIModelView):
-    pass
+appbuilder.add_view(
+    SolarBIModelAddView,
+    'Search your Location',
+    href='/solar/add',
+    label=__('Search'),
+    icon='fa-search',
+    category='SolarBI',
+    category_label=__('SolarBI'),
+    category_icon='fa-sun-o'
+)
 
 
 appbuilder.add_view(
@@ -682,16 +698,16 @@ appbuilder.add_view(
     category_icon='fa-sun-o'
 )
 
-appbuilder.add_view(
-    SolarBIModelAddView,
-    'Search your Location',
-    href='/solar/add',
-    label=__('Search'),
-    icon='fa-search',
-    category='SolarBI',
-    category_label=__('SolarBI'),
-    category_icon='fa-sun-o'
-)
+# appbuilder.add_view(
+#     SolarBIModelAddView,
+#     'Search your Location',
+#     href='/solar/add',
+#     label=__('Search'),
+#     icon='fa-search',
+#     category='SolarBI',
+#     category_label=__('SolarBI'),
+#     category_icon='fa-sun-o'
+# )
 
 
 appbuilder.add_view(

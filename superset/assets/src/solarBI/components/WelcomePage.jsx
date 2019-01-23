@@ -87,7 +87,7 @@ const styles = theme => ({
     display: "block",
     marginLeft: "auto",
     marginRight: "auto",
-    width: "100%"
+    width: "50%"
   }
 });
 
@@ -200,7 +200,12 @@ class WelcomePage extends React.Component {
 
         <p className={classes.head}>Country-wide solar potential</p>
         <div
-          style={{ backgroundColor: "white", marginTop: 30, marginBottom: 200 }}
+          style={{
+            backgroundColor: "white",
+            marginTop: 30,
+            marginBottom: 200,
+            width: "100%"
+          }}
         >
           <img
             className={classes.solarMap}

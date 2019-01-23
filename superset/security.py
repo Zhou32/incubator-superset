@@ -78,16 +78,16 @@ OBJECT_SPEC_PERMISSIONS = set([
     'metric_access',
 ])
 
-SOLAR_PERMISSIONS = {
-    'can_explore_json': 'Superset',
-    'resetmypassword': 'UserDBModelView',
-    'can_this_form_post': 'ResetMyPasswordView',
-    'can_this_form_get': 'ResetMyPasswordView',
-    'can_this_form_post': 'UserInfoEditView',
-    'can_this_form_get': 'UserInfoEditView',
-    'can_userinfo': 'UserDBModelView',
-    'userinfoedit': 'UserDBModelView'
-}
+SOLAR_PERMISSIONS = [
+    ('can_explore_json', 'Superset'),
+    ('resetmypassword', 'SolarUserDBModelView'),
+    ('can_this_form_post', 'ResetMyPasswordView'),
+    ('can_this_form_get', 'ResetMyPasswordView'),
+    ('can_this_form_post', 'UserInfoEditView'),
+    ('can_this_form_get', 'UserInfoEditView'),
+    ('can_userinfo', 'SolarUserDBModelView'),
+    ('userinfoedit', 'SolarUserDBModelView')
+]
 
 SOLAR_PERMISSIONS_COMMON = ['can_show', 'can_list', 'can_delete', 'can_add']
 SOLAR_PERMISSIONS_VIEW = ['SolarBIModelAddView', 'SolarBIModelWelcomeView', 'SolarBIModelView']
@@ -394,8 +394,8 @@ class SupersetSecurityManager(SecurityManager):
 
     def is_solar_pvm(self, pvm):
         result = False
-        for key in SOLAR_PERMISSIONS:
-            result = result or (pvm.view_menu.name == SOLAR_PERMISSIONS[key] and pvm.permission.name == key)
+        for item in SOLAR_PERMISSIONS:
+            result = result or (pvm.view_menu.name == item[1] and pvm.permission.name == item[0])
         for permission in SOLAR_PERMISSIONS_COMMON:
             for view in SOLAR_PERMISSIONS_VIEW:
                 result = result or (pvm.view_menu.name == view and pvm.permission.name == permission)
