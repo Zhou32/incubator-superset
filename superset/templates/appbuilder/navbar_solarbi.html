@@ -7,9 +7,9 @@
 <li>
   <a href="/solar/list/"> Saved </a>
 </li>
-<li>
-  <a href="{{appbuilder.get_url_for_userinfo}}">{{_("Profile")}}</a>
-</li>
+{#<li>#}
+{#  <a href="{{appbuilder.get_url_for_userinfo}}">{{_("Profile")}}</a>#}
+{#</li>#}
 {#<li>#}
 {#  <a href="/solar/welcome"> Support </a>#}
 {#</li>#}
@@ -20,7 +20,6 @@
     <a  class="dropdown-toggle"
         data-toggle="dropdown"
         title="{{g.user.get_full_name()}}"
-        style=  "padding-top: 22px; padding-bottom: 17px"
     >
       <i class="fa fa-user"></i><b class="caret"></b>
     </a>
