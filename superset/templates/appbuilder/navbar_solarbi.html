@@ -21,11 +21,11 @@
         data-toggle="dropdown"
         title="{{g.user.get_full_name()}}"
     >
-      <i class="fa fa-user"></i><b class="caret"></b>
+      <i class="fa fa-user"></i>&nbsp;<b class="caret"></b>
     </a>
     <ul class="dropdown-menu"
         style="margin-top: 2px">
-      <li><a href="{{appbuilder.get_url_for_userinfo}}"><span class="fa fa-fw fa-user"></span>{{_("Profile")}}</a></li>
+      <li><a href="{{appbuilder.get_url_for_userinfo}}" target="_blank"><span class="fa fa-fw fa-user"></span>{{_("Profile")}}</a></li>
       <li><a href="{{appbuilder.get_url_for_logout}}"><span class="fa fa-fw fa-sign-out"></span>{{_("Logout")}}</a></li>
     </ul>
 </li>

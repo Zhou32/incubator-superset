@@ -618,7 +618,7 @@ class SolarBIModelWelcomeView(SolarBIModelView):
         return self.render_template(
             'superset/basic.html',
             entry=entry_point,
-            title='Superset',
+            title='Welcome - SolarBI',
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
             is_solar=is_solar,
         )
@@ -725,7 +725,7 @@ class SolarBIModelAddView(SolarBIModelView):
         return self.render_template(
             'superset/basic.html',
             entry=entry_point,
-            title='Superset',
+            title='Search - SolarBI',
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
             is_solar=is_solar,
         )
