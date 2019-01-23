@@ -60,7 +60,7 @@ describe('InfoTabs', () => {
           wrapper.setState({ tabValue: 1 });
           wrapper.update();
           expect(wrapper.state('tabValue')).toBe(1);
-          // expect(wrapper.find('TabContainer#tab2Content').length).toBe(1);
+          expect(wrapper.find('TabContainer#tab2Content').length).toBe(1);
           // expect(wrapper.find('TabContainer#tab1Content').length).toBe(0);
           // expect(wrapper.find('TabContainer#tab3Content').length).toBe(0);
       });
