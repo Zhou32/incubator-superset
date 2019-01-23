@@ -10,7 +10,8 @@ from sqlalchemy import or_
 from superset import sql_parse
 from superset.connectors.connector_registry import ConnectorRegistry
 from superset.exceptions import SupersetSecurityException
-from superset.register import SolarRegisterUserDBView
+from superset.solar.register import SolarRegisterUserDBView
+from superset.solar.userinfo import SolarUserDBModelView
 
 READ_ONLY_MODEL_VIEWS = {
     'DatabaseAsync',
@@ -94,6 +95,7 @@ SOLAR_PERMISSIONS_MENU = ['SolarBI', 'Search your Location', 'Saved Solar Data',
 
 
 class SupersetSecurityManager(SecurityManager):
+    userdbmodelview = SolarUserDBModelView
     registeruserdbview = SolarRegisterUserDBView
 
     def get_schema_perm(self, database, schema):

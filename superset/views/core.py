@@ -580,18 +580,14 @@ class SolarBIModelWelcomeView(SolarBIModelView):
         entry_point = 'solarBI'
         is_solar = False
 
-        datasource_id = ''
+        datasource_id = self.get_solar_datasource()
         for role in g.user.roles:
             if role.name == 'Admin':
                 is_solar = False
                 break
             if role.name == 'solar_default':
                 is_solar = True
-
-            for permission in role.permissions:
-                if permission.permission.name == 'datasource_access':
-                    datasource_id = permission.view_menu.name.split(':')[1].replace(')', '')
-                    break
+                break
 
         welcome_dashboard_id = (
             db.session
@@ -624,26 +620,18 @@ class SolarBIModelWelcomeView(SolarBIModelView):
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
 
-        # for role in g.user.roles:
-        #     if role.name == 'Admin':
-        #         return super(SolarBIModelAddView, self).add()
-
         entry_point = 'solarBI'
         is_solar = False
 
-        datasource_id = ''
+        datasource_id = self.get_solar_datasource()
         for role in g.user.roles:
             if role.name == 'Admin':
                 is_solar = False
                 break
             if role.name == 'solar_default':
                 is_solar = True
+                break
 
-            if 'solar' in role.name:
-                for permission in role.permissions:
-                    if permission.permission.name == 'datasource_access':
-                        datasource_id = permission.view_menu.name.split(':')[1].replace(')', '')
-                        break
 
         welcome_dashboard_id = (
             db.session
@@ -669,6 +657,14 @@ class SolarBIModelWelcomeView(SolarBIModelView):
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
             is_solar=is_solar,
         )
+
+    def get_solar_datasource(self):
+        for role in g.user.roles:
+            if 'solar' in role.name:
+                for permission in role.permissions:
+                    if permission.permission.name == 'datasource_access':
+                        datasource_id = permission.view_menu.name.split(':')[1].replace(')', '')
+                        return datasource_id
 
 
 class SolarBIModelAddView(SolarBIModelView):
