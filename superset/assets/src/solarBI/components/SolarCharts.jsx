@@ -101,8 +101,9 @@ class SolarCharts extends React.Component {
 
     const option = {
       title: {
-        text: "2017-2018 Solar Heatmap",
-        show: false
+        text: "Heat Map: Year-on-Year Average Solar Irradiance",
+        show: true,
+        left: "center"
       },
       toolbox: {
         feature: {
@@ -111,7 +112,7 @@ class SolarCharts extends React.Component {
             title: "Save As Image"
           }
         },
-        left: "middle"
+        left: "right"
       },
       tooltip: {
         position: "top"
@@ -180,8 +181,9 @@ class SolarCharts extends React.Component {
 
       const option = {
         title: {
-          text: "2017-2018 Solar Bar Chart",
-          show: false
+          text: "Monthly Average Solar Irradiance",
+          show: true,
+          left: "center"
         },
         toolbox: {
           feature: {
@@ -195,7 +197,7 @@ class SolarCharts extends React.Component {
             //   lang: ["Data View", "close", "refresh"]
             // }
           },
-          left: "middle"
+          left: "right"
         },
         tooltip: {},
         xAxis: {
@@ -279,13 +281,12 @@ class SolarCharts extends React.Component {
                 style={{ zIndex: 10 }}
                 onClick={this.handleHeatmapClick}
               >
-                <InfoIcon />
               </IconButton>
             }
           />
           <CardContent className={classes.cardContent}>
             <ReactEcharts
-              style={{ width: "100%", height: 350, marginTop: -65 }}
+              style={{ width: "100%", height: 350, marginTop: -30 }}
               option={heatmapOptions}
             />
           </CardContent>
@@ -316,13 +317,12 @@ class SolarCharts extends React.Component {
                 style={{ zIndex: 10 }}
                 onClick={this.handleBarchartClick}
               >
-                <InfoIcon />
               </IconButton>
             }
           />
           <CardContent className={classes.cardContent}>
             <ReactEcharts
-              style={{ width: "100%", height: 330, marginTop: -65 }}
+              style={{ width: "100%", height: 330, marginTop: -30 }}
               option={barchartOptions}
             />
           </CardContent>

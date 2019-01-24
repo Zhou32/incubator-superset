@@ -309,15 +309,15 @@ export class MapView extends React.Component {
         <div>
           <p
             style={{
-              fontSize: 24,
+              fontSize: 30,
+              fontWeight: "bold",
               textAlign: "center",
-              color: "#755692",
+              color: "black",
               marginTop: 50,
               marginBottom: 36
             }}
           >
-            Based on your location find below data from Jan 2017 until the
-            latest satellite update.
+            Solar Irradiance Exposure
           </p>
 
           <SolarCharts queryData={queryResponse["data"]["data"]} />
