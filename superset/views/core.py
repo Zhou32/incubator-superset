@@ -533,6 +533,13 @@ class SolarBIModelAddView(SolarBIModelView):
     base_filters = [['viz_type', FilterEqual, 'solarBI'],['created_by', FilterEqualFunction, get_user]]
     base_permissions = ['can_list', 'can_show', 'can_add', 'can_delete', 'can_edit']
 
+    search_columns = (
+        'slice_name', 'description', 'owners',
+    )
+    list_columns = [
+        'slice_link', 'creator', 'modified']
+    order_columns = [ 'modified']
+
     filters_not_for_admin = {}
 
     @expose('/list/')
