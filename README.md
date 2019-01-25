@@ -1,3 +1,21 @@
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
 Superset
 =========
 
@@ -169,6 +187,7 @@ the world know they are using Superset. Join our growing community!
  1. [Fordeal](http://www.fordeal.com)
  1. [GfK Data Lab](http://datalab.gfk.com)
  1. [Grassroot](https://www.grassrootinstitute.org/)
+ 1. [HuiShouBao](http://www.huishoubao.com/)
  1. [jampp](https://jampp.com/)
  1. [Konfío](http://konfio.mx)
  1. [Kuaishou](https://www.kuaishou.com/)
