@@ -23,6 +23,9 @@ const styles = theme => ({
   cardContent: {
     padding: 0
   },
+  cardHeader: {
+    width: 40
+  },
   typography: {
     margin: theme.spacing.unit * 2,
     fontSize: 15,
@@ -101,9 +104,10 @@ class SolarCharts extends React.Component {
 
     const option = {
       title: {
-        text: "Heat Map: Year-on-Year Average Solar Irradiance",
+        text: "Year-on-Year Average",
         show: true,
-        left: "center"
+        left: "center",
+        top: -5
       },
       toolbox: {
         feature: {
@@ -112,7 +116,8 @@ class SolarCharts extends React.Component {
             title: "Save As Image"
           }
         },
-        left: "right"
+        right: 55,
+        top: -5
       },
       tooltip: {
         position: "top"
@@ -181,9 +186,10 @@ class SolarCharts extends React.Component {
 
       const option = {
         title: {
-          text: "Monthly Average Solar Irradiance",
+          text: "Monthly Average",
           show: true,
-          left: "center"
+          left: "center",
+          top: -5
         },
         toolbox: {
           feature: {
@@ -191,13 +197,9 @@ class SolarCharts extends React.Component {
               pixelRatio: 2,
               title: "Save As Image"
             }
-            // dataView: {
-            //   show: true,
-            //   title: "View Data",
-            //   lang: ["Data View", "close", "refresh"]
-            // }
           },
-          left: "right"
+          right: 55,
+          top: -5
         },
         tooltip: {},
         xAxis: {
@@ -281,12 +283,13 @@ class SolarCharts extends React.Component {
                 style={{ zIndex: 10 }}
                 onClick={this.handleHeatmapClick}
               >
+                <InfoIcon />
               </IconButton>
             }
           />
           <CardContent className={classes.cardContent}>
             <ReactEcharts
-              style={{ width: "100%", height: 350, marginTop: -30 }}
+              style={{ width: "100%", height: 350, marginTop: -50 }}
               option={heatmapOptions}
             />
           </CardContent>
@@ -306,7 +309,7 @@ class SolarCharts extends React.Component {
           }}
         >
           <Typography className={classes.typography}>
-            Heatmap Lorem Ipsum has been the industry's standard.
+            Heat Map: Year-on-Year Average Solar Irradiance
           </Typography>
         </Popover>
 
@@ -317,12 +320,13 @@ class SolarCharts extends React.Component {
                 style={{ zIndex: 10 }}
                 onClick={this.handleBarchartClick}
               >
+                <InfoIcon />
               </IconButton>
             }
           />
           <CardContent className={classes.cardContent}>
             <ReactEcharts
-              style={{ width: "100%", height: 330, marginTop: -30 }}
+              style={{ width: "100%", height: 330, marginTop: -50 }}
               option={barchartOptions}
             />
           </CardContent>
@@ -342,7 +346,7 @@ class SolarCharts extends React.Component {
           }}
         >
           <Typography className={classes.typography}>
-            Barchart Lorem Ipsum has been the industry's standard.
+            Monthly Average Solar Irradiance
           </Typography>
         </Popover>
       </div>

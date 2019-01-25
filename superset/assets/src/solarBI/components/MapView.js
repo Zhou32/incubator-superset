@@ -313,11 +313,21 @@ export class MapView extends React.Component {
               fontWeight: "bold",
               textAlign: "center",
               color: "black",
-              marginTop: 50,
-              marginBottom: 36
+              marginTop: 10
             }}
           >
             Solar Irradiance Exposure
+          </p>
+          <p
+            style={{
+              fontSize: 25,
+              textAlign: "center",
+              color: "#68918d",
+              marginTop: 10,
+              marginBottom: 30
+            }}
+          >
+            {queryResponse.form_data.spatial_address.address.slice(0, -11)}
           </p>
 
           <SolarCharts queryData={queryResponse["data"]["data"]} />
