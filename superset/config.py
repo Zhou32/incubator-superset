@@ -432,14 +432,13 @@ ENABLE_ACCESS_REQUEST = False
 
 # smtp server configuration
 EMAIL_NOTIFICATIONS = True  # all the emails are sent using dryrun
-SMTP_HOST = 'email-smtp.us-west-2.amazonaws.com'
-SMTP_STARTTLS = True
-SMTP_SSL = True
-SMTP_USER = 'AKIAISTP2VVSMYG7X62A'
-SMTP_PORT = 465
-SMTP_PASSWORD = 'AhDOJ0gw1xam5CCNOuDkK0g0mxrlS6yJB0DNFX6GieRI'
-
-MAIL_DEFAULT_SENDER = 'oscar@solarbi.com.au'
+MAIL_SERVER = 'email-smtp.us-west-2.amazonaws.com'
+MAIL_USE_TLS = False
+MAIL_USE_SSL = True
+MAIL_USERNAME = 'AKIAISTP2VVSMYG7X62A'
+MAIL_PORT = 465
+MAIL_PASSWORD = 'AhDOJ0gw1xam5CCNOuDkK0g0mxrlS6yJB0DNFX6GieRI'
+MAIL_DEFAULT_SENDER = 'noreply@solarbi.com.au'
 
 if not CACHE_DEFAULT_TIMEOUT:
     CACHE_DEFAULT_TIMEOUT = CACHE_CONFIG.get('CACHE_DEFAULT_TIMEOUT')
