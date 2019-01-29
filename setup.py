@@ -73,7 +73,7 @@ setup(
         'boto3>=1.4.7, <2.0.0',
         'botocore>=1.12.80, <1.13.0',
         'celery>=4.2.0, <5.0.0',
-        'click>=6.0, <7.0.0',  # click >=7 forces "-" instead of "_"
+        'click>=6.0, <7.0.0',  # `click`>=7 forces "-" instead of "_"
         'colorama',
         'contextlib2',
         'croniter>=0.3.26',
@@ -90,7 +90,7 @@ setup(
         'idna',
         'isodate',
         'markdown>=3.0',
-        'pandas>=0.18.0',
+        'pandas>=0.18.0, <0.24.0',  # `pandas`>=0.24.0 changes datetimelike API
         'parsedatetime',
         'pathlib2',
         'polyline',
@@ -116,7 +116,7 @@ setup(
         'cors': ['flask-cors>=2.0.0'],
         'console_log': ['console_log==0.2.10'],
         'hive': [
-            'pyhive>=0.4.0',
+            'pyhive>=0.6.1',
             'tableschema',
             'thrift-sasl>=0.2.1',
             'thrift>=0.9.3',
