@@ -115,7 +115,9 @@ class TableColumn(Model, BaseColumn):
         label = label if label else self.column_name
         label = self.table.get_label(label)
         if not self.expression:
-            col = column(self.column_name).label(label)
+            db_engine_spec = self.table.database.db_engine_spec
+            type_ = db_engine_spec.get_sqla_column_type(self.type)
+            col = column(self.column_name, type_=type_).label(label)
         else:
             col = literal_column(self.expression).label(label)
         return col
@@ -251,7 +253,10 @@ class SqlaTable(Model, BaseDatasource):
     owner_class = security_manager.user_model
 
     __tablename__ = 'tables'
-    __table_args__ = (UniqueConstraint('database_id', 'table_name'),)
+    __table_args__ = (UniqueConstraint('database_id',
+                                       'schema',
+                                       'table_name',
+                                       name='uq_table_in_db_schema'),)
 
     table_name = Column(String(250))
     main_dttm_col = Column(String(250))
