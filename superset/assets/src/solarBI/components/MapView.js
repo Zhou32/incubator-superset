@@ -393,7 +393,7 @@ export class MapView extends React.Component {
           )}
           {this.state.searching && entry !== "welcome" && (
             <Grid>
-              <Row className="show-grid" style={{ marginTop: "20%" }}>
+              <Row className="show-grid" style={{ marginTop: "20vh" }}>
                 <Col xs={10} xsOffset={1} md={10} mdOffset={1}>
                   <LocationSearchBox
                     address={this.state.address}
@@ -421,7 +421,7 @@ export class MapView extends React.Component {
               boxShadow:
                 "0 1px 3px rgba(0,0,0,0.12), 0 4px 6px rgba(29,114,12,0.24)",
               borderRadius: "1em",
-              height: "495px",
+              height: "40%",
               width: "100%",
               position: "relative"
             }}
