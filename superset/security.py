@@ -106,7 +106,7 @@ SOLAR_PERMISSIONS = {
     'can_this_form_post': 'UserInfoEditView',
     'can_this_form_get': 'UserInfoEditView',
     'can_userinfo': 'UserDBModelView',
-    'userinfoedit': 'UserDBModelView'
+    'userinfoedit': 'UserDBModelView',
 }
 
 
@@ -351,11 +351,10 @@ class SupersetSecurityManager(SecurityManager):
         self.set_role('Gamma', self.is_gamma_pvm)
         self.set_role('granter', self.is_granter_pvm)
         self.set_role('sql_lab', self.is_sql_lab_pvm)
-        self.set_role('solar_default',self.is_solar_pvm)
+        self.set_role('solar_default', self.is_solar_pvm)
 
         if conf.get('PUBLIC_ROLE_LIKE_GAMMA', False):
             self.set_role('Public', self.is_gamma_pvm)
-
 
         # self.set_role('Custom', self.is_custom_pvm)
         # if conf.get('PUBLIC_ROLE_LIKE_CUSTOM', False):
@@ -410,7 +409,8 @@ class SupersetSecurityManager(SecurityManager):
     def is_solar_pvm(self, pvm):
         result = False
         for key in SOLAR_PERMISSIONS:
-            result = result or (pvm.view_menu.name == SOLAR_PERMISSIONS[key] and pvm.permission.name == key)
+            result = result or (pvm.view_menu.name == SOLAR_PERMISSIONS[key] and
+                                pvm.permission.name == key)
         return result
 
     def is_sql_lab_pvm(self, pvm):
