@@ -17,38 +17,38 @@
  * under the License.
  */
 /* eslint camelcase: 0 */
-import React from "react";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-// import { Alert, Radio } from "react-bootstrap";
-import Select from "react-select";
-import { t } from "@superset-ui/translation";
-import { saveSolarData } from "../actions/solarActions";
-import { supersetURL } from "../../utils/common";
-import { withStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import Modal from "@material-ui/core/Modal";
-import Slide from "@material-ui/core/Slide";
-import Input from "@material-ui/core/Input";
-import Button from "@material-ui/core/Button";
-import Divider from "@material-ui/core/Divider";
-import TextField from "@material-ui/core/TextField";
-import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+// import { Alert, Radio } from 'react-bootstrap';
+// import Select from 'react-select';
+import { t } from '@superset-ui/translation';
+// import { supersetURL } from '../../utils/common';
+// import { withStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import Modal from '@material-ui/core/Modal';
+import Slide from '@material-ui/core/Slide';
+// import Input from '@material-ui/core/Input';
+import Button from '@material-ui/core/Button';
+import Divider from '@material-ui/core/Divider';
+import TextField from '@material-ui/core/TextField';
+import { createMuiTheme, MuiThemeProvider, withStyles } from '@material-ui/core/styles';
+import { saveSolarData } from '../actions/solarActions';
 
 const theme = createMuiTheme({
   typography: {
-    useNextVariants: true
+    useNextVariants: true,
   },
   palette: {
     primary: {
-      main: "#489795"
-    }
-  }
+      main: '#489795',
+    },
+  },
 });
 
 const propTypes = {
   // can_overwrite: PropTypes.bool,
-  onHide: PropTypes.func.isRequired
+  onHide: PropTypes.func.isRequired,
   // actions: PropTypes.object,
   // form_data: PropTypes.object,
   // userId: PropTypes.string.isRequired,
@@ -60,36 +60,36 @@ const propTypes = {
 
 const styles = theme => ({
   modal: {
-    position: "absolute",
+    position: 'absolute',
     width: theme.spacing.unit * 60,
     backgroundColor: theme.palette.background.paper,
-    boxShadow: "0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)",
-    padding: theme.spacing.unit * 4
+    boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
+    padding: theme.spacing.unit * 4,
   },
   input: {
-    width: "100%",
+    width: '100%',
     height: 40,
-    fontSize: 20
+    fontSize: 20,
   },
   button: {
     marginTop: 20,
     fontSize: 12,
-    color: "white",
-    float: "right"
+    color: 'white',
+    float: 'right',
   },
   divider: {
     marginTop: 15,
-    marginBottom: 12
+    marginBottom: 12,
   },
   textField: {
     marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit
+    marginRight: theme.spacing.unit,
     // marginTop: 40,
-    // width: "100%"
+    // width: '100%'
   },
   resize: {
-    fontSize: 20
-  }
+    fontSize: 20,
+  },
 });
 
 class SaveModal extends React.Component {
@@ -97,26 +97,26 @@ class SaveModal extends React.Component {
     super(props);
     this.state = {
       saveToDashboardId: null,
-      newDashboardName: "",
-      newSliceName: "",
+      newDashboardName: '',
+      newSliceName: '',
       dashboards: [],
       alert: null,
-      action: props.can_overwrite ? "overwrite" : "saveas",
-      addToDash: "noSave",
-      vizType: props.form_data.viz_type
+      action: props.can_overwrite ? 'overwrite' : 'saveas',
+      addToDash: 'noSave',
+      vizType: props.form_data.viz_type,
     };
   }
 
   onChange(name, event) {
     switch (name) {
-      case "newSliceName":
+      case 'newSliceName':
         this.setState({ newSliceName: event.target.value });
         break;
-      case "saveToDashboardId":
+      case 'saveToDashboardId':
         this.setState({ saveToDashboardId: event.value });
-        this.changeDash("existing");
+        this.changeDash('existing');
         break;
-      case "newDashboardName":
+      case 'newDashboardName':
         this.setState({ newDashboardName: event.target.value });
         break;
       default:
@@ -141,10 +141,10 @@ class SaveModal extends React.Component {
     if (this.props.slice && this.props.slice.slice_id) {
       sliceParams.slice_id = this.props.slice.slice_id;
     }
-    if (sliceParams.action === "saveas") {
+    if (sliceParams.action === 'saveas') {
       sliceName = this.state.newSliceName;
-      if (sliceName === "") {
-        this.setState({ alert: t("Please enter a chart name") });
+      if (sliceName === '') {
+        this.setState({ alert: t('Please enter a chart name') });
         return;
       }
       sliceParams.slice_name = sliceName;
@@ -159,7 +159,7 @@ class SaveModal extends React.Component {
         // Go to new slice url or dashboard url
         if (gotodash) {
           // window.location = data.slice.slice_url;
-          window.location = "/solar/list";
+          window.location = '/solar/list';
         }
       });
     this.props.onHide();
@@ -171,7 +171,7 @@ class SaveModal extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const canNotSaveToDash = true;
+    // const canNotSaveToDash = true;
     return (
       <div>
         <Modal
@@ -181,7 +181,7 @@ class SaveModal extends React.Component {
           disableAutoFocus
         >
           <Slide direction="up" in={this.props.open} mountOnEnter unmountOnExit>
-            <div style={{ top: "35%", left: "35%" }} className={classes.modal}>
+            <div style={{ top: '35%', left: '35%' }} className={classes.modal}>
               <Typography variant="h4" id="modal-title">
                 Save Chart
               </Typography>
@@ -189,29 +189,29 @@ class SaveModal extends React.Component {
               <TextField
                 label="Chart Name"
                 className={classes.input}
-                onChange={this.onChange.bind(this, "newSliceName")}
+                onChange={this.onChange.bind(this, 'newSliceName')}
                 inputProps={{
-                  "aria-label": "Save"
+                  'aria-label': 'Save',
                 }}
                 InputLabelProps={{
                   style: {
-                    fontSize: 16
-                  }
+                    fontSize: 16,
+                  },
                 }}
                 InputProps={{
                   style: {
-                    fontSize: 16
-                  }
+                    fontSize: 16,
+                  },
                 }}
               />
               {/* <TextField
-                id="outlined-email-input"
-                label="Email"
+                id='outlined-email-input'
+                label='Email'
                 className={classes.textField}
-                margin="normal"
+                margin='normal'
                 // inputProps={{
                 //   style: {
-                //     fontSize: "1.5rem"
+                //     fontSize: '1.5rem'
                 //   }
                 // }}
                 // InputProps={{
@@ -224,8 +224,8 @@ class SaveModal extends React.Component {
                 //     root: classes.resize
                 //   }
                 // }}
-                name="email"
-                variant="outlined" */}
+                name='email'
+                variant='outlined' */}
               <MuiThemeProvider theme={theme}>
                 <Button
                   variant="contained"
@@ -241,57 +241,57 @@ class SaveModal extends React.Component {
         </Modal>
       </div>
 
-      // <Modal show onHide={this.props.onHide} bsStyle="large">
+      // <Modal show onHide={this.props.onHide} bsStyle='large'>
       //   <Modal.Header closeButton>
-      //     <Modal.Title>{t("Save A Chart")}</Modal.Title>
+      //     <Modal.Title>{t('Save A Chart')}</Modal.Title>
       //   </Modal.Header>
       //   <Modal.Body>
       //     {(this.state.alert || this.props.alert) && (
       //       <Alert>
       //         {this.state.alert ? this.state.alert : this.props.alert}
       //         <i
-      //           className="fa fa-close pull-right"
+      //           className='fa fa-close pull-right'
       //           onClick={this.removeAlert.bind(this)}
-      //           style={{ cursor: "pointer" }}
+      //           style={{ cursor: 'pointer' }}
       //         />
       //       </Alert>
       //     )}
       //     {this.props.slice && (
       //       <Radio
-      //         id="overwrite-radio"
+      //         id='overwrite-radio'
       //         disabled={!this.props.can_overwrite}
-      //         checked={this.state.action === "overwrite"}
-      //         onChange={this.changeAction.bind(this, "overwrite")}
+      //         checked={this.state.action === 'overwrite'}
+      //         onChange={this.changeAction.bind(this, 'overwrite')}
       //       >
-      //         {t("Overwrite chart %s", this.props.slice.slice_name)}
+      //         {t('Overwrite chart %s', this.props.slice.slice_name)}
       //       </Radio>
       //     )}
 
       //     <Radio
-      //       id="saveas-radio"
+      //       id='saveas-radio'
       //       inline
-      //       checked={this.state.action === "saveas"}
-      //       onChange={this.changeAction.bind(this, "saveas")}
+      //       checked={this.state.action === 'saveas'}
+      //       onChange={this.changeAction.bind(this, 'saveas')}
       //     >
-      //       {" "}
-      //       {t("Save as")} &nbsp;
+      //       {' '}
+      //       {t('Save as')} &nbsp;
       //     </Radio>
       //     <input
-      //       name="new_slice_name"
-      //       placeholder={t("[chart name]")}
-      //       onChange={this.onChange.bind(this, "newSliceName")}
-      //       onFocus={this.changeAction.bind(this, "saveas")}
+      //       name='new_slice_name'
+      //       placeholder={t('[chart name]')}
+      //       onChange={this.onChange.bind(this, 'newSliceName')}
+      //       onFocus={this.changeAction.bind(this, 'saveas')}
       //     />
       //   </Modal.Body>
 
       //   <Modal.Footer>
       //     <Button
-      //       type="button"
-      //       id="btn_modal_save"
-      //       className="btn pull-left"
+      //       type='button'
+      //       id='btn_modal_save'
+      //       className='btn pull-left'
       //       onClick={this.saveOrOverwrite.bind(this, true)}
       //     >
-      //       {t("Save")}
+      //       {t('Save')}
       //     </Button>
       //   </Modal.Footer>
       // </Modal>
@@ -301,7 +301,8 @@ class SaveModal extends React.Component {
 
 SaveModal.propTypes = propTypes;
 
-function mapStateToProps({ explore, saveModal }) {
+// function mapStateToProps({ explore, saveModal }) {
+function mapStateToProps() {
   return {
     // datasource: explore.datasource,
     // slice: explore.slice,
@@ -316,6 +317,6 @@ export { SaveModal };
 export default withStyles(styles)(
   connect(
     mapStateToProps,
-    { saveSolarData }
-  )(SaveModal)
+    { saveSolarData },
+  )(SaveModal),
 );

@@ -21,9 +21,9 @@
  * and associated with each and every visualization type.
  */
 import React from 'react';
-import {D3_TIME_FORMAT_OPTIONS} from './controls';
+import { D3_TIME_FORMAT_OPTIONS } from './controls';
 import * as v from './validators';
-import {t} from '../locales';
+import { t } from '../locales';
 
 export const sections = {
     druidTimeSeries: {
@@ -1063,8 +1063,8 @@ export const visTypes = {
             },
         ],
         controlOverrides: {
-            groupby: {includeTime: true},
-            columns: {includeTime: true},
+            groupby: { includeTime: true },
+            columns: { includeTime: true },
         },
     },
 
@@ -1621,7 +1621,8 @@ export const visTypes = {
                     'The controls you want to filter on. Note that only columns ' +
                     'checked as "filterable" will show up on this list.'),
                 mapStateToProps: state => ({
-                    options: (state.datasource) ? state.datasource.columns.filter(c => c.filterable) : [],
+                    options: (state.datasource) ?
+                    state.datasource.columns.filter(c => c.filterable) : [],
                 }),
             },
         },
@@ -1923,7 +1924,7 @@ export const visTypes = {
                 label: t('Query'),
                 expanded: true,
                 controlSetRows: [
-                    ['spatial_address','radius'],
+                    ['spatial_address', 'radius'],
                     ['adhoc_filters'],
                 ],
             },
@@ -1946,7 +1947,7 @@ export default visTypes;
 export function sectionsToRender(vizType, datasourceType) {
     const viz = visTypes[vizType];
 
-    const sectionsCopy = {...sections};
+    const sectionsCopy = { ...sections };
     if (viz.sectionOverrides) {
         Object.entries(viz.sectionOverrides).forEach(([section, overrides]) => {
             if (typeof overrides === 'object' && overrides.constructor === Object) {

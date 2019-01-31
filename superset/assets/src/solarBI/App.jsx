@@ -16,27 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React from "react";
-import { hot } from "react-hot-loader";
-import thunk from "redux-thunk";
-import { createStore, applyMiddleware, compose } from "redux";
-import { Provider } from "react-redux";
+import React from 'react';
+import { hot } from 'react-hot-loader';
+import thunk from 'redux-thunk';
+import { createStore, applyMiddleware, compose } from 'redux';
+import { Provider } from 'react-redux';
 
-import MapView from "./components/MapView";
-import ToastPresenter from "../messageToasts/containers/ToastPresenter";
-import { initFeatureFlags } from "src/featureFlags";
-import { initEnhancer } from "../reduxUtils";
-import getInitialState from "./reducers/getInitialState";
-import rootReducer from "./reducers/index";
+import { initFeatureFlags } from 'src/featureFlags';
+import MapView from './components/MapView';
+import ToastPresenter from '../messageToasts/containers/ToastPresenter';
+import { initEnhancer } from '../reduxUtils';
+import getInitialState from './reducers/getInitialState';
+import rootReducer from './reducers/index';
 
-import setupApp from "../setup/setupApp";
-import setupPlugins from "../setup/setupPlugins";
+import setupApp from '../setup/setupApp';
+import setupPlugins from '../setup/setupPlugins';
 
 setupApp();
 setupPlugins();
 
-const container = document.getElementById("app");
-const bootstrapData = JSON.parse(container.getAttribute("data-bootstrap"));
+const container = document.getElementById('app');
+const bootstrapData = JSON.parse(container.getAttribute('data-bootstrap'));
 initFeatureFlags(bootstrapData.common.feature_flags);
 const initState = getInitialState(bootstrapData);
 
@@ -45,8 +45,8 @@ const store = createStore(
   initState,
   compose(
     applyMiddleware(thunk),
-    initEnhancer(false)
-  )
+    initEnhancer(false),
+  ),
 );
 
 const App = () => (

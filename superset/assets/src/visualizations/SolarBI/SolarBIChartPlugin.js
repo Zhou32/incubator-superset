@@ -16,18 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t } from "@superset-ui/translation";
+import { t } from '@superset-ui/translation';
 // import ChartPlugin from '../core/models/ChartPlugin';
 // import ChartMetadata from '../core/models/ChartMetadata';
-import { ChartMetadata, ChartPlugin } from "@superset-ui/chart";
-import transformProps from "./transformProps";
-import thumbnail from "./images/thumbnail.png";
+import { ChartMetadata, ChartPlugin } from '@superset-ui/chart';
+import transformProps from './transformProps';
+import thumbnail from './images/thumbnail.png';
 
 const metadata = new ChartMetadata({
-  name: t("Solar Business Intelligence"),
-  description: "",
-  credits: [""],
-  thumbnail
+  name: t('Solar Business Intelligence'),
+  description: '',
+  credits: [''],
+  thumbnail,
 });
 
 export default class SolarBIChartPlugin extends ChartPlugin {
@@ -35,7 +35,7 @@ export default class SolarBIChartPlugin extends ChartPlugin {
     super({
       metadata,
       transformProps,
-      loadChart: () => import("./SolarBI")
+      loadChart: () => import('./SolarBI'),
     });
   }
 }

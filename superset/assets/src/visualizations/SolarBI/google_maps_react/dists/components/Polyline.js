@@ -17,40 +17,40 @@
  * under the License.
  */
 (function (global, factory) {
-  if (typeof define === "function" && define.amd) {
+  if (typeof define === 'function' && define.amd) {
     define(['exports', 'react', 'prop-types', '../lib/arePathsEqual', '../lib/String'], factory);
-  } else if (typeof exports !== "undefined") {
+  } else if (typeof exports !== 'undefined') {
     factory(exports, require('react'), require('prop-types'), require('../lib/arePathsEqual'), require('../lib/String'));
   } else {
-    var mod = {
-      exports: {}
+    const mod = {
+      exports: {},
     };
     factory(mod.exports, global.react, global.propTypes, global.arePathsEqual, global.String);
     global.Polyline = mod.exports;
   }
-})(this, function (exports, _react, _propTypes, _arePathsEqual, _String) {
-  'use strict';
+}(this, function (exports, _react, _propTypes, _arePathsEqual, _String) {
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
+
+  Object.defineProperty(exports, '__esModule', {
+    value: true,
   });
   exports.Polyline = undefined;
 
-  var _react2 = _interopRequireDefault(_react);
+  const _react2 = _interopRequireDefault(_react);
 
-  var _propTypes2 = _interopRequireDefault(_propTypes);
+  const _propTypes2 = _interopRequireDefault(_propTypes);
 
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : {
-      default: obj
+      default: obj,
     };
   }
 
-  var _extends = Object.assign || function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
+  const _extends = Object.assign || function (target) {
+    for (let i = 1; i < arguments.length; i++) {
+      const source = arguments[i];
 
-      for (var key in source) {
+      for (const key in source) {
         if (Object.prototype.hasOwnProperty.call(source, key)) {
           target[key] = source[key];
         }
@@ -61,9 +61,9 @@
   };
 
   function _objectWithoutProperties(obj, keys) {
-    var target = {};
+    const target = {};
 
-    for (var i in obj) {
+    for (const i in obj) {
       if (keys.indexOf(i) >= 0) continue;
       if (!Object.prototype.hasOwnProperty.call(obj, i)) continue;
       target[i] = obj[i];
@@ -74,17 +74,17 @@
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
+      throw new TypeError('Cannot call a class as a function');
     }
   }
 
-  var _createClass = function () {
+  const _createClass = (function () {
     function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
+      for (let i = 0; i < props.length; i++) {
+        let descriptor = props[i];
         descriptor.enumerable = descriptor.enumerable || false;
         descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
+        if ('value' in descriptor) descriptor.writable = true;
         Object.defineProperty(target, descriptor.key, descriptor);
       }
     }
@@ -94,19 +94,19 @@
       if (staticProps) defineProperties(Constructor, staticProps);
       return Constructor;
     };
-  }();
+  }());
 
   function _possibleConstructorReturn(self, call) {
     if (!self) {
       throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
     }
 
-    return call && (typeof call === "object" || typeof call === "function") ? call : self;
+    return call && (typeof call === 'object' || typeof call === 'function') ? call : self;
   }
 
   function _inherits(subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+    if (typeof superClass !== 'function' && superClass !== null) {
+      throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass);
     }
 
     subClass.prototype = Object.create(superClass && superClass.prototype, {
@@ -114,16 +114,16 @@
         value: subClass,
         enumerable: false,
         writable: true,
-        configurable: true
-      }
+        configurable: true,
+      },
     });
     if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
   }
 
-  var evtNames = ['click', 'mouseout', 'mouseover'];
+  const evtNames = ['click', 'mouseout', 'mouseover'];
 
-  var wrappedPromise = function wrappedPromise() {
-    var wrappedPromise = {},
+  const wrappedPromise = function wrappedPromise() {
+    let wrappedPromise = {},
         promise = new Promise(function (resolve, reject) {
       wrappedPromise.resolve = resolve;
       wrappedPromise.reject = reject;
@@ -135,13 +135,14 @@
     return wrappedPromise;
   };
 
-  var Polyline = exports.Polyline = function (_React$Component) {
+  const Polyline = exports.Polyline = (function (_React$Component) {
     _inherits(Polyline, _React$Component);
 
     function Polyline() {
       _classCallCheck(this, Polyline);
 
-      return _possibleConstructorReturn(this, (Polyline.__proto__ || Object.getPrototypeOf(Polyline)).apply(this, arguments));
+      return _possibleConstructorReturn(this, (Polyline.__proto__ ||
+        Object.getPrototypeOf(Polyline)).apply(this, arguments));
     }
 
     _createClass(Polyline, [{
@@ -149,30 +150,31 @@
       value: function componentDidMount() {
         this.polylinePromise = wrappedPromise();
         this.renderPolyline();
-      }
+      },
     }, {
       key: 'componentDidUpdate',
       value: function componentDidUpdate(prevProps) {
-        if (this.props.map !== prevProps.map || !(0, _arePathsEqual.arePathsEqual)(this.props.path, prevProps.path)) {
+        if (this.props.map !== prevProps.map ||
+            !(0, _arePathsEqual.arePathsEqual)(this.props.path, prevProps.path)) {
           if (this.polyline) {
             this.polyline.setMap(null);
           }
           this.renderPolyline();
         }
-      }
+      },
     }, {
       key: 'componentWillUnmount',
       value: function componentWillUnmount() {
         if (this.polyline) {
           this.polyline.setMap(null);
         }
-      }
+      },
     }, {
       key: 'renderPolyline',
       value: function renderPolyline() {
-        var _this2 = this;
+        let _this2 = this;
 
-        var _props = this.props,
+        let _props = this.props,
             map = _props.map,
             google = _props.google,
             path = _props.path,
@@ -185,12 +187,12 @@
           return null;
         }
 
-        var params = _extends({
-          map: map,
-          path: path,
-          strokeColor: strokeColor,
-          strokeOpacity: strokeOpacity,
-          strokeWeight: strokeWeight
+        let params = _extends({
+          map,
+          path,
+          strokeColor,
+          strokeOpacity,
+          strokeWeight,
         }, props);
 
         this.polyline = new google.maps.Polyline(params);
@@ -200,39 +202,39 @@
         });
 
         this.polylinePromise.resolve(this.polyline);
-      }
+      },
     }, {
       key: 'getPolyline',
       value: function getPolyline() {
         return this.polylinePromise;
-      }
+      },
     }, {
       key: 'handleEvent',
       value: function handleEvent(evt) {
-        var _this3 = this;
+        let _this3 = this;
 
         return function (e) {
-          var evtName = 'on' + (0, _String.camelize)(evt);
+          let evtName = 'on' + (0, _String.camelize)(evt);
           if (_this3.props[evtName]) {
             _this3.props[evtName](_this3.props, _this3.polyline, e);
           }
         };
-      }
+      },
     }, {
       key: 'render',
       value: function render() {
         return null;
-      }
+      },
     }]);
 
     return Polyline;
-  }(_react2.default.Component);
+  }(_react2.default.Component));
 
   Polyline.propTypes = {
     path: _propTypes2.default.array,
     strokeColor: _propTypes2.default.string,
     strokeOpacity: _propTypes2.default.number,
-    strokeWeight: _propTypes2.default.number
+    strokeWeight: _propTypes2.default.number,
   };
 
   evtNames.forEach(function (e) {
@@ -240,8 +242,8 @@
   });
 
   Polyline.defaultProps = {
-    name: 'Polyline'
+    name: 'Polyline',
   };
 
   exports.default = Polyline;
-});
+}));

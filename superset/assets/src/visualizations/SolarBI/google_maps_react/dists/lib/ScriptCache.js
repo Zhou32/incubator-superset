@@ -17,39 +17,39 @@
  * under the License.
  */
 (function (global, factory) {
-    if (typeof define === "function" && define.amd) {
+    if (typeof define === 'function' && define.amd) {
         define(['exports', './windowOrGlobal'], factory);
-    } else if (typeof exports !== "undefined") {
+    } else if (typeof exports !== 'undefined') {
         factory(exports, require('./windowOrGlobal'));
     } else {
-        var mod = {
-            exports: {}
+        const mod = {
+            exports: {},
         };
         factory(mod.exports, global.windowOrGlobal);
         global.ScriptCache = mod.exports;
     }
-})(this, function (exports, window) {
-    'use strict';
+}(this, function (exports, window) {
 
-    Object.defineProperty(exports, "__esModule", {
-        value: true
+
+    Object.defineProperty(exports, '__esModule', {
+        value: true,
     });
-    var counter = 0;
-    var scriptMap = typeof window !== 'undefined' && window._scriptMap || new Map();
-    var ScriptCache = exports.ScriptCache = function (global) {
+    let counter = 0;
+    const scriptMap = typeof window !== 'undefined' && window._scriptMap || new Map();
+    const ScriptCache = exports.ScriptCache = (function (global) {
         global._scriptMap = global._scriptMap || scriptMap;
         return function ScriptCache(scripts) {
-            var Cache = {};
+            const Cache = {};
 
             Cache._onLoad = function (key) {
                 return function (cb) {
-                    var registered = true;
+                    let registered = true;
 
                     function unregister() {
                         registered = false;
                     }
 
-                    var stored = scriptMap.get(key);
+                    const stored = scriptMap.get(key);
 
                     if (stored) {
                         stored.promise.then(function () {
@@ -69,25 +69,34 @@
 
             Cache._scriptTag = function (key, src) {
                 if (!scriptMap.has(key)) {
-                    // Server side rendering environments don't always have access to the `document` global.
-                    // In these cases, we're not going to be able to return a script tag, so just return null.
+                    // Server side rendering environments don't always have
+                    // access to the `document` global.
+                    // In these cases, we're not going to be able to return
+                    // a script tag, so just return null.
                     if (typeof document === 'undefined') return null;
 
-                    var tag = document.createElement('script');
-                    var promise = new Promise(function (resolve, reject) {
-                        var resolved = false,
-                            errored = false,
-                            body = document.getElementsByTagName('body')[0];
+                    const tag = document.createElement('script');
+                    const promise = new Promise(function (resolve, reject) {
+                        // const resolved = false;
+                        // const errored = false;
+                        const body = document.getElementsByTagName('body')[0];
 
                         tag.type = 'text/javascript';
                         tag.async = false; // Load in order
 
-                        var cbName = 'loaderCB' + counter++ + Date.now();
-                        var cb = void 0;
+                        const cbName = 'loaderCB' + counter++ + Date.now();
+                        let cb = 0;
 
-                        var handleResult = function handleResult(state) {
+                        const cleanup = function cleanup() {
+                            if (global[cbName] && typeof global[cbName] === 'function') {
+                                global[cbName] = null;
+                                delete global[cbName];
+                            }
+                        };
+
+                        const handleResult = function handleResult(state) {
                             return function (evt) {
-                                var stored = scriptMap.get(key);
+                                const stored = scriptMap.get(key);
                                 if (state === 'loaded') {
                                     stored.resolved = true;
                                     resolve(src);
@@ -105,13 +114,6 @@
                             };
                         };
 
-                        var cleanup = function cleanup() {
-                            if (global[cbName] && typeof global[cbName] === 'function') {
-                                global[cbName] = null;
-                                delete global[cbName];
-                            }
-                        };
-
                         tag.onload = handleResult('loaded');
                         tag.onerror = handleResult('error');
                         tag.onreadystatechange = function () {
@@ -121,6 +123,7 @@
                         // Pick off callback, if there is one
                         if (src.match(/callback=CALLBACK_NAME/)) {
                             src = src.replace(/(callback=)[^\&]+/, '$1' + cbName);
+                            // src = src.replace(/(callback=)[^]+/, '$1' + cbName);
                             cb = window[cbName] = tag.onload;
                         } else {
                             tag.addEventListener('load', tag.onload);
@@ -132,11 +135,11 @@
 
                         return tag;
                     });
-                    var initialState = {
+                    const initialState = {
                         loaded: false,
                         error: false,
-                        promise: promise,
-                        tag: tag
+                        promise,
+                        tag,
                     };
                     scriptMap.set(key, initialState);
                 }
@@ -156,19 +159,20 @@
             //   }, {});
 
             Object.keys(scripts).forEach(function (key) {
-                var script = scripts[key];
+                const script = scripts[key];
 
-                var tag = window._scriptMap.has(key) ? window._scriptMap.get(key).tag : Cache._scriptTag(key, script);
+                const tag = window._scriptMap.has(key) ?
+                window._scriptMap.get(key).tag : Cache._scriptTag(key, script);
 
                 Cache[key] = {
-                    tag: tag,
-                    onLoad: Cache._onLoad(key)
+                    tag,
+                    onLoad: Cache._onLoad(key),
                 };
             });
 
             return Cache;
         };
-    }(window);
+    }(window));
 
     exports.default = ScriptCache;
-});
+}));

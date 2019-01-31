@@ -27,10 +27,10 @@ export default class MapChartPreset extends Preset {
         super({
             name: 'Maps',
             plugins: [
-                new CountryMapChartPlugin().configure({key: 'country_map'}),
-                new MapBoxChartPlugin().configure({key: 'mapbox'}),
-                new WorldMapChartPlugin().configure({key: 'world_map'}),
-                new SolarBIChartPlugin().configure({key: 'solarBI'})
+                new CountryMapChartPlugin().configure({ key: 'country_map' }),
+                new MapBoxChartPlugin().configure({ key: 'mapbox' }),
+                new WorldMapChartPlugin().configure({ key: 'world_map' }),
+                new SolarBIChartPlugin().configure({ key: 'solarBI' }),
             ],
         });
     }

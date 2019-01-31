@@ -17,35 +17,44 @@
  * under the License.
  */
 (function (global, factory) {
-  if (typeof define === "function" && define.amd) {
+  if (typeof define === 'function' && define.amd) {
     define(['exports'], factory);
-  } else if (typeof exports !== "undefined") {
+  } else if (typeof exports !== 'undefined') {
     factory(exports);
   } else {
-    var mod = {
-      exports: {}
+    const mod = {
+      exports: {},
     };
     factory(mod.exports);
     global.arePathsEqual = mod.exports;
   }
 })(this, function (exports) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
+  // 'use strict';
+  Object.defineProperty(exports, '__esModule', {
+    value: true,
   });
 
-  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  const _typeof = typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol' ? function (obj) {
     return typeof obj;
   } : function (obj) {
-    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+    return obj && typeof Symbol === 'function' && obj.constructor === Symbol && obj !== Symbol.prototype ? 'symbol' : typeof obj;
+  };
+
+  /**
+   * Helper that checks whether an array consists of objects
+   * with lat and lng properties
+   * @param {object} elem the element to check
+   * @returns {boolean} whether or not it's valid
+   */
+  const isValidLatLng = function isValidLatLng(elem) {
+    return elem !== null && (typeof elem === 'undefined' ? 'undefined' : _typeof(elem)) === 'object' && elem.hasOwnProperty('lat') && elem.hasOwnProperty('lng');
   };
 
   /**
    * Compares two path arrays of LatLng objects.
    */
 
-  var arePathsEqual = exports.arePathsEqual = function arePathsEqual(pathA, pathB) {
+  const arePathsEqual = exports.arePathsEqual = function arePathsEqual(pathA, pathB) {
     if (pathA === pathB) {
       return true;
     }
@@ -55,7 +64,7 @@
     if (pathA.length !== pathB.length) {
       return false;
     }
-    for (var i = 0; i < pathA.length; ++i) {
+    for (let i = 0; i < pathA.length; ++i) {
       if (pathA[i] === pathB[i]) {
         continue;
       }
@@ -67,15 +76,5 @@
       }
     }
     return true;
-  };
-
-  /**
-   * Helper that checks whether an array consists of objects
-   * with lat and lng properties
-   * @param {object} elem the element to check
-   * @returns {boolean} whether or not it's valid
-   */
-  var isValidLatLng = function isValidLatLng(elem) {
-    return elem !== null && (typeof elem === 'undefined' ? 'undefined' : _typeof(elem)) === 'object' && elem.hasOwnProperty('lat') && elem.hasOwnProperty('lng');
   };
 });

@@ -51,10 +51,10 @@ export default class AddSliceContainer extends React.PureComponent {
         viz_type: this.state.visType,
         datasource: this.state.datasourceValue,
       }));
-    if(this.state.visType == 'solarBI')
+    if (this.state.visType === 'solarBI') {
       return `/superset/solar/?form_data=${formData}`;
-    else
-      return `/superset/explore/?form_data=${formData}`;
+    }
+    return `/superset/explore/?form_data=${formData}`;
   }
 
   gotoSlice() {
