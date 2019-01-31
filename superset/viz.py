@@ -29,11 +29,12 @@ import inspect
 from itertools import product
 import logging
 import math
+import os
 import pickle as pkl
 import re
+import sys
 import traceback
 import uuid
-import os
 
 from dateutil import relativedelta as rdelta
 from flask import request
@@ -269,8 +270,8 @@ class BaseViz(object):
             is_timeseries = True
 
         granularity = (
-                form_data.get('granularity') or
-                form_data.get('granularity_sqla')
+            form_data.get('granularity') or
+            form_data.get('granularity_sqla')
         )
         limit = int(form_data.get('limit') or 0)
         timeseries_limit_metric = form_data.get('timeseries_limit_metric')
@@ -509,8 +510,8 @@ class TableViz(BaseViz):
         fd = self.form_data
         # TODO handle datasource-type-specific code in datasource
         conditions_met = (
-                (fd.get('granularity') and fd.get('granularity') != 'all') or
-                (fd.get('granularity_sqla') and fd.get('time_grain_sqla'))
+            (fd.get('granularity') and fd.get('granularity') != 'all') or
+            (fd.get('granularity_sqla') and fd.get('time_grain_sqla'))
         )
         if fd.get('include_time') and not conditions_met:
             raise Exception(_(
@@ -785,7 +786,6 @@ class CalHeatmapViz(BaseViz):
                     v = v.value
                 values[str(v / 10**9)] = obj.get(metric)
             data[metric] = values
-
 
         start, end = utils.get_since_until(form_data.get('time_range'),
                                            form_data.get('since'),
@@ -2216,7 +2216,7 @@ class DeckScatterViz(BaseDeckGLViz):
         self.is_timeseries = bool(
             fd.get('time_grain_sqla') or fd.get('granularity'))
         self.point_radius_fixed = (
-                fd.get('point_radius_fixed') or {'type': 'fix', 'value': 500})
+            fd.get('point_radius_fixed') or {'type': 'fix', 'value': 500})
         return super(DeckScatterViz, self).query_obj()
 
     def get_metrics(self):
@@ -2691,7 +2691,7 @@ class PartitionViz(NVD3TimeSeriesViz):
             levels = self.levels_for('agg_sum', [DTTM_ALIAS] + groups, df)
         return self.nest_values(levels)
 
-import sys
+
 class SolarBI(BaseViz):
     """deck.gl's ScreenGridLayer"""
 
@@ -2734,7 +2734,8 @@ class SolarBI(BaseViz):
             if fabs(coordinate_lat_lng[1] - lng) < threshold_lng:
                 for lat in lat_list:
                     if fabs(coordinate_lat_lng[0] - lat) < threshold_lat:
-                        dist = self.haversine(coordinate_lat_lng[0], coordinate_lat_lng[1], lat, lng)
+                        dist = self.haversine(coordinate_lat_lng[0],
+                                              coordinate_lat_lng[1], lat, lng)
                         if dist < r:
                             point.append((lat, lng, dist))
 
@@ -2760,17 +2761,18 @@ class SolarBI(BaseViz):
                 for lat in lat_list:
                     if fabs(coordinate_lat_lng[0] - lat) < threshold_lat:
                         count += 1
-                        if self.haversine(coordinate_lat_lng[0], coordinate_lat_lng[1], lat, lng) < r:
+                        if self.haversine(coordinate_lat_lng[0],
+                                          coordinate_lat_lng[1], lat, lng) < r:
                             point.append((lat, lng))
                             count_s += 1
-        print(f"invoke count={count}, legal points count={count_s}")
+        print(f'invoke count={count}, legal points count={count_s}')
         return point
 
     # distance calculator
     def haversine(self, lat1, lon1, lat2, lon2):  # decimal number
         from math import radians, cos, sin, asin, sqrt
         """
-        Calculate the great circle distance between two points 
+        Calculate the great circle distance between two points
         on the earth (specified in decimal degrees)
         """
         # convert dec to rad
@@ -2787,20 +2789,25 @@ class SolarBI(BaseViz):
     def search_address(self):
         lat = self.form_data['spatial_address']['lat']
         lng = self.form_data['spatial_address']['lon']
-        radius = self.form_data['radius']
+        # radius = self.form_data['radius']
         if not self.lng_list839:
-            self.lat_list679 = [float(x) for x in self.load_data('solar_locations/lat679.pk')]
-            self.lng_list839 = [float(x) for x in self.load_data('solar_locations/lng839.pk')]
+            self.lat_list679 = [float(x) for x in
+                                self.load_data('solar_locations/lat679.pk')]
+            self.lng_list839 = [float(x) for x in
+                                self.load_data('solar_locations/lng839.pk')]
 
-        self.get_closest_point((float(lat), float(lng)), self.lat_list679, self.lng_list839)
-        where = f"latitude = '{self.nearest_lat}' and longitude = '{self.nearest_lng}' AND radiation != -999"
+        point = (float(lat), float(lng))
+        self.get_closest_point(point, self.lat_list679, self.lng_list839)
+        where = f"latitude = '{self.nearest_lat}' and longitude = \
+                             '{self.nearest_lng}' AND radiation != -999"
         return where
 
     def query_obj(self):
         d = super(SolarBI, self).query_obj()
-        fd = self.form_data
+        # fd = self.form_data
 
-        metric_1 = {'expressionType': 'SQL', 'sqlExpression': 'avg(radiation)', 'label': 'radiation'}
+        metric_1 = {'expressionType': 'SQL', 'sqlExpression':
+                    'avg(radiation)', 'label': 'radiation'}
         # metric_2 = {'expressionType': 'SQL', 'sqlExpression': 'date', 'label': 'date'}
         # metric_3 = {'expressionType': 'SQL', 'sqlExpression': 'month', 'label': 'month'}
         # metric_4 = {'expressionType': 'SQL', 'sqlExpression': 'day', 'label': 'day'}
@@ -2825,7 +2832,8 @@ class SolarBI(BaseViz):
                     x_axis += '/' + str(results[self.partition[j]][i])
             x.append(x_axis)
             y.append(results['radiation'][i])
-        data = {'lat': self.nearest_lat, 'lng': self.nearest_lng, 'radius': radius, 'data': [x, y]}
+        data = {'lat': self.nearest_lat, 'lng': self.nearest_lng,
+                'radius': radius, 'data': [x, y]}
         return data
 
 
