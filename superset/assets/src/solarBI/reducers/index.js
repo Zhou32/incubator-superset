@@ -1,9 +1,9 @@
-import { combineReducers } from "redux";
+import { combineReducers } from 'redux';
 
-import solarBI from "./solarReducer";
-import messageToasts from "../../messageToasts/reducers/index";
+import solarBI from './solarReducer';
+import messageToasts from '../../messageToasts/reducers/index';
 
 export default combineReducers({
   solarBI,
-  messageToasts
+  messageToasts,
 });

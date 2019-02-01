@@ -1,30 +1,24 @@
 /* eslint camelcase: 0 */
-import { SupersetClient } from "@superset-ui/connection";
-import { Logger, LOG_ACTIONS_LOAD_CHART } from "../../logger";
-import getClientErrorObject from "../../utils/getClientErrorObject";
-import {
-  getExploreUrlAndPayload,
-  getURIDirectory
-} from "../../explore/exploreUtils";
-import {
-  saveSliceFailed,
-  saveSliceSuccess
-} from "../../explore/actions/saveModalActions";
+import { SupersetClient } from '@superset-ui/connection';
+import { t } from '@superset-ui/translation';
+import URI from 'urijs';
+import { Logger, LOG_ACTIONS_LOAD_CHART } from '../../logger';
+import getClientErrorObject from '../../utils/getClientErrorObject';
+// import { getExploreUrlAndPayload, getURIDirectory } from '../../explore/exploreUtils';
+// import { saveSliceFailed, saveSliceSuccess } from '../../explore/actions/saveModalActions';
 import {
   addSuccessToast as addSuccessToastAction,
   addDangerToast as addDangerToastAction,
-  addInfoToast as addInfoToastAction
-} from "../../messageToasts/actions/index";
-import { t } from "@superset-ui/translation";
-import URI from "urijs";
+  addInfoToast as addInfoToastAction,
+} from '../../messageToasts/actions/index';
 
-export const SOLAR_UPDATE_STARTED = "SOLAR_UPDATE_STARTED";
+export const SOLAR_UPDATE_STARTED = 'SOLAR_UPDATE_STARTED';
 export function solarUpdateStarted(queryController, latestQueryFormData, key) {
   return {
     type: SOLAR_UPDATE_STARTED,
     queryController,
     latestQueryFormData,
-    key
+    key,
   };
 }
 
@@ -32,35 +26,35 @@ export const addInfoToast = addInfoToastAction;
 export const addSuccessToast = addSuccessToastAction;
 export const addDangerToast = addDangerToastAction;
 
-export const SOLAR_UPDATE_SUCCEEDED = "SOLAR_UPDATE_SUCCEEDED";
+export const SOLAR_UPDATE_SUCCEEDED = 'SOLAR_UPDATE_SUCCEEDED';
 export function solarUpdateSucceeded(queryResponse, key) {
   return { type: SOLAR_UPDATE_SUCCEEDED, queryResponse, key };
 }
 
-export const SOLAR_UPDATE_TIMEOUT = "SOLAR_UPDATE_TIMEOUT";
+export const SOLAR_UPDATE_TIMEOUT = 'SOLAR_UPDATE_TIMEOUT';
 export function solarUpdateTimeout(statusText, timeout, key) {
   return { type: SOLAR_UPDATE_TIMEOUT, statusText, timeout, key };
 }
 
-export const SOLAR_UPDATE_STOPPED = "SOLAR_UPDATE_STOPPED";
+export const SOLAR_UPDATE_STOPPED = 'SOLAR_UPDATE_STOPPED';
 export function solarUpdateStopped(key) {
   return { type: SOLAR_UPDATE_STOPPED, key };
 }
 
-export const SOLAR_UPDATE_FAILED = "SOLAR_UPDATE_FAILED";
+export const SOLAR_UPDATE_FAILED = 'SOLAR_UPDATE_FAILED';
 export function solarUpdateFailed(queryResponse, key) {
   return { type: SOLAR_UPDATE_FAILED, queryResponse, key };
 }
 
-export const FETCH_SOLAR_DATA = "FETCH_SOLAR_DATA";
+export const FETCH_SOLAR_DATA = 'FETCH_SOLAR_DATA';
 export function fetchSolarData(formData, force = false, timeout = 60, key) {
-  return dispatch => {
+  return (dispatch) => {
     const url =
-      "/superset/explore_json/" +
-      formData["datasource_type"] +
-      "/" +
-      formData["datasource_id"] +
-      "/";
+      '/superset/explore_json/' +
+      formData.datasource_type +
+      '/' +
+      formData.datasource_id +
+      '/';
     const logStart = Logger.getTimestamp();
     const controller = new AbortController();
     const { signal } = controller;
@@ -70,7 +64,7 @@ export function fetchSolarData(formData, force = false, timeout = 60, key) {
       url,
       postPayload: { form_data: formData },
       signal,
-      timeout: timeout * 1000
+      timeout: timeout * 1000,
     })
       .then(({ json }) => {
         Logger.append(LOG_ACTIONS_LOAD_CHART, {
@@ -83,67 +77,67 @@ export function fetchSolarData(formData, force = false, timeout = 60, key) {
           duration: Logger.getTimestamp() - logStart,
           has_extra_filters:
             formData.extra_filters && formData.extra_filters.length > 0,
-          viz_type: formData.viz_type
+          viz_type: formData.viz_type,
         });
-        dispatch(addSuccessToastAction(t("Successfully fetch data")));
+        dispatch(addSuccessToastAction(t('Successfully fetch data')));
         return dispatch(solarUpdateSucceeded(json, key));
       })
-      .catch(response => {
-        const appendErrorLog = errorDetails => {
+      .catch((response) => {
+        const appendErrorLog = (errorDetails) => {
           Logger.append(LOG_ACTIONS_LOAD_CHART, {
             slice_id: key,
             has_err: true,
             error_details: errorDetails,
             datasource: formData.datasource,
             start_offset: logStart,
-            duration: Logger.getTimestamp() - logStart
+            duration: Logger.getTimestamp() - logStart,
           });
         };
 
-        if (response.statusText === "timeout") {
-          appendErrorLog("timeout");
-          dispatch(addDangerToast(t("Fetching timeout!")));
+        if (response.statusText === 'timeout') {
+          appendErrorLog('timeout');
+          dispatch(addDangerToast(t('Fetching timeout!')));
           return dispatch(
-            solarUpdateTimeout(response.statusText, timeout, key)
+            solarUpdateTimeout(response.statusText, timeout, key),
           );
-        } else if (response.name === "AbortError") {
-          appendErrorLog("abort");
-          dispatch(addDangerToast(t("Fetching abort!")));
+        } else if (response.name === 'AbortError') {
+          appendErrorLog('abort');
+          dispatch(addDangerToast(t('Fetching abort!')));
           return dispatch(solarUpdateStopped(key));
         }
-        return getClientErrorObject(response).then(parsedResponse => {
+        return getClientErrorObject(response).then((parsedResponse) => {
           appendErrorLog(parsedResponse.error);
-          dispatch(addDangerToast(t("Fetching failed!")));
+          dispatch(addDangerToast(t('Fetching failed!')));
           return dispatch(solarUpdateFailed(parsedResponse, key));
         });
       });
   };
 }
 
-export const SAVE_SOLAR_DATA_SUCCESS = "SAVE_SOLAR_DATA_SUCCESS";
+export const SAVE_SOLAR_DATA_SUCCESS = 'SAVE_SOLAR_DATA_SUCCESS';
 export function saveSolarDataSuccess(data) {
   return { type: SAVE_SOLAR_DATA_SUCCESS, data };
 }
 
-export const SAVE_SOLAR_DATA_FAILED = "SAVE_SOLAR_DATA_FAILED";
+export const SAVE_SOLAR_DATA_FAILED = 'SAVE_SOLAR_DATA_FAILED';
 export function saveSolarDataFailed() {
   return { type: SAVE_SOLAR_DATA_FAILED };
 }
 
 export function saveSolarData(formData, requestParams) {
-  return dispatch => {
-    const directory = "/superset/solar/";
+  return (dispatch) => {
+    const directory = '/superset/solar/';
     const payload = {
       ...formData,
-      endpointType: "base",
-      requestParams
+      endpointType: 'base',
+      requestParams,
     };
 
-    let uri = new URI([location.protocol, "//", location.host].join(""));
+    let uri = new URI([location.protocol, '//', location.host].join(''));
     const search = uri.search(true);
     const paramNames = Object.keys(requestParams);
     if (paramNames.length) {
-      paramNames.forEach(name => {
+      paramNames.forEach((name) => {
         if (requestParams.hasOwnProperty(name)) {
           search[name] = requestParams[name];
         }
@@ -153,7 +147,7 @@ export function saveSolarData(formData, requestParams) {
 
     return SupersetClient.post({
       url: uri.toString(),
-      postPayload: { form_data: payload }
+      postPayload: { form_data: payload },
     })
       .then(({ json }) => dispatch(saveSolarDataSuccess(json)))
       .catch(() => dispatch(saveSolarDataFailed()));

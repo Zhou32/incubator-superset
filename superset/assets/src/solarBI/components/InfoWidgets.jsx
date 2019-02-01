@@ -1,49 +1,51 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import Slider from "@material-ui/lab/Slider";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
-import TextField from "@material-ui/core/TextField";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import AppBar from "@material-ui/core/AppBar";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
-import { Grid, Row, Col } from "react-bootstrap";
-import IconBtn from "./IconBtn";
-import EnvironmentImpact from "./EnvironmentImpact";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import Slider from '@material-ui/lab/Slider';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import TextField from '@material-ui/core/TextField';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import AppBar from '@material-ui/core/AppBar';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+// import IconBtn from "./IconBtn";
+import EnvironmentImpact from './EnvironmentImpact';
 
 const styles = theme => ({
   root: {
-    display: "flex"
+    display: 'flex',
   },
   slider: {
-    padding: "22px 0px"
+    padding: '22px 0px',
   },
   card: {
-    minWidth: 450
+    minWidth: 450,
   },
   envCard: {
     minWidth: 850,
     minHeight: 180,
-    marginTop: 20
+    marginTop: 20,
   },
   financeCard: {
     minWidth: 850,
     minHeight: 200,
-    marginTop: 20
+    marginTop: 20,
   },
   textField: {
     marginLeft: 20,
-    marginRight: 20
+    marginRight: 20,
   },
   cardContent: {
-    margin: "0 20"
+    margin: '0 20',
   },
   typography: {
-    textAlign: "center"
-  }
+    textAlign: 'center',
+  },
+  notUse: {
+    margin: theme.spacing.unit,
+  },
 });
 
 function TabContainer(props) {
@@ -60,7 +62,7 @@ class InfoWidgets extends React.Component {
 
     this.state = {
       value: 50,
-      tabValue: 0
+      tabValue: 0,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -84,7 +86,7 @@ class InfoWidgets extends React.Component {
         <div className={classes.root}>
           <Card className={classes.card}>
             <CardContent className={classes.cardContent}>
-              <IconBtn content="Based on your usage, Project Sunroof can recommend the optimal solar installation size that can fit on your roof." />
+              {/* <IconBtn content="Based on your usage, Project Sunroof can recommend the optimal solar installation size that can fit on your roof." /> */}
               <Typography
                 variant="h4"
                 id="label"
@@ -110,10 +112,10 @@ class InfoWidgets extends React.Component {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">$</InputAdornment>
-                  )
+                  ),
                 }}
               />
-              <div style={{ display: "flex" }}>
+              <div style={{ display: 'flex' }}>
                 <span>$0</span>
                 <Slider
                   classes={{ container: classes.slider }}
@@ -128,7 +130,7 @@ class InfoWidgets extends React.Component {
 
           <Card className={classes.card}>
             <CardContent className={classes.cardContent}>
-              <IconBtn content="Based on your usage, Project Sunroof can recommend the optimal solar installation size that can fit on your roof." />
+              {/* <IconBtn content="Based on your usage, Project Sunroof can recommend the optimal solar installation size that can fit on your roof." /> */}
               <Typography
                 variant="h4"
                 id="label"
@@ -154,7 +156,7 @@ class InfoWidgets extends React.Component {
 
         <Card className={classes.envCard}>
           <CardContent className={classes.cardContent}>
-            <IconBtn content="Based on your usage, Project Sunroof can recommend the optimal solar installation size that can fit on your roof." />
+            {/* <IconBtn content="Based on your usage, Project Sunroof can recommend the optimal solar installation size that can fit on your roof." /> */}
             <Typography variant="h4" id="label" className={classes.typography}>
               Your potential environmental impact
             </Typography>
@@ -182,7 +184,7 @@ class InfoWidgets extends React.Component {
                 variant="fullWidth"
                 onChange={this.handleTabChange}
                 indicatorColor="primary"
-                // centered
+              // centered
               >
                 <Tab label="Item One" />
                 <Tab label="Item Two" />
@@ -200,7 +202,8 @@ class InfoWidgets extends React.Component {
 }
 
 InfoWidgets.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  children: PropTypes.string,
 };
 
 export default withStyles(styles)(InfoWidgets);

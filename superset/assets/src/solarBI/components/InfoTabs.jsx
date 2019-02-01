@@ -1,95 +1,78 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import Slider from "@material-ui/lab/Slider";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
-import TextField from "@material-ui/core/TextField";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import AppBar from "@material-ui/core/AppBar";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
-import { Grid, Row, Col } from "react-bootstrap";
-import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
-import IconBtn from "./IconBtn";
-import SaveModal from "./SaveModal";
-import ExportModal from "./ExportModal";
-import Tooltip from "@material-ui/core/Tooltip";
-import IconButton from "@material-ui/core/IconButton";
-import KeyboardBackspaceIcon from "@material-ui/icons/KeyboardBackspace";
-import SaveIcon from "@material-ui/icons/Save";
-import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+// import Typography from '@material-ui/core/Typography';
+// import Slider from '@material-ui/lab/Slider';
+// import Card from '@material-ui/core/Card';
+// import CardContent from '@material-ui/core/CardContent';
+// import TextField from '@material-ui/core/TextField';
+// import AppBar from '@material-ui/core/AppBar';
+// import Tabs from '@material-ui/core/Tabs';
+// import Tab from '@material-ui/core/Tab';
+import Tooltip from '@material-ui/core/Tooltip';
+import IconButton from '@material-ui/core/IconButton';
+import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
+import SaveIcon from '@material-ui/icons/Save';
+import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 
 const styles = theme => ({
   root: {
-    marginBottom: 40
+    marginBottom: 40,
   },
   slider: {
-    padding: "22px 0px"
+    padding: '22px 0px',
   },
   card: {
-    minWidth: 450
+    minWidth: 450,
   },
   infoCard: {
     minHeight: 200,
     marginTop: 10,
-    marginBottom: 100
+    marginBottom: 100,
   },
   cardContent: {
-    margin: "0 20"
+    margin: '0 20',
   },
   typography: {
-    textAlign: "center",
+    textAlign: 'center',
     marginTop: 10,
-    marginBottom: 30
+    marginBottom: 30,
   },
   icon: {
-    color: "#09290f",
-    backgroundColor: "#489795",
-    transform: "scale(1.4)",
-    margin: "15 20"
+    color: '#09290f',
+    backgroundColor: '#489795',
+    transform: 'scale(1.4)',
+    margin: '15 20',
   },
   tooltip: {
-    fontSize: 14
+    fontSize: 14,
   },
   tabContainer: {
-    fontWeight: 300
-  }
-});
-
-const tabHeadStyles = {
-  fontSize: 20,
-  textTransform: "none"
-};
-
-const theme = createMuiTheme({
-  typography: {
-    useNextVariants: true
+    fontWeight: 300,
   },
-  palette: {
-    primary: {
-      main: "#489795"
-    },
-    secondary: {
-      main: "#8E44AD"
-    }
-  }
+  notUse: {
+    margin: theme.spacing.unit,
+  },
 });
 
-function TabContainer(props) {
-  return (
-    <Typography component="div" style={{ padding: 8 * 3, fontSize: 20 }}>
-      {props.children}
-    </Typography>
-  );
-}
+// const tabHeadStyles = {
+//   fontSize: 20,
+//   textTransform: 'none',
+// };
+
+// function TabContainer(props) {
+//   return (
+//     <Typography component="div" style={{ padding: 8 * 3, fontSize: 20 }}>
+//       {props.children}
+//     </Typography>
+//   );
+// }
 
 class InfoTabs extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      tabValue: 0
+      tabValue: 0,
     };
     this.handleTabChange = this.handleTabChange.bind(this);
     this.onBackClick = this.onBackClick.bind(this);
@@ -123,7 +106,7 @@ class InfoTabs extends React.Component {
 
   render() {
     const { classes } = this.props;
-    let tabValue = this.state.tabValue;
+    // const tabValue = this.state.tabValue;
     return (
       <div className={classes.root}>
         <Tooltip title="Go Back" classes={{ tooltip: classes.tooltip }}>
@@ -135,7 +118,7 @@ class InfoTabs extends React.Component {
             <KeyboardBackspaceIcon />
           </IconButton>
         </Tooltip>
-        <div style={{ float: "right" }}>
+        <div style={{ float: 'right' }}>
           {this.props.can_save && this.props.solar_new && (
             <Tooltip title="Save" classes={{ tooltip: classes.tooltip }}>
               <IconButton
@@ -165,7 +148,6 @@ class InfoTabs extends React.Component {
         </div>
         {/* <Card className={classes.infoCard} md={6} xs={3}>
           <CardContent className={classes.cardContent}>
-            <IconBtn content="Based on your usage, Project Sunroof can recommend the optimal solar installation size that can fit on your roof." />
             <Typography
               variant="h3"
               id="label"
@@ -188,7 +170,7 @@ class InfoTabs extends React.Component {
               </Tabs>
             </AppBar>
             {tabValue === 0 && (
-              <TabContainer 
+              <TabContainer
                 id='tab1Content'>
                 <p style={{ fontWeight: 300 }}>
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce
@@ -276,7 +258,7 @@ InfoTabs.propTypes = {
   getCSVURL: PropTypes.func.isRequired,
   can_save: PropTypes.bool.isRequired,
   can_export: PropTypes.bool.isRequired,
-  solar_new: PropTypes.bool.isRequired
+  solar_new: PropTypes.bool.isRequired,
 };
 
 export default withStyles(styles)(InfoTabs);

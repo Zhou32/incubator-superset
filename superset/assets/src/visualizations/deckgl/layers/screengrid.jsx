@@ -12,9 +12,9 @@ import * as common from './common';
 import { getPlaySliderParams } from '../../../modules/time';
 import sandboxedEval from '../../../modules/sandbox';
 
-function getPoints(data) {
-  return data.map(d => d.position);
-}
+// function getPoints(data) {
+//   return data.map(d => d.position);
+// }
 
 function getLayer(formData, payload, slice, filters) {
   const fd = formData;
@@ -36,7 +36,6 @@ function getLayer(formData, payload, slice, filters) {
     });
   }
 
-  console.log(data);
   // Passing a layer creator function instead of a layer since the
   // layer needs to be regenerated at each render
   return new ScreenGridLayer({
@@ -122,15 +121,15 @@ DeckGLScreenGrid.propTypes = propTypes;
 
 function deckScreenGrid(slice, payload, setControlValue) {
   const fd = slice.formData;
-  let viewport = {
+  const viewport = {
     ...fd.viewport,
     width: slice.width(),
     height: slice.height(),
   };
 
-  if (false && fd.autozoom) {
-    viewport = common.fitViewport(viewport, getPoints(payload.data.features));
-  }
+  // if (false && fd.autozoom) {
+  //   viewport = common.fitViewport(viewport, getPoints(payload.data.features));
+  // }
 
   ReactDOM.render(
     <DeckGLScreenGrid

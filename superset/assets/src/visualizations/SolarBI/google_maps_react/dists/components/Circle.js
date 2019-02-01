@@ -1,16 +1,16 @@
 (function (global, factory) {
-  if (typeof define === "function" && define.amd) {
+  if (typeof define === 'function' && define.amd) {
     define(['exports', 'react', 'prop-types', '../lib/arePathsEqual', '../lib/String'], factory);
-  } else if (typeof exports !== "undefined") {
+  } else if (typeof exports !== 'undefined') {
     factory(exports, require('react'), require('prop-types'), require('../lib/arePathsEqual'), require('../lib/String'));
   } else {
-    var mod = {
-      exports: {}
+    let mod = {
+      exports: {},
     };
     factory(mod.exports, global.react, global.propTypes, global.arePathsEqual, global.String);
     global.Circle = mod.exports;
   }
-})(this, function (exports, _react, _propTypes, _arePathsEqual, _String) {
+}(this, function (exports, _react, _propTypes, _arePathsEqual, _String) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -106,10 +106,10 @@
 
   var wrappedPromise = function wrappedPromise() {
     var wrappedPromise = {},
-        promise = new Promise(function (resolve, reject) {
-      wrappedPromise.resolve = resolve;
-      wrappedPromise.reject = reject;
-    });
+      promise = new Promise(function (resolve, reject) {
+        wrappedPromise.resolve = resolve;
+        wrappedPromise.reject = reject;
+      });
     wrappedPromise.then = promise.then.bind(promise);
     wrappedPromise.catch = promise.catch.bind(promise);
     wrappedPromise.promise = promise;
@@ -133,8 +133,8 @@
 
       return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = Circle.__proto__ || Object.getPrototypeOf(Circle)).call.apply(_ref, [this].concat(args))), _this), _this.centerChanged = function (newCenter) {
         var _this$props$center = _this.props.center,
-            lat = _this$props$center.lat,
-            lng = _this$props$center.lng;
+          lat = _this$props$center.lat,
+          lng = _this$props$center.lng;
 
         return lat !== newCenter.lat || lng !== newCenter.lng;
       }, _this.propsChanged = function (newProps) {
@@ -160,8 +160,8 @@
       key: 'componentDidUpdate',
       value: function componentDidUpdate(prevProps) {
         var _props = this.props,
-            path = _props.path,
-            map = _props.map;
+          path = _props.path,
+          map = _props.map;
 
 
         if (this.propsChanged(prevProps) || map !== prevProps.map || !(0, _arePathsEqual.arePathsEqual)(path, prevProps.path)) {
@@ -180,18 +180,18 @@
         var _this2 = this;
 
         var _props2 = this.props,
-            map = _props2.map,
-            google = _props2.google,
-            center = _props2.center,
-            radius = _props2.radius,
-            strokeColor = _props2.strokeColor,
-            strokeOpacity = _props2.strokeOpacity,
-            strokeWeight = _props2.strokeWeight,
-            fillColor = _props2.fillColor,
-            fillOpacity = _props2.fillOpacity,
-            draggable = _props2.draggable,
-            visible = _props2.visible,
-            props = _objectWithoutProperties(_props2, ['map', 'google', 'center', 'radius', 'strokeColor', 'strokeOpacity', 'strokeWeight', 'fillColor', 'fillOpacity', 'draggable', 'visible']);
+          map = _props2.map,
+          google = _props2.google,
+          center = _props2.center,
+          radius = _props2.radius,
+          strokeColor = _props2.strokeColor,
+          strokeOpacity = _props2.strokeOpacity,
+          strokeWeight = _props2.strokeWeight,
+          fillColor = _props2.fillColor,
+          fillOpacity = _props2.fillOpacity,
+          draggable = _props2.draggable,
+          visible = _props2.visible,
+          props = _objectWithoutProperties(_props2, ['map', 'google', 'center', 'radius', 'strokeColor', 'strokeOpacity', 'strokeWeight', 'fillColor', 'fillOpacity', 'draggable', 'visible']);
 
         if (!google) {
           return null;
@@ -268,4 +268,4 @@
   };
 
   exports.default = Circle;
-});
+}));

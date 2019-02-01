@@ -1,22 +1,18 @@
-import React from "react";
-import PropTypes from "prop-types";
-import ControlHeader from "../ControlHeader";
-
-import PlacesAutocomplete, {
-  geocodeByAddress,
-  getLatLng
-} from "react-places-autocomplete";
+import React from 'react';
+import PropTypes from 'prop-types';
+import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
+import ControlHeader from '../ControlHeader';
 
 const propTypes = {
   onChange: PropTypes.func,
   value: PropTypes.object,
-  choices: PropTypes.array
+  choices: PropTypes.array,
 };
 
 const defaultProps = {
-  onChange: () => {},
+  onChange: () => { },
   animation: true,
-  choices: []
+  choices: [],
 };
 
 export default class AddressSearchControl extends React.Component {
@@ -24,14 +20,18 @@ export default class AddressSearchControl extends React.Component {
     super(props);
     const v = props.value || {};
     this.state = {
-      type: "latlong",
+      type: 'latlong',
       latCol: v.latCol,
       lonCol: v.lonCol,
-      address: "",
-      value: null
+      address: '',
+      value: null,
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSelect = this.handleSelect.bind(this);
+  }
+
+  componentDidMount() {
+    this.props.onChange(null, []);
   }
 
   setType(type) {
@@ -48,25 +48,19 @@ export default class AddressSearchControl extends React.Component {
 
     geocodeByAddress(address)
       .then(results => getLatLng(results[0]))
-      .then(latLng => {
-        console.log("Success", latLng);
-        let value = {
+      .then((latLng) => {
+        const value = {
           lat: latLng.lat,
           lon: latLng.lng,
-          latCol: "longitude",
-          lonCol: "latitude",
-          type: this.state.type
+          latCol: 'longitude',
+          lonCol: 'latitude',
+          type: this.state.type,
         };
 
-        console.log("Success11", latLng);
         this.setState({ value });
         this.props.onChange(value, []);
       })
-      .catch(error => console.error("Error", error));
-  }
-
-  componentDidMount() {
-    this.props.onChange(null, []);
+      .catch(error => error);
   }
 
   render() {
@@ -78,35 +72,30 @@ export default class AddressSearchControl extends React.Component {
           onChange={this.handleChange}
           onSelect={this.handleSelect}
         >
-          {({
-            getInputProps,
-            suggestions,
-            getSuggestionItemProps,
-            loading
-          }) => (
+          {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
             <div>
               <input
                 {...getInputProps({
-                  placeholder: "Search Places ...",
-                  className: "location-search-input"
+                  placeholder: 'Search Places ...',
+                  className: 'location-search-input',
                 })}
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
               />
               <div className="autocomplete-dropdown-container">
                 {loading && <div>Loading...</div>}
-                {suggestions.map(suggestion => {
+                {suggestions.map((suggestion) => {
                   const className = suggestion.active
-                    ? "suggestion-item--active"
-                    : "suggestion-item";
+                    ? 'suggestion-item--active'
+                    : 'suggestion-item';
                   // inline style for demonstration purpose
                   const style = suggestion.active
-                    ? { backgroundColor: "#fafafa", cursor: "pointer" }
-                    : { backgroundColor: "#ffffff", cursor: "pointer" };
+                    ? { backgroundColor: '#fafafa', cursor: 'pointer' }
+                    : { backgroundColor: '#ffffff', cursor: 'pointer' };
                   return (
                     <div
                       {...getSuggestionItemProps(suggestion, {
                         className,
-                        style
+                        style,
                       })}
                     >
                       <span>{suggestion.description}</span>

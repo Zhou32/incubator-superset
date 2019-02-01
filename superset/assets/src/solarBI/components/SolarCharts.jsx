@@ -1,36 +1,35 @@
-import React from "react";
-import PropTypes from "prop-types";
-import ReactEcharts from "echarts-for-react";
-import IconBtn from "./IconBtn";
-import { withStyles } from "@material-ui/core/styles";
-import Card from "@material-ui/core/Card";
-import CardHeader from "@material-ui/core/CardHeader";
-import CardContent from "@material-ui/core/CardContent";
-import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
-import Popover from "@material-ui/core/Popover";
-import InfoIcon from "@material-ui/icons/Info";
-import withWidth from "@material-ui/core/withWidth";
+import React from 'react';
+import PropTypes from 'prop-types';
+import ReactEcharts from 'echarts-for-react';
+import { withStyles } from '@material-ui/core/styles';
+import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
+import CardContent from '@material-ui/core/CardContent';
+import Typography from '@material-ui/core/Typography';
+import IconButton from '@material-ui/core/IconButton';
+import Popover from '@material-ui/core/Popover';
+import InfoIcon from '@material-ui/icons/Info';
+import withWidth from '@material-ui/core/withWidth';
 
 const styles = theme => ({
   card: {
     minWidth: 565,
     minHeight: 330,
     padding: 0,
-    margin: "20 10",
-    marginLeft: 0
+    margin: '20 10',
+    marginLeft: 0,
   },
   cardContent: {
-    padding: 0
+    padding: 0,
   },
   cardHeader: {
-    width: 40
+    width: 40,
   },
   typography: {
     margin: theme.spacing.unit * 2,
     fontSize: 15,
-    width: 300
-  }
+    width: 300,
+  },
 });
 
 class SolarCharts extends React.Component {
@@ -39,7 +38,7 @@ class SolarCharts extends React.Component {
 
     this.state = {
       heatmapAnchor: null,
-      barchartAnchor: null
+      barchartAnchor: null,
     };
 
     this.handleHeatmapClick = this.handleHeatmapClick.bind(this);
@@ -52,20 +51,20 @@ class SolarCharts extends React.Component {
 
   getHeatmapOption(data) {
     const months = [
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "10",
-      "11",
-      "12"
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      '10',
+      '11',
+      '12',
     ];
-    const years = ["2018", "2017"];
+    const years = ['2018', '2017'];
 
     let solarData = [
       [0, 0, Math.round(data[1][12])],
@@ -91,89 +90,88 @@ class SolarCharts extends React.Component {
       [1, 8, Math.round(data[1][8])],
       [1, 9, Math.round(data[1][9])],
       [1, 10, Math.round(data[1][10])],
-      [1, 11, Math.round(data[1][11])]
+      [1, 11, Math.round(data[1][11])],
     ];
 
     const solarValues = solarData.map(item => item[2]);
-    const minSolarValue = Math.min(...solarValues);
     const maxSolarValue = Math.max(...solarValues);
 
-    solarData = solarData.map(function(item) {
-      return [item[1], item[0], item[2] || "-"];
+    solarData = solarData.map(function (item) {
+      return [item[1], item[0], item[2] || '-'];
     });
 
     const option = {
       title: {
-        text: "Year-on-Year Average",
+        text: 'Year-on-Year Average',
         show: true,
-        left: "center",
-        top: -5
+        left: 'center',
+        top: -5,
       },
       toolbox: {
         feature: {
           saveAsImage: {
             pixelRatio: 2,
-            title: "Save As Image"
-          }
+            title: 'Save As Image',
+          },
         },
         right: 55,
-        top: -5
+        top: -5,
       },
       tooltip: {
-        position: "top"
+        position: 'top',
       },
       animation: false,
       grid: {
-        height: "70%",
-        y: "10%"
+        height: '70%',
+        y: '10%',
       },
       xAxis: {
-        type: "category",
+        type: 'category',
         data: months,
         splitArea: {
-          show: true
-        }
+          show: true,
+        },
       },
       yAxis: {
-        type: "category",
+        type: 'category',
         data: years,
         splitArea: {
-          show: true
-        }
+          show: true,
+        },
       },
       visualMap: {
         min: 0,
         max: maxSolarValue,
         calculable: true,
-        orient: "horizontal",
-        left: "center",
+        orient: 'horizontal',
+        left: 'center',
         bottom: 1,
         inRange: {
-          color: ["#adfff1", "#22c3aa", "#489795"]
-        }
+          color: ['#adfff1', '#22c3aa', '#489795'],
+        },
       },
       series: [
         {
-          name: "☀️ Irradiance ☀️ (W/m²)",
-          type: "heatmap",
+          name: '☀️ Irradiance ☀️ (W/m²)',
+          type: 'heatmap',
           data: solarData,
           label: {
             normal: {
-              show: true
-            }
+              show: true,
+            },
           },
           itemStyle: {
             emphasis: {
               shadowBlur: 10,
-              shadowColor: "rgba(0, 0, 0, 0.5)"
+              shadowColor: 'rgba(0, 0, 0, 0.5)',
             },
-            color: "rgb(128, 128, 0)"
+            color: 'rgb(128, 128, 0)',
           },
           tooltip: {
-            position: "bottom"
-          }
-        }
-      ]
+            position: 'bottom',
+          },
+        },
+      ],
     };
     return option;
   }
@@ -186,49 +184,49 @@ class SolarCharts extends React.Component {
 
       const option = {
         title: {
-          text: "Monthly Average",
+          text: 'Monthly Average',
           show: true,
-          left: "center",
-          top: -5
+          left: 'center',
+          top: -5,
         },
         toolbox: {
           feature: {
             saveAsImage: {
               pixelRatio: 2,
-              title: "Save As Image"
-            }
+              title: 'Save As Image',
+            },
           },
           right: 55,
-          top: -5
+          top: -5,
         },
         tooltip: {},
         xAxis: {
           data: xAxisData,
           silent: false,
           splitLine: {
-            show: false
-          }
+            show: false,
+          },
         },
         yAxis: {
-          name: "(W/m²)"
+          name: '(W/m²)',
         },
         itemStyle: {
-          color: "#489795"
+          color: '#489795',
         },
         series: [
           {
-            name: "☀️ Irradiance ☀️ (W/m²)",
-            type: "bar",
+            name: '☀️ Irradiance ☀️ (W/m²)',
+            type: 'bar',
             data: data1,
             animationDelay(idx) {
               return idx * 10;
-            }
-          }
+            },
+          },
         ],
-        animationEasing: "elasticOut",
+        animationEasing: 'elasticOut',
         animationDelayUpdate(idx) {
           return idx * 5;
-        }
+        },
       };
 
       return option;
@@ -238,25 +236,25 @@ class SolarCharts extends React.Component {
 
   handleHeatmapClick(event) {
     this.setState({
-      heatmapAnchor: event.currentTarget
+      heatmapAnchor: event.currentTarget,
     });
   }
 
   handleBarchartClick(event) {
     this.setState({
-      barchartAnchor: event.currentTarget
+      barchartAnchor: event.currentTarget,
     });
   }
 
   handleHeatmapClose() {
     this.setState({
-      heatmapAnchor: null
+      heatmapAnchor: null,
     });
   }
 
   handleBarchartClose() {
     this.setState({
-      barchartAnchor: null
+      barchartAnchor: null,
     });
   }
 
@@ -271,7 +269,7 @@ class SolarCharts extends React.Component {
 
     const isSmallScreen = /xs|sm|md/.test(width);
     const rootStyle = {
-      display: isSmallScreen ? "initial" : "flex"
+      display: isSmallScreen ? 'initial' : 'flex',
     };
 
     return (
@@ -289,7 +287,7 @@ class SolarCharts extends React.Component {
           />
           <CardContent className={classes.cardContent}>
             <ReactEcharts
-              style={{ width: "100%", height: 350, marginTop: -50 }}
+              style={{ width: '100%', height: 350, marginTop: -50 }}
               option={heatmapOptions}
             />
           </CardContent>
@@ -300,12 +298,12 @@ class SolarCharts extends React.Component {
           anchorEl={heatmapAnchor}
           onClose={this.handleHeatmapClose}
           anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "center"
+            vertical: 'bottom',
+            horizontal: 'center',
           }}
           transformOrigin={{
-            vertical: "top",
-            horizontal: "center"
+            vertical: 'top',
+            horizontal: 'center',
           }}
         >
           <Typography className={classes.typography}>
@@ -326,7 +324,7 @@ class SolarCharts extends React.Component {
           />
           <CardContent className={classes.cardContent}>
             <ReactEcharts
-              style={{ width: "100%", height: 330, marginTop: -50 }}
+              style={{ width: '100%', height: 330, marginTop: -50 }}
               option={barchartOptions}
             />
           </CardContent>
@@ -337,12 +335,12 @@ class SolarCharts extends React.Component {
           anchorEl={barchartAnchor}
           onClose={this.handleBarchartClose}
           anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "center"
+            vertical: 'bottom',
+            horizontal: 'center',
           }}
           transformOrigin={{
-            vertical: "top",
-            horizontal: "center"
+            vertical: 'top',
+            horizontal: 'center',
           }}
         >
           <Typography className={classes.typography}>
@@ -356,7 +354,8 @@ class SolarCharts extends React.Component {
 
 SolarCharts.propTypes = {
   classes: PropTypes.object.isRequired,
-  queryData: PropTypes.array.isRequired
+  width: PropTypes.string.isRequired,
+  queryData: PropTypes.array.isRequired,
 };
 
 export default withWidth()(withStyles(styles)(SolarCharts));

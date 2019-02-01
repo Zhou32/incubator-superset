@@ -104,7 +104,7 @@ export const controlPanelConfigs = {
   deck_polygon: DeckPolygon,
   deck_scatter: DeckScatter,
   deck_screengrid: DeckScreengrid,
-  solarBI: SolarBI
+  solarBI: SolarBI,
 };
 
 export default controlPanelConfigs;

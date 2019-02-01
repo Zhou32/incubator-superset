@@ -1,16 +1,16 @@
-import React from "react";
-import PropTypes from "prop-types";
-import MapView from "./components/MapView";
+import React from 'react';
+import PropTypes from 'prop-types';
+import MapView from './components/MapView';
 
 const propTypes = {
-  user: PropTypes.object.isRequired
+  user: PropTypes.object.isRequired,
 };
 
 export default class Welcome extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      search: ""
+      search: '',
     };
     this.onSearchChange = this.onSearchChange.bind(this);
   }

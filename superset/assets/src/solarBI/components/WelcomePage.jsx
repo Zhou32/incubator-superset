@@ -1,94 +1,79 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import { Grid, Row, Col, Alert } from "react-bootstrap";
-import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
-import { withStyles } from "@material-ui/core/styles";
-import Loading from "./Loading";
-import classNames from "classnames";
-import withWidth from "@material-ui/core/withWidth";
-import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
+import React from 'react';
+import PropTypes from 'prop-types';
+import Button from '@material-ui/core/Button';
+import { withStyles } from '@material-ui/core/styles';
 
-const theme = createMuiTheme({
-  typography: {
-    useNextVariants: true
-  },
-  palette: {
-    primary: {
-      main: "#489795"
-    }
-  }
-});
+const propTypes = {
+  classes: PropTypes.object.isRequired,
+};
 
 const styles = theme => ({
   root: {
-    marginTop: -19
+    marginTop: -19,
   },
   title: {
-    backgroundImage: `url("/static/assets/images/welcome_background.png")`,
-    height: 350
+    backgroundImage: 'url("/static/assets/images/welcome_background.png")',
+    height: 350,
   },
   topLine1: {
     height: 2,
-    position: "fixed",
-    width: "100%",
+    position: 'fixed',
+    width: '100%',
     top: 0,
-    backgroundImage: `linear-gradient(to right, #FAD961, #00736A, #FAD961)`
+    backgroundImage: 'linear-gradient(to right, #FAD961, #00736A, #FAD961)',
   },
   topLine2: {
     height: 2,
-    backgroundImage: `linear-gradient(to right, #FAD961, #00736A, #FAD961)`
+    backgroundImage: 'linear-gradient(to right, #FAD961, #00736A, #FAD961)',
   },
   head: {
-    textAlign: "center",
+    textAlign: 'center',
     paddingTop: 60,
-    fontSize: "4rem",
-    fontWeight: 400
+    fontSize: '4rem',
+    fontWeight: 400,
   },
   subtitle: {
-    textAlign: "center",
-    fontSize: "2.5rem",
+    textAlign: 'center',
+    fontSize: '2.5rem',
     fontWeight: 300,
-    lineHeight: 2
+    lineHeight: 2,
   },
   button: {
     margin: theme.spacing.unit,
     fontSize: 17,
-    height: 50
+    height: 50,
   },
   solarAssets: {
-    display: "flex",
-    alignItems: "center",
+    display: 'flex',
+    alignItems: 'center',
     width: 900,
-    margin: "auto",
-    padding: 20
+    margin: 'auto',
+    padding: 20,
   },
   row: {
-    display: "table",
+    display: 'table',
     marginLeft: 100,
-    width: 400
+    width: 400,
   },
   col: {
-    display: "table-cell",
-    verticalAlign: "middle"
+    display: 'table-cell',
+    verticalAlign: 'middle',
   },
   number: {
-    fontSize: "4em"
+    fontSize: '4em',
   },
   step: {
-    fontSize: "1.5em"
+    fontSize: '1.5em',
   },
   explain: {
-    fontSize: "1.1em"
+    fontSize: '1.1em',
   },
   solarMap: {
-    display: "block",
-    marginLeft: "auto",
-    marginRight: "auto",
-    width: "50%"
-  }
+    display: 'block',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    width: '50%',
+  },
 });
 
 class WelcomePage extends React.Component {
@@ -101,16 +86,11 @@ class WelcomePage extends React.Component {
   }
 
   handleClickGo() {
-    window.location = "/solar/add";
+    window.location = '/solar/add';
   }
 
   render() {
-    const { width } = this.props;
     const { classes } = this.props;
-    const isSmallScreen = /xs|sm|md/.test(width);
-    const buttonProps = {
-      size: isSmallScreen ? "medium" : "large"
-    };
 
     return (
       <div className={classes.root}>
@@ -122,7 +102,7 @@ class WelcomePage extends React.Component {
             Welcome to SolarBI, let's start by finding the solar irradiation on
             your project's location
           </p>
-          <div style={{ textAlign: "center" }}>
+          <div style={{ textAlign: 'center' }}>
             <Button
               className={classes.button}
               variant="contained"
@@ -134,7 +114,7 @@ class WelcomePage extends React.Component {
           </div>
         </div>
 
-        <div style={{ backgroundColor: "white" }}>
+        <div style={{ backgroundColor: 'white' }}>
           <p className={classes.head}>How SolarBI Works</p>
           <p className={classes.subtitle}>
             Your own personalized solar project estimator, powered by Empower
@@ -201,10 +181,10 @@ class WelcomePage extends React.Component {
         <p className={classes.head}>Country-wide solar potential</p>
         <div
           style={{
-            backgroundColor: "white",
+            backgroundColor: 'white',
             marginTop: 30,
             marginBottom: 200,
-            width: "100%"
+            width: '100%',
           }}
         >
           <img
@@ -218,6 +198,6 @@ class WelcomePage extends React.Component {
   }
 }
 
-// WelcomePage.propTypes = propTypes;
+WelcomePage.propTypes = propTypes;
 
-export default withWidth()(withStyles(styles)(WelcomePage));
+export default withStyles(styles)(WelcomePage);

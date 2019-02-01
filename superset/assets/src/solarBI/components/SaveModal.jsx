@@ -1,61 +1,63 @@
 /* eslint camelcase: 0 */
-import React from "react";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import Select from "react-select";
-import { t } from "@superset-ui/translation";
-import { saveSolarData } from "../actions/solarActions";
-import { supersetURL } from "../../utils/common";
-import { withStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import Slide from "@material-ui/core/Slide";
-import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { withStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
+import Slide from '@material-ui/core/Slide';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import { saveSolarData } from '../actions/solarActions';
 
 const theme = createMuiTheme({
   typography: {
-    useNextVariants: true
+    useNextVariants: true,
   },
   palette: {
     primary: {
-      main: "#489795"
-    }
-  }
+      main: '#489795',
+    },
+  },
 });
 
 const propTypes = {
-  // can_overwrite: PropTypes.bool,
-  onHide: PropTypes.func.isRequired
-  // actions: PropTypes.object
+  onHide: PropTypes.func.isRequired,
+  can_overwrite: PropTypes.bool,
+  form_data: PropTypes.object.isRequired,
+  slice: PropTypes.object,
+  saveSolarData: PropTypes.func.isRequired,
+  classes: PropTypes.object.isRequired,
+  open: PropTypes.bool.isRequired,
 };
 
-const styles = theme => ({
+const styles = tm => ({
   modal: {
-    position: "absolute",
+    position: 'absolute',
     width: theme.spacing.unit * 60,
     backgroundColor: theme.palette.background.paper,
-    boxShadow: "0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)",
-    padding: theme.spacing.unit * 4
+    boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
+    padding: theme.spacing.unit * 4,
   },
   button: {
-    fontSize: "1.2em"
+    fontSize: '1.2em',
   },
   dialog: {
-    width: "80%",
-    padding: 10
+    width: '80%',
+    padding: 10,
   },
   title: {
-    fontSize: "1.6em"
+    fontSize: '1.6em',
   },
   resize: {
-    fontSize: 20
-  }
+    fontSize: 20,
+  },
+  notUse: {
+    margin: tm.spacing.unit,
+  },
 });
 
 function Transition(props) {
@@ -67,13 +69,13 @@ class SaveModal extends React.Component {
     super(props);
     this.state = {
       saveToDashboardId: null,
-      newDashboardName: "",
-      newSliceName: "",
+      newDashboardName: '',
+      newSliceName: '',
       dashboards: [],
       alert: false,
-      action: props.can_overwrite ? "overwrite" : "saveas",
-      addToDash: "noSave",
-      vizType: props.form_data.viz_type
+      action: props.can_overwrite ? 'overwrite' : 'saveas',
+      addToDash: 'noSave',
+      vizType: props.form_data.viz_type,
     };
 
     this.handleClose = this.handleClose.bind(this);
@@ -82,14 +84,14 @@ class SaveModal extends React.Component {
 
   onChange(name, event) {
     switch (name) {
-      case "newSliceName":
+      case 'newSliceName':
         this.setState({ newSliceName: event.target.value });
         break;
-      case "saveToDashboardId":
+      case 'saveToDashboardId':
         this.setState({ saveToDashboardId: event.value });
-        this.changeDash("existing");
+        this.changeDash('existing');
         break;
-      case "newDashboardName":
+      case 'newDashboardName':
         this.setState({ newDashboardName: event.target.value });
         break;
       default:
@@ -114,9 +116,9 @@ class SaveModal extends React.Component {
     if (this.props.slice && this.props.slice.slice_id) {
       sliceParams.slice_id = this.props.slice.slice_id;
     }
-    if (sliceParams.action === "saveas") {
+    if (sliceParams.action === 'saveas') {
       sliceName = this.state.newSliceName;
-      if (sliceName === "") {
+      if (sliceName === '') {
         this.setState({ alert: true });
         return;
       }
@@ -127,12 +129,11 @@ class SaveModal extends React.Component {
 
     this.props
       .saveSolarData(this.props.form_data, sliceParams)
-      .then(({ data }) => {
-        console.log(data);
+      .then(() => {
         // Go to new slice url or dashboard url
         if (gotodash) {
           // window.location = data.slice.slice_url;
-          window.location = "/solar/list";
+          window.location = '/solar/list';
         }
       });
     this.props.onHide();
@@ -145,7 +146,6 @@ class SaveModal extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const canNotSaveToDash = true;
     return (
       <div>
         <MuiThemeProvider theme={theme}>
@@ -164,7 +164,7 @@ class SaveModal extends React.Component {
               Save Chart
             </DialogTitle>
             <DialogContent>
-              <DialogContentText style={{ fontSize: "1.2em" }}>
+              <DialogContentText style={{ fontSize: '1.2em' }}>
                 To save the chart, please enter a name here.
               </DialogContentText>
               <TextField
@@ -174,16 +174,16 @@ class SaveModal extends React.Component {
                 id="name"
                 label="Chart Name"
                 fullWidth
-                onChange={this.onChange.bind(this, "newSliceName")}
+                onChange={this.onChange.bind(this, 'newSliceName')}
                 InputLabelProps={{
                   style: {
-                    fontSize: "1.2em"
-                  }
+                    fontSize: '1.2em',
+                  },
                 }}
                 InputProps={{
                   style: {
-                    fontSize: "1.2em"
-                  }
+                    fontSize: '1.2em',
+                  },
                 }}
               />
             </DialogContent>
@@ -212,20 +212,15 @@ class SaveModal extends React.Component {
 
 SaveModal.propTypes = propTypes;
 
-function mapStateToProps({ explore, saveModal }) {
+function mapStateToProps() {
   return {
-    // datasource: explore.datasource,
-    // slice: explore.slice,
-    // can_overwrite: explore.can_overwrite,
-    // userId: explore.user_id,
-    // dashboards: saveModal.dashboards,
-    // alert: saveModal.saveModalAlert
+
   };
 }
 
 export default withStyles(styles)(
   connect(
     mapStateToProps,
-    { saveSolarData }
-  )(SaveModal)
+    { saveSolarData },
+  )(SaveModal),
 );

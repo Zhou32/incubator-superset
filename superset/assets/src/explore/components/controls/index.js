@@ -1,27 +1,27 @@
-import AnnotationLayerControl from "./AnnotationLayerControl";
-import BoundsControl from "./BoundsControl";
-import CheckboxControl from "./CheckboxControl";
-import CollectionControl from "./CollectionControl";
-import ColorPickerControl from "./ColorPickerControl";
-import ColorSchemeControl from "./ColorSchemeControl";
-import DatasourceControl from "./DatasourceControl";
-import DateFilterControl from "./DateFilterControl";
-import FixedOrMetricControl from "./FixedOrMetricControl";
-import HiddenControl from "./HiddenControl";
-import SelectAsyncControl from "./SelectAsyncControl";
-import SelectControl from "./SelectControl";
-import SliderControl from "./SliderControl";
-import SpatialControl from "./SpatialControl";
-import TextAreaControl from "./TextAreaControl";
-import TextControl from "./TextControl";
-import TimeSeriesColumnControl from "./TimeSeriesColumnControl";
-import ViewportControl from "./ViewportControl";
-import VizTypeControl from "./VizTypeControl";
-import MetricsControl from "./MetricsControl";
-import AdhocFilterControl from "./AdhocFilterControl";
-import FilterPanel from "./FilterPanel";
-import FilterBoxItemControl from "./FilterBoxItemControl";
-import AddressSearchControl from "./AddressSearchControl";
+import AnnotationLayerControl from './AnnotationLayerControl';
+import BoundsControl from './BoundsControl';
+import CheckboxControl from './CheckboxControl';
+import CollectionControl from './CollectionControl';
+import ColorPickerControl from './ColorPickerControl';
+import ColorSchemeControl from './ColorSchemeControl';
+import DatasourceControl from './DatasourceControl';
+import DateFilterControl from './DateFilterControl';
+import FixedOrMetricControl from './FixedOrMetricControl';
+import HiddenControl from './HiddenControl';
+import SelectAsyncControl from './SelectAsyncControl';
+import SelectControl from './SelectControl';
+import SliderControl from './SliderControl';
+import SpatialControl from './SpatialControl';
+import TextAreaControl from './TextAreaControl';
+import TextControl from './TextControl';
+import TimeSeriesColumnControl from './TimeSeriesColumnControl';
+import ViewportControl from './ViewportControl';
+import VizTypeControl from './VizTypeControl';
+import MetricsControl from './MetricsControl';
+import AdhocFilterControl from './AdhocFilterControl';
+import FilterPanel from './FilterPanel';
+import FilterBoxItemControl from './FilterBoxItemControl';
+import AddressSearchControl from './AddressSearchControl';
 const controlMap = {
   AnnotationLayerControl,
   BoundsControl,
@@ -46,6 +46,7 @@ const controlMap = {
   AdhocFilterControl,
   AddressSearchControl,
   FilterPanel,
-  FilterBoxItemControl
+  FilterBoxItemControl,
 };
+
 export default controlMap;

@@ -1,14 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-// import classNames from 'classnames';
 import { withStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-// import TextField from '@material-ui/core/TextField';
-// import Button from '@material-ui/core/Button';
-// import Icon from '@material-ui/core/Icon';
-// import IconButton from '@material-ui/core/IconButton';
 import Fab from '@material-ui/core/Fab';
 import InputAdornment from '@material-ui/core/InputAdornment';
-// import { green } from '@material-ui/core/colors';
 import Input from '@material-ui/core/Input';
 import Search from '@material-ui/icons/Search';
 import Card from '@material-ui/core/Card';
@@ -66,7 +60,7 @@ const styles = tm => ({
   },
   card: {
     minHeight: 250,
-  }
+  },
 });
 
 class LocationSearchBox extends React.Component {
@@ -79,13 +73,12 @@ class LocationSearchBox extends React.Component {
     this.onSearchClick = this.onSearchClick.bind(this);
   }
 
+  /*eslint-disable */
   componentDidMount() {
     if (typeof google === 'undefined') {
-      console.log("1231231231")
       return;
     }
 
-    // const { country } = this.props;
     const { places } = google.maps;
     const options = {
       componentRestrictions: { country: 'AU' },
@@ -105,6 +98,7 @@ class LocationSearchBox extends React.Component {
       }
     }
   }
+  /* eslint-enable */
 
   onChange(name, event) {
     this.setState({
@@ -118,7 +112,6 @@ class LocationSearchBox extends React.Component {
   }
 
   handlePlaceSelect(addressObject) {
-    // let address = addressObject.formatted_address;
     if (addressObject) {
       this.setState({
         address: addressObject,
@@ -128,7 +121,6 @@ class LocationSearchBox extends React.Component {
 
   render() {
     const { classes } = this.props;
-    // const { width } = this.props;
 
     return (
       <Card className={classes.card}>
@@ -139,12 +131,12 @@ class LocationSearchBox extends React.Component {
             placeholder="Address"
             className={classes.input}
             classes={{ focused: classes.inputFocused }}
-            inputRef={ref => (this.locationSearch = ref)}
+            inputRef={ref => (this.locationSearch = ref)} // eslint-disable-line no-return-assign
             onChange={this.onChange.bind(this, 'address')}
             inputProps={{
               style: {
                 fontSize: 18,
-                paddingLeft: 10
+                paddingLeft: 10,
               },
             }}
             disableUnderline

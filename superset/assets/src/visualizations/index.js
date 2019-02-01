@@ -50,7 +50,7 @@ export const VIZ_TYPES = {
   deck_arc: 'deck_arc',
   deck_polygon: 'deck_polygon',
   rose: 'rose',
-    // solarBI:'solarBI'
+  // solarBI:'solarBI'
 };
 
 const loadVis = promise =>
@@ -138,7 +138,6 @@ const vizMap = {
   [VIZ_TYPES.deck_multi]: () =>
     loadVis(import(/* webpackChunkName: "deckgl/multi" */ './deckgl/multi.jsx')),
   [VIZ_TYPES.rose]: () => loadVis(import(/* webpackChunkName: "rose" */ './Rose/adaptor.jsx')),
-  // [VIZ_TYPES.solarBI]: () => loadVis(import(/* webpackChunkName: "solarBI" */ './SolarBI/adaptor.jsx')),
 };
 
 export default vizMap;
