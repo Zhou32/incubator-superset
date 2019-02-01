@@ -456,7 +456,7 @@ ENABLE_ACCESS_REQUEST = False
 # smtp server configuration
 EMAIL_NOTIFICATIONS = True  # all the emails are sent using dryrun
 SMTP_HOST = 'email-smtp.us-west-2.amazonaws.com'
-SMTP_STARTTLS = True
+SMTP_STARTTLS = False
 SMTP_SSL = True
 SMTP_USER = 'AKIAISTP2VVSMYG7X62A'
 SMTP_PORT = 465
