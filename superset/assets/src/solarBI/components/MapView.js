@@ -229,13 +229,13 @@ class MapView extends React.Component {
             name: '☀️ Irradiance ☀️ (W/m²)',
             type: 'bar',
             data: data1,
-            animationDelay: function (idx) {
+            animationDelay(idx) {
               return idx * 10;
             },
           },
         ],
         animationEasing: 'elasticOut',
-        animationDelayUpdate: function (idx) {
+        animationDelayUpdate(idx) {
           return idx * 5;
         },
       };

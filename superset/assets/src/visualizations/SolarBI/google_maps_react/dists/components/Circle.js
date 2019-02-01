@@ -117,9 +117,9 @@
         configurable: true,
       },
     });
-    if (superClass) { 
+    if (superClass) {
 Object.setPrototypeOf ?
-        Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; 
+        Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 }
   }
 
@@ -154,7 +154,9 @@ _ret;
         args[_key] = arguments[_key];
       }
 
-      return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = Circle.__proto__ || Object.getPrototypeOf(Circle)).call.apply(_ref, [this].concat(args))), _this), _this.centerChanged = function (newCenter) {
+      return _ret = (_temp = (_this = _possibleConstructorReturn(this,
+        (_ref = Circle.__proto__ || Object.getPrototypeOf(Circle)).call.apply(_ref, [this].concat(args))), _this),
+        _this.centerChanged = function (newCenter) {
         let _this$props$center = _this.props.center,
             lat = _this$props$center.lat,
             lng = _this$props$center.lng;
@@ -187,7 +189,8 @@ _ret;
             map = _props.map;
 
 
-        if (this.propsChanged(prevProps) || map !== prevProps.map || !(0, _arePathsEqual.arePathsEqual)(path, prevProps.path)) {
+        if (this.propsChanged(prevProps) || map !== prevProps.map
+            || !(0, _arePathsEqual.arePathsEqual)(path, prevProps.path)) {
           this.destroyCircle();
           this.renderCircle();
         }

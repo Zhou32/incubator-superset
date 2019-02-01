@@ -16,90 +16,90 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React from "react";
-import classNames from "classnames";
-import { withStyles } from "@material-ui/core/styles";
-import TextField from "@material-ui/core/TextField";
-import Button from "@material-ui/core/Button";
-import Icon from "@material-ui/core/Icon";
-import IconButton from "@material-ui/core/IconButton";
-import Fab from "@material-ui/core/Fab";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
-import { green } from "@material-ui/core/colors";
-import Input from "@material-ui/core/Input";
-import Search from "@material-ui/icons/Search";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
+import React from 'react';
+// import classNames from 'classnames';
+// import { withStyles } from '@material-ui/core/styles';
+// import TextField from '@material-ui/core/TextField';
+// import Button from '@material-ui/core/Button';
+// import Icon from '@material-ui/core/Icon';
+// import IconButton from '@material-ui/core/IconButton';
+import Fab from '@material-ui/core/Fab';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import { createMuiTheme, MuiThemeProvider, withStyles } from '@material-ui/core/styles';
+// import { green } from '@material-ui/core/colors';
+import Input from '@material-ui/core/Input';
+import Search from '@material-ui/icons/Search';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
 
 const theme = createMuiTheme({
   palette: {
     primary: {
-      main: "#489795"
+      main: '#489795',
     },
     secondary: {
-      main: "#FFEBEE"
-    }
+      main: '#FFEBEE',
+    },
   },
   typography: {
-    useNextVariants: true
-  }
+    useNextVariants: true,
+  },
 });
 
 const styles = theme => ({
   textField: {
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit,
-    width: 750
+    width: 750,
   },
   button: {
-    margin: "4px",
-    fontSize: "13px"
+    margin: '4px',
+    fontSize: '13px',
   },
   fab: {
-    margin: theme.spacing.unit
+    margin: theme.spacing.unit,
   },
   icon: {
-    margin: theme.spacing.unit
+    margin: theme.spacing.unit,
   },
   input: {
-    margin: "70 40",
+    margin: '70 40',
     height: 60,
     // width: 750,
-    width: "90%",
-    backgroundColor: "#f6f6f6",
-    borderRadius: "3em",
-    border: "1px solid dimgray",
-    "&:focus": {
-      borderColor: "#80bdff",
-      boxShadow: "0 0 0 0.2rem rgba(0,123,255,.25)"
-    }
+    width: '90%',
+    backgroundColor: '#f6f6f6',
+    borderRadius: '3em',
+    border: '1px solid dimgray',
+    '&:focus': {
+      borderColor: '#80bdff',
+      boxShadow: '0 0 0 0.2rem rgba(0,123,255,.25)',
+    },
   },
   inputFocused: {
     // width: 750,
-    width: "90%",
-    borderColor: "#80bdff",
-    boxShadow: "0 0 0 0.2rem rgba(0,123,255,.25)"
+    width: '90%',
+    borderColor: '#80bdff',
+    boxShadow: '0 0 0 0.2rem rgba(0,123,255,.25)',
   },
   card: {
-    minHeight: 250
-  }
+    minHeight: 250,
+  },
 });
 
 class LocationSearchBox extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      address: props.address
+      address: props.address,
     };
 
     this.onSearchClick = this.onSearchClick.bind(this);
   }
 
   componentDidMount() {
-    if (typeof google === "undefined") {
+    if (typeof google === 'undefined') {
       console.warn(
-        "Google Places was not initialized. LocationSearchBox will not function."
+        'Google Places was not initialized. LocationSearchBox will not function.',
       );
       return;
     }
@@ -109,7 +109,7 @@ class LocationSearchBox extends React.Component {
     let options;
 
     options = {
-      componentRestrictions: { country: "AU" }
+      componentRestrictions: { country: 'AU' },
     };
 
     const input = this.locationSearch;
@@ -118,10 +118,10 @@ class LocationSearchBox extends React.Component {
       if (!input._autocomplete) {
         input._autocomplete = new places.Autocomplete(input, options);
         input._autocomplete.addListener(
-          "place_changed",
+          'place_changed',
           (() => {
             this.handlePlaceSelect(input._autocomplete.getPlace());
-          }).bind(input._autocomplete)
+          }),
         );
       }
     }
@@ -131,14 +131,14 @@ class LocationSearchBox extends React.Component {
     // let address = addressObject.formatted_address;
     if (addressObject) {
       this.setState({
-        address: addressObject
+        address: addressObject,
       });
     }
   }
 
   onChange(name, event) {
     this.setState({
-      [name]: event.target.value
+      [name]: event.target.value,
     });
   }
 
@@ -160,14 +160,14 @@ class LocationSearchBox extends React.Component {
             className={classes.input}
             classes={{ focused: classes.inputFocused }}
             inputRef={ref => (this.locationSearch = ref)}
-            onChange={this.onChange.bind(this, "address")}
+            onChange={this.onChange.bind(this, 'address')}
             inputProps={{
               style: {
                 fontSize: 18,
-                paddingLeft: 10
-              }
+                paddingLeft: 10,
+              },
             }}
-            disableUnderline={true}
+            disableUnderline
             endAdornment={
               <MuiThemeProvider theme={theme}>
                 <InputAdornment position="end">
