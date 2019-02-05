@@ -48,10 +48,10 @@ const styles = theme => ({
   },
 });
 
-function TabContainer(props) {
+function TabContainer(prop) {
   return (
     <Typography component="div" style={{ padding: 8 * 3 }}>
-      {props.children}
+      {prop.children}
     </Typography>
   );
 }
@@ -86,7 +86,6 @@ class InfoWidgets extends React.Component {
         <div className={classes.root}>
           <Card className={classes.card}>
             <CardContent className={classes.cardContent}>
-              {/* <IconBtn content="Based on your usage, Project Sunroof can recommend the optimal solar installation size that can fit on your roof." /> */}
               <Typography
                 variant="h4"
                 id="label"
@@ -130,7 +129,6 @@ class InfoWidgets extends React.Component {
 
           <Card className={classes.card}>
             <CardContent className={classes.cardContent}>
-              {/* <IconBtn content="Based on your usage, Project Sunroof can recommend the optimal solar installation size that can fit on your roof." /> */}
               <Typography
                 variant="h4"
                 id="label"
@@ -156,7 +154,6 @@ class InfoWidgets extends React.Component {
 
         <Card className={classes.envCard}>
           <CardContent className={classes.cardContent}>
-            {/* <IconBtn content="Based on your usage, Project Sunroof can recommend the optimal solar installation size that can fit on your roof." /> */}
             <Typography variant="h4" id="label" className={classes.typography}>
               Your potential environmental impact
             </Typography>
@@ -174,7 +171,6 @@ class InfoWidgets extends React.Component {
 
         <Card className={classes.financeCard}>
           <CardContent className={classes.cardContent}>
-            <IconBtn content="Based on your usage, Project Sunroof can recommend the optimal solar installation size that can fit on your roof." />
             <Typography variant="h4" id="label" className={classes.typography}>
               Your potential environmental impact
             </Typography>
@@ -203,7 +199,6 @@ class InfoWidgets extends React.Component {
 
 InfoWidgets.propTypes = {
   classes: PropTypes.object.isRequired,
-  children: PropTypes.string,
 };
 
 export default withStyles(styles)(InfoWidgets);

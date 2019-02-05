@@ -10,3 +10,4 @@ vendor/*
 docs/*
 src/dashboard/deprecated/*
 src/visualizations/SolarBI/*
+src/components/LocationSearchBox.js
