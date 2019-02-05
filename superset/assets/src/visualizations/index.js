@@ -68,7 +68,7 @@ export const VIZ_TYPES = {
   deck_arc: 'deck_arc',
   deck_polygon: 'deck_polygon',
   rose: 'rose',
-    solarBI:'solarBI'
+    solarBI: 'solarBI',
 };
 
 const loadVis = promise =>

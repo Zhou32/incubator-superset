@@ -27,16 +27,16 @@ import { getCategoricalSchemeRegistry, getSequentialSchemeRegistry } from '@supe
 export default function setupColors() {
   // Register color schemes
   const categoricalSchemeRegistry = getCategoricalSchemeRegistry();
-  [airbnb, categoricalD3, google, lyft].forEach(group => {
-    group.forEach(scheme => {
+  [airbnb, categoricalD3, google, lyft].forEach((group) => {
+    group.forEach((scheme) => {
       categoricalSchemeRegistry.registerValue(scheme.id, scheme);
     });
   });
-  categoricalSchemeRegistry.setDefaultKey("bnbColors");
+  categoricalSchemeRegistry.setDefaultKey('bnbColors');
 
   const sequentialSchemeRegistry = getSequentialSchemeRegistry();
-  [sequentialCommon, sequentialD3].forEach(group => {
-    group.forEach(scheme => {
+  [sequentialCommon, sequentialD3].forEach((group) => {
+    group.forEach((scheme) => {
       sequentialSchemeRegistry.registerValue(scheme.id, scheme);
     });
   });

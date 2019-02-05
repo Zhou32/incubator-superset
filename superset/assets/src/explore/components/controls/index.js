@@ -40,6 +40,7 @@ import AdhocFilterControl from './AdhocFilterControl';
 import FilterPanel from './FilterPanel';
 import FilterBoxItemControl from './FilterBoxItemControl';
 import AddressSearchControl from './AddressSearchControl';
+
 const controlMap = {
   AnnotationLayerControl,
   BoundsControl,
@@ -64,6 +65,6 @@ const controlMap = {
   AdhocFilterControl,
   AddressSearchControl,
   FilterPanel,
-  FilterBoxItemControl
+  FilterBoxItemControl,
 };
 export default controlMap;
