@@ -40,7 +40,13 @@
     "indent": 0,
     "no-multi-spaces": 0,
     "padded-blocks": 0,
-    "import/extensions": [".js", ".jsx", ".ts", ".tsx", ".json"]
+    "import/extensions": [
+      ".js",
+      ".jsx",
+      ".ts",
+      ".tsx",
+      ".json"
+    ]
   },
   "settings": {
     "import/resolver": "webpack"
