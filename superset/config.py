@@ -208,7 +208,10 @@ IMG_UPLOAD_URL = '/static/uploads/'
 # IMG_SIZE = (300, 200, True)
 
 CACHE_DEFAULT_TIMEOUT = 60 * 60 * 24
-CACHE_CONFIG = {'CACHE_TYPE': 'null'}
+CACHE_CONFIG = {'CACHE_TYPE': 'redis',
+    'CACHE_DEFAULT_TIMEOUT': CACHE_DEFAULT_TIMEOUT,
+    'CACHE_KEY_PREFIX': 'superset_results',
+    'CACHE_REDIS_URL': 'redis://redis:6379/0'}
 TABLE_NAMES_CACHE_CONFIG = {'CACHE_TYPE': 'null'}
 
 # CORS Options
@@ -325,7 +328,7 @@ MAPBOX_API_KEY = os.environ.get('pk.eyJ1IjoiZHJ1bmtlbjIwMDIiLCJhIjoiY2ptdTh5e\
 # Maximum number of rows returned from a database
 # in async mode, no more than SQL_MAX_ROW will be returned and stored
 # in the results backend. This also becomes the limit when exporting CSVs
-SQL_MAX_ROW = 100000
+SQL_MAX_ROW = 10000000
 
 # Default row limit for SQL Lab queries
 DEFAULT_SQLLAB_LIMIT = 1000
@@ -440,14 +443,15 @@ FLASK_APP_MUTATOR = None
 ENABLE_ACCESS_REQUEST = False
 
 # smtp server configuration
-EMAIL_NOTIFICATIONS = False  # all the emails are sent using dryrun
-SMTP_HOST = 'localhost'
-SMTP_STARTTLS = True
-SMTP_SSL = False
-SMTP_USER = 'superset'
-SMTP_PORT = 25
-SMTP_PASSWORD = 'superset'
-SMTP_MAIL_FROM = 'superset@superset.com'
+EMAIL_NOTIFICATIONS = True  # all the emails are sent using dryrun
+
+MAIL_SERVER = 'email-smtp.us-west-2.amazonaws.com'
+MAIL_USE_TLS = False
+MAIL_USE_SSL = True
+MAIL_USERNAME = 'AKIAISTP2VVSMYG7X62A'
+MAIL_PORT = 465
+MAIL_PASSWORD = 'AhDOJ0gw1xam5CCNOuDkK0g0mxrlS6yJB0DNFX6GieRI'
+MAIL_DEFAULT_SENDER = 'noreply@solarbi.com.au'
 
 if not CACHE_DEFAULT_TIMEOUT:
     CACHE_DEFAULT_TIMEOUT = CACHE_CONFIG.get('CACHE_DEFAULT_TIMEOUT')
