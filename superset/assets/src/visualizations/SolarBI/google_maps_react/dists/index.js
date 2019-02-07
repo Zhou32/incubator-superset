@@ -1,4 +1,22 @@
-(function(global, factory) {
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+(function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define([
       "exports",
@@ -52,7 +70,7 @@
     );
     global.index = mod.exports;
   }
-})(this, function(
+})(this, function (
   exports,
   _GoogleApiComponent,
   _Marker,
@@ -75,43 +93,43 @@
   exports.Map = exports.Circle = exports.Polyline = exports.Polygon = exports.HeatMap = exports.InfoWindow = exports.Marker = exports.GoogleApiWrapper = undefined;
   Object.defineProperty(exports, "GoogleApiWrapper", {
     enumerable: true,
-    get: function() {
+    get: function () {
       return _GoogleApiComponent.wrapper;
     }
   });
   Object.defineProperty(exports, "Marker", {
     enumerable: true,
-    get: function() {
+    get: function () {
       return _Marker.Marker;
     }
   });
   Object.defineProperty(exports, "InfoWindow", {
     enumerable: true,
-    get: function() {
+    get: function () {
       return _InfoWindow.InfoWindow;
     }
   });
   Object.defineProperty(exports, "HeatMap", {
     enumerable: true,
-    get: function() {
+    get: function () {
       return _HeatMap.HeatMap;
     }
   });
   Object.defineProperty(exports, "Polygon", {
     enumerable: true,
-    get: function() {
+    get: function () {
       return _Polygon.Polygon;
     }
   });
   Object.defineProperty(exports, "Polyline", {
     enumerable: true,
-    get: function() {
+    get: function () {
       return _Polyline.Polyline;
     }
   });
   Object.defineProperty(exports, "Circle", {
     enumerable: true,
-    get: function() {
+    get: function () {
       return _Circle.Circle;
     }
   });
@@ -126,8 +144,8 @@
     return obj && obj.__esModule
       ? obj
       : {
-          default: obj
-        };
+        default: obj
+      };
   }
 
   function _classCallCheck(instance, Constructor) {
@@ -136,7 +154,7 @@
     }
   }
 
-  var _createClass = (function() {
+  var _createClass = (function () {
     function defineProperties(target, props) {
       for (var i = 0; i < props.length; i++) {
         var descriptor = props[i];
@@ -147,7 +165,7 @@
       }
     }
 
-    return function(Constructor, protoProps, staticProps) {
+    return function (Constructor, protoProps, staticProps) {
       if (protoProps) defineProperties(Constructor.prototype, protoProps);
       if (staticProps) defineProperties(Constructor, staticProps);
       return Constructor;
@@ -170,7 +188,7 @@
     if (typeof superClass !== "function" && superClass !== null) {
       throw new TypeError(
         "Super expression must either be null or a function, not " +
-          typeof superClass
+        typeof superClass
       );
     }
 
@@ -226,7 +244,7 @@
     "zoom_changed"
   ];
 
-  var Map = (exports.Map = (function(_React$Component) {
+  var Map = (exports.Map = (function (_React$Component) {
     _inherits(Map, _React$Component);
 
     function Map(props) {
@@ -260,13 +278,13 @@
           if (this.props.centerAroundCurrentLocation) {
             if (navigator && navigator.geolocation) {
               this.geoPromise = (0, _cancelablePromise.makeCancelable)(
-                new Promise(function(resolve, reject) {
+                new Promise(function (resolve, reject) {
                   navigator.geolocation.getCurrentPosition(resolve, reject);
                 })
               );
 
               this.geoPromise.promise
-                .then(function(pos) {
+                .then(function (pos) {
                   var coords = pos.coords;
                   _this2.setState({
                     currentLocation: {
@@ -275,7 +293,7 @@
                     }
                   });
                 })
-                .catch(function(e) {
+                .catch(function (e) {
                   return e;
                 });
             }
@@ -318,7 +336,7 @@
           if (this.geoPromise) {
             this.geoPromise.cancel();
           }
-          Object.keys(this.listeners).forEach(function(e) {
+          Object.keys(this.listeners).forEach(function (e) {
             google.maps.event.removeListener(_this3.listeners[e]);
           });
         }
@@ -369,7 +387,7 @@
               }
             );
 
-            Object.keys(mapConfig).forEach(function(key) {
+            Object.keys(mapConfig).forEach(function (key) {
               // Allow to configure mapConfig with 'false'
               if (mapConfig[key] === null) {
                 delete mapConfig[key];
@@ -378,7 +396,7 @@
 
             this.map = new maps.Map(node, mapConfig);
 
-            evtNames.forEach(function(e) {
+            evtNames.forEach(function (e) {
               _this4.listeners[e] = _this4.map.addListener(
                 e,
                 _this4.handleEvent(e)
@@ -397,12 +415,12 @@
           var timeout = void 0;
           var handlerName = "on" + (0, _String.camelize)(evtName);
 
-          return function(e) {
+          return function (e) {
             if (timeout) {
               clearTimeout(timeout);
               timeout = null;
             }
-            timeout = setTimeout(function() {
+            timeout = setTimeout(function () {
               if (_this5.props[handlerName]) {
                 _this5.props[handlerName](_this5.props, _this5.map, e);
               }
@@ -450,7 +468,7 @@
 
           if (!children) return;
 
-          return _react2.default.Children.map(children, function(c) {
+          return _react2.default.Children.map(children, function (c) {
             if (!c) return;
             return _react2.default.cloneElement(c, {
               map: _this6.map,
@@ -523,7 +541,7 @@
     bounds: _propTypes2.default.object
   };
 
-  evtNames.forEach(function(e) {
+  evtNames.forEach(function (e) {
     return (Map.propTypes[(0, _String.camelize)(e)] = _propTypes2.default.func);
   });
 

@@ -21,7 +21,7 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
 
-from flask import Flask, redirect, g
+from flask import Flask, g, redirect
 from flask_appbuilder import AppBuilder, IndexView, SQLA
 from flask_appbuilder.baseviews import expose
 from flask_compress import Compress
@@ -107,7 +107,7 @@ def get_manifest():
         get_unloaded_chunks=get_unloaded_chunks,
         js_manifest=get_js_manifest_files,
         css_manifest=get_css_manifest_files,
-        is_solar=is_solar_user()
+        is_solar=is_solar_user(),
     )
 
 
@@ -199,13 +199,12 @@ class MyIndexView(IndexView):
         if hasattr(g.user, 'roles'):
             for role in g.user.roles:
                 if role.name == 'Admin':
-                    entry_point ='superset'
+                    entry_point = 'superset'
                     break
         else:
             return redirect('/login')
 
         return redirect(f'/{entry_point}/welcome')
-
 
 
 custom_sm = app.config.get('CUSTOM_SECURITY_MANAGER') or SupersetSecurityManager

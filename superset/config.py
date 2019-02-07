@@ -142,7 +142,7 @@ AUTH_TYPE = AUTH_DB
 AUTH_USER_REGISTRATION = True
 
 # The default user self registration role
-AUTH_USER_REGISTRATION_ROLE = "solar_default"
+AUTH_USER_REGISTRATION_ROLE = 'solar_default'
 
 RECAPTCHA_DISABLE = False
 RECAPTCHA_USE_SSL = False
@@ -214,9 +214,9 @@ IMG_UPLOAD_URL = '/static/uploads/'
 
 CACHE_DEFAULT_TIMEOUT = 60 * 60 * 24
 CACHE_CONFIG = {'CACHE_TYPE': 'redis',
-    'CACHE_DEFAULT_TIMEOUT': CACHE_DEFAULT_TIMEOUT,
-    'CACHE_KEY_PREFIX': 'superset_results',
-    'CACHE_REDIS_URL': 'redis://redis:6379/0'}
+                'CACHE_DEFAULT_TIMEOUT': CACHE_DEFAULT_TIMEOUT,
+                'CACHE_KEY_PREFIX': 'superset_results',
+                'CACHE_REDIS_URL': 'redis://redis:6379/0'}
 TABLE_NAMES_CACHE_CONFIG = {'CACHE_TYPE': 'null'}
 # CORS Options
 ENABLE_CORS = False
@@ -233,7 +233,8 @@ SUPERSET_WEBSERVER_DOMAINS = None
 # TODO: Add processing of other spreadsheet formats (xls, xlsx etc)
 ALLOWED_EXTENSIONS = set(['csv'])
 
-# CSV Options: key/value pairs that will be passed as argument to DataFrame.to_csv method note: index option should not be overridden
+# CSV Options: key/value pairs that will be passed as argument to DataFrame.to_csv
+# method note: index option should not be overridden
 CSV_EXPORT = {
     'encoding': 'utf-8',
 }
@@ -411,7 +412,7 @@ SQLLAB_ASYNC_TIME_LIMIT_SEC = 60 * 60 * 6
 # in SQL Lab by using the "Run Async" button/feature
 
 # On Redis
-from werkzeug.contrib.cache import RedisCache
+from werkzeug.contrib.cache import RedisCache  # noqa
 RESULTS_BACKEND = RedisCache(
     host='localhost', port=6379, key_prefix='superset_results')
 
@@ -432,7 +433,7 @@ UPLOADED_CSV_HIVE_NAMESPACE = None
 # meaning values for existing keys get overwritten by the content of this
 # dictionary.
 JINJA_CONTEXT_ADDONS = {
-    'my_crazy_macro': lambda x: x*2,
+    'my_crazy_macro': lambda x: x * 2,
 }
 
 # Roles that are controlled by the API / Superset and should not be changes
