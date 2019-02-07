@@ -23,8 +23,8 @@ Superset can render.
 from collections import defaultdict, OrderedDict
 import copy
 from datetime import datetime, timedelta
-import os
 from functools import reduce
+import os
 import hashlib
 import inspect
 from itertools import product
