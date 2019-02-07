@@ -29,10 +29,10 @@ from flask import (
 )
 from flask_appbuilder import expose, SimpleFormView
 from flask_appbuilder.actions import action
-from flask_appbuilder.models.sqla.interface import SQLAInterface
-from flask_appbuilder.security.decorators import has_access, has_access_api
 from flask_appbuilder.models.sqla.filters import FilterEqual, \
     FilterEqualFunction, FilterNotEqual
+from flask_appbuilder.models.sqla.interface import SQLAInterface
+from flask_appbuilder.security.decorators import has_access, has_access_api
 from flask_babel import gettext as __
 from flask_babel import lazy_gettext as _
 import pandas as pd
@@ -126,9 +126,9 @@ class DashboardFilter(SupersetFilter):
         )
         owner_ids_qry = (
             db.session
-                .query(Dash.id)
-                .join(Dash.owners)
-                .filter(User.id == User.get_user_id())
+            .query(Dash.id)
+            .join(Dash.owners)
+            .filter(User.id == User.get_user_id())
         )
         query = query.filter(
             or_(Dash.id.in_(
@@ -1139,7 +1139,7 @@ class Superset(BaseSupersetView):
             session.query(DAR).filter(
                 DAR.datasource_id == datasource_id,
                 DAR.datasource_type == datasource_type,
-                DAR.created_by_fk == requested_by.id
+                DAR.created_by_fk == requested_by.id,
             ).all()
         )
 
@@ -1253,8 +1253,8 @@ class Superset(BaseSupersetView):
         if slice_id:
             slc = (
                 db.session.query(models.Slice)
-                    .filter_by(id=slice_id)
-                    .one()
+                .filter_by(id=slice_id)
+                .one()
             )
             return slc.get_viz()
         else:
@@ -1964,9 +1964,8 @@ class Superset(BaseSupersetView):
             return json_success(json.dumps(engine.table_names(), indent=4))
         except Exception as e:
             logging.exception(e)
-            return json_error_response((
-                                           'Connection failed!\n\n'
-                                           'The error message returned was:\n{}').format(e))
+            return json_error_response(('Connection failed!\n\n' 
+                                        'The error message returned was:\n{}').format(e))
 
     @api
     @has_access_api
@@ -2154,7 +2153,7 @@ class Superset(BaseSupersetView):
         Slice = models.Slice  # noqa
         qry = (
             db.session.query(Slice)
-                .filter(
+            .filter(
                 sqla.or_(
                     Slice.created_by_fk == user_id,
                     Slice.changed_by_fk == user_id,
@@ -2331,7 +2330,7 @@ class Superset(BaseSupersetView):
                         f'dashboard_id={dash.id}&')
 
         dash_edit_perm = check_ownership(dash, raise_if_false=False) and \
-                         security_manager.can_access('can_save_dash', 'Superset')
+            security_manager.can_access('can_save_dash', 'Superset')
         dash_save_perm = security_manager.can_access('can_save_dash', 'Superset')
         superset_can_explore = security_manager.can_access('can_explore', 'Superset')
         slice_can_edit = security_manager.can_access('can_edit', 'SliceModelView')

@@ -20,6 +20,7 @@
 These objects represent the backend of all the visualizations that
 Superset can render.
 """
+import os
 from collections import defaultdict, OrderedDict
 import copy
 from datetime import datetime, timedelta
@@ -32,7 +33,6 @@ import math
 import pickle as pkl
 import re
 import traceback
-import os
 import uuid
 
 from dateutil import relativedelta as rdelta
@@ -509,8 +509,8 @@ class TableViz(BaseViz):
         fd = self.form_data
         # TODO handle datasource-type-specific code in datasource
         conditions_met = (
-                (fd.get('granularity') and fd.get('granularity') != 'all') or
-                (fd.get('granularity_sqla') and fd.get('time_grain_sqla'))
+            (fd.get('granularity') and fd.get('granularity') != 'all') or
+            (fd.get('granularity_sqla') and fd.get('time_grain_sqla'))
         )
         if fd.get('include_time') and not conditions_met:
             raise Exception(_(
@@ -2691,7 +2691,7 @@ class PartitionViz(NVD3TimeSeriesViz):
         return self.nest_values(levels)
 
 
-import sys  #noqa
+import sys  # noqa
 
 
 class SolarBI(BaseViz):
@@ -2767,7 +2767,7 @@ class SolarBI(BaseViz):
                                           coordinate_lat_lng[1], lat, lng) < r:
                             point.append((lat, lng))
                             count_s += 1
-        print(f"invoke count={count}, legal points count={count_s}")
+        print(f'invoke count={count}, legal points count={count_s}')
         return point
 
     # distance calculator
