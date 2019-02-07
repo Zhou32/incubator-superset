@@ -149,7 +149,7 @@ class SupersetSecurityManager(SecurityManager):
         )
 
     def get_datasource_access_error_msg(self, datasource):
-        return """This endpoint requires the datasource {}, database or 
+        return """This endpoint requires the datasource {}, database or
         `all_datasource_access` permission""".format(datasource.name)
 
     def get_datasource_access_link(self, datasource):

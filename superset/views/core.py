@@ -1964,7 +1964,7 @@ class Superset(BaseSupersetView):
             return json_success(json.dumps(engine.table_names(), indent=4))
         except Exception as e:
             logging.exception(e)
-            return json_error_response(('Connection failed!\n\n' 
+            return json_error_response(('Connection failed!\n\n'
                                         'The error message returned was:\n{}').format(e))
 
     @api

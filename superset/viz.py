@@ -20,8 +20,8 @@
 These objects represent the backend of all the visualizations that
 Superset can render.
 """
-import os
 from collections import defaultdict, OrderedDict
+import os  # noqa
 import copy
 from datetime import datetime, timedelta
 from functools import reduce
