@@ -22,8 +22,8 @@ Superset can render.
 """
 from collections import defaultdict, OrderedDict
 import copy
-import os
 from datetime import datetime, timedelta
+import os
 from functools import reduce
 import hashlib
 import inspect
