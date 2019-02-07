@@ -608,14 +608,14 @@ class SolarBIModelAddView(SolarBIModelView):
 
         datasource_id = self.get_solar_datasource()
 
-        welcome_dashboard_id = (
-            db.session
-            .query(UserAttribute.welcome_dashboard_id)
-            .filter_by(user_id=g.user.get_id())
-            .scalar()
-        )
-        if welcome_dashboard_id:
-            return self.dashboard(str(welcome_dashboard_id))
+        # welcome_dashboard_id = (
+        #     db.session
+        #     .query(UserAttribute.welcome_dashboard_id)
+        #     .filter_by(user_id=g.user.get_id())
+        #     .scalar()
+        # )
+        # if welcome_dashboard_id:
+        #     return self.dashboard(str(welcome_dashboard_id))
 
         payload = {
             'user': bootstrap_user_data(),
@@ -652,14 +652,14 @@ class SolarBIModelAddView(SolarBIModelView):
 
         datasource_id = self.get_solar_datasource()
 
-        welcome_dashboard_id = (
-            db.session
-            .query(UserAttribute.welcome_dashboard_id)
-            .filter_by(user_id=g.user.get_id())
-            .scalar()
-        )
-        if welcome_dashboard_id:
-            return self.dashboard(str(welcome_dashboard_id))
+        # welcome_dashboard_id = (
+        #     db.session
+        #     .query(UserAttribute.welcome_dashboard_id)
+        #     .filter_by(user_id=g.user.get_id())
+        #     .scalar()
+        # )
+        # if welcome_dashboard_id:
+        #     return self.dashboard(str(welcome_dashboard_id))
 
         payload = {
             'user': bootstrap_user_data(),
