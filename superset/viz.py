@@ -24,11 +24,11 @@ from collections import defaultdict, OrderedDict
 import copy
 from datetime import datetime, timedelta
 from functools import reduce
-import os
 import hashlib
 import inspect
 from itertools import product
 import logging
+import os
 import math
 import pickle as pkl
 import re
