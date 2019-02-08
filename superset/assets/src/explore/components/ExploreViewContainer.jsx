@@ -226,7 +226,6 @@ class ExploreViewContainer extends React.Component {
 
   triggerQueryIfNeeded() {
     if (this.props.chart.triggerQuery && !this.hasErrors()) {
-      console.log(this.props.form_data);
       this.props.actions.runQuery(
         this.props.form_data,
         false,

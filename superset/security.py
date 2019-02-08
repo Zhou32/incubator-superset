@@ -26,6 +26,7 @@ from sqlalchemy import or_
 from superset import sql_parse
 from superset.connectors.connector_registry import ConnectorRegistry
 from superset.exceptions import SupersetSecurityException
+from superset.solar.register import SolarRegisterUserDBView
 
 READ_ONLY_MODEL_VIEWS = {
     'DatabaseAsync',
@@ -92,6 +93,16 @@ OBJECT_SPEC_PERMISSIONS = set([
     'metric_access',
 ])
 
+SOLAR_PERMISSIONS = [
+    ('can_explore_json', 'Superset'),
+    ('resetmypassword', 'UserDBModelView'),
+    ('can_this_form_post', 'ResetMyPasswordView'),
+    ('can_this_form_get', 'ResetMyPasswordView'),
+    ('can_this_form_post', 'UserInfoEditView'),
+    ('can_this_form_get', 'UserInfoEditView'),
+    ('can_userinfo', 'UserDBModelView'),
+    ('userinfoedit', 'UserDBModelView'),
+]
 
 SOLAR_PERMISSIONS = {
     'can_show': 'SolarBIModelView',
@@ -111,6 +122,7 @@ SOLAR_PERMISSIONS = {
 
 
 class SupersetSecurityManager(SecurityManager):
+    registeruserdbview = SolarRegisterUserDBView
 
     def get_schema_perm(self, database, schema):
         if schema:
@@ -129,8 +141,7 @@ class SupersetSecurityManager(SecurityManager):
 
     def database_access(self, database):
         return (
-            self.can_access(
-                'all_database_access', 'all_database_access') or
+            self.can_access('all_database_access', 'all_database_access') or
             self.can_access('database_access', database.perm)
         )
 
@@ -149,7 +160,7 @@ class SupersetSecurityManager(SecurityManager):
 
     def get_datasource_access_error_msg(self, datasource):
         return """This endpoint requires the datasource {}, database or
-            `all_datasource_access` permission""".format(datasource.name)
+        `all_datasource_access` permission""".format(datasource.name)
 
     def get_datasource_access_link(self, datasource):
         from superset import conf
@@ -230,12 +241,10 @@ class SupersetSecurityManager(SecurityManager):
         perms = self.user_datasource_perms()
         if perms:
             tables = (
-                db.session.query(SqlaTable)
-                .filter(
+                db.session.query(SqlaTable).filter(
                     SqlaTable.perm.in_(perms),
                     SqlaTable.database_id == database.id,
-                )
-                .all()
+                ).all()
             )
             for t in tables:
                 if t.schema:
@@ -328,7 +337,7 @@ class SupersetSecurityManager(SecurityManager):
         sesh = self.get_session
         pvms = (
             sesh.query(ab_models.PermissionView)
-            .filter(or_(
+                .filter(or_(
                 ab_models.PermissionView.permission == None,  # NOQA
                 ab_models.PermissionView.view_menu == None,  # NOQA
             ))
@@ -452,15 +461,13 @@ class SupersetSecurityManager(SecurityManager):
         if not permission:
             permission_table = self.permission_model.__table__  # noqa: E501 pylint: disable=no-member
             connection.execute(
-                permission_table.insert()
-                .values(name=permission_name),
+                permission_table.insert().values(name=permission_name),
             )
             permission = self.find_permission(permission_name)
         if not view_menu:
             view_menu_table = self.viewmenu_model.__table__  # pylint: disable=no-member
             connection.execute(
-                view_menu_table.insert()
-                .values(name=view_menu_name),
+                view_menu_table.insert().values(name=view_menu_name),
             )
             view_menu = self.find_view_menu(view_menu_name)
 
@@ -470,8 +477,7 @@ class SupersetSecurityManager(SecurityManager):
         if not pv and permission and view_menu:
             permission_view_table = self.permissionview_model.__table__  # noqa: E501 pylint: disable=no-member
             connection.execute(
-                permission_view_table.insert()
-                .values(
+                permission_view_table.insert().values(
                     permission_id=permission.id,
                     view_menu_id=view_menu.id,
                 ),

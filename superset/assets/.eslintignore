@@ -25,7 +25,5 @@ stylesheets/*
 vendor/*
 docs/*
 src/dashboard/deprecated/*
-
-# ignore SolarBI JS code
-src/solarBI/*
 src/visualizations/SolarBI/*
+src/components/LocationSearchBox.js

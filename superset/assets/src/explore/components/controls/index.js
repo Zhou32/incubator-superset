@@ -67,4 +67,5 @@ const controlMap = {
   FilterPanel,
   FilterBoxItemControl,
 };
+
 export default controlMap;

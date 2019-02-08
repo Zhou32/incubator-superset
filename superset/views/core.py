@@ -122,9 +122,7 @@ class DashboardFilter(SupersetFilter):
         # TODO(bogdan): add `schema_access` support here
         datasource_perms = self.get_view_menus('datasource_access')
         slice_ids_qry = (
-            db.session
-            .query(Slice.id)
-            .filter(Slice.perm.in_(datasource_perms))
+            db.session.query(Slice.id).filter(Slice.perm.in_(datasource_perms))
         )
         owner_ids_qry = (
             db.session
@@ -537,27 +535,33 @@ def get_user():
 
 
 class SolarBIModelView(SliceModelView):  # noqa
+    pass
 
+
+class SolarBIModelWelcomeView(SolarBIModelView):
+    pass
+
+
+class SolarBIModelAddView(SolarBIModelView):
     route_base = '/solar'
     datamodel = SQLAInterface(models.Slice)
     base_filters = [['viz_type', FilterEqual, 'solarBI'],
                     ['created_by', FilterEqualFunction, get_user]]
-    base_permissions = ['can_list', 'can_show', 'can_add',
-                        'can_delete', 'can_edit']
+    base_permissions = ['can_list', 'can_show', 'can_add', 'can_delete', 'can_edit']
+
+    search_columns = (
+        'slice_name', 'description', 'owners',
+    )
+    list_columns = [
+        'slice_link', 'creator', 'modified']
+    order_columns = ['modified']
 
     filters_not_for_admin = {}
-
-    @expose('/add', methods=['GET', 'POST'])
-    @has_access
-    def add(self):
-        for role in g.user.roles:
-            if role.name == 'Admin':
-                return super(SolarBIModelView, self).add()
-        return redirect('/superset/welcome')
 
     @expose('/list/')
     @has_access
     def list(self):
+
         for role in g.user.roles:
             if role.name == 'Admin':
                 self.remove_filters_for_role(role.name)
@@ -594,14 +598,128 @@ class SolarBIModelView(SliceModelView):  # noqa
                 self._base_filters.filters.remove(f)
                 self._base_filters.values.remove(value)
 
+    @expose('/add', methods=['GET', 'POST'])
+    @has_access
+    def add(self):
+        if not g.user or not g.user.get_id():
+            return redirect(appbuilder.get_url_for_login)
+
+        entry_point = 'solarBI'
+
+        datasource_id = self.get_solar_datasource()
+
+        # welcome_dashboard_id = (
+        #     db.session
+        #     .query(UserAttribute.welcome_dashboard_id)
+        #     .filter_by(user_id=g.user.get_id())
+        #     .scalar()
+        # )
+        # if welcome_dashboard_id:
+        #     return self.dashboard(str(welcome_dashboard_id))
+
+        payload = {
+            'user': bootstrap_user_data(),
+            'common': BaseSupersetView().common_bootsrap_payload(),
+            'datasource_id': datasource_id,
+            'datasource_type': 'table',
+            'entry': 'add',
+        }
+
+        return self.render_template(
+            'superset/basic.html',
+            entry=entry_point,
+            title='Search - SolarBI',
+            bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
+        )
+
+    def get_solar_datasource(self):
+        for role in g.user.roles:
+            if 'solar' in role.name:
+                for permission in role.permissions:
+                    if permission.permission.name == 'datasource_access':
+                        datasource_id = \
+                            permission.view_menu.name.split(':')[1].replace(')', '')
+                        return datasource_id
+
+    @expose('/welcome')
+    def welcome(self):
+        """Personalized welcome page"""
+
+        if not g.user or not g.user.get_id():
+            return redirect(appbuilder.get_url_for_login)
+
+        entry_point = 'solarBI'
+
+        datasource_id = self.get_solar_datasource()
+
+        # welcome_dashboard_id = (
+        #     db.session
+        #     .query(UserAttribute.welcome_dashboard_id)
+        #     .filter_by(user_id=g.user.get_id())
+        #     .scalar()
+        # )
+        # if welcome_dashboard_id:
+        #     return self.dashboard(str(welcome_dashboard_id))
+
+        payload = {
+            'user': bootstrap_user_data(),
+            'common': BaseSupersetView().common_bootsrap_payload(),
+            'datasource_id': datasource_id,
+            'datasource_type': 'table',
+            'entry': 'welcome',
+        }
+
+        return self.render_template(
+            'superset/basic.html',
+            entry=entry_point,
+            title='Welcome - SolarBI',
+            bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
+        )
+
+
+appbuilder.add_view(
+    SolarBIModelAddView,
+    'Search your Location',
+    href='/solar/add',
+    label=__('Search'),
+    icon='fa-search',
+    category='SolarBI',
+    category_label=__('SolarBI'),
+    category_icon='fa-sun-o',
+)
+
+
+appbuilder.add_view(
+    SolarBIModelWelcomeView,
+    'Introduction',
+    href='/solar/welcome',
+    label=__('Welcome'),
+    icon='fa-home',
+    category='SolarBI',
+    category_label=__('SolarBI'),
+    category_icon='fa-sun-o',
+)
+
+# appbuilder.add_view(
+#     SolarBIModelAddView,
+#     'Search your Location',
+#     href='/solar/add',
+#     label=__('Search'),
+#     icon='fa-search',
+#     category='SolarBI',
+#     category_label=__('SolarBI'),
+#     category_icon='fa-sun-o'
+# )
+
 
 appbuilder.add_view(
     SolarBIModelView,
-    'SolarBI',
-    label=__('SolarBI'),
-    icon='fa-sun-o',
-    category='',
-    category_icon='',
+    'Saved Solar Data',
+    label=__('Saved'),
+    icon='fa-save',
+    category='SolarBI',
+    category_label=__('SolarBI'),
+    category_icon='fa-sun-o',
 )
 
 
@@ -947,9 +1065,7 @@ class Superset(BaseSupersetView):
         dashboard_id = request.args.get('dashboard_id')
         if dashboard_id:
             dash = (
-                db.session.query(models.Dashboard)
-                          .filter_by(id=int(dashboard_id))
-                          .one()
+                db.session.query(models.Dashboard).filter_by(id=int(dashboard_id)).one()
             )
             datasources |= dash.datasources
         datasource_id = request.args.get('datasource_id')
@@ -957,9 +1073,7 @@ class Superset(BaseSupersetView):
         if datasource_id:
             ds_class = ConnectorRegistry.sources.get(datasource_type)
             datasource = (
-                db.session.query(ds_class)
-                          .filter_by(id=int(datasource_id))
-                          .one()
+                db.session.query(ds_class).filter_by(id=int(datasource_id)).one()
             )
             datasources.add(datasource)
 
@@ -1022,12 +1136,11 @@ class Superset(BaseSupersetView):
             return json_error_response(USER_MISSING_ERR)
 
         requests = (
-            session.query(DAR)
-            .filter(
+            session.query(DAR).filter(
                 DAR.datasource_id == datasource_id,
                 DAR.datasource_type == datasource_type,
-                DAR.created_by_fk == requested_by.id)
-            .all()
+                DAR.created_by_fk == requested_by.id,
+            ).all()
         )
 
         if not requests:
@@ -1437,12 +1550,14 @@ class Superset(BaseSupersetView):
             title = slc.slice_name
         else:
             title = _('Explore - %(table)s', table=table_name)
+
         return self.render_template(
             'superset/basic.html',
             bootstrap_data=json.dumps(bootstrap_data),
             entry='explore',
             title=title,
-            standalone_mode=standalone)
+            standalone_mode=standalone,
+        )
 
     @api
     @handle_api_exception
@@ -1668,8 +1783,9 @@ class Superset(BaseSupersetView):
         data = json.loads(request.form.get('data'))
         dash = models.Dashboard()
         original_dash = (
-            session.query(models.Dashboard)
-                   .filter_by(id=dashboard_id).first())
+            session
+            .query(models.Dashboard)
+            .filter_by(id=dashboard_id).first())
 
         dash.owners = [g.user] if g.user else []
         dash.dashboard_title = data['dashboard_title']
@@ -1809,9 +1925,9 @@ class Superset(BaseSupersetView):
             if db_name:
                 database = (
                     db.session
-                      .query(models.Database)
-                      .filter_by(database_name=db_name)
-                      .first()
+                    .query(models.Database)
+                    .filter_by(database_name=db_name)
+                    .first()
                 )
                 if database and uri == database.safe_sqlalchemy_uri():
                     # the password-masked uri was passed
@@ -1836,9 +1952,7 @@ class Superset(BaseSupersetView):
                 )
 
             engine_params = (
-                request.json
-                       .get('extras', {})
-                       .get('engine_params', {}))
+                request.json.get('extras', {}).get('engine_params', {}))
             connect_args = engine_params.get('connect_args')
 
             if configuration and connect_args is not None:
@@ -1850,9 +1964,8 @@ class Superset(BaseSupersetView):
             return json_success(json.dumps(engine.table_names(), indent=4))
         except Exception as e:
             logging.exception(e)
-            return json_error_response((
-                                       'Connection failed!\n\n'
-                                       'The error message returned was:\n{}').format(e))
+            return json_error_response(('Connection failed!\n\n'
+                                        'The error message returned was:\n{}').format(e))
 
     @api
     @has_access_api
@@ -1868,15 +1981,22 @@ class Superset(BaseSupersetView):
 
         qry = (
             db.session.query(M.Log, M.Dashboard, M.Slice)
-                      .outerjoin(M.Dashboard,
-                                 M.Dashboard.id == M.Log.dashboard_id)
-                      .outerjoin(M.Slice,
-                                 M.Slice.id == M.Log.slice_id)
-                      .filter(sqla.and_(~M.Log.action.in_(('queries',
-                                                           'shortner', 'sql_json')),
-                                        M.Log.user_id == user_id))
-                      .order_by(M.Log.dttm.desc())
-                      .limit(limit)
+            .outerjoin(
+                M.Dashboard,
+                M.Dashboard.id == M.Log.dashboard_id,
+            )
+            .outerjoin(
+                M.Slice,
+                M.Slice.id == M.Log.slice_id,
+            )
+            .filter(
+                sqla.and_(
+                    ~M.Log.action.in_(('queries', 'shortner', 'sql_json')),
+                    M.Log.user_id == user_id,
+                ),
+            )
+            .order_by(M.Log.dttm.desc())
+            .limit(limit)
         )
         payload = []
         for log in qry.all():
@@ -2008,7 +2128,8 @@ class Superset(BaseSupersetView):
                     Slice.changed_by_fk == user_id,
                     FavStar.user_id == user_id,
                 ),
-            ).order_by(Slice.slice_name.asc())
+            )
+            .order_by(Slice.slice_name.asc())
         )
         payload = [{
             'id': o.Slice.id,
@@ -2037,7 +2158,8 @@ class Superset(BaseSupersetView):
                     Slice.created_by_fk == user_id,
                     Slice.changed_by_fk == user_id,
                 ),
-            ).order_by(Slice.changed_on.desc())
+            )
+            .order_by(Slice.changed_on.desc())
         )
         payload = [{
             'id': o.id,
@@ -2205,9 +2327,9 @@ class Superset(BaseSupersetView):
                     return redirect(
                         'superset/request_access/?'
                         f'dashboard_id={dash.id}&')
-        is_ownership = check_ownership(dash, raise_if_false=False)
-        can_access = security_manager.can_access('can_save_dash', 'Superset')
-        dash_edit_perm = is_ownership and can_access
+
+        dash_edit_perm = check_ownership(dash, raise_if_false=False) and \
+            security_manager.can_access('can_save_dash', 'Superset')
         dash_save_perm = security_manager.can_access('can_save_dash', 'Superset')
         superset_can_explore = security_manager.can_access('can_explore', 'Superset')
         slice_can_edit = security_manager.can_access('can_edit', 'SliceModelView')
@@ -2751,9 +2873,10 @@ class Superset(BaseSupersetView):
         queries_to_timeout = [
             client_id for client_id, query_dict in dict_queries.items()
             if (
-                query_dict['state'] in unfinished_states and
-                (now - query_dict['startDttm'] >
-                 config.get('SQLLAB_ASYNC_TIME_LIMIT_SEC') * 1000)
+                query_dict['state'] in unfinished_states and (
+                    now - query_dict['startDttm'] >
+                    config.get('SQLLAB_ASYNC_TIME_LIMIT_SEC') * 1000
+                )
             )
         ]
 
@@ -2811,8 +2934,8 @@ class Superset(BaseSupersetView):
         query_limit = config.get('QUERY_SEARCH_LIMIT', 1000)
         sql_queries = (
             query.order_by(Query.start_time.asc())
-                 .limit(query_limit)
-                 .all()
+            .limit(query_limit)
+            .all()
         )
 
         dict_queries = [q.to_dict() for q in sql_queries]
@@ -2840,14 +2963,11 @@ class Superset(BaseSupersetView):
 
         datasource_id = ''
         for role in g.user.roles:
-            if role.name == 'Admin':
-                entry_point = 'welcome'
-                break
 
             for permission in role.permissions:
                 if permission.permission.name == 'datasource_access':
-                    raw_datasource_id = permission.view_menu.name.split(':')[1]
-                    datasource_id = raw_datasource_id.replace(')', '')
+                    datasource_id = \
+                        permission.view_menu.name.split(':')[1].replace(')', '')
                     break
 
         welcome_dashboard_id = (
@@ -2882,9 +3002,11 @@ class Superset(BaseSupersetView):
         form_data, slc = self.get_form_data(use_slice_data=True)
 
         datasource_id, datasource_type = self.datasource_info(
-            form_data['datasource_id'] if 'datasource_id' in form_data.keys() else None,
-            form_data['datasource_type'] if 'datasource_type' in form_data.keys()
-            else None, form_data)
+            form_data['datasource_id']
+            if 'datasource_id' in form_data.keys() else None,
+            form_data['datasource_type']
+            if 'datasource_type' in form_data.keys() else None,
+            form_data)
 
         error_redirect = '/solar/list/'
         datasource = ConnectorRegistry.get_datasource(
@@ -2966,12 +3088,22 @@ class Superset(BaseSupersetView):
         else:
             title = _('Explore - %(table)s', table=table_name)
 
+        is_solar = False
+
+        for role in g.user.roles:
+            if role.name == 'Admin':
+                is_solar = False
+                break
+            if role.name == 'solar_default':
+                is_solar = True
+
         return self.render_template(
             'superset/basic.html',
             entry='solarBI',
             title=title,
             bootstrap_data=json.dumps(bootstrap_data),
             standalone_mode=standalone,
+            is_solar=is_solar,
         )
 
     @has_access
@@ -3001,6 +3133,7 @@ class Superset(BaseSupersetView):
             'defaultDbId': config.get('SQLLAB_DEFAULT_DBID'),
             'common': self.common_bootsrap_payload(),
         }
+
         return self.render_template(
             'superset/basic.html',
             entry='sqllab',
@@ -3054,11 +3187,9 @@ class Superset(BaseSupersetView):
             return self.json_response(schemas_allowed_processed)
         except Exception:
             return json_error_response((
-                                       'Failed to fetch schemas allowed for \
-                                        csv upload in this database! '
-                                       'Please contact Superset Admin!\n\n'
-                                       'The error message returned was:\n{}')
-                                       .format(traceback.format_exc()))
+                'Failed to fetch schemas allowed for csv upload in this database!'
+                ' Please contact Superset Admin!\n\n'
+                'The error message returned was:\n{}').format(traceback.format_exc()))
 
 
 appbuilder.add_view_no_menu(Superset)

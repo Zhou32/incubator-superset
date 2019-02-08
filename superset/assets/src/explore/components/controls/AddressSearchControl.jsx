@@ -18,12 +18,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-
-import PlacesAutocomplete, {
-  geocodeByAddress,
-  getLatLng,
-} from 'react-places-autocomplete';
-
+import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
 import ControlHeader from '../ControlHeader';
 
 const propTypes = {
@@ -33,7 +28,7 @@ const propTypes = {
 };
 
 const defaultProps = {
-  onChange: () => {},
+  onChange: () => { },
   animation: true,
   choices: [],
 };
@@ -72,7 +67,6 @@ export default class AddressSearchControl extends React.Component {
     geocodeByAddress(address)
       .then(results => getLatLng(results[0]))
       .then((latLng) => {
-        console.log('Success', latLng);
         const value = {
           lat: latLng.lat,
           lon: latLng.lng,
@@ -81,11 +75,10 @@ export default class AddressSearchControl extends React.Component {
           type: this.state.type,
         };
 
-        console.log('Success11', latLng);
         this.setState({ value });
         this.props.onChange(value, []);
       })
-      .catch(error => console.error('Error', error));
+      .catch(error => error);
   }
 
   render() {
@@ -97,12 +90,7 @@ export default class AddressSearchControl extends React.Component {
           onChange={this.handleChange}
           onSelect={this.handleSelect}
         >
-          {({
-            getInputProps,
-            suggestions,
-            getSuggestionItemProps,
-            loading,
-          }) => (
+          {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
             <div>
               <input
                 {...getInputProps({

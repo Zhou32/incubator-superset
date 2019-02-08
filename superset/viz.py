@@ -2795,19 +2795,19 @@ class SolarBI(BaseViz):
                                 self.load_data('solar_locations/lat679.pk')]
             self.lng_list839 = [float(x) for x in
                                 self.load_data('solar_locations/lng839.pk')]
-
-        point = (float(lat), float(lng))
-        self.get_closest_point(point, self.lat_list679, self.lng_list839)
-        where = f"latitude = '{self.nearest_lat}' and longitude = \
-                             '{self.nearest_lng}' AND radiation != -999"
+        self.get_closest_point((float(lat), float(lng)), self.lat_list679,
+                               self.lng_list839)
+        where = f"latitude = '{self.nearest_lat}' AND " \
+            f"longitude = '{self.nearest_lng}' AND " \
+            f"radiationtype = 'dni' AND radiation != -999"
         return where
 
     def query_obj(self):
         d = super(SolarBI, self).query_obj()
         # fd = self.form_data
 
-        metric_1 = {'expressionType': 'SQL', 'sqlExpression':
-                    'avg(radiation)', 'label': 'radiation'}
+        metric_1 = {'expressionType': 'SQL', 'sqlExpression': 'avg(radiation)',
+                    'label': 'radiation'}
         # metric_2 = {'expressionType': 'SQL', 'sqlExpression': 'date', 'label': 'date'}
         # metric_3 = {'expressionType': 'SQL', 'sqlExpression': 'month', 'label': 'month'}
         # metric_4 = {'expressionType': 'SQL', 'sqlExpression': 'day', 'label': 'day'}

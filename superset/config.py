@@ -219,7 +219,6 @@ CACHE_CONFIG = {'CACHE_TYPE': 'redis',
                 'CACHE_KEY_PREFIX': 'superset_results',
                 'CACHE_REDIS_URL': 'redis://redis:6379/0'}
 TABLE_NAMES_CACHE_CONFIG = {'CACHE_TYPE': 'null'}
-
 # CORS Options
 ENABLE_CORS = False
 CORS_OPTIONS = {}

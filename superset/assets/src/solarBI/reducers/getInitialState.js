@@ -16,14 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import getToastsFromPyFlashMessages from "../../messageToasts/utils/getToastsFromPyFlashMessages";
+import getToastsFromPyFlashMessages from '../../messageToasts/utils/getToastsFromPyFlashMessages';
 
 export default function getInitialState(bootstrapData) {
   return {
     solarBI: {
       ...bootstrapData,
       solarAlert: null,
-      solarStatus: "waiting",
+      solarStatus: 'waiting',
       solarStackTrace: null,
       solarUpdateEndTime: null,
       solarUpdateStartTime: 0,
@@ -32,8 +32,8 @@ export default function getInitialState(bootstrapData) {
       queryResponse: null,
       triggerQuery: true,
       lastRendered: 0,
-      saveModalAlert: null
+      saveModalAlert: null,
     },
-    messageToasts: getToastsFromPyFlashMessages({}.flash_messages || [])
+    messageToasts: getToastsFromPyFlashMessages({}.flash_messages || []),
   };
 }

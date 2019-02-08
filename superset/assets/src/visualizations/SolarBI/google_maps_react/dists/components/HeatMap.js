@@ -124,10 +124,10 @@
 
   var wrappedPromise = function wrappedPromise() {
     var wrappedPromise = {},
-        promise = new Promise(function (resolve, reject) {
-      wrappedPromise.resolve = resolve;
-      wrappedPromise.reject = reject;
-    });
+      promise = new Promise(function (resolve, reject) {
+        wrappedPromise.resolve = resolve;
+        wrappedPromise.reject = reject;
+      });
     wrappedPromise.then = promise.then.bind(promise);
     wrappedPromise.catch = promise.catch.bind(promise);
     wrappedPromise.promise = promise;
@@ -173,17 +173,17 @@
         var _this2 = this;
 
         var _props = this.props,
-            map = _props.map,
-            google = _props.google,
-            positions = _props.positions,
-            mapCenter = _props.mapCenter,
-            icon = _props.icon,
-            gradient = _props.gradient,
-            _props$radius = _props.radius,
-            radius = _props$radius === undefined ? 20 : _props$radius,
-            _props$opacity = _props.opacity,
-            opacity = _props$opacity === undefined ? 0.2 : _props$opacity,
-            props = _objectWithoutProperties(_props, ['map', 'google', 'positions', 'mapCenter', 'icon', 'gradient', 'radius', 'opacity']);
+          map = _props.map,
+          google = _props.google,
+          positions = _props.positions,
+          mapCenter = _props.mapCenter,
+          icon = _props.icon,
+          gradient = _props.gradient,
+          _props$radius = _props.radius,
+          radius = _props$radius === undefined ? 20 : _props$radius,
+          _props$opacity = _props.opacity,
+          opacity = _props$opacity === undefined ? 0.2 : _props$opacity,
+          props = _objectWithoutProperties(_props, ['map', 'google', 'positions', 'mapCenter', 'icon', 'gradient', 'radius', 'opacity']);
 
         if (!google) {
           return null;

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-(function(global, factory) {
+(function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define([
       "exports",
@@ -46,7 +46,7 @@
     );
     global.InfoWindow = mod.exports;
   }
-})(this, function(exports, _react, _propTypes, _reactDom, _server) {
+})(this, function (exports, _react, _propTypes, _reactDom, _server) {
   "use strict";
 
   Object.defineProperty(exports, "__esModule", {
@@ -66,13 +66,13 @@
     return obj && obj.__esModule
       ? obj
       : {
-          default: obj
-        };
+        default: obj
+      };
   }
 
   var _extends =
     Object.assign ||
-    function(target) {
+    function (target) {
       for (var i = 1; i < arguments.length; i++) {
         var source = arguments[i];
 
@@ -104,7 +104,7 @@
     }
   }
 
-  var _createClass = (function() {
+  var _createClass = (function () {
     function defineProperties(target, props) {
       for (var i = 0; i < props.length; i++) {
         var descriptor = props[i];
@@ -115,7 +115,7 @@
       }
     }
 
-    return function(Constructor, protoProps, staticProps) {
+    return function (Constructor, protoProps, staticProps) {
       if (protoProps) defineProperties(Constructor.prototype, protoProps);
       if (staticProps) defineProperties(Constructor, staticProps);
       return Constructor;
@@ -138,7 +138,7 @@
     if (typeof superClass !== "function" && superClass !== null) {
       throw new TypeError(
         "Super expression must either be null or a function, not " +
-          typeof superClass
+        typeof superClass
       );
     }
 
@@ -156,7 +156,7 @@
         : (subClass.__proto__ = superClass);
   }
 
-  var InfoWindow = (exports.InfoWindow = (function(_React$Component) {
+  var InfoWindow = (exports.InfoWindow = (function (_React$Component) {
     _inherits(InfoWindow, _React$Component);
 
     function InfoWindow() {

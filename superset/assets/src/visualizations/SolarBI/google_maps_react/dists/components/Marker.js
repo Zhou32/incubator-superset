@@ -124,10 +124,10 @@
 
   var wrappedPromise = function wrappedPromise() {
     var wrappedPromise = {},
-        promise = new Promise(function (resolve, reject) {
-      wrappedPromise.resolve = resolve;
-      wrappedPromise.reject = reject;
-    });
+      promise = new Promise(function (resolve, reject) {
+        wrappedPromise.resolve = resolve;
+        wrappedPromise.reject = reject;
+      });
     wrappedPromise.then = promise.then.bind(promise);
     wrappedPromise.catch = promise.catch.bind(promise);
     wrappedPromise.promise = promise;
@@ -173,15 +173,15 @@
         var _this2 = this;
 
         var _props = this.props,
-            map = _props.map,
-            google = _props.google,
-            position = _props.position,
-            mapCenter = _props.mapCenter,
-            icon = _props.icon,
-            label = _props.label,
-            draggable = _props.draggable,
-            title = _props.title,
-            props = _objectWithoutProperties(_props, ['map', 'google', 'position', 'mapCenter', 'icon', 'label', 'draggable', 'title']);
+          map = _props.map,
+          google = _props.google,
+          position = _props.position,
+          mapCenter = _props.mapCenter,
+          icon = _props.icon,
+          label = _props.label,
+          draggable = _props.draggable,
+          title = _props.title,
+          props = _objectWithoutProperties(_props, ['map', 'google', 'position', 'mapCenter', 'icon', 'label', 'draggable', 'title']);
 
         if (!google) {
           return null;

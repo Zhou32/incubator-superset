@@ -21,7 +21,7 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
 
-from flask import Flask, redirect
+from flask import Flask, g, redirect
 from flask_appbuilder import AppBuilder, IndexView, SQLA
 from flask_appbuilder.baseviews import expose
 from flask_compress import Compress
@@ -92,6 +92,14 @@ def get_unloaded_chunks(files, loaded_chunks):
 parse_manifest_json()
 
 
+def is_solar_user():
+    if not g.user.is_anonymous:
+        for role in g.user.roles:
+            if 'solar' in role.name:
+                return True
+    return False
+
+
 @app.context_processor
 def get_manifest():
     return dict(
@@ -99,6 +107,7 @@ def get_manifest():
         get_unloaded_chunks=get_unloaded_chunks,
         js_manifest=get_js_manifest_files,
         css_manifest=get_css_manifest_files,
+        is_solar=is_solar_user(),
     )
 
 
@@ -186,7 +195,16 @@ for middleware in app.config.get('ADDITIONAL_MIDDLEWARE'):
 class MyIndexView(IndexView):
     @expose('/')
     def index(self):
-        return redirect('/superset/welcome')
+        entry_point = 'solar'
+        if hasattr(g.user, 'roles'):
+            for role in g.user.roles:
+                if role.name == 'Admin':
+                    entry_point = 'superset'
+                    break
+        else:
+            return redirect('/login')
+
+        return redirect(f'/{entry_point}/welcome')
 
 
 custom_sm = app.config.get('CUSTOM_SECURITY_MANAGER') or SupersetSecurityManager

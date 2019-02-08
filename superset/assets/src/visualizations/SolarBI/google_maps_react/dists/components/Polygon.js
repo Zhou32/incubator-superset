@@ -124,10 +124,10 @@
 
   var wrappedPromise = function wrappedPromise() {
     var wrappedPromise = {},
-        promise = new Promise(function (resolve, reject) {
-      wrappedPromise.resolve = resolve;
-      wrappedPromise.reject = reject;
-    });
+      promise = new Promise(function (resolve, reject) {
+        wrappedPromise.resolve = resolve;
+        wrappedPromise.reject = reject;
+      });
     wrappedPromise.then = promise.then.bind(promise);
     wrappedPromise.catch = promise.catch.bind(promise);
     wrappedPromise.promise = promise;
@@ -173,15 +173,15 @@
         var _this2 = this;
 
         var _props = this.props,
-            map = _props.map,
-            google = _props.google,
-            paths = _props.paths,
-            strokeColor = _props.strokeColor,
-            strokeOpacity = _props.strokeOpacity,
-            strokeWeight = _props.strokeWeight,
-            fillColor = _props.fillColor,
-            fillOpacity = _props.fillOpacity,
-            props = _objectWithoutProperties(_props, ['map', 'google', 'paths', 'strokeColor', 'strokeOpacity', 'strokeWeight', 'fillColor', 'fillOpacity']);
+          map = _props.map,
+          google = _props.google,
+          paths = _props.paths,
+          strokeColor = _props.strokeColor,
+          strokeOpacity = _props.strokeOpacity,
+          strokeWeight = _props.strokeWeight,
+          fillColor = _props.fillColor,
+          fillOpacity = _props.fillOpacity,
+          props = _objectWithoutProperties(_props, ['map', 'google', 'paths', 'strokeColor', 'strokeOpacity', 'strokeWeight', 'fillColor', 'fillOpacity']);
 
         if (!google) {
           return null;

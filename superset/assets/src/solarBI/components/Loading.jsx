@@ -16,14 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react';
+import PropTypes from 'prop-types';
 
 const propTypes = {
-  size: PropTypes.number
+  size: PropTypes.number,
 };
 const defaultProps = {
-  size: 50
+  size: 50,
 };
 
 export default function Loading({ size }) {
@@ -33,14 +33,16 @@ export default function Loading({ size }) {
       alt="Loading..."
       src="/static/assets/images/loading.gif"
       style={{
-        width: Math.min(size, 50),
+        width: Math.min(size, 80),
         // height is auto
         padding: 0,
-        margin: 0,
-        position: "absolute",
-        left: "50%",
-        top: "50%",
-        transform: "translate(-50%, -50%)"
+        // margin: 30,
+        margin: 'auto',
+        marginTop: 200,
+        position: 'absolute',
+        left: '50%',
+        top: '50%',
+        transform: 'translate(-50%, -50%)',
       }}
     />
   );
