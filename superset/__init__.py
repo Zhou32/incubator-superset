@@ -93,10 +93,11 @@ parse_manifest_json()
 
 
 def is_solar_user():
-    if not g.user.is_anonymous:
-        for role in g.user.roles:
-            if 'solar' in role.name:
-                return True
+    if hasattr(g.user, 'roles'):
+        if not g.user.is_anonymous:
+            for role in g.user.roles:
+                if 'solar' in role.name:
+                    return True
     return False
 
 

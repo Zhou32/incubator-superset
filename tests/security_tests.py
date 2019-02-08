@@ -252,6 +252,10 @@ class RolePermissionTests(SupersetTestCase):
             ['RegisterUserDBView', 'this_form_get'],
             ['RegisterUserDBView', 'this_form_post'],
             ['Superset', 'solar'],
+            ['SolarRegisterUserDBView', 'activation'],
+            ['SolarRegisterUserDBView', 'this_form_get'],
+            ['SolarRegisterUserDBView', 'this_form_post'],
+            ['SolarBIModelAddView', 'welcome']
         ]
         unsecured_views = []
         for view_class in appbuilder.baseviews:
