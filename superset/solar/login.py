@@ -15,25 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 # pylint: disable=C,R,W
-from flask_appbuilder.security.registerviews import RegisterUserDBView
-from flask_appbuilder.security.forms import RegisterUserDBForm
-from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
-from wtforms import StringField
-from wtforms.validators import DataRequired
-from flask_babel import lazy_gettext
-
-email_subject = 'SolarBI - Email Confirmation '
+from flask_appbuilder.security.views import AuthDBView
 
 
-class SolarRegisterUserDBForm(RegisterUserDBForm):
-    organization = StringField(lazy_gettext('Organisation'),
-                               validators=[DataRequired()],
-                               widget=BS3TextFieldWidget())
-
-
-class SolarRegisterUserDBView(RegisterUserDBView):
-    form = SolarRegisterUserDBForm
-
-    email_subject = email_subject
-
-    # def form_post(self, form):
+# class SolarAuthDBView(AuthDBView):
+    # login_template = 'appbuilder/general/security/login_o.html'
