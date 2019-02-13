@@ -27,7 +27,7 @@ from superset import sql_parse
 from superset.connectors.connector_registry import ConnectorRegistry
 from superset.exceptions import SupersetSecurityException
 from superset.solar.register import SolarRegisterUserDBView
-from superset.solar.login import SolarAuthDBView
+from superset.solar.login import SolarAuthDBView, SolarUserDBModelView
 
 
 READ_ONLY_MODEL_VIEWS = {
@@ -116,6 +116,7 @@ SOLAR_PERMISSIONS_MENU = ['SolarBI', 'Search your Location', 'Saved Solar Data',
 class SupersetSecurityManager(SecurityManager):
     registeruserdbview = SolarRegisterUserDBView
     authdbview = SolarAuthDBView
+    userdbmodelview = SolarUserDBModelView
 
     def get_schema_perm(self, database, schema):
         if schema:

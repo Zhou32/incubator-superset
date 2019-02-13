@@ -15,8 +15,32 @@
 # specific language governing permissions and limitations
 # under the License.
 # pylint: disable=C,R,W
-from flask_appbuilder.security.views import AuthDBView
+from flask_appbuilder.security.views import AuthDBView, UserDBModelView
+from flask_appbuilder.security.forms import LoginForm_db
+from flask_appbuilder import expose
+from flask import redirect, g
+from flask_login import login_user
 
 
-# class SolarAuthDBView(AuthDBView):
-    # login_template = 'appbuilder/general/security/login_o.html'
+class SolarAuthDBView(AuthDBView):
+    @expose('/login/', methods=['GET', 'POST'])
+    def login(self):
+        if g.user is not None and g.user.is_authenticated:
+            return redirect(self.appbuilder.get_url_for_index)
+        form = LoginForm_db()
+        if form.validate_on_submit():
+            user = self.appbuilder.sm.auth_user_db(form.username.data,
+                                                   form.password.data)
+            if not user:
+                # flash(as_unicode(self.invalid_login_message), 'warning')
+                return redirect(self.appbuilder.get_url_for_login)
+            login_user(user, remember=False)
+            return redirect(self.appbuilder.get_url_for_index)
+        return self.render_template(self.login_template,
+                                    title=self.title,
+                                    form=form,
+                                    appbuilder=self.appbuilder)
+
+
+class SolarUserDBModelView(UserDBModelView):
+    list_columns = ['first_name', 'username', 'email', 'roles']

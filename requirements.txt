@@ -77,3 +77,4 @@ werkzeug==0.14.1          # via flask
 wtforms==2.2.1            # via flask-wtf
 xlrd==1.1.0               # via tabulator
 redis==3.0.1
+warrant==0.6.1
