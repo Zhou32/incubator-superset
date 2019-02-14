@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 # pylint: disable=C,R,W
-from flask_appbuilder.security.views import AuthDBView, UserDBModelView
+from flask_appbuilder.security.views import AuthDBView
 from flask_appbuilder.security.forms import LoginForm_db
 from flask_appbuilder import expose
 from flask import redirect, g
@@ -42,5 +42,3 @@ class SolarAuthDBView(AuthDBView):
                                     appbuilder=self.appbuilder)
 
 
-class SolarUserDBModelView(UserDBModelView):
-    list_columns = ['first_name', 'username', 'email', 'roles']

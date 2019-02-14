@@ -27,7 +27,8 @@ from superset import sql_parse
 from superset.connectors.connector_registry import ConnectorRegistry
 from superset.exceptions import SupersetSecurityException
 from superset.solar.register import SolarRegisterUserDBView
-from superset.solar.login import SolarAuthDBView, SolarUserDBModelView
+from superset.solar.login import SolarAuthDBView
+from superset.solar.views import SolarUserDBModelView
 
 
 READ_ONLY_MODEL_VIEWS = {
