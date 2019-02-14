@@ -22,6 +22,7 @@ in your PYTHONPATH as there is a ``from superset_config import *``
 at the end of this file.
 """
 from collections import OrderedDict
+from superset.solar.security import SolarBISecurityManager
 import imp
 import json
 import os

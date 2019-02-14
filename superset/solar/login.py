@@ -23,6 +23,7 @@ from flask_login import login_user
 
 
 class SolarAuthDBView(AuthDBView):
+
     @expose('/login/', methods=['GET', 'POST'])
     def login(self):
         if g.user is not None and g.user.is_authenticated:
@@ -31,14 +32,18 @@ class SolarAuthDBView(AuthDBView):
         if form.validate_on_submit():
             user = self.appbuilder.sm.auth_user_db(form.username.data,
                                                    form.password.data)
+
             if not user:
                 # flash(as_unicode(self.invalid_login_message), 'warning')
                 return redirect(self.appbuilder.get_url_for_login)
             login_user(user, remember=False)
+            print(g.user.roles)
+            print(type(g.user.roles))
             return redirect(self.appbuilder.get_url_for_index)
         return self.render_template(self.login_template,
                                     title=self.title,
                                     form=form,
                                     appbuilder=self.appbuilder)
+
 
 
