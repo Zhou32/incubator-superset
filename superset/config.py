@@ -216,8 +216,8 @@ CACHE_CONFIG = {'CACHE_TYPE': 'redis',
 TABLE_NAMES_CACHE_CONFIG = {'CACHE_TYPE': 'null'}
 
 # CORS Options
-ENABLE_CORS = False
-CORS_OPTIONS = {}
+ENABLE_CORS = True
+CORS_OPTIONS = {resources: r'/superset/favstar/*'}
 
 # Chrome allows up to 6 open connections per domain at a time. When there are more
 # than 6 slices in dashboard, a lot of time fetch requests are queued up and wait for
