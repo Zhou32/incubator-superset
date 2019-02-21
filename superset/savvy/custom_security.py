@@ -47,11 +47,9 @@ class CustomSecurityManager(SupersetSecurityManager):
         # print(self.passwordrecoverview.default_view)
         # return url_for('%s.%s' % (self.registeruser_view.endpoint, self.registeruser_view.default_view))
         return url_for('%s.%s' % (self.passwordrecoverview.endpoint, self.passwordrecoverview.default_view))
-        # return url_for('%s.%s' % (self.passwordresetview.endpoint, self.passwordresetview.default_view))
 
-    def get_url_for_reset(self,user):
-        login_user(user)
-        return url_for('%s.%s' % (self.passwordresetview.endpoint, self.passwordresetview.default_view))
+    def get_url_for_reset(self,user, token):
+        return url_for('%s.%s' % (self.passwordresetview.endpoint, self.passwordresetview.default_view), token=token)
 
     def add_reset_request(self, email):
         reset_request = self.resetRequestModel()

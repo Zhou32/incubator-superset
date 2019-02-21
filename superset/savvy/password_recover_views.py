@@ -2,7 +2,7 @@ from flask_appbuilder.views import PublicFormView, SimpleFormView,  expose
 from flask_appbuilder._compat import as_unicode
 from flask_babel import lazy_gettext
 from flask_appbuilder.security.forms import DynamicForm
-from flask import flash, redirect, url_for, g
+from flask import flash, redirect, url_for, request
 from flask_appbuilder.fieldwidgets import BS3PasswordFieldWidget
 from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired, Email, EqualTo
@@ -34,20 +34,13 @@ class EmailResetPasswordView(PublicFormView):
     redirect_url = '/'
     message = lazy_gettext('Password Changed')
 
-    def form_post(self, form):
-        print("posting reset form")
-        user = g.user
-        print(user.email)
-        print(form.password.data, form.conf_password.data)
-        flash(as_unicode(self.message), 'info')
-        return redirect(self.appbuilder.get_url_for_index)
-
     @expose("/form", methods=['GET'])
     def this_form_get(self):
         self._init_vars()
         form = self.form.refresh()
-        user = g.user
-        if not user.is_anonymous:
+        token = request.args.get('token')
+        print(token)
+        if token is not None:
             self.form_get(form)
             widgets = self._get_edit_widget(form=form)
             self.update_redirect()
@@ -81,7 +74,7 @@ class PasswordRecoverView(PublicFormView):
         This is the view for recovering password
     """
 
-    route_base = '/passwordrecover'
+    route_base = '/recover'
 
     email_template = 'appbuilder/general/security/recover_mail.html'
     """ The template used to generate the email sent to the user """
@@ -135,15 +128,15 @@ class PasswordRecoverView(PublicFormView):
             return None
 
     @expose('/reset/<string:reset_hash>')
-    def reset(self,reset_hash):
+    def reset(self, reset_hash):
         """ This is end point to verify the reset password hash from user
             TODO
         """
-        # print(reset_hash)
+        print(reset_hash)
         if reset_hash is not None:
             # return redirect(self.reset_password())
             user = self.appbuilder.sm.find_user(email='bwhsdzf@gmail.com')
-            return redirect(self.appbuilder.sm.get_url_for_reset(user=user))
+            return redirect(self.appbuilder.sm.get_url_for_reset(user=user, token=reset_hash))
     #
     # def reset_password(self):
     #     print("to reset password page")
