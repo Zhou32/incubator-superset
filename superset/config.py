@@ -31,6 +31,8 @@ from celery.schedules import crontab
 from dateutil import tz
 from flask_appbuilder.security.manager import AUTH_DB
 
+from superset.savvy.custom_security import CustomSecurityManager
+
 from superset.stats_logger import DummyStatsLogger
 
 # Realtime stats logger, a StatsD implementation exists
@@ -62,7 +64,8 @@ SUPERSET_WEBSERVER_PORT = 8088
 SUPERSET_WEBSERVER_TIMEOUT = 60  # deprecated
 SUPERSET_DASHBOARD_POSITION_DATA_LIMIT = 65535
 EMAIL_NOTIFICATIONS = False
-CUSTOM_SECURITY_MANAGER = None
+# CUSTOM_SECURITY_MANAGER =None
+CUSTOM_SECURITY_MANAGER = CustomSecurityManager
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 # ---------------------------------------------------------
 
