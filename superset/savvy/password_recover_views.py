@@ -39,8 +39,8 @@ class EmailResetPasswordView(PublicFormView):
         self._init_vars()
         form = self.form.refresh()
         token = request.args.get('token')
-        print(token)
-        if token is not None:
+        user = self.appbuilder.sm.find_user_by_token(token)
+        if user is not None:
             self.form_get(form)
             widgets = self._get_edit_widget(form=form)
             self.update_redirect()
@@ -48,6 +48,7 @@ class EmailResetPasswordView(PublicFormView):
                                         title=self.form_title,
                                         widgets=widgets,
                                         appbuilder=self.appbuilder)
+        print('not found')
         return redirect(self.appbuilder.get_url_for_index)
 
     @expose("/form", methods=['POST'])
@@ -55,10 +56,11 @@ class EmailResetPasswordView(PublicFormView):
         self._init_vars()
         form = self.form.refresh()
         if form.validate_on_submit():
-            response = self.form_post(form)
+            token = request.args.get('token')
+            response = self.form_post(form,token)
             if not response:
                 return self.this_form_get()
-            return response
+            return redirect(response)
         else:
             widgets = self._get_edit_widget(form=form)
             return self.render_template(
@@ -68,6 +70,15 @@ class EmailResetPasswordView(PublicFormView):
                 appbuilder=self.appbuilder
             )
 
+    def form_post(self, form, token):
+        user = self.appbuilder.sm.find_user_by_token(token)
+        if user is not None:
+            flash(as_unicode(self.message), 'info')
+            password = form.password.data
+            self.appbuilder.sm.reset_password(user.id, password)
+            self.appbuilder.sm.set_token_used(token)
+            return self.appbuilder.get_url_for_index
+        return None
 
 class PasswordRecoverView(PublicFormView):
     """
@@ -93,19 +104,19 @@ class PasswordRecoverView(PublicFormView):
 
     form = PasswordRecoverForm
 
-    def send_email(self, email):
+    def send_email(self, email, hash):
         """
             Method for sending the registration Email to the user
         """
         try:
             from flask_mail import Mail, Message
-        except:
+        except Exception:
             log.error("Install Flask-Mail to use User registration")
             return False
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
         msg.subject = self.email_subject
-        url = url_for('.reset', _external=True, reset_hash='helloworld')
+        url = url_for('.reset', _external=True, reset_hash=hash)
         print(url)
         msg.html = self.render_template(self.email_template,
                                         url=url)
@@ -118,10 +129,10 @@ class PasswordRecoverView(PublicFormView):
         return True
 
     def add_password_reset(self, email):
-        # print("sending to ", email)
-        if self.appbuilder.sm.add_reset_request(email):
+        reset_hash = self.appbuilder.sm.add_reset_request(email)
+        if reset_hash is not None:
             flash(as_unicode(self.message), 'info')
-            self.send_email(email)
+            self.send_email(email, reset_hash)
             return redirect('/')
         else:
             flash(as_unicode(self.error_message), 'danger')
@@ -132,16 +143,8 @@ class PasswordRecoverView(PublicFormView):
         """ This is end point to verify the reset password hash from user
             TODO
         """
-        print(reset_hash)
         if reset_hash is not None:
-            # return redirect(self.reset_password())
-            user = self.appbuilder.sm.find_user(email='bwhsdzf@gmail.com')
-            return redirect(self.appbuilder.sm.get_url_for_reset(user=user, token=reset_hash))
-    #
-    # def reset_password(self):
-    #     print("to reset password page")
-    #     print(self.appbuilder.sm.to_reset_view())
-    #     return self.appbuilder.sm.to_reset_view()
+            return redirect(self.appbuilder.sm.get_url_for_reset(token=reset_hash))
 
     def form_get(self, form):
         self.add_form_unique_validations(form)

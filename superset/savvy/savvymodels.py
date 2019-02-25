@@ -1,8 +1,5 @@
 import datetime
 from sqlalchemy import Table, Column, Integer, String, Boolean, DateTime, ForeignKey, Sequence, UniqueConstraint
-from sqlalchemy.orm import relationship, backref
-from sqlalchemy.ext.declarative import declared_attr
-from flask_appbuilder._compat import as_unicode
 from flask_appbuilder import Model
 
 
