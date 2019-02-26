@@ -139,7 +139,7 @@ class PasswordRecoverView(PublicFormView):
         if reset_hash is not None:
             flash(as_unicode(self.message), 'info')
             self.send_email(email, reset_hash)
-            return redirect('/')
+            return redirect(self.appbuilder.get_url_for_index)
         else:
             flash(as_unicode(self.error_message), 'danger')
             return None
@@ -152,30 +152,7 @@ class PasswordRecoverView(PublicFormView):
         if reset_hash is not None:
             return redirect(self.appbuilder.sm.get_url_for_reset(token=reset_hash))
 
-    def form_get(self, form):
-        self.add_form_unique_validations(form)
-
     def form_post(self, form):
-        self.add_form_unique_validations(form)
         return self.add_password_reset(email=form.email.data)
 
-    @expose('/form', methods=['POST'])
-    def this_form_post(self):
-        self._init_vars()
-        form = self.form.refresh()
-        if form.validate_on_submit():
-            response = self.form_post(form)
-            if not response:
-                return self.this_form_get()
-            return response
-        else:
-            widgets = self._get_edit_widget(form=form)
-            return self.render_template(
-                self.form_template,
-                title=self.form_title,
-                widgets=widgets,
-                appbuilder=self.appbuilder,
-            )
 
-    def add_form_unique_validations(self, form):
-        return

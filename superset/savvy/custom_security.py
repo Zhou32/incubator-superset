@@ -22,26 +22,30 @@ from werkzeug.security import generate_password_hash
 
 from superset.savvy.password_recover_views import EmailResetPasswordView,\
     PasswordRecoverView
-from superset.security import SupersetSecurityManager
 from superset.savvy.savvymodels import Organization, ResetRequest
+from superset.security import SupersetSecurityManager
 
 
 class CustomSecurityManager(SupersetSecurityManager):
 
-    passwordrecoverview = PasswordRecoverView
-    passwordresetview = EmailResetPasswordView
+    passwordrecoverview = PasswordRecoverView()
+    passwordresetview = EmailResetPasswordView()
 
     resetRequestModel = ResetRequest
     orgModel = Organization
 
     def register_views(self):
         super(CustomSecurityManager, self).register_views()
-        if self.passwordrecoverview:
-            self.passwordrecoverview = self\
-                .appbuilder.add_view_no_menu(self.passwordrecoverview)
-        if self.passwordresetview:
-            self.passwordresetview = self\
-                .appbuilder.add_view_no_menu(self.passwordresetview)
+        self.appbuilder.add_view_no_menu(self.passwordrecoverview)
+        self.appbuilder.add_view_no_menu(self.passwordresetview)
+
+    # def create_custom_permissions(self):
+    #     super(CustomSecurityManager, self).create_custom_permissions()
+    #     self.merge_perm('can_this_form_get', 'PasswordRecoverView')
+    #     self.merge_perm('can_this_form_post', 'PasswordRecoverView')
+    #     self.merge_perm('reset', 'PasswordRecoverView')
+    #     self.merge_perm('can_this_form_get', 'EmailResetPasswordView')
+    #     self.merge_perm('can_this_form_post', 'EmailResetPasswordView')
 
     @property
     def get_url_for_recover(self):

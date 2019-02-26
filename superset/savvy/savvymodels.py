@@ -38,9 +38,9 @@ class Organization(Model):
     org_name = Column(String(64), nullable=False)
 
 
-assoc_org_user = Table('org_user', Model.metadata,
-                       Column('id', Integer, Sequence('ab_org_user_id_seq'),
-                              primary_key=True),
-                       Column('org_id', Integer, ForeignKey('ab_organization.id')),
-                       Column('user_id', Integer, ForeignKey('ab_user.id')),
-                       UniqueConstraint('org_id', 'user_id'))
+# assoc_org_user = Table('org_user', Model.metadata,
+#                        Column('id', Integer, Sequence('ab_org_user_id_seq'),
+#                               primary_key=True),
+#                        Column('org_id', Integer, ForeignKey('ab_organization.id')),
+#                        Column('user_id', Integer, ForeignKey('ab_user.id')),
+#                        UniqueConstraint('org_id', 'user_id'))
