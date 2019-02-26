@@ -19,12 +19,11 @@ import logging
 
 from flask import flash, redirect, request, url_for
 from flask_appbuilder._compat import as_unicode
-from flask_appbuilder.fieldwidgets import BS3PasswordFieldWidget
-from flask_appbuilder.security.forms import DynamicForm
+from flask_appbuilder.security.forms import DynamicForm, ResetPasswordForm
 from flask_appbuilder.views import expose, PublicFormView
 from flask_babel import lazy_gettext
-from wtforms import PasswordField, StringField
-from wtforms.validators import DataRequired, Email, EqualTo
+from wtforms import StringField
+from wtforms.validators import DataRequired, Email
 
 log = logging.getLogger(__name__)
 
@@ -33,20 +32,9 @@ class PasswordRecoverForm(DynamicForm):
     email = StringField(lazy_gettext('Email'), validators=[DataRequired(), Email()])
 
 
-class PasswordResetForm(DynamicForm):
-    password = PasswordField(lazy_gettext('Password'),
-                             validators=[DataRequired()],
-                             widget=BS3PasswordFieldWidget())
-    conf_password = PasswordField(lazy_gettext('Confirm Password'),
-                                  validators=[DataRequired(),
-                                              EqualTo('password',
-                                                        message=lazy_gettext('Passwords must match'))],
-                                  widget=BS3PasswordFieldWidget())
-
-
 class EmailResetPasswordView(PublicFormView):
     route_base = '/reset'
-    form = PasswordResetForm
+    form = ResetPasswordForm
     form_title = lazy_gettext('Reset Password Form')
     redirect_url = '/'
     message = lazy_gettext('Password Changed')
@@ -84,7 +72,7 @@ class EmailResetPasswordView(PublicFormView):
                 self.form_template,
                 title=self.form_title,
                 widgets=widgets,
-                appbuilder=self.appbuilder
+                appbuilder=self.appbuilder,
             )
 
     def form_post(self, form, token):
@@ -129,7 +117,7 @@ class PasswordRecoverView(PublicFormView):
         try:
             from flask_mail import Mail, Message
         except Exception:
-            log.error("Install Flask-Mail to use User registration")
+            log.error('Install Flask-Mail to use User registration')
             return False
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
@@ -142,7 +130,7 @@ class PasswordRecoverView(PublicFormView):
         try:
             mail.send(msg)
         except Exception as e:
-            log.error("Send email exception: {0}".format(str(e)))
+            log.error('Send email exception: {0}'.format(str(e)))
             return False
         return True
 
@@ -171,7 +159,7 @@ class PasswordRecoverView(PublicFormView):
         self.add_form_unique_validations(form)
         return self.add_password_reset(email=form.email.data)
 
-    @expose("/form", methods=['POST'])
+    @expose('/form', methods=['POST'])
     def this_form_post(self):
         self._init_vars()
         form = self.form.refresh()
@@ -186,7 +174,7 @@ class PasswordRecoverView(PublicFormView):
                 self.form_template,
                 title=self.form_title,
                 widgets=widgets,
-                appbuilder=self.appbuilder
+                appbuilder=self.appbuilder,
             )
 
     def add_form_unique_validations(self, form):

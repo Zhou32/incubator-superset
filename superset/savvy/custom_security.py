@@ -18,10 +18,11 @@
 import datetime
 
 from flask import url_for
+from werkzeug.security import generate_password_hash
+
 from superset.security import SupersetSecurityManager
 from superset.savvy.password_recover_views import EmailResetPasswordView, PasswordRecoverView
 from superset.savvy.savvymodels import Organization, ResetRequest
-from werkzeug.security import generate_password_hash
 
 
 class CustomSecurityManager(SupersetSecurityManager):

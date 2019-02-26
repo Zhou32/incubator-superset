@@ -18,8 +18,8 @@
 import datetime
 
 from flask_appbuilder import Model
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Sequence,\
-    Integer, String, Table, UniqueConstraint
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, \
+    Sequence, String, Table, UniqueConstraint
 
 
 class ResetRequest(Model):
