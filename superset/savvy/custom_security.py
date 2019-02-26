@@ -33,7 +33,7 @@ class CustomSecurityManager(SupersetSecurityManager):
     orgModel = Organization
 
     def register_views(self):
-        super(SupersetSecurityManager, self).register_views()
+        super(CustomSecurityManager, self).register_views()
         if self.passwordrecoverview:
             self.passwordrecoverview = self\
                 .appbuilder.add_view_no_menu(self.passwordrecoverview)
