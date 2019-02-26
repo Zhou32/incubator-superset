@@ -39,7 +39,7 @@ class EmailResetPasswordView(PublicFormView):
     redirect_url = '/'
     message = lazy_gettext('Password Changed')
 
-    @expose("/form", methods=['GET'])
+    @expose('/form', methods=['GET'])
     def this_form_get(self):
         self._init_vars()
         form = self.form.refresh()
@@ -56,7 +56,7 @@ class EmailResetPasswordView(PublicFormView):
         print('not found')
         return redirect(self.appbuilder.get_url_for_index)
 
-    @expose("/form", methods=['POST'])
+    @expose('/form', methods=['POST'])
     def this_form_post(self):
         self._init_vars()
         form = self.form.refresh()

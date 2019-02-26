@@ -20,8 +20,9 @@ import datetime
 from flask import url_for
 from werkzeug.security import generate_password_hash
 
+from superset.savvy.password_recover_views import EmailResetPasswordView,\
+    PasswordRecoverView
 from superset.security import SupersetSecurityManager
-from superset.savvy.password_recover_views import EmailResetPasswordView, PasswordRecoverView
 from superset.savvy.savvymodels import Organization, ResetRequest
 
 
@@ -82,7 +83,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         if reset_request is not None:
             time = reset_request.reset_date
             current_time = datetime.datetime.now()
-            time_diff = (current_time-time).total_seconds()
+            time_diff = (current_time - time).total_seconds()
             if time_diff < 3600:
                 """Check time diff of reset hash time"""
                 email = reset_request.email
