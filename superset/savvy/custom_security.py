@@ -19,7 +19,7 @@ import datetime
 from superset.security import SupersetSecurityManager
 from flask import url_for
 from superset.savvy.password_recover_views import PasswordRecoverView, EmailResetPasswordView
-from superset.savvy.savvymodels import ResetRequest
+from superset.savvy.savvymodels import ResetRequest, Organization
 from werkzeug.security import generate_password_hash
 
 
@@ -29,6 +29,7 @@ class CustomSecurityManager(SupersetSecurityManager):
     passwordresetview = EmailResetPasswordView
 
     resetRequestModel = ResetRequest
+    orgModel = Organization
 
     def register_views(self):
         super(SupersetSecurityManager, self).register_views()
@@ -95,6 +96,22 @@ class CustomSecurityManager(SupersetSecurityManager):
     def to_reset_view(self):
         return url_for('%s.%s' % (self.passwordresetview.endpoint, self.passwordresetview.default_view))
 
+    def find_org_by_name(self, org_name):
+        return self.get_session.query(self.orgModel).filter_by(org_name=org_name).first()
+
+    def create_org(self, org_name):
+        org = self.find_org_by_name(org_name)
+        if org is not None:
+            return False
+        org = self.orgModel()
+        org.org_name=org_name
+        try:
+            self.get_session.add(org)
+            self.get_session.commit()
+            return True
+        except Exception:
+            self.get_session.rollback()
+            return False
 
 
 
