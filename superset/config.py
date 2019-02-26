@@ -460,6 +460,15 @@ MAIL_DEFAULT_SENDER = 'noreply@solarbi.com.au'
 if not CACHE_DEFAULT_TIMEOUT:
     CACHE_DEFAULT_TIMEOUT = CACHE_CONFIG.get('CACHE_DEFAULT_TIMEOUT')
 
+# Following configs are for tests
+SMTP_HOST = 'localhost'
+SMTP_STARTTLS = True
+SMTP_SSL = False
+SMTP_USER = 'superset'
+SMTP_PORT = 25
+SMTP_PASSWORD = 'superset'
+SMTP_MAIL_FROM = 'superset@superset.com'
+
 # Whether to bump the logging level to ERRROR on the flask_appbiulder package
 # Set to False if/when debugging FAB related issues like
 # permission management
