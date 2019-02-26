@@ -16,9 +16,10 @@
 # under the License.
 # pylint: disable=C,R,W
 import datetime
-from sqlalchemy import Table, Column, Integer, String, Boolean,\
-    DateTime, ForeignKey, Sequence, UniqueConstraint
+
 from flask_appbuilder import Model
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Sequence,\
+    Integer, String, Table, UniqueConstraint
 
 
 class ResetRequest(Model):
@@ -38,8 +39,8 @@ class Organization(Model):
 
 
 assoc_org_user = Table('org_user', Model.metadata,
-                       Column('id', Integer, Sequence('ab_org_user_id_seq'), primary_key=True),
+                       Column('id', Integer, Sequence('ab_org_user_id_seq'),
+                              primary_key=True),
                        Column('org_id', Integer, ForeignKey('ab_organization.id')),
                        Column('user_id', Integer, ForeignKey('ab_user.id')),
-                       UniqueConstraint('org_id', 'user_id')
-)
+                       UniqueConstraint('org_id', 'user_id'))

@@ -15,17 +15,16 @@
 # specific language governing permissions and limitations
 # under the License.
 # pylint: disable=C,R,W
-
-from flask_appbuilder.views import PublicFormView, SimpleFormView,  expose
-from flask_appbuilder._compat import as_unicode
-from flask_babel import lazy_gettext
-from flask_appbuilder.security.forms import DynamicForm
-from flask import flash, redirect, url_for, request
-from flask_appbuilder.fieldwidgets import BS3PasswordFieldWidget
-from wtforms import StringField, PasswordField
-from wtforms.validators import DataRequired, Email, EqualTo
-
 import logging
+
+from flask import flash, redirect, request, url_for
+from flask_appbuilder._compat import as_unicode
+from flask_appbuilder.fieldwidgets import BS3PasswordFieldWidget
+from flask_appbuilder.security.forms import DynamicForm
+from flask_appbuilder.views import expose, PublicFormView
+from flask_babel import lazy_gettext
+from wtforms import PasswordField, StringField
+from wtforms.validators import DataRequired, Email, EqualTo
 
 log = logging.getLogger(__name__)
 
@@ -39,14 +38,14 @@ class PasswordResetForm(DynamicForm):
                              validators=[DataRequired()],
                              widget=BS3PasswordFieldWidget())
     conf_password = PasswordField(lazy_gettext('Confirm Password'),
-                                  validators=[DataRequired(), EqualTo('password', message=lazy_gettext('Passwords must match'))],
+                                  validators=[DataRequired(),
+                                              EqualTo('password',
+                                                        message=lazy_gettext('Passwords must match'))],
                                   widget=BS3PasswordFieldWidget())
-
 
 
 class EmailResetPasswordView(PublicFormView):
     route_base = '/reset'
-
     form = PasswordResetForm
     form_title = lazy_gettext('Reset Password Form')
     redirect_url = '/'
@@ -75,7 +74,7 @@ class EmailResetPasswordView(PublicFormView):
         form = self.form.refresh()
         if form.validate_on_submit():
             token = request.args.get('token')
-            response = self.form_post(form,token)
+            response = self.form_post(form, token)
             if not response:
                 return self.this_form_get()
             return redirect(response)
@@ -97,6 +96,7 @@ class EmailResetPasswordView(PublicFormView):
             self.appbuilder.sm.set_token_used(token)
             return self.appbuilder.get_url_for_index
         return None
+
 
 class PasswordRecoverView(PublicFormView):
     """
@@ -191,7 +191,3 @@ class PasswordRecoverView(PublicFormView):
 
     def add_form_unique_validations(self, form):
         return
-
-
-
-

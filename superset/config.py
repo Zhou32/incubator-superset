@@ -30,9 +30,7 @@ import sys
 from celery.schedules import crontab
 from dateutil import tz
 from flask_appbuilder.security.manager import AUTH_DB
-
 from superset.savvy.custom_security import CustomSecurityManager
-
 from superset.stats_logger import DummyStatsLogger
 
 # Realtime stats logger, a StatsD implementation exists
@@ -76,7 +74,8 @@ SECRET_KEY = '\2\1thisismyscretkey\1\2\e\y\y\h'  # noqa
 # DB_USER = 'savvybi'
 # DB_PASSWORD = 'savvybi141428'
 # DB_URL = 'savvybi-test.ciimkozo2x5b.ap-southeast-2.rds.amazonaws.com'
-# SQLALCHEMY_DATABASE_URI = 'postgresql://{username}:{password}@{url}/savvybi'.format(username=DB_USER, password=DB_PASSWORD, url=DB_URL)
+# SQLALCHEMY_DATABASE_URI = 'postgresql://{username}:{password}@{url}
+# /savvybi'.format(username=DB_USER, password=DB_PASSWORD, url=DB_URL)
 # SQLALCHEMY_DATABASE_URI = 'mysql://myapp@localhost/myapp'
 # SQLALCHEMY_DATABASE_URI = 'postgresql://root:password@localhost/myapp'
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(DATA_DIR, 'superset.db')
@@ -213,9 +212,9 @@ IMG_UPLOAD_URL = '/static/uploads/'
 
 CACHE_DEFAULT_TIMEOUT = 60 * 60 * 24
 CACHE_CONFIG = {'CACHE_TYPE': 'redis',
-    'CACHE_DEFAULT_TIMEOUT': CACHE_DEFAULT_TIMEOUT,
-    'CACHE_KEY_PREFIX': 'superset_results',
-    'CACHE_REDIS_URL': 'redis://redis:6379/0'}
+                'CACHE_DEFAULT_TIMEOUT': CACHE_DEFAULT_TIMEOUT,
+                'CACHE_KEY_PREFIX': 'superset_results',
+                'CACHE_REDIS_URL': 'redis://redis:6379/0'}
 TABLE_NAMES_CACHE_CONFIG = {'CACHE_TYPE': 'null'}
 
 # CORS Options
