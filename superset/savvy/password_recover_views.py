@@ -154,5 +154,3 @@ class PasswordRecoverView(PublicFormView):
 
     def form_post(self, form):
         return self.add_password_reset(email=form.email.data)
-
-

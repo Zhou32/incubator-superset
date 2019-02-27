@@ -19,7 +19,7 @@ import datetime
 
 from flask_appbuilder import Model
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, \
-    Sequence, String, Table, UniqueConstraint
+    Sequence, String
 
 
 class ResetRequest(Model):
@@ -36,7 +36,6 @@ class Organization(Model):
     __tablename__ = 'ab_organization'
     id = Column(Integer, Sequence('ab_org_id_seq'), primary_key=True)
     org_name = Column(String(64), nullable=False)
-
 
 # assoc_org_user = Table('org_user', Model.metadata,
 #                        Column('id', Integer, Sequence('ab_org_user_id_seq'),
