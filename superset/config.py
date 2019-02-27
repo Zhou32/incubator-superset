@@ -144,10 +144,15 @@ AUTH_TYPE = AUTH_DB
 # AUTH_ROLE_PUBLIC = 'Public'
 
 # Will allow user self registration
-# AUTH_USER_REGISTRATION = True
+AUTH_USER_REGISTRATION = True
 
 # The default user self registration role
-# AUTH_USER_REGISTRATION_ROLE = "Public"
+AUTH_USER_REGISTRATION_ROLE = "Public"
+
+RECAPTCHA_DISABLE = False
+RECAPTCHA_USE_SSL = False
+RECAPTCHA_PUBLIC_KEY = '6LfkdoEUAAAAABhKgDekc0LvM_w8oAP9cdaYe3VE'
+RECAPTCHA_PRIVATE_KEY = '6LfkdoEUAAAAAOEGECGPA0BwBhVoxDSCyJUifWGi'
 
 # When using LDAP Auth, setup the ldap server
 # AUTH_LDAP_SERVER = "ldap://ldapserver.new"
