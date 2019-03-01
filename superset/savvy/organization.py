@@ -8,7 +8,7 @@ from sqlalchemy import (
     MetaData, String, Table, Text, Sequence, UniqueConstraint
 )
 from sqlalchemy.orm import relationship, backref
-# from flask_appbuilder.security.sqla.models import RegisterUser
+from flask_appbuilder.security.sqla.models import RegisterUser
 
 # from superset import app
 #
@@ -37,8 +37,8 @@ class Organization(Model):
 
 class OrgRegisterUser(Model):
     """ the register model for users who are invited by admin """
-    __tablename__ = 'ab_register_user'
-    id = Column(Integer, Sequence('ab_register_user_id_seq'), primary_key=True)
+    __tablename__ = 'ab_register_user_all'
+    id = Column(Integer, Sequence('ab_register_user_all_id_seq'), primary_key=True)
     first_name = Column(String(64), nullable=False)
     last_name = Column(String(64), nullable=False)
     password = Column(String(256))

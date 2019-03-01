@@ -29,6 +29,8 @@ from superset.connectors.connector_registry import ConnectorRegistry
 from superset.exceptions import SupersetSecurityException
 from .savvy.register import SavvyRegisterUserDBView
 from flask_appbuilder import const
+from werkzeug.security import generate_password_hash
+import uuid
 
 log = logging.getLogger(__name__)
 
@@ -102,7 +104,7 @@ class SupersetSecurityManager(SecurityManager):
     registeruserdbview = SavvyRegisterUserDBView
 
 
-    from superset.savvy.orgnization import OrgRegisterUser
+    from superset.savvy.organization import OrgRegisterUser
     registeruser_model = OrgRegisterUser
 
     def get_schema_perm(self, database, schema):
@@ -463,9 +465,9 @@ class SupersetSecurityManager(SecurityManager):
             )
 
     def add_org(self, reg):
-        from superset.savvy.orgnization import Organization
+        from superset.savvy.organization import Organization
         new_org = Organization()
-        new_org.organization_name = reg.organisation
+        new_org.organization_name = reg.organization
         try:
             self.get_session.add(new_org)
             self.get_session.commit()
@@ -475,21 +477,23 @@ class SupersetSecurityManager(SecurityManager):
             self.appbuilder.get_session.rollback()
             return None
 
-    def add_register_user_org(self, username, first_name, last_name, email, password='', hashed_password='', organization=''):
+    def add_register_user_org_admin(self, organization, first_name, last_name, email, password='', hashed_password=''):
+
+        register_user = self.registeruser_model()
+        register_user.first_name = first_name
+        register_user.last_name = last_name
+        register_user.email = email
+        register_user.organization = organization
+        if hashed_password:
+            register_user.password = hashed_password
+        else:
+            register_user.password = generate_password_hash(password)
+        register_user.registration_hash = str(uuid.uuid1())
         try:
-            register_user = self.registeruser_model()
-            register_user.first_name = first_name
-            register_user.last_name = last_name
-            register_user.username = username
-            register_user.email = email
-            register_user.organization = organization
-            if hashed_password:
-                register_user.password = hashed_password
-            else:
-                register_user.password = generate_password_hash(password)
-            register_user.registration_hash = str(uuid.uuid1())
-            register_user.save()
+            self.get_session.add(register_user)
+            self.get_session.commit()
             return register_user
         except Exception as e:
             log.error(const.LOGMSG_ERR_SEC_ADD_REGISTER_USER.format(str(e)))
-            return False
+            self.appbuilder.get_session.rollback()
+            return None
