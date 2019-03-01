@@ -23,7 +23,7 @@ from werkzeug.security import generate_password_hash
 
 from superset.savvy.password_recover_views import EmailResetPasswordView,\
     PasswordRecoverView
-from superset.savvy.savvymodels import Organization, ResetRequest
+from superset.savvy.savvymodels import ResetRequest
 from superset.security import SupersetSecurityManager
 
 PERMISSION_COMMON = {
@@ -31,8 +31,11 @@ PERMISSION_COMMON = {
 }
 
 OWNER_NOT_ALLOWED_MENU = {
-    'List Roles', 'Base Permissions', 'Views/Menus', 'Permission on Views/Menus', 'Action Log',
-    'Manage', 'Druid Clusters', 'Druid Datasources', 'Scan New Datasources', 'Refresh Druid Metadata',
+    'List Roles', 'Base Permissions', 'Views/Menus',
+    'Permission on Views/Menus', 'Action Log',
+    'Manage', 'Druid Clusters', 'Druid Datasources',
+    'Scan New Datasources', 'Refresh Druid Metadata',
+    'SQL Lab',
 }
 
 OWNER_PERMISSION_MODEL = {
@@ -49,7 +52,6 @@ OWNER_PERMISSION_MENU = {
     'Security', 'List Users',
     'Sources', 'Databases', 'Tables', 'Upload a CSV',
     'Charts', 'Dashboards',
-    'SQL Lab', 'SQL Editor',
 }
 
 SUPERUSER_PERMISSION_MENU = {
@@ -58,17 +60,12 @@ SUPERUSER_PERMISSION_MENU = {
     'Charts', 'Dashboards',
 }
 
-USER_PERMISSION_COMMON ={
-    ('can_list', '')
+USER_NOT_ALLOWED_MENU = {
+    'Druid Clusters', 'Druid Datasources', 'Scan New Datasources',
 }
 
-USER_PERMISSION_MENU = {
-    'Sources', 'Databases', 'Tables', 'Upload a CSV',
-    'Charts', 'Dashboards',
-}
-
-VIEWER_PERMISSION_MENU = {
-    'Charts', 'Dashboards',
+VIEWER_NOT_ALLOWED_MENU = {
+    'Sources',
 }
 
 
@@ -78,20 +75,11 @@ class CustomSecurityManager(SupersetSecurityManager):
     passwordresetview = EmailResetPasswordView()
 
     resetRequestModel = ResetRequest
-    orgModel = Organization
 
     def register_views(self):
         super(CustomSecurityManager, self).register_views()
         self.appbuilder.add_view_no_menu(self.passwordrecoverview)
         self.appbuilder.add_view_no_menu(self.passwordresetview)
-
-    # def create_custom_permissions(self):
-    #     super(CustomSecurityManager, self).create_custom_permissions()
-    #     self.merge_perm('can_this_form_get', 'PasswordRecoverView')
-    #     self.merge_perm('can_this_form_post', 'PasswordRecoverView')
-    #     self.merge_perm('reset', 'PasswordRecoverView')
-    #     self.merge_perm('can_this_form_get', 'EmailResetPasswordView')
-    #     self.merge_perm('can_this_form_post', 'EmailResetPasswordView')
 
     def sync_role_definitions(self):
         """Inits the Superset application with security roles and such"""
@@ -107,6 +95,8 @@ class CustomSecurityManager(SupersetSecurityManager):
         self.set_role('granter', self.is_granter_pvm)
         self.set_role('sql_lab', self.is_sql_lab_pvm)
         self.set_role('org_owner', self.is_owner_pvm)
+        self.set_role('org_user', self.is_user_pvm)
+        self.set_role('org_viewer', self.is_viewer_pvm)
 
         if conf.get('PUBLIC_ROLE_LIKE_GAMMA', False):
             self.set_role('Public', self.is_gamma_pvm)
@@ -122,22 +112,31 @@ class CustomSecurityManager(SupersetSecurityManager):
         result = result or self.is_sql_lab_pvm(pvm)
         for permission in PERMISSION_COMMON:
             for view in OWNER_PERMISSION_MODEL:
-                result = result or (pvm.view_menu.name == view and pvm.permission.name == permission)
+                result = result or (pvm.view_menu.name == view and
+                                    pvm.permission.name == permission)
         result = result or (pvm.view_menu.name not in OWNER_NOT_ALLOWED_MENU)
+        if pvm.view_menu.name in OWNER_NOT_ALLOWED_MENU:
+            return False
         return result
 
     def is_superuser_pvm(self, pvm):
         result = False
         for menu in SUPERUSER_PERMISSION_MENU:
-            result = result or (pvm.view_menu.name == menu and pvm.permission.name == 'menu_access')
+            result = result or (pvm.view_menu.name == menu and
+                                pvm.permission.name == 'menu_access')
         return result
 
-    def is_user_pvm(self,pvm):
-        result = False
+    def is_user_pvm(self, pvm):
+        result = self.is_gamma_pvm(pvm)
+        if pvm.view_menu.name in USER_NOT_ALLOWED_MENU:
+            return False
         return result
 
     def is_viewer_pvm(self, pvm):
-        return False
+        result = self.is_gamma_pvm(pvm)
+        if pvm.view_menu.name in VIEWER_NOT_ALLOWED_MENU:
+            return False
+        return result
 
     @property
     def get_url_for_recover(self):
