@@ -18,6 +18,7 @@
 """A set of constants and methods to manage permissions and security"""
 import logging
 
+
 from flask import g
 from flask_appbuilder.security.sqla import models as ab_models
 from flask_appbuilder.security.sqla.manager import SecurityManager
@@ -26,6 +27,10 @@ from sqlalchemy import or_
 from superset import sql_parse
 from superset.connectors.connector_registry import ConnectorRegistry
 from superset.exceptions import SupersetSecurityException
+from .savvy.register import SavvyRegisterUserDBView
+from flask_appbuilder import const
+
+log = logging.getLogger(__name__)
 
 READ_ONLY_MODEL_VIEWS = {
     'DatabaseAsync',
@@ -94,6 +99,11 @@ OBJECT_SPEC_PERMISSIONS = set([
 
 
 class SupersetSecurityManager(SecurityManager):
+    registeruserdbview = SavvyRegisterUserDBView
+
+
+    from superset.savvy.orgnization import OrgRegisterUser
+    registeruser_model = OrgRegisterUser
 
     def get_schema_perm(self, database, schema):
         if schema:
@@ -451,3 +461,35 @@ class SupersetSecurityManager(SecurityManager):
                 self.get_datasource_access_error_msg(datasource),
                 self.get_datasource_access_link(datasource),
             )
+
+    def add_org(self, reg):
+        from superset.savvy.orgnization import Organization
+        new_org = Organization()
+        new_org.organization_name = reg.organisation
+        try:
+            self.get_session.add(new_org)
+            self.get_session.commit()
+            return new_org
+        except Exception as e:
+            log.error(const.LOGMSG_ERR_SEC_ADD_REGISTER_USER.format(str(e)))
+            self.appbuilder.get_session.rollback()
+            return None
+
+    def add_register_user_org(self, username, first_name, last_name, email, password='', hashed_password='', organization=''):
+        try:
+            register_user = self.registeruser_model()
+            register_user.first_name = first_name
+            register_user.last_name = last_name
+            register_user.username = username
+            register_user.email = email
+            register_user.organization = organization
+            if hashed_password:
+                register_user.password = hashed_password
+            else:
+                register_user.password = generate_password_hash(password)
+            register_user.registration_hash = str(uuid.uuid1())
+            register_user.save()
+            return register_user
+        except Exception as e:
+            log.error(const.LOGMSG_ERR_SEC_ADD_REGISTER_USER.format(str(e)))
+            return False
