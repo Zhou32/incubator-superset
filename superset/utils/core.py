@@ -1081,3 +1081,8 @@ def MediumText():
 
 def shortid():
     return '{}'.format(uuid.uuid4())[-12:]
+
+
+def post_request(url, params):
+    import requests
+    return requests.post(url, data=params)
