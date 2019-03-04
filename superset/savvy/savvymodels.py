@@ -30,16 +30,3 @@ class ResetRequest(Model):
     reset_date = Column(DateTime, default=datetime.datetime.now, nullable=True)
     reset_hash = Column(String(256))
     used = Column(Boolean)
-
-
-# class Organization(Model):
-#     __tablename__ = 'ab_organization'
-#     id = Column(Integer, Sequence('ab_org_id_seq'), primary_key=True)
-#     org_name = Column(String(64), nullable=False)
-
-# assoc_org_user = Table('org_user', Model.metadata,
-#                        Column('id', Integer, Sequence('ab_org_user_id_seq'),
-#                               primary_key=True),
-#                        Column('org_id', Integer, ForeignKey('ab_organization.id')),
-#                        Column('user_id', Integer, ForeignKey('ab_user.id')),
-#                        UniqueConstraint('org_id', 'user_id'))

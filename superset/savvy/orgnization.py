@@ -37,7 +37,7 @@ class Organization(Model):
 
 class OrgRegisterUser(Model):
     """ the register model for users who are invited by admin """
-    __tablename__ = 'ab_register_user'
+    __tablename__ = 'ab_register_user_all'
     id = Column(Integer, Sequence('ab_register_user_id_seq'), primary_key=True)
     first_name = Column(String(64), nullable=False)
     last_name = Column(String(64), nullable=False)
@@ -46,6 +46,6 @@ class OrgRegisterUser(Model):
     registration_date = Column(DateTime, default=datetime.now, nullable=True)
     registration_hash = Column(String(256))
     organization = Column(String(250), nullable=False)
-    inviter = Column('inviter_id', Integer, ForeignKey('ab_user.id'),nullable=True)
+    inviter_id = Column('inviter_id', Integer, ForeignKey('ab_user.id'),nullable=True)
     valid_date = Column(DateTime, default=(datetime.now() + timedelta(hours=register_valid_hours)), nullable=True)
     role_assigned = Column('role_id', Integer, ForeignKey('ab_role.id'), nullable=True)
