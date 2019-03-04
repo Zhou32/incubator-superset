@@ -464,10 +464,11 @@ class SupersetSecurityManager(SecurityManager):
                 self.get_datasource_access_link(datasource),
             )
 
-    def add_org(self, reg):
+    def add_org(self, reg, user):
         from superset.savvy.organization import Organization
         new_org = Organization()
         new_org.organization_name = reg.organization
+        new_org.users.append(user)
         try:
             self.get_session.add(new_org)
             self.get_session.commit()

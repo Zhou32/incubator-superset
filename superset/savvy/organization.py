@@ -32,7 +32,7 @@ class Organization(Model):
     __tablename__ = 'organizations'
     id = Column(Integer, primary_key=True)
     organization_name = Column(String(250))
-    user = relationship('User', secondary=assoc_org_user, backref='organizations')
+    users = relationship('User', secondary=assoc_org_user, backref='organization')
 
 
 class OrgRegisterUser(Model):

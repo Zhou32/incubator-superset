@@ -81,20 +81,21 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
             log.error(const.LOGMSG_ERR_SEC_NO_REGISTER_HASH.format(activation_hash))
             flash(as_unicode(self.false_error_message), 'danger')
             return redirect(self.appbuilder.get_url_for_index)
-        if not self.appbuilder.sm.add_user(username=reg.email,
+        user = self.appbuilder.sm.add_user(username=reg.email,
                                            email=reg.email,
                                            first_name=reg.first_name,
                                            last_name=reg.last_name,
                                            role=self.appbuilder.sm.find_role(
                                                self.appbuilder.sm.auth_user_registration_role),
-                                           password=reg.password):
+                                           password=reg.password)
+        if not user:
             flash(as_unicode(self.error_message), 'danger')
             return redirect(self.appbuilder.get_url_for_index)
         else:
-            org_reg = self.appbuilder.sm.add_org(reg)
-            aws_info = post_request('https://3ozse3mao8.execute-api.ap-southeast-2.amazonaws.com/test/createorg',
-                                    {"OrgName": org_reg.organization_name, "OrgID": org_reg.id})
-            self.handle_aws_info(aws_info)
+            org_reg = self.appbuilder.sm.add_org(reg, user)
+            # aws_info = post_request('https://3ozse3mao8.execute-api.ap-southeast-2.amazonaws.com/test/createorg',
+            #                         {"OrgName": org_reg.organization_name, "OrgID": org_reg.id})
+            # self.handle_aws_info(aws_info)
             self.appbuilder.sm.del_register_user(reg)
             return self.render_template(self.activation_template,
                                         username=reg.email,
