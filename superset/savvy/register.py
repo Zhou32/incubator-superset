@@ -15,14 +15,18 @@
 # specific language governing permissions and limitations
 # under the License.
 # pylint: disable=C,R,W
+from flask import g
 from flask_appbuilder import expose, const
-from flask_appbuilder.security.registerviews import RegisterUserDBView
+from flask_appbuilder.security.registerviews import RegisterUserDBView, BaseRegisterUser
 from flask_appbuilder.security.forms import DynamicForm
 from flask_appbuilder.fieldwidgets import BS3TextFieldWidget, BS3PasswordFieldWidget
 from flask_appbuilder._compat import as_unicode
-from wtforms import StringField, BooleanField, PasswordField, SelectField
+from werkzeug.utils import redirect
+from wtforms import StringField, PasswordField, SelectField, HiddenField
 from flask_babel import lazy_gettext
 from flask import flash, redirect, url_for
+
+from superset.savvy.savvy_views import RegisterInvitationForm, log
 from ..utils.core import post_request
 
 from wtforms.validators import DataRequired, EqualTo, Email
@@ -55,16 +59,44 @@ class SavvyRegisterUserDBForm(DynamicForm):
 
 class SavvyRegisterInvitationUserDBForm(DynamicForm):
     role = SelectField(label=lazy_gettext('Invitation Role'),
-                       choices=[('1', 'super_user'),('2', 'normal_user'), ('3', 'viewer_user')])
+                       choices=[('org_superuser', 'Superuser'),('org_user', 'normal user'), ('org_viewer', 'viewer user')])
     email = StringField(lazy_gettext('Email'), validators=[DataRequired(), Email()], widget=BS3TextFieldWidget())
+    # inviter_id = HiddenField(lazy_gettext('Inviter'))
+    # organization = HiddenField(lazy_gettext('Organization'))
 
 
 class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
     redirect_url = '/'
     form = SavvyRegisterInvitationUserDBForm
+    msg = 'Invitation has been sent to the email.'
     email_subject = 'Invitation Registration'
 
-    @expose('/invite/')
+    def send_email(self, register_user):
+        """
+            Method for sending the registration Email to the user
+        """
+        try:
+            from flask_mail import Mail, Message
+        except:
+            log.error("Install Flask-Mail to use User registration")
+            return False
+        mail = Mail(self.appbuilder.get_app)
+        msg = Message()
+        msg.subject = self.email_subject
+        url = self.appbuilder.sm.get_url_for_invitation(register_user.registration_hash)
+        msg.html = self.render_template(self.email_template,
+                                        url=url,
+                                        first_name=register_user.first_name,
+                                        last_name=register_user.last_name)
+        msg.recipients = [register_user.email]
+        try:
+            mail.send(msg)
+        except Exception as e:
+            log.error("Send email exception: {0}".format(str(e)))
+            return False
+        return True
+
+    @expose('/invite')
     def invitation(self):
         self._init_vars()
         form = self.form.refresh()
@@ -75,6 +107,23 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
                                     widgets=widgets,
                                     appbuilder=self.appbuilder
                                     )
+
+    @expose('/invite', methods=['POST'])
+    def invitation_post(self):
+        form = self.form.refresh()
+        if form.validate_on_submit():
+            user_id = g.user.id
+            organization = self.appbuilder.sm.find_org(user_id=user_id)
+            reg_user = self.appbuilder.sm.add_invite_register_user(email=form.email.data,
+                                                                   organization=organization.organization_name,
+                                                                   role=form.role.data,
+                                                                   inviter=user_id)
+            if reg_user:
+                if self.send_email(reg_user):
+                    print('success send')
+                    return redirect(self.appbuilder.get_url_for_index)
+        else:
+            return self.invitation()
 
 
 class SavvyRegisterUserDBView(RegisterUserDBView):
@@ -92,14 +141,6 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
         """
         reg = self.appbuilder.sm.find_register_user(activation_hash)
 
-        # reg = RegisterUser()
-        # reg.username = 'Colin'
-        # reg.password = 'pa55word'
-        # reg.email = 'chenyang.wang@zawee.work'
-        # reg.last_name = 'Wang'
-        # reg.first_name = 'Chenyang'
-        # reg.organisation = 'Colin23'
-        # activation_hash = ''
         if not reg:
             log.error(const.LOGMSG_ERR_SEC_NO_REGISTER_HASH.format(activation_hash))
             flash(as_unicode(self.false_error_message), 'danger')
@@ -108,9 +149,8 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
                                            email=reg.email,
                                            first_name=reg.first_name,
                                            last_name=reg.last_name,
-                                           role=self.appbuilder.sm.find_role(
-                                               self.appbuilder.sm.auth_user_registration_role),
-                                           password=reg.password)
+                                           role=self.appbuilder.sm.find_role('org_owner'),
+                                           hashed_password=reg.password)
         if not user:
             flash(as_unicode(self.error_message), 'danger')
             return redirect(self.appbuilder.get_url_for_index)
@@ -187,10 +227,110 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
             log.error("Send email exception: {0}".format(str(e)))
             return False
         return True
-    # username = 'Colin'
-    # password = 'pa55word'
-    # email = 'chenyang.wang@zawee.work'
-    # family_name = 'Wang'
-    # given_name = 'Chenyang'
-    # role = 'admin'
-    # organisation = 'Colin23'
+
+
+class SavvyRegisterInviteView(BaseRegisterUser):
+    form = RegisterInvitationForm
+
+    email_template = 'appbuilder/general/security/register_mail.html'
+    email_subject =  'SavvyBI - Register'
+
+    def send_email(self, register_user):
+        """
+            Method for sending the registration Email to the user
+        """
+        try:
+            from flask_mail import Mail, Message
+        except Exception:
+            log.error('Install Flask-Mail to use User registration')
+            return False
+        mail = Mail(self.appbuilder.get_app)
+        msg = Message()
+        msg.subject = self.email_subject
+        url = url_for('.activate', _external=True, invitation_hash=register_user.registration_hash)
+        print(url)
+        msg.html = self.render_template(self.email_template,
+                                        url=url)
+        msg.recipients = [register_user.email]
+        try:
+            mail.send(msg)
+        except Exception as e:
+            log.error('Send email exception: {0}'.format(str(e)))
+            return False
+        return True
+
+    @expose('/invitation/<string:invitation_hash>', methods=['GET'])
+    def invitation(self, invitation_hash):
+        """End point for registration by invitation"""
+        self._init_vars()
+        form = self.form.refresh()
+        # Find org inviter and email by invitation hash
+        org_name, inviter, email, role = self.appbuilder.sm.find_invite_hash(invitation_hash)
+        if email is not None:
+            form.email.data = email
+            form.organization.data = org_name
+            form.inviter.data = inviter
+            form.role.data = role
+            widgets = self._get_edit_widget(form=form)
+            self.update_redirect()
+            return self.render_template(self.form_template,
+                                        title=self.form_title,
+                                        widgets=widgets,
+                                        appbuilder=self.appbuilder)
+        return redirect(self.appbuilder.get_url_for_index)
+
+    def edit_invited_register_user(self, form, invitation_hash):
+        register_user = self.appbuilder.sm.edit_invite_register_user_by_hash(invitation_hash,
+                                                                             first_name=form.first_name.data,
+                                                                             last_name=form.last_name.data,
+                                                                             password=form.password.data,
+                                                                             )
+        if register_user:
+            if self.send_email(register_user):
+                flash(as_unicode(self.message), 'info')
+                return self.appbuilder.get_url_for_index
+            else:
+                flash(as_unicode(self.error_message), 'danger')
+                self.appbuilder.sm.del_register_user(register_user)
+                return None
+
+    @expose('/invitation/<string:invitation_hash>', methods=['POST'])
+    def invite_register(self, invitation_hash):
+        """End point for registration by invitation"""
+        form = self.form.refresh()
+
+        if form.validate_on_submit() and self.appbuilder.sm.find_register_user(invitation_hash):
+            response = self.edit_invited_register_user(form, invitation_hash)
+            if not response:
+                return redirect(self.appbuilder.get_url_for_index)
+            return redirect(response)
+        else:
+            widgets = self._get_edit_widget(form=form)
+            return self.render_template(
+                self.form_template,
+                title=self.form_title,
+                widgets=widgets,
+                appbuilder=self.appbuilder,
+            )
+
+    @expose('/activate/<string:invitation_hash>')
+    def activate(self, invitation_hash):
+        reg = self.appbuilder.sm.find_register_user(invitation_hash)
+        if not reg:
+            flash(as_unicode(self.false_error_message), 'danger')
+            return redirect(self.appbuilder.get_url_for_index)
+        if not self.appbuilder.sm.add_org_user(email=reg.email,
+                                               first_name=reg.first_name,
+                                               last_name=reg.last_name,
+                                               role_id=reg.role_assigned,
+                                               organization=reg.organization,
+                                               hashed_password=reg.password):
+            flash(as_unicode(self.error_message), 'danger')
+            return redirect(self.appbuilder.get_url_for_index)
+        else:
+            self.appbuilder.sm.del_register_user(reg)
+            return self.render_template(self.activation_template,
+                                        username=reg.email,
+                                        first_name=reg.first_name,
+                                        last_name=reg.last_name,
+                                        appbuilder=self.appbuilder)

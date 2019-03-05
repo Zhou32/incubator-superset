@@ -17,12 +17,15 @@
 # pylint: disable=C,R,W
 import datetime
 import logging
+import uuid
 
 from flask import url_for
+from flask_appbuilder import const
 from werkzeug.security import generate_password_hash
 
-from superset.savvy.savvy_views import EmailResetPasswordView,\
-    InviteRegisterView, PasswordRecoverView
+from superset.savvy.register import SavvyRegisterInvitationUserDBView, SavvyRegisterInviteView
+from superset.savvy.savvy_views import EmailResetPasswordView, \
+    PasswordRecoverView
 from superset.savvy.savvymodels import ResetRequest
 from superset.security import SupersetSecurityManager
 from superset.savvy.organization import OrgRegisterUser, Organization
@@ -65,6 +68,11 @@ USER_NOT_ALLOWED_MENU = {
     'Druid Clusters', 'Druid Datasources', 'Scan New Datasources',
 }
 
+NOT_ALLOWED_SQL_PERM = {
+    'can_sql_json', 'can_csv', 'can_search_queries', 'can_sqllab_viz',
+    'can_sqllab',
+}
+
 VIEWER_NOT_ALLOWED_MENU = {
     'Sources',
 }
@@ -74,10 +82,11 @@ class CustomSecurityManager(SupersetSecurityManager):
 
     passwordrecoverview = PasswordRecoverView()
     passwordresetview = EmailResetPasswordView()
-    invite_register_view = InviteRegisterView()
+    invite_register_view = SavvyRegisterInviteView()
+    invitation_view = SavvyRegisterInvitationUserDBView()
 
     resetRequestModel = ResetRequest
-    inviteRegisterModel = OrgRegisterUser
+    registeruser_model = OrgRegisterUser
     organizationModel = Organization
 
     def register_views(self):
@@ -85,6 +94,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         self.appbuilder.add_view_no_menu(self.passwordrecoverview)
         self.appbuilder.add_view_no_menu(self.passwordresetview)
         self.appbuilder.add_view_no_menu(self.invite_register_view)
+        self.appbuilder.add_view_no_menu(self.invitation_view)
 
     def sync_role_definitions(self):
         """Inits the Superset application with security roles and such"""
@@ -100,6 +110,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         self.set_role('granter', self.is_granter_pvm)
         self.set_role('sql_lab', self.is_sql_lab_pvm)
         self.set_role('org_owner', self.is_owner_pvm)
+        self.set_role('org_superuser', self.is_superuser_pvm)
         self.set_role('org_user', self.is_user_pvm)
         self.set_role('org_viewer', self.is_viewer_pvm)
 
@@ -120,17 +131,20 @@ class CustomSecurityManager(SupersetSecurityManager):
                 result = result or (pvm.view_menu.name == view and
                                     pvm.permission.name == permission)
         result = result or (pvm.view_menu.name not in OWNER_NOT_ALLOWED_MENU)
-        if pvm.view_menu.name in OWNER_NOT_ALLOWED_MENU:
-            return False
-        if self.is_sql_lab_pvm(pvm):
+        if pvm.view_menu.name in OWNER_NOT_ALLOWED_MENU or pvm.permission.name in NOT_ALLOWED_SQL_PERM:
             return False
         return result
 
     def is_superuser_pvm(self, pvm):
-        result = False
-        for menu in SUPERUSER_PERMISSION_MENU:
-            result = result or (pvm.view_menu.name == menu and
-                                pvm.permission.name == 'menu_access')
+        result = self.is_alpha_only(pvm)
+
+        for permission in PERMISSION_COMMON:
+            for view in OWNER_PERMISSION_MODEL:
+                result = result or (pvm.view_menu.name == view and
+                                    pvm.permission.name == permission)
+        result = result or (pvm.view_menu.name not in OWNER_NOT_ALLOWED_MENU)
+        if pvm.view_menu.name in OWNER_NOT_ALLOWED_MENU or pvm.permission.name in NOT_ALLOWED_SQL_PERM:
+            return False
         return result
 
     def is_user_pvm(self, pvm):
@@ -153,6 +167,10 @@ class CustomSecurityManager(SupersetSecurityManager):
     def get_url_for_reset(self, token):
         return url_for('%s.%s' % (self.passwordresetview.endpoint,
                                   self.passwordresetview.default_view), token=token)
+
+    def get_url_for_invitation(self, token):
+        return url_for('%s.%s' % (self.invite_register_view.endpoint,
+                                  'invitation'), invitation_hash=token, _external=True)
 
     def add_reset_request(self, email):
         """try look for not used existed hash for user"""
@@ -209,33 +227,55 @@ class CustomSecurityManager(SupersetSecurityManager):
         return url_for('%s.%s' % (self.passwordresetview.endpoint,
                                   self.passwordresetview.default_view))
 
-    def add_invite_register_user(self, first_name, last_name, email, role, inviter, hash,
-                                 password='', hashed_password='', organization=''):
-
-        invited_user = self.inviteRegisterModel()
-        invited_user.email = email
-        invited_user.first_name = first_name
-        invited_user.last_name = last_name
-        invited_user.inviter_id = inviter
-        role = self.find_role(role)
-        invited_user.role_assigned = role.id
+    def add_invite_register_user(self, first_name=None, last_name=None, email=None, role=None,
+                                 inviter=None, password='', hashed_password='', organization=''):
+        invited_user = self.registeruser_model()
+        if email:
+            invited_user.email = email
+        if first_name:
+            invited_user.first_name = first_name
+        if last_name:
+            invited_user.last_name = last_name
+        if inviter:
+            invited_user.inviter = inviter
+        if role:
+            role = self.find_role(role)
+            invited_user.role_assigned = role.id
         if hashed_password:
             invited_user.password = hashed_password
         else:
             invited_user.password = generate_password_hash(password)
-        invited_user.organization = organization
-        invited_user.registration_hash = hash
+        if organization:
+            invited_user.organization = organization
+        invited_user.registration_hash = str(uuid.uuid1())
         try:
             self.get_session.add(invited_user)
             self.get_session.commit()
             return invited_user
         except Exception as e:
             self.get_session.rollback()
-            print(e)
+            logging.error(e)
             return None
 
-    def find_invite_register_user(self, invitation_hash):
-        return self.get_session.query(self.inviteRegisterModel).filter_by(registration_hash=invitation_hash).first()
+    def edit_invite_register_user_by_hash(self, invitation_hash, first_name=None, last_name=None,
+                                          password='', hashed_password=''):
+        invited_user = self.find_register_user(invitation_hash)
+        if first_name:
+            invited_user.first_name = first_name
+        if last_name:
+            invited_user.last_name = last_name
+        if hashed_password:
+            invited_user.password = hashed_password
+        else:
+            invited_user.password = generate_password_hash(password)
+        try:
+            self.get_session.merge(invited_user)
+            self.get_session.commit()
+            return invited_user
+        except Exception as e:
+            self.get_session.rollback()
+            logging.error(e)
+            return None
 
     def del_invite_register_user(self, register_user):
         try:
@@ -246,14 +286,20 @@ class CustomSecurityManager(SupersetSecurityManager):
             return False
 
     def find_invite_hash(self, invitation_hash):
-        org_name = 'ericorg'
-        inviter = 'eric eric'
-        email = 'bwhsdzf@gmail.com'
-        role = 'org_user'
-        return org_name, inviter, email, role
+        reg_user = self.find_register_user(invitation_hash)
+        org_name = reg_user.organization
+        inviter = self.get_user_by_id(reg_user.inviter)
+        inviter = inviter.get_full_name()
+        email = reg_user.email
+        role = self.get_session.query(self.role_model).filter_by(id=reg_user.role_assigned).first()
+        return org_name, inviter, email, role.name
 
-    def find_org(self, org_name):
-        return self.get_session.query(self.organizationModel).filter_by(organization_name=org_name).first()
+    def find_org(self, org_name=None, user_id=None ):
+        if org_name:
+            return self.get_session.query(self.organizationModel).filter_by(organization_name=org_name).first()
+        elif user_id:
+            return self.get_session.query(self.organizationModel).\
+                filter(self.organizationModel.users.any(id=user_id)).scalar()
 
     def add_org_user(self, email, first_name, last_name, hashed_password, organization, role_id):
         try:
@@ -263,12 +309,49 @@ class CustomSecurityManager(SupersetSecurityManager):
             user.username = email
             user.first_name = first_name
             user.last_name = last_name
+            user.active = True
             user.password = hashed_password
             role = self.get_session.query(self.role_model).filter_by(id=role_id).first()
             user.roles.append(role)
-            org.user.append(user)
+            org.users.append(user)
             self.get_session.add(user)
             self.get_session.commit()
             return user
-        except Exception:
+        except Exception as e:
+            logging.error(e)
             return False
+
+    def add_org(self, reg, user):
+        from superset.savvy.organization import Organization
+        new_org = Organization()
+        new_org.organization_name = reg.organization
+        new_org.users.append(user)
+        try:
+            self.get_session.add(new_org)
+            self.get_session.commit()
+            return new_org
+        except Exception as e:
+            logging.error(const.LOGMSG_ERR_SEC_ADD_REGISTER_USER.format(str(e)))
+            self.appbuilder.get_session.rollback()
+            return None
+
+    def add_register_user_org_admin(self, organization, first_name, last_name, email, password='', hashed_password=''):
+
+        register_user = self.registeruser_model()
+        register_user.first_name = first_name
+        register_user.last_name = last_name
+        register_user.email = email
+        register_user.organization = organization
+        if hashed_password:
+            register_user.password = hashed_password
+        else:
+            register_user.password = generate_password_hash(password)
+        register_user.registration_hash = str(uuid.uuid1())
+        try:
+            self.get_session.add(register_user)
+            self.get_session.commit()
+            return register_user
+        except Exception as e:
+            logging.error(const.LOGMSG_ERR_SEC_ADD_REGISTER_USER.format(str(e)))
+            self.appbuilder.get_session.rollback()
+            return None

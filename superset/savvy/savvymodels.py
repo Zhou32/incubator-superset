@@ -23,8 +23,8 @@ from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, \
 
 
 class ResetRequest(Model):
-    ___tablename__ = 'ab_reset_request'
-    id = Column(Integer, Sequence('ab_reset_request_id_seq'), primary_key=True)
+    ___tablename__ = 'reset_request'
+    id = Column(Integer, Sequence('reset_request_id_seq'), primary_key=True)
     user_id = Column(Integer, ForeignKey('ab_user.id'))
     email = Column(String(64), nullable=False)
     reset_date = Column(DateTime, default=datetime.datetime.now, nullable=True)

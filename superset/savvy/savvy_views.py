@@ -21,10 +21,9 @@ from flask import flash, redirect, request, url_for
 from flask_appbuilder._compat import as_unicode
 from flask_appbuilder.fieldwidgets import BS3PasswordFieldWidget, BS3TextFieldWidget
 from flask_appbuilder.security.forms import DynamicForm, ResetPasswordForm
-from flask_appbuilder.security.registerviews import BaseRegisterUser
 from flask_appbuilder.views import expose, PublicFormView
 from flask_babel import lazy_gettext
-from wtforms import StringField, PasswordField, HiddenField
+from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired, Email, EqualTo
 
 log = logging.getLogger(__name__)
@@ -173,117 +172,4 @@ class PasswordRecoverView(PublicFormView):
     def form_post(self, form):
         return self.add_password_reset(email=form.email.data)
 
-
-class InviteRegisterView(BaseRegisterUser):
-    form = RegisterInvitationForm
-
-    email_template = 'appbuilder/general/security/register_mail.html'
-    email_subject =  'SavvyBI - Register'
-
-    def send_email(self, register_user):
-        """
-            Method for sending the registration Email to the user
-        """
-        try:
-            from flask_mail import Mail, Message
-        except Exception:
-            log.error('Install Flask-Mail to use User registration')
-            return False
-        mail = Mail(self.appbuilder.get_app)
-        msg = Message()
-        msg.subject = self.email_subject
-        url = url_for('.activate', _external=True, invitation_hash=register_user.registration_hash)
-        print(url)
-        msg.html = self.render_template(self.email_template,
-                                        url=url)
-        msg.recipients = [register_user.email]
-        try:
-            mail.send(msg)
-        except Exception as e:
-            log.error('Send email exception: {0}'.format(str(e)))
-            return False
-        return True
-
-    @expose('/invitation/<string:invitation_hash>', methods=['GET'])
-    def find_register(self, invitation_hash):
-        """End point for registration by invitation"""
-        self._init_vars()
-        form = self.form.refresh()
-        # Find org inviter and email by invitation hash
-        org_name, inviter, email, role = self.appbuilder.sm.find_invite_hash(invitation_hash)
-        if email is not None:
-            print(org_name, inviter, email)
-            form.email.data = email
-            form.organization.data = org_name
-            form.inviter.data = inviter
-            form.role.data = role
-            widgets = self._get_edit_widget(form=form)
-            self.update_redirect()
-            return self.render_template(self.form_template,
-                                        title=self.form_title,
-                                        widgets=widgets,
-                                        appbuilder=self.appbuilder)
-        return redirect(self.appbuilder.get_url_for_index)
-
-    def add_invited_register_user(self, form, invitation_hash):
-        register_user = self.appbuilder.sm.add_invite_register_user(first_name=form.first_name.data,
-                                                                    last_name=form.last_name.data,
-                                                                    email=form.email.data,
-                                                                    password=form.password.data,
-                                                                    organization=form.organization.data,
-                                                                    role=form.role.data,
-                                                                    inviter=form.inviter.data,
-                                                                    hash=invitation_hash)
-        if register_user:
-            if self.send_email(register_user):
-                return self.appbuilder.get_url_for_index
-            else:
-                self.appbuilder.sm.del_register_user(register_user)
-                return None
-
-    @expose('/invitation/<string:invitation_hash>', methods=['POST'])
-    def invite_register(self, invitation_hash):
-        """End point for registration by invitation"""
-        self._init_vars()
-        form = self.form.refresh()
-
-        # Check invitation hash
-
-        if form.validate_on_submit():
-            response = self.add_invited_register_user(form, invitation_hash)
-            if not response:
-
-                return redirect(self.appbuilder.get_url_for_index)
-            return redirect(response)
-        else:
-            widgets = self._get_edit_widget(form=form)
-            return self.render_template(
-                self.form_template,
-                title=self.form_title,
-                widgets=widgets,
-                appbuilder=self.appbuilder,
-            )
-
-    @expose('/activate/<string:invitation_hash>')
-    def activate(self, invitation_hash):
-        print(invitation_hash)
-        reg = self.appbuilder.sm.find_invite_register_user(invitation_hash)
-        if not reg:
-            flash(as_unicode(self.false_error_message), 'danger')
-            return redirect(self.appbuilder.get_url_for_index)
-        if not self.appbuilder.sm.add_org_user(email=reg.email,
-                                               first_name=reg.first_name,
-                                               last_name=reg.last_name,
-                                               role_id=reg.role_assigned,
-                                               organization=reg.organization,
-                                               hashed_password=reg.password):
-            flash(as_unicode(self.error_message), 'danger')
-            return redirect(self.appbuilder.get_url_for_index)
-        else:
-            self.appbuilder.sm.del_register_user(reg)
-            return self.render_template(self.activation_template,
-                                        username=reg.username,
-                                        first_name=reg.first_name,
-                                        last_name=reg.last_name,
-                                        appbuilder=self.appbuilder)
 
