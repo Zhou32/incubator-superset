@@ -8,7 +8,7 @@ from sqlalchemy import (
     MetaData, String, Table, Text, Sequence, UniqueConstraint
 )
 from sqlalchemy.orm import relationship, backref
-# from flask_appbuilder.security.sqla.models import RegisterUser
+from flask_appbuilder.security.sqla.models import RegisterUser
 
 # from superset import app
 #
@@ -32,13 +32,13 @@ class Organization(Model):
     __tablename__ = 'organizations'
     id = Column(Integer, primary_key=True)
     organization_name = Column(String(250))
-    user = relationship('User', secondary=assoc_org_user, backref='organizations')
+    users = relationship('User', secondary=assoc_org_user, backref='organization')
 
 
 class OrgRegisterUser(Model):
     """ the register model for users who are invited by admin """
     __tablename__ = 'ab_register_user_all'
-    id = Column(Integer, Sequence('ab_register_user_id_seq'), primary_key=True)
+    id = Column(Integer, Sequence('ab_register_user_all_id_seq'), primary_key=True)
     first_name = Column(String(64), nullable=False)
     last_name = Column(String(64), nullable=False)
     password = Column(String(256))
@@ -46,6 +46,6 @@ class OrgRegisterUser(Model):
     registration_date = Column(DateTime, default=datetime.now, nullable=True)
     registration_hash = Column(String(256))
     organization = Column(String(250), nullable=False)
-    inviter_id = Column('inviter_id', Integer, ForeignKey('ab_user.id'),nullable=True)
+    inviter = Column('inviter_id', Integer, ForeignKey('ab_user.id'),nullable=True)
     valid_date = Column(DateTime, default=(datetime.now() + timedelta(hours=register_valid_hours)), nullable=True)
     role_assigned = Column('role_id', Integer, ForeignKey('ab_role.id'), nullable=True)

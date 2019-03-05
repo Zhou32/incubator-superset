@@ -25,7 +25,7 @@ from superset.savvy.savvy_views import EmailResetPasswordView,\
     InviteRegisterView, PasswordRecoverView
 from superset.savvy.savvymodels import ResetRequest
 from superset.security import SupersetSecurityManager
-from superset.savvy.orgnization import OrgRegisterUser, Organization
+from superset.savvy.organization import OrgRegisterUser, Organization
 
 PERMISSION_COMMON = {
     'can_add', 'can_list', 'can_show', 'can_edit',
