@@ -20,7 +20,7 @@ from flask_appbuilder.security.registerviews import RegisterUserDBView
 from flask_appbuilder.security.forms import DynamicForm
 from flask_appbuilder.fieldwidgets import BS3TextFieldWidget, BS3PasswordFieldWidget
 from flask_appbuilder._compat import as_unicode
-from wtforms import StringField, BooleanField, PasswordField
+from wtforms import StringField, BooleanField, PasswordField, SelectField
 from flask_babel import lazy_gettext
 from flask import flash, redirect, url_for
 from ..utils.core import post_request
@@ -53,13 +53,36 @@ class SavvyRegisterUserDBForm(DynamicForm):
                                   widget=BS3PasswordFieldWidget())
 
 
+class SavvyRegisterInvitationUserDBForm(DynamicForm):
+    role = SelectField(label=lazy_gettext('Invitation Role'),
+                       choices=[('1', 'super_user'),('2', 'normal_user'), ('3', 'viewer_user')])
+    email = StringField(lazy_gettext('Email'), validators=[DataRequired(), Email()], widget=BS3TextFieldWidget())
+
+
+class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
+    redirect_url = '/'
+    form = SavvyRegisterInvitationUserDBForm
+    email_subject = 'Invitation Registration'
+
+    @expose('/invite/')
+    def invitation(self):
+        self._init_vars()
+        form = self.form.refresh()
+        widgets = self._get_edit_widget(form=form)
+        self.update_redirect()
+        return self.render_template(self.form_template,
+                                    title=self.form_title,
+                                    widgets=widgets,
+                                    appbuilder=self.appbuilder
+                                    )
+
+
 class SavvyRegisterUserDBView(RegisterUserDBView):
     redirect_url = '/'
     form = SavvyRegisterUserDBForm
     email_subject = email_subject
 
     @expose('/activation/<string:activation_hash>')
-    @expose('/here')
     def activation(self, activation_hash):
 
         """
@@ -154,9 +177,9 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
         msg.subject = self.email_subject
         url = url_for('.activation', _external=True, activation_hash=register_user.registration_hash)
         msg.html = self.render_template(self.email_template,
-                                   url=url,
-                                   first_name=register_user.first_name,
-                                   last_name=register_user.last_name)
+                                        url=url,
+                                        first_name=register_user.first_name,
+                                        last_name=register_user.last_name)
         msg.recipients = [register_user.email]
         try:
             mail.send(msg)

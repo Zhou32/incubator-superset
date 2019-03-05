@@ -27,7 +27,7 @@ from sqlalchemy import or_
 from superset import sql_parse
 from superset.connectors.connector_registry import ConnectorRegistry
 from superset.exceptions import SupersetSecurityException
-from .savvy.register import SavvyRegisterUserDBView
+from .savvy.register import SavvyRegisterUserDBView, SavvyRegisterInvitationUserDBView
 from flask_appbuilder import const
 from werkzeug.security import generate_password_hash
 import uuid
@@ -106,6 +106,10 @@ class SupersetSecurityManager(SecurityManager):
 
     from superset.savvy.organization import OrgRegisterUser
     registeruser_model = OrgRegisterUser
+
+    def register_views(self):
+        super(SecurityManager, self).register_views()
+        self.appbuilder.add_view_no_menu(SavvyRegisterInvitationUserDBView())
 
     def get_schema_perm(self, database, schema):
         if schema:
