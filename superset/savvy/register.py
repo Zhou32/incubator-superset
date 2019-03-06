@@ -24,11 +24,14 @@ from wtforms import StringField, BooleanField, PasswordField, SelectField
 from flask_babel import lazy_gettext
 from flask import flash, redirect, url_for
 from ..utils.core import post_request
+from sqlalchemy import and_, create_engine
 
 from wtforms.validators import DataRequired, EqualTo, Email
 from flask_appbuilder.validators import Unique
 
+
 import logging
+import json
 
 email_subject = 'SavvyBI - Email Confirmation '
 log = logging.getLogger(__name__)
@@ -133,10 +136,33 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
             form.email.validators.append(Unique(datamodel_user, 'email'))
             form.email.validators.append(Unique(datamodel_register_user, 'email'))
 
-    def handle_aws_info(self, info):
-        access_key = info['AccessKeyId']
-        secret_key = info['SecretAccessKey']
-        athena_link = f'awsathena+jdbc:{access_key}:{secret_key}@athena.us-west-2.amazonaws.com/market_report_prod_ore?s3_staging_dir=s3://druid.dts.input-bucket.oregon'
+    @expose('/here/')
+    def handle_aws_info(self, info=None):
+        # info = post_request('https://3ozse3mao8.execute-api.ap-southeast-2.amazonaws.com/test/createorg',{"org_name": "theFirstone1111", "org_id": "1111111"})
+        # aws_info = json.loads(info.text)
+        # access_key = aws_info['AccessKeyId']
+        # secret_key = aws_info['SecretAccessKey']
+
+        access_key = 'AKIAIRQFEHI3X7KAETYA'
+        secret_key = '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'
+
+        athena_link = f'awsathena+jdbc://{access_key}:{secret_key}@athena.us-west-2.amazonaws.com/market_report_prod_ore?s3_staging_dir=s3://druid.dts.input-bucket.oregon'
+        print(athena_link)
+        self.testconn(athena_link)
+
+    def testconn(self, athena_link):
+        """Tests a sqla connection"""
+        from ..views.base import json_error_response
+        try:
+            engine = create_engine(athena_link)
+            engine.connect()
+            table_list = engine.table_names()
+            print(table_list)
+        except Exception as e:
+            logging.exception(e)
+            return json_error_response((
+                'Connection failed!\n\n'
+                'The error message returned was:\n{}').format(e))
 
     def form_post(self, form):
         self.add_form_unique_validations(form)
