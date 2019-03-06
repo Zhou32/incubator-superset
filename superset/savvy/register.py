@@ -17,12 +17,12 @@
 # pylint: disable=C,R,W
 from flask import g
 from flask_appbuilder import expose, const
+from flask_appbuilder.security.decorators import has_access
 from flask_appbuilder.security.registerviews import RegisterUserDBView, BaseRegisterUser
 from flask_appbuilder.security.forms import DynamicForm
 from flask_appbuilder.fieldwidgets import BS3TextFieldWidget, BS3PasswordFieldWidget
 from flask_appbuilder._compat import as_unicode
-from werkzeug.utils import redirect
-from wtforms import StringField, PasswordField, SelectField, HiddenField
+from wtforms import StringField, PasswordField, SelectField
 from flask_babel import lazy_gettext
 from flask import flash, redirect, url_for
 
@@ -58,8 +58,7 @@ class SavvyRegisterUserDBForm(DynamicForm):
 
 
 class SavvyRegisterInvitationUserDBForm(DynamicForm):
-    role = SelectField(label=lazy_gettext('Invitation Role'),
-                       choices=[('org_superuser', 'Superuser'),('org_user', 'normal user'), ('org_viewer', 'viewer user')])
+    role = SelectField(label=lazy_gettext('Invitation Role'))
     email = StringField(lazy_gettext('Email'), validators=[DataRequired(), Email()], widget=BS3TextFieldWidget())
     # inviter_id = HiddenField(lazy_gettext('Inviter'))
     # organization = HiddenField(lazy_gettext('Organization'))
@@ -97,9 +96,12 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
         return True
 
     @expose('/invite')
+    @has_access
     def invitation(self):
         self._init_vars()
         form = self.form.refresh()
+        form.role.choices = self.appbuilder.sm.find_invite_roles(g.user.id)
+        # print(form.role.choices)
         widgets = self._get_edit_widget(form=form)
         self.update_redirect()
         return self.render_template(self.form_template,
@@ -109,8 +111,10 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
                                     )
 
     @expose('/invite', methods=['POST'])
+    @has_access
     def invitation_post(self):
         form = self.form.refresh()
+        form.role.choices = self.appbuilder.sm.find_invite_roles(g.user.id)
         if form.validate_on_submit():
             user_id = g.user.id
             organization = self.appbuilder.sm.find_org(user_id=user_id)
@@ -120,8 +124,8 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
                                                                    inviter=user_id)
             if reg_user:
                 if self.send_email(reg_user):
-                    print('success send')
-                    return redirect(self.appbuilder.get_url_for_index)
+                    flash(as_unicode('Invitation sent to %s' % form.email.data), 'info')
+                    return self.invitation()
         else:
             return self.invitation()
 
@@ -277,6 +281,8 @@ class SavvyRegisterInviteView(BaseRegisterUser):
                                         title=self.form_title,
                                         widgets=widgets,
                                         appbuilder=self.appbuilder)
+        else:
+            flash('Unable to find valid invitation.', 'danger')
         return redirect(self.appbuilder.get_url_for_index)
 
     def edit_invited_register_user(self, form, invitation_hash):

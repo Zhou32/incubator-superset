@@ -23,15 +23,16 @@ from flask import url_for
 from flask_appbuilder import const
 from werkzeug.security import generate_password_hash
 
-from superset.savvy.register import SavvyRegisterInvitationUserDBView, SavvyRegisterInviteView
+from superset.savvy.register import SavvyRegisterInvitationUserDBView, SavvyRegisterInviteView, \
+    SavvyRegisterUserDBView
 from superset.savvy.savvy_views import EmailResetPasswordView, \
     PasswordRecoverView
-from superset.savvy.savvymodels import ResetRequest
+from superset.savvy.savvymodels import ResetRequest, SavvyUserDBModelView
 from superset.security import SupersetSecurityManager
 from superset.savvy.organization import OrgRegisterUser, Organization
 
 PERMISSION_COMMON = {
-    'can_add', 'can_list', 'can_show', 'can_edit',
+    'can_add', 'can_list', 'can_show', 'can_edit', 'can_invitation', 'can_invitation_post'
 }
 
 OWNER_NOT_ALLOWED_MENU = {
@@ -50,6 +51,7 @@ OWNER_PERMISSION_MODEL = {
     'TableModelView',
     'DashboardModelView',
     'DashboardAddView',
+    'SavvyRegisterInvitationUserDBView',
 }
 
 OWNER_PERMISSION_MENU = {
@@ -58,14 +60,16 @@ OWNER_PERMISSION_MENU = {
     'Charts', 'Dashboards',
 }
 
-SUPERUSER_PERMISSION_MENU = {
-    'Security', 'List Users',
-    'Sources', 'Databases', 'Tables', 'Upload a CSV',
-    'Charts', 'Dashboards',
+OWNER_INVITE_ROLES = {
+    'org_superuser', 'org_user', 'org_viewer',
 }
 
-USER_NOT_ALLOWED_MENU = {
-    'Druid Clusters', 'Druid Datasources', 'Scan New Datasources',
+SUPERUSER_INVITE_ROLES = {
+    'org_user', 'org_viewer',
+}
+
+USER_NOT_ALLOWED = {
+    'Druid Clusters', 'Druid Datasources', 'Scan New Datasources', 'SavvyRegisterInvitationUserDBView',
 }
 
 NOT_ALLOWED_SQL_PERM = {
@@ -73,8 +77,8 @@ NOT_ALLOWED_SQL_PERM = {
     'can_sqllab',
 }
 
-VIEWER_NOT_ALLOWED_MENU = {
-    'Sources',
+VIEWER_NOT_ALLOWED = {
+    'Sources', 'SavvyRegisterInvitationUserDBView',
 }
 
 
@@ -85,9 +89,13 @@ class CustomSecurityManager(SupersetSecurityManager):
     invite_register_view = SavvyRegisterInviteView()
     invitation_view = SavvyRegisterInvitationUserDBView()
 
+    registeruserdbview = SavvyRegisterUserDBView
+    userdbmodelview = SavvyUserDBModelView
+
     resetRequestModel = ResetRequest
     registeruser_model = OrgRegisterUser
     organizationModel = Organization
+
 
     def register_views(self):
         super(CustomSecurityManager, self).register_views()
@@ -149,13 +157,13 @@ class CustomSecurityManager(SupersetSecurityManager):
 
     def is_user_pvm(self, pvm):
         result = self.is_gamma_pvm(pvm)
-        if pvm.view_menu.name in USER_NOT_ALLOWED_MENU:
+        if pvm.view_menu.name in USER_NOT_ALLOWED:
             return False
         return result
 
     def is_viewer_pvm(self, pvm):
         result = self.is_gamma_pvm(pvm)
-        if pvm.view_menu.name in VIEWER_NOT_ALLOWED_MENU:
+        if pvm.view_menu.name in VIEWER_NOT_ALLOWED:
             return False
         return result
 
@@ -227,6 +235,18 @@ class CustomSecurityManager(SupersetSecurityManager):
         return url_for('%s.%s' % (self.passwordresetview.endpoint,
                                   self.passwordresetview.default_view))
 
+    def find_invite_roles(self, inviter_id):
+        inviter = self.get_user_by_id(inviter_id)
+        for role in inviter.roles:
+            if role.name == 'org_owner':
+                invite_roles = [self.find_role(role_name) for role_name in OWNER_INVITE_ROLES]
+                return [(str(invite_role.id), invite_role.name) for invite_role in invite_roles]
+            elif role.name == 'org_superuser':
+                invite_roles = [self.find_role(role_name) for role_name in SUPERUSER_INVITE_ROLES]
+                return [(str(invite_role.id), invite_role.name) for invite_role in invite_roles]
+            elif role.name == 'Admin':
+                return [(str(invite_role.id), invite_role.name) for invite_role in self.get_all_roles()]
+
     def add_invite_register_user(self, first_name=None, last_name=None, email=None, role=None,
                                  inviter=None, password='', hashed_password='', organization=''):
         invited_user = self.registeruser_model()
@@ -239,8 +259,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         if inviter:
             invited_user.inviter = inviter
         if role:
-            role = self.find_role(role)
-            invited_user.role_assigned = role.id
+            invited_user.role_assigned = role
         if hashed_password:
             invited_user.password = hashed_password
         else:
@@ -286,15 +305,22 @@ class CustomSecurityManager(SupersetSecurityManager):
             return False
 
     def find_invite_hash(self, invitation_hash):
-        reg_user = self.find_register_user(invitation_hash)
-        org_name = reg_user.organization
-        inviter = self.get_user_by_id(reg_user.inviter)
-        inviter = inviter.get_full_name()
-        email = reg_user.email
-        role = self.get_session.query(self.role_model).filter_by(id=reg_user.role_assigned).first()
-        return org_name, inviter, email, role.name
+        try:
+            reg_user = self.find_register_user(invitation_hash)
+            org_name = reg_user.organization
 
-    def find_org(self, org_name=None, user_id=None ):
+            inviter = self.get_user_by_id(reg_user.inviter)
+            inviter = inviter.get_full_name()
+            email = reg_user.email
+            role = self.get_session.query(self.role_model).filter_by(id=reg_user.role_assigned).first()
+            if datetime.datetime.now() > reg_user.valid_date:
+                raise Exception
+            return org_name, inviter, email, role.name
+        except Exception as e:
+            logging.error(e)
+            return None, None, None, None
+
+    def find_org(self, org_name=None, user_id=None):
         if org_name:
             return self.get_session.query(self.organizationModel).filter_by(organization_name=org_name).first()
         elif user_id:
@@ -313,7 +339,8 @@ class CustomSecurityManager(SupersetSecurityManager):
             user.password = hashed_password
             role = self.get_session.query(self.role_model).filter_by(id=role_id).first()
             user.roles.append(role)
-            org.users.append(user)
+            if org is not None:
+                org.users.append(user)
             self.get_session.add(user)
             self.get_session.commit()
             return user
@@ -322,8 +349,7 @@ class CustomSecurityManager(SupersetSecurityManager):
             return False
 
     def add_org(self, reg, user):
-        from superset.savvy.organization import Organization
-        new_org = Organization()
+        new_org = self.organizationModel()
         new_org.organization_name = reg.organization
         new_org.users.append(user)
         try:
@@ -335,8 +361,14 @@ class CustomSecurityManager(SupersetSecurityManager):
             self.appbuilder.get_session.rollback()
             return None
 
-    def add_register_user_org_admin(self, organization, first_name, last_name, email, password='', hashed_password=''):
+    def delete_org(self, organization):
+        try:
+            self.get_session.delete(organization)
+            self.get_session.commit()
+        except Exception:
+            self.get_session.rollback()
 
+    def add_register_user_org_admin(self, organization, first_name, last_name, email, password='', hashed_password=''):
         register_user = self.registeruser_model()
         register_user.first_name = first_name
         register_user.last_name = last_name

@@ -18,6 +18,7 @@
 import datetime
 
 from flask_appbuilder import Model
+from flask_appbuilder.security.views import UserDBModelView
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, \
     Sequence, String
 
@@ -30,3 +31,14 @@ class ResetRequest(Model):
     reset_date = Column(DateTime, default=datetime.datetime.now, nullable=True)
     reset_hash = Column(String(256))
     used = Column(Boolean)
+
+
+class SavvyUserDBModelView(UserDBModelView):
+
+    def pre_delete(self, user):
+        print(user)
+        organization = self.appbuilder.sm.find_org(user_id=user.id)
+        if len(organization.users) == 1:
+            self.appbuilder.sm.delete_org(organization)
+
+
