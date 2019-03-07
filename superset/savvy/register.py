@@ -95,7 +95,14 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
             return False
         return True
 
-    @expose('/invite')
+    def add_form_unique_validations(self, form):
+        datamodel_user = self.appbuilder.sm.get_user_datamodel
+        datamodel_register_user = self.appbuilder.sm.get_register_user_datamodel
+        if len(form.email.validators) == 2:
+            form.email.validators.append(Unique(datamodel_user, 'email'))
+            form.email.validators.append(Unique(datamodel_register_user, 'email'))
+
+    @expose('/invite', methods=['GET'])
     @has_access
     def invitation(self):
         self._init_vars()
@@ -104,6 +111,7 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
         # print(form.role.choices)
         widgets = self._get_edit_widget(form=form)
         self.update_redirect()
+        self.add_form_unique_validations(form)
         return self.render_template(self.form_template,
                                     title=self.form_title,
                                     widgets=widgets,
@@ -115,19 +123,31 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
     def invitation_post(self):
         form = self.form.refresh()
         form.role.choices = self.appbuilder.sm.find_invite_roles(g.user.id)
+        self.add_form_unique_validations(form)
         if form.validate_on_submit():
             user_id = g.user.id
             organization = self.appbuilder.sm.find_org(user_id=user_id)
             reg_user = self.appbuilder.sm.add_invite_register_user(email=form.email.data,
-                                                                   organization=organization.organization_name,
+                                                                   organization=organization,
                                                                    role=form.role.data,
                                                                    inviter=user_id)
             if reg_user:
                 if self.send_email(reg_user):
                     flash(as_unicode('Invitation sent to %s' % form.email.data), 'info')
                     return self.invitation()
+                else:
+                    flash(as_unicode('Cannot send invitation to user'), 'danger')
+                    return self.invitation()
+            else:
+                flash(as_unicode('Superuser reaches limit.'), 'danger')
+                return self.invitation()
         else:
-            return self.invitation()
+            widgets = self._get_edit_widget(form=form)
+            return self.render_template(self.form_template,
+                                        title=self.form_title,
+                                        widgets=widgets,
+                                        appbuilder=self.appbuilder
+                                        )
 
 
 class SavvyRegisterUserDBView(RegisterUserDBView):
@@ -173,9 +193,12 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
     def add_form_unique_validations(self, form):
         datamodel_user = self.appbuilder.sm.get_user_datamodel
         datamodel_register_user = self.appbuilder.sm.get_register_user_datamodel
+        datamodel_organization = self.appbuilder.sm.get_organization_datamodel()
         if len(form.email.validators) == 2:
             form.email.validators.append(Unique(datamodel_user, 'email'))
             form.email.validators.append(Unique(datamodel_register_user, 'email'))
+        if len(form.organization.validators) == 1:
+            form.organization.validators.append(Unique(datamodel_organization, 'organization_name'))
 
     def handle_aws_info(self, info):
         access_key = info['AccessKeyId']
@@ -196,6 +219,7 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
 
         :rtype : RegisterUser
         """
+
         register_user = self.appbuilder.sm.add_register_user_org_admin(organizaiton, first_name, last_name, email,
                                                                        password)
         if register_user:

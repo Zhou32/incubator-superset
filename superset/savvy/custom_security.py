@@ -20,6 +20,7 @@ import logging
 import uuid
 
 from flask import url_for
+from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder import const
 from werkzeug.security import generate_password_hash
 
@@ -54,10 +55,8 @@ OWNER_PERMISSION_MODEL = {
     'SavvyRegisterInvitationUserDBView',
 }
 
-OWNER_PERMISSION_MENU = {
-    'Security', 'List Users',
-    'Sources', 'Databases', 'Tables', 'Upload a CSV',
-    'Charts', 'Dashboards',
+OWNER_NOT_ALLOWED_PERMISSION = {
+    ('can_delete', 'SavvyUserDBModelView'),
 }
 
 OWNER_INVITE_ROLES = {
@@ -66,6 +65,10 @@ OWNER_INVITE_ROLES = {
 
 SUPERUSER_INVITE_ROLES = {
     'org_user', 'org_viewer',
+}
+
+SUPERUSER_NOT_ALLOWED_PERMISSION = {
+    ('can_delete', 'RegisterUserModelView'),
 }
 
 USER_NOT_ALLOWED = {
@@ -96,6 +99,14 @@ class CustomSecurityManager(SupersetSecurityManager):
     registeruser_model = OrgRegisterUser
     organizationModel = Organization
 
+    organization_datamodel = None
+
+    def __init__(self, appbuilder):
+        super(CustomSecurityManager, self).__init__(appbuilder)
+        self.organization_datamodel = SQLAInterface(self.organizationModel, session=self.appbuilder.get_session)
+
+    def get_organization_datamodel(self):
+        return self.organization_datamodel
 
     def register_views(self):
         super(CustomSecurityManager, self).register_views()
@@ -141,18 +152,16 @@ class CustomSecurityManager(SupersetSecurityManager):
         result = result or (pvm.view_menu.name not in OWNER_NOT_ALLOWED_MENU)
         if pvm.view_menu.name in OWNER_NOT_ALLOWED_MENU or pvm.permission.name in NOT_ALLOWED_SQL_PERM:
             return False
+        for permission in OWNER_NOT_ALLOWED_PERMISSION:
+            if pvm.permission.name == permission[0] and pvm.view_menu.name == permission[1]:
+                return False
         return result
 
     def is_superuser_pvm(self, pvm):
-        result = self.is_alpha_only(pvm)
-
-        for permission in PERMISSION_COMMON:
-            for view in OWNER_PERMISSION_MODEL:
-                result = result or (pvm.view_menu.name == view and
-                                    pvm.permission.name == permission)
-        result = result or (pvm.view_menu.name not in OWNER_NOT_ALLOWED_MENU)
-        if pvm.view_menu.name in OWNER_NOT_ALLOWED_MENU or pvm.permission.name in NOT_ALLOWED_SQL_PERM:
-            return False
+        result = self.is_owner_pvm(pvm)
+        for permission in SUPERUSER_NOT_ALLOWED_PERMISSION:
+            if pvm.permission.name == permission[0] and pvm.view_menu.name == permission[1]:
+                return False
         return result
 
     def is_user_pvm(self, pvm):
@@ -248,7 +257,7 @@ class CustomSecurityManager(SupersetSecurityManager):
                 return [(str(invite_role.id), invite_role.name) for invite_role in self.get_all_roles()]
 
     def add_invite_register_user(self, first_name=None, last_name=None, email=None, role=None,
-                                 inviter=None, password='', hashed_password='', organization=''):
+                                 inviter=None, password='', hashed_password='', organization=None):
         invited_user = self.registeruser_model()
         if email:
             invited_user.email = email
@@ -260,12 +269,16 @@ class CustomSecurityManager(SupersetSecurityManager):
             invited_user.inviter = inviter
         if role:
             invited_user.role_assigned = role
+
         if hashed_password:
             invited_user.password = hashed_password
         else:
             invited_user.password = generate_password_hash(password)
         if organization:
-            invited_user.organization = organization
+            invited_user.organization = organization.organization_name
+            if role == str(self.find_role('org_superuser').id) and organization.superuser_number >= 1:
+                logging.error(u'Superuser reaches limit for %s. ' % organization.organization_name)
+                return None
         invited_user.registration_hash = str(uuid.uuid1())
         try:
             self.get_session.add(invited_user)
@@ -341,7 +354,10 @@ class CustomSecurityManager(SupersetSecurityManager):
             user.roles.append(role)
             if org is not None:
                 org.users.append(user)
+            if role.name == 'org_superuser':
+                org.superuser_number = org.superuser_number + 1
             self.get_session.add(user)
+            self.get_session.merge(org)
             self.get_session.commit()
             return user
         except Exception as e:
@@ -352,6 +368,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         new_org = self.organizationModel()
         new_org.organization_name = reg.organization
         new_org.users.append(user)
+        new_org.superuser_number = 0
         try:
             self.get_session.add(new_org)
             self.get_session.commit()
