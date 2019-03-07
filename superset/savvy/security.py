@@ -23,13 +23,11 @@ from flask import url_for
 from flask_appbuilder import const
 from werkzeug.security import generate_password_hash
 
-from superset.savvy.register import SavvyRegisterInvitationUserDBView, SavvyRegisterInviteView, \
-    SavvyRegisterUserDBView
-from superset.savvy.savvy_views import EmailResetPasswordView, \
-    PasswordRecoverView
-from superset.savvy.savvymodels import ResetRequest, SavvyUserDBModelView
+from superset.savvy.views import SavvyRegisterInvitationUserDBView, SavvyRegisterInviteView, \
+    SavvyRegisterUserDBView, SavvyUserDBModelView, EmailResetPasswordView, PasswordRecoverView
+from superset.savvy.models import ResetRequest, OrgRegisterUser, Organization
 from superset.security import SupersetSecurityManager
-from superset.savvy.organization import OrgRegisterUser, Organization
+
 
 PERMISSION_COMMON = {
     'can_add', 'can_list', 'can_show', 'can_edit', 'can_invitation', 'can_invitation_post'
@@ -95,7 +93,6 @@ class CustomSecurityManager(SupersetSecurityManager):
     resetRequestModel = ResetRequest
     registeruser_model = OrgRegisterUser
     organizationModel = Organization
-
 
     def register_views(self):
         super(CustomSecurityManager, self).register_views()
