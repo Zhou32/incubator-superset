@@ -1,70 +1,154 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-# pylint: disable=C,R,W
-from flask import g
-from flask_appbuilder import expose, const
-from flask_appbuilder.security.decorators import has_access
-from flask_appbuilder.security.registerviews import RegisterUserDBView, BaseRegisterUser
-from flask_appbuilder.security.forms import DynamicForm
-from flask_appbuilder.fieldwidgets import BS3TextFieldWidget, BS3PasswordFieldWidget
-from flask_appbuilder._compat import as_unicode
-from wtforms import StringField, PasswordField, SelectField
-from flask_babel import lazy_gettext
-from flask import flash, redirect, url_for
-
-from superset.savvy.savvy_views import RegisterInvitationForm, log
-from ..utils.core import post_request
-from sqlalchemy import and_, create_engine
-
-from wtforms.validators import DataRequired, EqualTo, Email
-from flask_appbuilder.validators import Unique
-
-
 import logging
-import json
 
-email_subject = 'SavvyBI - Email Confirmation '
+from flask import flash, redirect, request, url_for, g
+from flask_babel import lazy_gettext
+from flask_mail import Mail, Message
+from sqlalchemy import create_engine
+
+from flask_appbuilder import const
+from flask_appbuilder.validators import Unique
+from flask_appbuilder._compat import as_unicode
+from flask_appbuilder.views import expose, PublicFormView
+from flask_appbuilder.security.decorators import has_access
+from flask_appbuilder.security.forms import ResetPasswordForm
+from flask_appbuilder.security.views import UserDBModelView
+from flask_appbuilder.security.registerviews import RegisterUserDBView, BaseRegisterUser
+
+from .forms import (
+    PasswordRecoverForm, SavvyRegisterInvitationUserDBForm, SavvyRegisterUserDBForm, RegisterInvitationForm
+)
+
 log = logging.getLogger(__name__)
+email_subject = 'SavvyBI - Email Confirmation'
 
 
-class SavvyRegisterUserDBForm(DynamicForm):
-    organization = StringField(lazy_gettext('Organization'),
-                               validators=[DataRequired()],
-                               widget=BS3TextFieldWidget())
-    email = StringField(lazy_gettext('Email'), validators=[DataRequired(), Email()], widget=BS3TextFieldWidget())
-    first_name = StringField(lazy_gettext('First Name'), validators=[DataRequired()], widget=BS3TextFieldWidget())
-    last_name = StringField(lazy_gettext('Last Name'), validators=[DataRequired()], widget=BS3TextFieldWidget())
+class SavvyUserDBModelView(UserDBModelView):
 
-    password = PasswordField(lazy_gettext('Password'),
-                             description=lazy_gettext(
-                                 'Please use a good password policy, this application does not check this for you'),
-                             validators=[DataRequired()],
-                             widget=BS3PasswordFieldWidget())
-    conf_password = PasswordField(lazy_gettext('Confirm Password'),
-                                  description=lazy_gettext('Please rewrite the password to confirm'),
-                                  validators=[EqualTo('password', message=lazy_gettext('Passwords must match'))],
-                                  widget=BS3PasswordFieldWidget())
+    def pre_delete(self, user):
+        print(user)
+        organization = self.appbuilder.sm.find_org(user_id=user.id)
+        if len(organization.users) == 1:
+            self.appbuilder.sm.delete_org(organization)
 
 
-class SavvyRegisterInvitationUserDBForm(DynamicForm):
-    role = SelectField(label=lazy_gettext('Invitation Role'))
-    email = StringField(lazy_gettext('Email'), validators=[DataRequired(), Email()], widget=BS3TextFieldWidget())
-    # inviter_id = HiddenField(lazy_gettext('Inviter'))
-    # organization = HiddenField(lazy_gettext('Organization'))
+class EmailResetPasswordView(PublicFormView):
+    route_base = '/reset'
+    form = ResetPasswordForm
+    form_title = lazy_gettext('Reset Password Form')
+    redirect_url = '/'
+    message = lazy_gettext('Password Changed')
+
+    @expose('/form', methods=['GET'])
+    def this_form_get(self):
+        self._init_vars()
+        form = self.form.refresh()
+        token = request.args.get('token')
+        user = self.appbuilder.sm.find_user_by_token(token)
+        if user is not None:
+            self.form_get(form)
+            widgets = self._get_edit_widget(form=form)
+            self.update_redirect()
+            return self.render_template(self.form_template,
+                                        title=self.form_title,
+                                        widgets=widgets,
+                                        appbuilder=self.appbuilder)
+        return redirect(self.appbuilder.get_url_for_index)
+
+    @expose('/form', methods=['POST'])
+    def this_form_post(self):
+        self._init_vars()
+        form = self.form.refresh()
+        if form.validate_on_submit():
+            token = request.args.get('token')
+            response = self.form_post(form, token=token)
+            if not response:
+                return self.this_form_get()
+            return redirect(response)
+        else:
+            widgets = self._get_edit_widget(form=form)
+            return self.render_template(
+                self.form_template,
+                title=self.form_title,
+                widgets=widgets,
+                appbuilder=self.appbuilder,
+            )
+
+    def form_post(self, form, **kwargs):
+        token = kwargs['token']
+        user = self.appbuilder.sm.find_user_by_token(token)
+
+        if user is not None:
+            flash(as_unicode(self.message), 'info')
+            password = form.password.data
+            self.appbuilder.sm.reset_password(user.id, password)
+            self.appbuilder.sm.set_token_used(token)
+            return self.appbuilder.get_url_for_index
+
+        return None
+
+
+class PasswordRecoverView(PublicFormView):
+    """
+        This is the view for recovering password
+    """
+
+    route_base = '/recover'
+
+    email_template = 'appbuilder/general/security/recover_mail.html'
+    """ The template used to generate the email sent to the user """
+
+    email_subject = lazy_gettext('Change your password')
+    """ The email subject sent to the user """
+
+    message = lazy_gettext('Password reset link sent to your email')
+    """ The message shown on a successful registration """
+
+    error_message = lazy_gettext('This email is not registered or confirmed yet.')
+    """ The message shown on an unsuccessful registration """
+
+    form_title = lazy_gettext('Enter your registered email for recovery')
+    """ The form title """
+
+    form = PasswordRecoverForm
+
+    def send_email(self, email, hash_val):
+        """
+            Method for sending the registration Email to the user
+        """
+        mail = Mail(self.appbuilder.get_app)
+        msg = Message()
+        msg.subject = self.email_subject
+        url = url_for('.reset', _external=True, reset_hash=hash_val)
+        print(url)
+        msg.html = self.render_template(self.email_template,
+                                        url=url)
+        msg.recipients = [email]
+        try:
+            mail.send(msg)
+        except Exception as e:
+            log.error('Send email exception: {0}'.format(str(e)))
+            return False
+        return True
+
+    def add_password_reset(self, email):
+        reset_hash = self.appbuilder.sm.add_reset_request(email)
+        if reset_hash is not None:
+            flash(as_unicode(self.message), 'info')
+            self.send_email(email, reset_hash)
+            return redirect(self.appbuilder.get_url_for_index)
+        else:
+            flash(as_unicode(self.error_message), 'danger')
+            return None
+
+    @expose('/reset/<string:reset_hash>')
+    def reset(self, reset_hash):
+        """ This is end point to verify the reset password hash from user
+        """
+        if reset_hash is not None:
+            return redirect(self.appbuilder.sm.get_url_for_reset(token=reset_hash))
+
+    def form_post(self, form):
+        return self.add_password_reset(email=form.email.data)
 
 
 class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
@@ -77,11 +161,6 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
         """
             Method for sending the registration Email to the user
         """
-        try:
-            from flask_mail import Mail, Message
-        except:
-            log.error("Install Flask-Mail to use User registration")
-            return False
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
         msg.subject = self.email_subject
@@ -111,7 +190,6 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
         self._init_vars()
         form = self.form.refresh()
         form.role.choices = self.appbuilder.sm.find_invite_roles(g.user.id)
-        # print(form.role.choices)
         widgets = self._get_edit_widget(form=form)
         self.update_redirect()
         self.add_form_unique_validations(form)
@@ -172,6 +250,7 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
             log.error(const.LOGMSG_ERR_SEC_NO_REGISTER_HASH.format(activation_hash))
             flash(as_unicode(self.false_error_message), 'danger')
             return redirect(self.appbuilder.get_url_for_index)
+
         user = self.appbuilder.sm.add_user(username=reg.email,
                                            email=reg.email,
                                            first_name=reg.first_name,
@@ -183,9 +262,6 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
             return redirect(self.appbuilder.get_url_for_index)
         else:
             org_reg = self.appbuilder.sm.add_org(reg, user)
-            # aws_info = post_request('https://3ozse3mao8.execute-api.ap-southeast-2.amazonaws.com/test/createorg',
-            #                         {"OrgName": org_reg.organization_name, "OrgID": org_reg.id})
-            # self.handle_aws_info(aws_info)
             self.appbuilder.sm.del_register_user(reg)
             return self.render_template(self.activation_template,
                                         username=reg.email,
@@ -204,20 +280,16 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
             form.organization.validators.append(Unique(datamodel_organization, 'organization_name'))
 
     @expose('/here/')
-    def handle_aws_info(self, info=None):
-        # info = post_request('https://3ozse3mao8.execute-api.ap-southeast-2.amazonaws.com/test/createorg',{"org_name": "theFirstone1111", "org_id": "1111111"})
-        # aws_info = json.loads(info.text)
-        # access_key = aws_info['AccessKeyId']
-        # secret_key = aws_info['SecretAccessKey']
-
+    def handle_aws_info(self):
         access_key = 'AKIAIRQFEHI3X7KAETYA'
         secret_key = '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'
 
-        athena_link = f'awsathena+jdbc://{access_key}:{secret_key}@athena.us-west-2.amazonaws.com/market_report_prod_ore?s3_staging_dir=s3://druid.dts.input-bucket.oregon'
-        print(athena_link)
+        athena_link = f'awsathena+jdbc://{access_key}:{secret_key}@athena.us-west-2.amazonaws.com/' \
+                      f'market_report_prod_ore?s3_staging_dir=s3://druid.dts.input-bucket.oregon'
         self.testconn(athena_link)
 
-    def testconn(self, athena_link):
+    @staticmethod
+    def testconn(athena_link):
         """Tests a sqla connection"""
         from ..views.base import json_error_response
         try:
@@ -261,11 +333,6 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
         """
             Method for sending the registration Email to the user
         """
-        try:
-            from flask_mail import Mail, Message
-        except:
-            log.error("Install Flask-Mail to use User registration")
-            return False
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
         msg.subject = self.email_subject
@@ -287,17 +354,12 @@ class SavvyRegisterInviteView(BaseRegisterUser):
     form = RegisterInvitationForm
 
     email_template = 'appbuilder/general/security/register_mail.html'
-    email_subject =  'SavvyBI - Register'
+    email_subject = 'SavvyBI - Register'
 
     def send_email(self, register_user):
         """
             Method for sending the registration Email to the user
         """
-        try:
-            from flask_mail import Mail, Message
-        except Exception:
-            log.error('Install Flask-Mail to use User registration')
-            return False
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
         msg.subject = self.email_subject

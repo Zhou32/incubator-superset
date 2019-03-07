@@ -1,0 +1,54 @@
+from flask_babel import lazy_gettext
+from wtforms import StringField, PasswordField, SelectField
+from wtforms.validators import DataRequired, EqualTo, Email
+
+from flask_appbuilder.security.forms import DynamicForm
+from flask_appbuilder.fieldwidgets import BS3TextFieldWidget, BS3PasswordFieldWidget
+
+
+class PasswordRecoverForm(DynamicForm):
+    email = StringField(lazy_gettext('Email'), validators=[DataRequired(), Email()])
+
+
+class RegisterInvitationForm(DynamicForm):
+    organization = StringField(lazy_gettext('Organization'), widget=BS3TextFieldWidget(), render_kw={'readonly': True})
+    inviter = StringField(lazy_gettext('Inviter'), widget=BS3TextFieldWidget(), render_kw={'readonly': True})
+    role = StringField(lazy_gettext('Role'), widget=BS3TextFieldWidget(), render_kw={'readonly': True})
+    first_name = StringField(lazy_gettext('First Name'), validators=[DataRequired()], widget=BS3TextFieldWidget())
+    last_name = StringField(lazy_gettext('Last Name'), validators=[DataRequired()], widget=BS3TextFieldWidget())
+    email = StringField(lazy_gettext('Email'), validators=[DataRequired(), Email()], widget=BS3TextFieldWidget())
+    password = PasswordField(lazy_gettext('Password'),
+                             description=lazy_gettext(
+                                 'Please use a good password policy, this application does not check this for you'),
+                             validators=[DataRequired()],
+                             widget=BS3PasswordFieldWidget())
+    conf_password = PasswordField(lazy_gettext('Confirm Password'),
+                                  description=lazy_gettext('Please rewrite the password to confirm'),
+                                  validators=[EqualTo('password', message=lazy_gettext('Passwords must match'))],
+                                  widget=BS3PasswordFieldWidget())
+
+
+class SavvyRegisterUserDBForm(DynamicForm):
+    organization = StringField(lazy_gettext('Organization'),
+                               validators=[DataRequired()],
+                               widget=BS3TextFieldWidget())
+    email = StringField(lazy_gettext('Email'), validators=[DataRequired(), Email()], widget=BS3TextFieldWidget())
+    first_name = StringField(lazy_gettext('First Name'), validators=[DataRequired()], widget=BS3TextFieldWidget())
+    last_name = StringField(lazy_gettext('Last Name'), validators=[DataRequired()], widget=BS3TextFieldWidget())
+
+    password = PasswordField(lazy_gettext('Password'),
+                             description=lazy_gettext(
+                                 'Please use a good password policy, this application does not check this for you'),
+                             validators=[DataRequired()],
+                             widget=BS3PasswordFieldWidget())
+    conf_password = PasswordField(lazy_gettext('Confirm Password'),
+                                  description=lazy_gettext('Please rewrite the password to confirm'),
+                                  validators=[EqualTo('password', message=lazy_gettext('Passwords must match'))],
+                                  widget=BS3PasswordFieldWidget())
+
+
+class SavvyRegisterInvitationUserDBForm(DynamicForm):
+    role = SelectField(label=lazy_gettext('Invitation Role'))
+    email = StringField(lazy_gettext('Email'), validators=[DataRequired(), Email()], widget=BS3TextFieldWidget())
+    # inviter_id = HiddenField(lazy_gettext('Inviter'))
+    # organization = HiddenField(lazy_gettext('Organization'))

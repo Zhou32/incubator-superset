@@ -1,21 +1,11 @@
-"""A collection of ORM sqlalchemy models for Superset"""
-
-from datetime import timedelta, datetime
+from datetime import timedelta
+import datetime
 
 from flask_appbuilder import Model
 from sqlalchemy import (
-    Boolean, Column, create_engine, DateTime, ForeignKey, Integer,
-    MetaData, String, Table, Text, Sequence, UniqueConstraint
-)
-from sqlalchemy.orm import relationship, backref
-from flask_appbuilder.security.sqla.models import RegisterUser
+    Boolean, Column, DateTime, Integer, String, UniqueConstraint, ForeignKey, Sequence, Table)
+from sqlalchemy.orm import relationship
 
-# from superset import app
-#
-# config = app.config
-# custom_password_store = config.get('SQLALCHEMY_CUSTOM_PASSWORD_STORE')
-# stats_logger = config.get('STATS_LOGGER')
-# log_query = config.get('QUERY_LOGGER')
 metadata = Model.metadata  # pylint: disable=no-member
 register_valid_hours = 24
 
@@ -44,9 +34,20 @@ class OrgRegisterUser(Model):
     last_name = Column(String(64), nullable=True)
     password = Column(String(256))
     email = Column(String(64), nullable=False)
-    registration_date = Column(DateTime, default=datetime.now, nullable=True)
+    registration_date = Column(DateTime, default=datetime.datetime.now, nullable=True)
     registration_hash = Column(String(256))
     organization = Column(String(250), nullable=False)
-    inviter = Column('inviter_id', Integer, ForeignKey('ab_user.id'),nullable=True)
-    valid_date = Column(DateTime, default=(datetime.now() + timedelta(hours=register_valid_hours)), nullable=True)
+    inviter = Column('inviter_id', Integer, ForeignKey('ab_user.id'), nullable=True)
+    valid_date = Column(DateTime, default=(datetime.datetime.now() + timedelta(hours=register_valid_hours)),
+                        nullable=True)
     role_assigned = Column('role_id', Integer, ForeignKey('ab_role.id'), nullable=True)
+
+
+class ResetRequest(Model):
+    ___tablename__ = 'reset_request'
+    id = Column(Integer, Sequence('reset_request_id_seq'), primary_key=True)
+    user_id = Column(Integer, ForeignKey('ab_user.id'))
+    email = Column(String(64), nullable=False)
+    reset_date = Column(DateTime, default=datetime.datetime.now, nullable=True)
+    reset_hash = Column(String(256))
+    used = Column(Boolean)
