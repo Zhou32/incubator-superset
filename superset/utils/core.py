@@ -1085,4 +1085,4 @@ def shortid():
 
 def post_request(url, params):
     import requests
-    return requests.post(url, data=params)
+    return requests.post(url, data=json.dumps(params))
