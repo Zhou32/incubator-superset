@@ -13,7 +13,7 @@ from flask_appbuilder.security.decorators import has_access
 from flask_appbuilder.security.forms import ResetPasswordForm
 from flask_appbuilder.security.views import UserDBModelView
 from flask_appbuilder.security.registerviews import RegisterUserDBView, BaseRegisterUser
-from .fitlers import OrgFilter
+from .filters import OrgFilter
 from .forms import (
     PasswordRecoverForm, SavvyRegisterInvitationUserDBForm, SavvyRegisterUserDBForm, RegisterInvitationForm
 )
@@ -307,21 +307,21 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
 
     def form_post(self, form):
         self.add_form_unique_validations(form)
-        self.add_registration_org_admin(organizaiton=form.organization.data,
+        self.add_registration_org_admin(organization=form.organization.data,
                                         first_name=form.first_name.data,
                                         last_name=form.last_name.data,
+                                        username=form.username.data,
                                         email=form.email.data,
                                         password=form.password.data)
 
-    def add_registration_org_admin(self, organizaiton, first_name, last_name, email, password=''):
+    def add_registration_org_admin(self, **kwargs):
         """
             Add a registration request for the user.
 
         :rtype : RegisterUser
         """
 
-        register_user = self.appbuilder.sm.add_register_user_org_admin(organizaiton, first_name, last_name, email,
-                                                                       password)
+        register_user = self.appbuilder.sm.add_register_user_org_admin(**kwargs)
         if register_user:
             if self.send_email(register_user):
                 flash(as_unicode(self.message), 'info')

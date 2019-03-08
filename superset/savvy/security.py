@@ -377,16 +377,14 @@ class CustomSecurityManager(SupersetSecurityManager):
         except Exception:
             self.get_session.rollback()
 
-    def add_register_user_org_admin(self, organization, first_name, last_name, email, password='', hashed_password=''):
+    def add_register_user_org_admin(self, **kwargs):
         register_user = self.registeruser_model()
-        register_user.first_name = first_name
-        register_user.last_name = last_name
-        register_user.email = email
-        register_user.organization = organization
-        if hashed_password:
-            register_user.password = hashed_password
-        else:
-            register_user.password = generate_password_hash(password)
+        register_user.first_name = kwargs['first_name']
+        register_user.last_name = kwargs['last_name']
+        register_user.username = kwargs['username']
+        register_user.email = kwargs['email']
+        register_user.organization = kwargs['organization']
+        register_user.password = generate_password_hash(kwargs['password'])
         register_user.registration_hash = str(uuid.uuid1())
         try:
             self.get_session.add(register_user)
