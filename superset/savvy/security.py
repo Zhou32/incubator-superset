@@ -21,6 +21,7 @@ import uuid
 
 from flask import url_for
 from flask_appbuilder import const
+from flask_appbuilder.models.sqla.interface import SQLAInterface
 from werkzeug.security import generate_password_hash
 
 from superset.savvy.views import SavvyRegisterInvitationUserDBView, SavvyRegisterInviteView, \
@@ -93,6 +94,13 @@ class CustomSecurityManager(SupersetSecurityManager):
     resetRequestModel = ResetRequest
     registeruser_model = OrgRegisterUser
     organizationModel = Organization
+
+    def __init__(self, appbuilder):
+        super(CustomSecurityManager, self).__init__(appbuilder)
+        self.organization_datamodel = SQLAInterface(self.organizationModel, session=self.appbuilder.get_session)
+
+    def get_organization_datamodel(self):
+        return self.organization_datamodel
 
     def register_views(self):
         super(CustomSecurityManager, self).register_views()
@@ -245,7 +253,7 @@ class CustomSecurityManager(SupersetSecurityManager):
                 return [(str(invite_role.id), invite_role.name) for invite_role in self.get_all_roles()]
 
     def add_invite_register_user(self, first_name=None, last_name=None, email=None, role=None,
-                                 inviter=None, password='', hashed_password='', organization=''):
+                                 inviter=None, password='', hashed_password='', organization=None):
         invited_user = self.registeruser_model()
         if email:
             invited_user.email = email
@@ -255,14 +263,18 @@ class CustomSecurityManager(SupersetSecurityManager):
             invited_user.last_name = last_name
         if inviter:
             invited_user.inviter = inviter
+        if organization:
+            invited_user.organization = organization.organization_name
         if role:
             invited_user.role_assigned = role
+            if role == str(self.find_role('org_superuser').id) and organization.superuser_number >= 3:
+                logging.error(u'Superusers reach limit for %s.' % organization.organization_name)
+                return None
         if hashed_password:
             invited_user.password = hashed_password
         else:
             invited_user.password = generate_password_hash(password)
-        if organization:
-            invited_user.organization = organization
+
         invited_user.registration_hash = str(uuid.uuid1())
         try:
             self.get_session.add(invited_user)
