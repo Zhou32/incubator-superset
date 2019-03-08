@@ -13,7 +13,7 @@ from flask_appbuilder.security.decorators import has_access
 from flask_appbuilder.security.forms import ResetPasswordForm
 from flask_appbuilder.security.views import UserDBModelView
 from flask_appbuilder.security.registerviews import RegisterUserDBView, BaseRegisterUser
-
+from .org_fitler import OrgFilter
 from .forms import (
     PasswordRecoverForm, SavvyRegisterInvitationUserDBForm, SavvyRegisterUserDBForm, RegisterInvitationForm
 )
@@ -23,6 +23,8 @@ email_subject = 'SavvyBI - Email Confirmation'
 
 
 class SavvyUserDBModelView(UserDBModelView):
+
+    base_filters = [['id', OrgFilter, lambda: []]]
 
     def pre_delete(self, user):
         print(user)

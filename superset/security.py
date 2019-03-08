@@ -27,10 +27,7 @@ from sqlalchemy import or_
 from superset import sql_parse
 from superset.connectors.connector_registry import ConnectorRegistry
 from superset.exceptions import SupersetSecurityException
-from .savvy.register import SavvyRegisterUserDBView, SavvyRegisterInvitationUserDBView
-from flask_appbuilder import const
-from werkzeug.security import generate_password_hash
-import uuid
+
 
 log = logging.getLogger(__name__)
 
