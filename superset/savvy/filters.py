@@ -1,11 +1,12 @@
 from flask_appbuilder.models.filters import BaseFilter
 from flask import g
 
+from .models import Organization
+
 
 class OrgFilter(BaseFilter):
     def apply(self, query, func):
         from superset import security_manager, db
-        from .models import Organization
 
         for role in g.user.roles:
             if role.name == 'Admin':
@@ -31,7 +32,6 @@ class OrgFilter(BaseFilter):
 class RoleFilter(BaseFilter):
     def apply(self, query, func):
         from superset import security_manager, db
-        from .models import Organization
 
         for role in g.user.roles:
             if role.name == 'admin':
