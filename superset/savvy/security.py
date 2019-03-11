@@ -95,6 +95,7 @@ class CustomSecurityManager(SupersetSecurityManager):
     registeruser_model = OrgRegisterUser
     organizationModel = Organization
 
+
     def __init__(self, appbuilder):
         super(CustomSecurityManager, self).__init__(appbuilder)
         self.organization_datamodel = SQLAInterface(self.organizationModel, session=self.appbuilder.get_session)
@@ -137,7 +138,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         self.clean_perms()
 
     def is_owner_pvm(self, pvm):
-        result = self.is_alpha_only(pvm)
+        result = self.is_gamma_pvm(pvm)
 
         for permission in PERMISSION_COMMON:
             for view in OWNER_PERMISSION_MODEL:
@@ -149,7 +150,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         return result
 
     def is_superuser_pvm(self, pvm):
-        result = self.is_alpha_only(pvm)
+        result = self.is_gamma_pvm(pvm)
 
         for permission in PERMISSION_COMMON:
             for view in OWNER_PERMISSION_MODEL:
@@ -336,12 +337,12 @@ class CustomSecurityManager(SupersetSecurityManager):
             return self.get_session.query(self.organizationModel).\
                 filter(self.organizationModel.users.any(id=user_id)).scalar()
 
-    def add_org_user(self, email, first_name, last_name, hashed_password, organization, role_id):
+    def add_org_user(self, email, first_name, last_name, username, hashed_password, organization, role_id):
         try:
             org = self.find_org(organization)
             user = self.user_model()
             user.email = email
-            user.username = email
+            user.username = username
             user.first_name = first_name
             user.last_name = last_name
             user.active = True
@@ -377,16 +378,14 @@ class CustomSecurityManager(SupersetSecurityManager):
         except Exception:
             self.get_session.rollback()
 
-    def add_register_user_org_admin(self, organization, first_name, last_name, email, password='', hashed_password=''):
+    def add_register_user_org_admin(self, **kwargs):
         register_user = self.registeruser_model()
-        register_user.first_name = first_name
-        register_user.last_name = last_name
-        register_user.email = email
-        register_user.organization = organization
-        if hashed_password:
-            register_user.password = hashed_password
-        else:
-            register_user.password = generate_password_hash(password)
+        register_user.first_name = kwargs['first_name']
+        register_user.last_name = kwargs['last_name']
+        register_user.username = kwargs['username']
+        register_user.email = kwargs['email']
+        register_user.organization = kwargs['organization']
+        register_user.password = generate_password_hash(kwargs['password'])
         register_user.registration_hash = str(uuid.uuid1())
         try:
             self.get_session.add(register_user)

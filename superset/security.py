@@ -28,6 +28,7 @@ from superset import sql_parse
 from superset.connectors.connector_registry import ConnectorRegistry
 from superset.exceptions import SupersetSecurityException
 
+
 log = logging.getLogger(__name__)
 
 READ_ONLY_MODEL_VIEWS = {

@@ -13,7 +13,7 @@ from flask_appbuilder.security.decorators import has_access
 from flask_appbuilder.security.forms import ResetPasswordForm
 from flask_appbuilder.security.views import UserDBModelView
 from flask_appbuilder.security.registerviews import RegisterUserDBView, BaseRegisterUser
-
+from .filters import OrgFilter
 from .forms import (
     PasswordRecoverForm, SavvyRegisterInvitationUserDBForm, SavvyRegisterUserDBForm, RegisterInvitationForm
 )
@@ -23,12 +23,32 @@ email_subject = 'SavvyBI - Email Confirmation'
 
 
 class SavvyUserDBModelView(UserDBModelView):
+    base_filters = [['id', OrgFilter, lambda: []]]
 
     def pre_delete(self, user):
         print(user)
         organization = self.appbuilder.sm.find_org(user_id=user.id)
         if len(organization.users) == 1:
             self.appbuilder.sm.delete_org(organization)
+
+    @expose('/add', methods=['GET', 'POST'])
+    @has_access
+    def add(self):
+        is_admin = False
+        for role in g.user.roles:
+            if role.name == 'Admin':
+                is_admin = True
+                break
+        if is_admin:
+            widget = self._add()
+            if not widget:
+                return self.post_add_redirect()
+            else:
+                return self.render_template(self.add_template,
+                                            title=self.add_title,
+                                            widgets=widget)
+        else:
+            return redirect('register/invite')
 
 
 class EmailResetPasswordView(PublicFormView):
@@ -305,21 +325,21 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
 
     def form_post(self, form):
         self.add_form_unique_validations(form)
-        self.add_registration_org_admin(organizaiton=form.organization.data,
+        self.add_registration_org_admin(organization=form.organization.data,
                                         first_name=form.first_name.data,
                                         last_name=form.last_name.data,
+                                        username=form.username.data,
                                         email=form.email.data,
                                         password=form.password.data)
 
-    def add_registration_org_admin(self, organizaiton, first_name, last_name, email, password=''):
+    def add_registration_org_admin(self, **kwargs):
         """
             Add a registration request for the user.
 
         :rtype : RegisterUser
         """
 
-        register_user = self.appbuilder.sm.add_register_user_org_admin(organizaiton, first_name, last_name, email,
-                                                                       password)
+        register_user = self.appbuilder.sm.add_register_user_org_admin(**kwargs)
         if register_user:
             if self.send_email(register_user):
                 flash(as_unicode(self.message), 'info')
@@ -440,6 +460,7 @@ class SavvyRegisterInviteView(BaseRegisterUser):
         if not self.appbuilder.sm.add_org_user(email=reg.email,
                                                first_name=reg.first_name,
                                                last_name=reg.last_name,
+                                               username=reg.username,
                                                role_id=reg.role_assigned,
                                                organization=reg.organization,
                                                hashed_password=reg.password):
