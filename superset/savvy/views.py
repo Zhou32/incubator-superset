@@ -228,19 +228,21 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
         if form.validate_on_submit():
             user_id = g.user.id
             organization = self.appbuilder.sm.find_org(user_id=user_id)
-            reg_user = self.appbuilder.sm.add_invite_register_user(email=form.email.data,
-                                                                   organization=organization,
-                                                                   role=form.role.data,
-                                                                   inviter=user_id)
-            if reg_user:
-                if self.send_email(reg_user):
-                    flash(as_unicode('Invitation sent to %s' % form.email.data), 'info')
-                    return self.invitation()
-                else:
-                    flash(as_unicode('Cannot send invitation to user'), 'danger')
-                    return self.invitation()
-            else:
-                flash(as_unicode('Superuser reaches limit.'), 'danger')
+
+            try:
+                reg_user = self.appbuilder.sm.add_invite_register_user(email=form.email.data,
+                                                                       organization=organization,
+                                                                       role=form.role.data,
+                                                                       inviter=user_id)
+                if reg_user:
+                    if self.send_email(reg_user):
+                        flash(as_unicode('Invitation sent to %s' % form.email.data), 'info')
+                        return self.invitation()
+                    else:
+                        flash(as_unicode('Cannot send invitation to user'), 'danger')
+                        return self.invitation()
+            except Exception as e:
+                flash(as_unicode(e), 'danger')
                 return self.invitation()
         else:
             widgets = self._get_edit_widget(form=form)
