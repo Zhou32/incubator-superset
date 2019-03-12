@@ -134,7 +134,7 @@ class DashboardFilter(SupersetFilter):
                 is_org_owner = True
                 break
 
-        if is_org_owner == True:
+        if is_org_owner:
             org = Organization
             try:
                 users_in_org = db.session.query(org).filter(org.users.any(id=g.user.id)).first().users
