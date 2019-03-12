@@ -13,7 +13,7 @@ from flask_appbuilder.security.decorators import has_access
 from flask_appbuilder.security.forms import ResetPasswordForm
 from flask_appbuilder.security.views import UserDBModelView
 from flask_appbuilder.security.registerviews import RegisterUserDBView, BaseRegisterUser
-from .filters import OrgFilter
+from .filters import OrgFilter, RoleFilter
 from .forms import (
     PasswordRecoverForm, SavvyRegisterInvitationUserDBForm, SavvyRegisterUserDBForm, RegisterInvitationForm
 )
@@ -23,7 +23,7 @@ email_subject = 'SavvyBI - Email Confirmation'
 
 
 class SavvyUserDBModelView(UserDBModelView):
-    base_filters = [['id', OrgFilter, lambda: []]]
+    base_filters = [['id', RoleFilter, lambda: []]]
 
     def pre_delete(self, user):
         print(user)
@@ -459,7 +459,6 @@ class SavvyRegisterInviteView(BaseRegisterUser):
         if not self.appbuilder.sm.add_org_user(email=reg.email,
                                                first_name=reg.first_name,
                                                last_name=reg.last_name,
-                                               username=reg.username,
                                                role_id=reg.role_assigned,
                                                organization=reg.organization,
                                                hashed_password=reg.password):
