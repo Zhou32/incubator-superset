@@ -337,12 +337,12 @@ class CustomSecurityManager(SupersetSecurityManager):
             return self.get_session.query(self.organizationModel).\
                 filter(self.organizationModel.users.any(id=user_id)).scalar()
 
-    def add_org_user(self, email, first_name, last_name, username, hashed_password, organization, role_id):
+    def add_org_user(self, email, first_name, last_name, hashed_password, organization, role_id):
         try:
             org = self.find_org(organization)
             user = self.user_model()
             user.email = email
-            user.username = username
+            user.username = email
             user.first_name = first_name
             user.last_name = last_name
             user.active = True
@@ -382,7 +382,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         register_user = self.registeruser_model()
         register_user.first_name = kwargs['first_name']
         register_user.last_name = kwargs['last_name']
-        register_user.username = kwargs['username']
+        register_user.username = kwargs['email']
         register_user.email = kwargs['email']
         register_user.organization = kwargs['organization']
         register_user.password = generate_password_hash(kwargs['password'])

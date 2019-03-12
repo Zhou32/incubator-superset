@@ -328,7 +328,6 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
         self.add_registration_org_admin(organization=form.organization.data,
                                         first_name=form.first_name.data,
                                         last_name=form.last_name.data,
-                                        username=form.username.data,
                                         email=form.email.data,
                                         password=form.password.data)
 
