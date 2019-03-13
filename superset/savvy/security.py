@@ -80,6 +80,8 @@ VIEWER_NOT_ALLOWED = {
     'Sources', 'SavvyRegisterInvitationUserDBView',
 }
 
+DB_ROLE_SUFFIX = '_db_role'
+
 
 class CustomSecurityManager(SupersetSecurityManager):
 
@@ -351,6 +353,8 @@ class CustomSecurityManager(SupersetSecurityManager):
             user.roles.append(role)
             if org is not None:
                 org.users.append(user)
+                db_role = self.find_role(org.organization_name + DB_ROLE_SUFFIX)
+                user.roles.append(db_role)
             self.get_session.add(user)
             self.get_session.commit()
             return user
@@ -395,3 +399,68 @@ class CustomSecurityManager(SupersetSecurityManager):
             logging.error(const.LOGMSG_ERR_SEC_ADD_REGISTER_USER.format(str(e)))
             self.appbuilder.get_session.rollback()
             return None
+
+    def create_db_role(self, database_name, database_uri, owner):
+        from superset.models.core import Database
+        from superset.connectors.sqla.models import SqlaTable
+        session = self.appbuilder.get_session
+        db_model = SQLAInterface(Database, session=session)
+        table_model = SQLAInterface(SqlaTable, session=session)
+        db = db_model.obj()
+        permission_list = []
+        db.database_name = database_name
+        db.sqlalchemy_uri = database_uri
+        db.cache_timeout = None
+        db.force_ctas_schema = None
+        db.set_sqlalchemy_uri(db.sqlalchemy_uri)
+        self.merge_perm('database_access', db.perm)
+        permission_list.append(self.find_permission_view_menu('database_access', db.perm))
+        db_model.add(db)
+        # print('db finished')
+        for schema in db.all_schema_names():
+            schema_perm = self.get_schema_perm(db, schema)
+            self.merge_perm(
+                'schema_access', schema_perm)
+            permission_list.append(self.find_permission_view_menu('schema_access', schema_perm))
+            # print('for schema ', schema)
+
+            for table_name in db.all_table_names_in_schema(schema=schema):
+                table = table_model.obj()
+                table.database = db
+                table.table_name = table_name
+                table.schema = schema
+                with session.no_autoflush:
+                    table_query = session.query(SqlaTable).filter(
+                        SqlaTable.table_name == table.table_name,
+                        SqlaTable.schema == table.schema,
+                        SqlaTable.database_id == table.database.id)
+                    if session.query(table_query.exists()).scalar():
+                        logging.debug('Table already exists')
+                # Fail before adding if the table can't be found
+                try:
+                    # print('add table')
+                    # table.get_sqla_table_object()
+                    table_model.add(table)
+                    table.fetch_metadata()
+                    if table.get_perm():
+                        self.merge_perm('datasource_access', table.get_perm())
+                        permission_list.append(self.find_permission_view_menu('datasource_access', table.get_perm()))
+                    if table.schema:
+                        self.merge_perm('schema_access', table.schema_perm)
+                    # print('add table fin')
+                except Exception as e:
+                    logging.exception(f'Got an error in pre_add for {table.name}')
+        print(permission_list)
+        permission_list_not_none = [permission for permission in permission_list if permission is not None]
+        # owner = self.find_user(email='bwhsdzf@gmail.com')
+        db_role = self.rolemodelview.datamodel.obj()
+        db_role.name = db.database_name + DB_ROLE_SUFFIX
+        db_role.permissions = permission_list_not_none
+        db_role.user = [owner]
+        self.rolemodelview.datamodel.add(db_role)
+        # print('add role')
+        return db_role
+
+
+
+

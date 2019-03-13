@@ -30,6 +30,7 @@ class OrgRegisterUser(Model):
     """ the register model for users who are invited by admin """
     __tablename__ = 'ab_register_user'
     id = Column(Integer, Sequence('ab_register_user_id_seq'), primary_key=True)
+    username = Column(String(64))
     first_name = Column(String(64), nullable=True)
     last_name = Column(String(64), nullable=True)
     password = Column(String(256))
