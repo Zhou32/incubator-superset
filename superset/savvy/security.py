@@ -253,24 +253,24 @@ class CustomSecurityManager(SupersetSecurityManager):
             elif role.name == 'Admin':
                 return [(str(invite_role.id), invite_role.name) for invite_role in self.get_all_roles()]
 
-    def add_invite_register_user(self, first_name=None, last_name=None, email=None, role=None,
-                                 inviter=None, password='', hashed_password='', organization=None):
+    def add_invite_register_user(self, email, organization, first_name=None, last_name=None, role=None,
+                                 inviter=None, password='', hashed_password=''):
         invited_user = self.registeruser_model()
-        if email:
-            invited_user.email = email
+        # email and organization parameters should be always available.
+        invited_user.email = email
+        invited_user.organization = organization.organization_name
+
         if first_name:
             invited_user.first_name = first_name
         if last_name:
             invited_user.last_name = last_name
         if inviter:
             invited_user.inviter = inviter
-        if organization:
-            invited_user.organization = organization.organization_name
         if role:
             invited_user.role_assigned = role
             if role == str(self.find_role('org_superuser').id) and organization.superuser_number >= 3:
                 logging.error(u'Superusers reach limit for %s.' % organization.organization_name)
-                return None
+                raise ValueError('Superuser reaches limit.')
         if hashed_password:
             invited_user.password = hashed_password
         else:
@@ -280,11 +280,11 @@ class CustomSecurityManager(SupersetSecurityManager):
         try:
             self.get_session.add(invited_user)
             self.get_session.commit()
-            return invited_user
         except Exception as e:
             self.get_session.rollback()
             logging.error(e)
-            return None
+            raise ValueError('Invitation is failed because of database integrity error')
+        return invited_user
 
     def edit_invite_register_user_by_hash(self, invitation_hash, first_name=None, last_name=None,
                                           password='', hashed_password=''):

@@ -13,7 +13,7 @@ from flask_appbuilder.security.decorators import has_access
 from flask_appbuilder.security.forms import ResetPasswordForm
 from flask_appbuilder.security.views import UserDBModelView
 from flask_appbuilder.security.registerviews import RegisterUserDBView, BaseRegisterUser
-from .filters import OrgFilter
+from .filters import OrgFilter, RoleFilter
 from .forms import (
     PasswordRecoverForm, SavvyRegisterInvitationUserDBForm, SavvyRegisterUserDBForm, RegisterInvitationForm
 )
@@ -23,7 +23,7 @@ email_subject = 'SavvyBI - Email Confirmation'
 
 
 class SavvyUserDBModelView(UserDBModelView):
-    base_filters = [['id', OrgFilter, lambda: []]]
+    base_filters = [['id', RoleFilter, lambda: []]]
 
     def pre_delete(self, user):
         print(user)
@@ -228,19 +228,21 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
         if form.validate_on_submit():
             user_id = g.user.id
             organization = self.appbuilder.sm.find_org(user_id=user_id)
-            reg_user = self.appbuilder.sm.add_invite_register_user(email=form.email.data,
-                                                                   organization=organization,
-                                                                   role=form.role.data,
-                                                                   inviter=user_id)
-            if reg_user:
-                if self.send_email(reg_user):
-                    flash(as_unicode('Invitation sent to %s' % form.email.data), 'info')
-                    return self.invitation()
-                else:
-                    flash(as_unicode('Cannot send invitation to user'), 'danger')
-                    return self.invitation()
-            else:
-                flash(as_unicode('Superuser reaches limit.'), 'danger')
+
+            try:
+                reg_user = self.appbuilder.sm.add_invite_register_user(email=form.email.data,
+                                                                       organization=organization,
+                                                                       role=form.role.data,
+                                                                       inviter=user_id)
+                if reg_user:
+                    if self.send_email(reg_user):
+                        flash(as_unicode('Invitation sent to %s' % form.email.data), 'info')
+                        return self.invitation()
+                    else:
+                        flash(as_unicode('Cannot send invitation to user'), 'danger')
+                        return self.invitation()
+            except Exception as e:
+                flash(as_unicode(e), 'danger')
                 return self.invitation()
         else:
             widgets = self._get_edit_widget(form=form)
@@ -459,7 +461,6 @@ class SavvyRegisterInviteView(BaseRegisterUser):
         if not self.appbuilder.sm.add_org_user(email=reg.email,
                                                first_name=reg.first_name,
                                                last_name=reg.last_name,
-                                               username=reg.username,
                                                role_id=reg.role_assigned,
                                                organization=reg.organization,
                                                hashed_password=reg.password):

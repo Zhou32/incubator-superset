@@ -23,7 +23,7 @@ class Organization(Model):
     id = Column(Integer, primary_key=True)
     organization_name = Column(String(250))
     users = relationship('User', secondary=assoc_org_user, backref='organization')
-    superuser_number = Column('superuser_number', Integer)
+    superuser_number = Column('superuser_number', Integer, default=0)
 
 
 class OrgRegisterUser(Model):
