@@ -25,7 +25,8 @@ from flask_appbuilder.models.sqla.interface import SQLAInterface
 from werkzeug.security import generate_password_hash
 
 from superset.savvy.views import SavvyRegisterInvitationUserDBView, SavvyRegisterInviteView, \
-    SavvyRegisterUserDBView, SavvyUserDBModelView, EmailResetPasswordView, PasswordRecoverView
+    SavvyRegisterUserDBView, SavvyUserDBModelView, EmailResetPasswordView, PasswordRecoverView, \
+    SavvyRegisterUserModelView
 from superset.savvy.models import ResetRequest, OrgRegisterUser, Organization
 from superset.security import SupersetSecurityManager
 
@@ -51,6 +52,7 @@ OWNER_PERMISSION_MODEL = {
     'DashboardModelView',
     'DashboardAddView',
     'SavvyRegisterInvitationUserDBView',
+    'SavvyRegisterUserModelView'
 }
 
 OWNER_PERMISSION_MENU = {
@@ -89,6 +91,7 @@ class CustomSecurityManager(SupersetSecurityManager):
     invitation_view = SavvyRegisterInvitationUserDBView()
 
     registeruserdbview = SavvyRegisterUserDBView
+    registerusermodelview = SavvyRegisterUserModelView
     userdbmodelview = SavvyUserDBModelView
 
     resetRequestModel = ResetRequest

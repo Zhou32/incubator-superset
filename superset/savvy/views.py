@@ -5,7 +5,7 @@ from flask_babel import lazy_gettext
 from flask_mail import Mail, Message
 from sqlalchemy import create_engine
 
-from flask_appbuilder import const
+from flask_appbuilder import const, ModelView
 from flask_appbuilder.validators import Unique
 from flask_appbuilder._compat import as_unicode
 from flask_appbuilder.views import expose, PublicFormView
@@ -13,11 +13,12 @@ from flask_appbuilder.security.decorators import has_access
 from flask_appbuilder.security.forms import ResetPasswordForm
 from flask_appbuilder.security.views import UserDBModelView
 from flask_appbuilder.security.registerviews import RegisterUserDBView, BaseRegisterUser
-from .filters import OrgFilter, RoleFilter
+from .filters import RoleFilter
+from flask_appbuilder.models.sqla.filters import FilterInFunction
 from .forms import (
     PasswordRecoverForm, SavvyRegisterInvitationUserDBForm, SavvyRegisterUserDBForm, RegisterInvitationForm
 )
-
+from .filters import get_user_id_list_form_org
 log = logging.getLogger(__name__)
 email_subject = 'SavvyBI - Email Confirmation'
 
@@ -473,3 +474,14 @@ class SavvyRegisterInviteView(BaseRegisterUser):
                                         first_name=reg.first_name,
                                         last_name=reg.last_name,
                                         appbuilder=self.appbuilder)
+
+
+class SavvyRegisterUserModelView(ModelView):
+    route_base = '/registeruser'
+    base_permissions = ['can_list', 'can_show', 'can_delete']
+    list_title = lazy_gettext('List of Registration Requests')
+    show_title = lazy_gettext('Show Registration')
+    list_columns = ['registration_date','email','organization','inviter[email]']
+    show_exclude_columns = ['password']
+    search_exclude_columns = ['password']
+    base_filters = [['inviter', FilterInFunction, get_user_id_list_form_org]]
