@@ -59,7 +59,13 @@ SUPERSET_CELERY_WORKERS = 32  # deprecated
 
 SUPERSET_WEBSERVER_ADDRESS = '0.0.0.0'
 SUPERSET_WEBSERVER_PORT = 8088
-SUPERSET_WEBSERVER_TIMEOUT = 60  # deprecated
+
+# This is an important setting, and should be lower than your
+# [load balancer / proxy / envoy / kong / ...] timeout settings.
+# You should also make sure to configure your WSGI server
+# (gunicorn, nginx, apache, ...) timeout setting to be <= to this setting
+SUPERSET_WEBSERVER_TIMEOUT = 60
+
 SUPERSET_DASHBOARD_POSITION_DATA_LIMIT = 65535
 EMAIL_NOTIFICATIONS = False
 CUSTOM_SECURITY_MANAGER = None
@@ -90,7 +96,7 @@ QUERY_SEARCH_LIMIT = 1000
 WTF_CSRF_ENABLED = True
 
 # Add endpoints that need to be exempt from CSRF protection
-WTF_CSRF_EXEMPT_LIST = []
+WTF_CSRF_EXEMPT_LIST = ['superset.views.core.log']
 
 # Whether to run the web server in debug mode or not
 DEBUG = os.environ.get('FLASK_ENV') == 'development'
@@ -197,6 +203,22 @@ LANGUAGES = {
 # and FEATURE_FLAGS = { 'BAR': True, 'BAZ': True } in superset_config.py
 # will result in combined feature flags of { 'FOO': True, 'BAR': True, 'BAZ': True }
 DEFAULT_FEATURE_FLAGS = {}
+
+# A function that receives a dict of all feature flags
+# (DEFAULT_FEATURE_FLAGS merged with FEATURE_FLAGS)
+# can alter it, and returns a similar dict. Note the dict of feature
+# flags passed to the function is a deepcopy of the dict in the config,
+# and can therefore be mutated without side-effect
+#
+# GET_FEATURE_FLAGS_FUNC can be used to implement progressive rollouts,
+# role-based features, or a full on A/B testing framework.
+#
+# from flask import g, request
+# def GET_FEATURE_FLAGS_FUNC(feature_flags_dict):
+#     feature_flags_dict['some_feature'] = g.user and g.user.id == 5
+#     return feature_flags_dict
+GET_FEATURE_FLAGS_FUNC = None
+
 
 # ---------------------------------------------------
 # Image and file configuration
@@ -457,7 +479,7 @@ SMTP_MAIL_FROM = 'superset@superset.com'
 if not CACHE_DEFAULT_TIMEOUT:
     CACHE_DEFAULT_TIMEOUT = CACHE_CONFIG.get('CACHE_DEFAULT_TIMEOUT')
 
-# Whether to bump the logging level to ERRROR on the flask_appbiulder package
+# Whether to bump the logging level to ERROR on the flask_appbuilder package
 # Set to False if/when debugging FAB related issues like
 # permission management
 SILENCE_FAB = True
