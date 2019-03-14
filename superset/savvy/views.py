@@ -9,7 +9,7 @@ from sqlalchemy import create_engine
 from flask_appbuilder import const
 from flask_appbuilder.validators import Unique
 from flask_appbuilder._compat import as_unicode
-from flask_appbuilder.views import expose, PublicFormView
+from flask_appbuilder.views import expose, PublicFormView, ModelView
 from flask_appbuilder.security.decorators import has_access
 from flask_appbuilder.security.forms import ResetPasswordForm
 from flask_appbuilder.security.views import UserDBModelView
@@ -297,12 +297,9 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
     def add_form_unique_validations(self, form):
         datamodel_user = self.appbuilder.sm.get_user_datamodel
         datamodel_register_user = self.appbuilder.sm.get_register_user_datamodel
-        datamodel_organization = self.appbuilder.sm.get_organization_datamodel()
         if len(form.email.validators) == 2:
             form.email.validators.append(Unique(datamodel_user, 'email'))
             form.email.validators.append(Unique(datamodel_register_user, 'email'))
-        if len(form.organization.validators) == 1:
-            form.organization.validators.append(Unique(datamodel_organization, 'organization_name'))
 
     @expose('/here/')
     def handle_aws_info(self, org, user):
@@ -477,3 +474,20 @@ class SavvyRegisterInviteView(BaseRegisterUser):
                                         first_name=reg.first_name,
                                         last_name=reg.last_name,
                                         appbuilder=self.appbuilder)
+
+
+class SavvyGroupModelView(ModelView):
+    route_base = '/groups'
+
+    list_title = lazy_gettext('List Groups')
+    show_title = lazy_gettext('Show group')
+    add_title = lazy_gettext('Add group')
+    edit_title = lazy_gettext('Edit group')
+
+    add_template = 'superset/models/group/add.html'
+
+    add_columns = ['group_name', 'sites', 'users']
+    edit_columns = add_columns
+    label_columns = {'group_name': lazy_gettext('Group Name'), 'sites': lazy_gettext('Sites')}
+    list_columns = ['group_name', 'sites']
+    order_columns = ['group_name']
