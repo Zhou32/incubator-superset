@@ -1,3 +1,4 @@
+import json
 import logging
 
 from flask import flash, redirect, request, url_for, g
@@ -18,13 +19,17 @@ from flask_appbuilder.models.sqla.filters import FilterInFunction
 from .forms import (
     PasswordRecoverForm, SavvyRegisterInvitationUserDBForm, SavvyRegisterUserDBForm, RegisterInvitationForm
 )
+
 from .filters import get_user_id_list_form_org
+from .utils import post_request
+
 log = logging.getLogger(__name__)
 email_subject = 'SavvyBI - Email Confirmation'
 
 
 class SavvyUserDBModelView(UserDBModelView):
     base_filters = [['id', RoleFilter, lambda: []]]
+
 
     def pre_delete(self, user):
         print(user)
@@ -285,6 +290,7 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
             return redirect(self.appbuilder.get_url_for_index)
         else:
             org_reg = self.appbuilder.sm.add_org(reg, user)
+            self.handle_aws_info(org_reg, user)
             self.appbuilder.sm.del_register_user(reg)
             return self.render_template(self.activation_template,
                                         username=reg.email,
@@ -303,23 +309,24 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
             form.organization.validators.append(Unique(datamodel_organization, 'organization_name'))
 
     @expose('/here/')
-    def handle_aws_info(self):
-        access_key = 'AKIAIRQFEHI3X7KAETYA'
-        secret_key = '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'
+    def handle_aws_info(self, org, user):
+        info = post_request('https://3ozse3mao8.execute-api.ap-southeast-2.amazonaws.com/test/createorg',
+                            {"org_name": org.organization_name, "org_id": org.id})
+        aws_info = json.loads(info.text)
+        access_key = aws_info['AccessKeyId']
+        secret_key = aws_info['SecretAccessKey']
+        athena_link = f'awsathena+jdbc://{access_key}:{secret_key}@athena.us-west-2.amazonaws.com/market_report_prod_ore?s3_staging_dir=s3://druid.dts.input-bucket.oregon'
+        self.testconn(athena_link, org, user)
 
-        athena_link = f'awsathena+jdbc://{access_key}:{secret_key}@athena.us-west-2.amazonaws.com/' \
-                      f'market_report_prod_ore?s3_staging_dir=s3://druid.dts.input-bucket.oregon'
-        self.testconn(athena_link)
-
-    @staticmethod
-    def testconn(athena_link):
+    def testconn(self, athena_link, org, user):
         """Tests a sqla connection"""
         from ..views.base import json_error_response
         try:
-            engine = create_engine(athena_link)
-            engine.connect()
-            table_list = engine.table_names()
-            print(table_list)
+            # engine = create_engine(athena_link)
+            # engine.connect()
+            # table_list = engine.table_names()
+            # print(table_list)
+            self.appbuilder.sm.create_db_role(org.organization_name, athena_link, user)
         except Exception as e:
             logging.exception(e)
             return json_error_response((
