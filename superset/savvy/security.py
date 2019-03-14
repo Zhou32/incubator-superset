@@ -25,12 +25,12 @@ from flask_appbuilder import const
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 from werkzeug.security import generate_password_hash
 
-from superset.savvy.views import SavvyRegisterInvitationUserDBView, SavvyRegisterInviteView, \
+from superset.savvy.views import SavvyGroupModelView,\
+    SavvyRegisterInvitationUserDBView, SavvyRegisterInviteView, \
     SavvyRegisterUserDBView, SavvyUserDBModelView, EmailResetPasswordView, PasswordRecoverView, \
     SavvyRegisterUserModelView, SavvyUserStatsChartView
-from superset.savvy.models import ResetRequest, OrgRegisterUser, Organization
+from superset.savvy.models import Group, ResetRequest, OrgRegisterUser, Organization
 from superset.security import SupersetSecurityManager
-from .utils import post_request
 
 
 PERMISSION_COMMON = {
@@ -94,23 +94,22 @@ class CustomSecurityManager(SupersetSecurityManager):
     passwordresetview = EmailResetPasswordView()
     invite_register_view = SavvyRegisterInviteView()
     invitation_view = SavvyRegisterInvitationUserDBView()
+    group_view = SavvyGroupModelView
 
     registeruserdbview = SavvyRegisterUserDBView
     registerusermodelview = SavvyRegisterUserModelView
     userdbmodelview = SavvyUserDBModelView
     userstatschartview = SavvyUserStatsChartView
 
-    resetRequestModel = ResetRequest
+    resetRequest_model = ResetRequest
     registeruser_model = OrgRegisterUser
-    organizationModel = Organization
+    organization_model = Organization
+    group_model = Group
 
 
     def __init__(self, appbuilder):
         super(CustomSecurityManager, self).__init__(appbuilder)
-        self.organization_datamodel = SQLAInterface(self.organizationModel, session=self.appbuilder.get_session)
-
-    def get_organization_datamodel(self):
-        return self.organization_datamodel
+        self.group_view.datamodel = SQLAInterface(self.group_model, self.appbuilder.get_session)
 
     def register_views(self):
         super(CustomSecurityManager, self).register_views()
@@ -118,6 +117,9 @@ class CustomSecurityManager(SupersetSecurityManager):
         self.appbuilder.add_view_no_menu(self.passwordresetview)
         self.appbuilder.add_view_no_menu(self.invite_register_view)
         self.appbuilder.add_view_no_menu(self.invitation_view)
+        self.group_view = self.appbuilder.add_view(self.group_view, "List Groups",
+                                                   icon="fa-user", label="List Groups",
+                                                   category="Security", category_icon="fa-cogs")
 
     def sync_role_definitions(self):
         """Inits the Superset application with security roles and such"""
@@ -156,28 +158,25 @@ class CustomSecurityManager(SupersetSecurityManager):
         result = result or (pvm.view_menu.name not in OWNER_NOT_ALLOWED_MENU)
         if pvm.view_menu.name in OWNER_NOT_ALLOWED_MENU or pvm.permission.name in NOT_ALLOWED_SQL_PERM:
             return False
-        return result
-
-    def is_superuser_pvm(self, pvm):
-        result = self.is_gamma_pvm(pvm)
-
-        for permission in PERMISSION_COMMON:
-            for view in OWNER_PERMISSION_MODEL:
-                result = result or (pvm.view_menu.name == view and
-                                    pvm.permission.name == permission)
-        result = result or (pvm.view_menu.name not in OWNER_NOT_ALLOWED_MENU)
-        if pvm.view_menu.name in OWNER_NOT_ALLOWED_MENU or pvm.permission.name in NOT_ALLOWED_SQL_PERM:
+        if self.is_user_defined_permission(pvm) or pvm.permission.name == 'all_database_access'\
+                or pvm.permission.name == 'all_datasource_access':
             return False
         return result
 
+    def is_superuser_pvm(self, pvm):
+        result = self.is_owner_pvm(pvm)
+
+        return result
+
     def is_user_pvm(self, pvm):
-        result = self.is_gamma_pvm(pvm)
-        if pvm.view_menu.name in USER_NOT_ALLOWED:
+        result = self.is_superuser_pvm(pvm)
+
+        if pvm.view_menu.name in USER_NOT_ALLOWED or self.is_admin_only(pvm):
             return False
         return result
 
     def is_viewer_pvm(self, pvm):
-        result = self.is_gamma_pvm(pvm)
+        result = self.is_user_pvm(pvm)
         if pvm.view_menu.name in VIEWER_NOT_ALLOWED:
             return False
         return result
@@ -197,12 +196,12 @@ class CustomSecurityManager(SupersetSecurityManager):
 
     def add_reset_request(self, email):
         """try look for not used existed hash for user"""
-        reset_request = self.get_session.query(self.resetRequestModel)\
+        reset_request = self.get_session.query(self.resetRequest_model)\
             .filter_by(email=email, used=False).first()
         if reset_request is not None:
             print(reset_request.id)
             self.set_token_used(reset_request.reset_hash)
-        reset_request = self.resetRequestModel()
+        reset_request = self.resetRequest_model()
         reset_request.email = email
         reset_request.used = False
         user = self.find_user(email=email)
@@ -221,7 +220,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         return None
 
     def find_user_by_token(self, token):
-        reset_request = self.get_session.query(self.resetRequestModel)\
+        reset_request = self.get_session.query(self.resetRequest_model)\
             .filter_by(reset_hash=token, used=False).first()
         if reset_request is not None:
             time = reset_request.reset_date
@@ -236,7 +235,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         return None
 
     def set_token_used(self, token):
-        reset_request = self.get_session.query(self.resetRequestModel)\
+        reset_request = self.get_session.query(self.resetRequest_model)\
             .filter_by(reset_hash=token).first()
         reset_request.used = True
         try:
@@ -341,10 +340,10 @@ class CustomSecurityManager(SupersetSecurityManager):
 
     def find_org(self, org_name=None, user_id=None):
         if org_name:
-            return self.get_session.query(self.organizationModel).filter_by(organization_name=org_name).first()
+            return self.get_session.query(self.organization_model).filter_by(organization_name=org_name).first()
         elif user_id:
-            return self.get_session.query(self.organizationModel).\
-                filter(self.organizationModel.users.any(id=user_id)).scalar()
+            return self.get_session.query(self.organization_model).\
+                filter(self.organization_model.users.any(id=user_id)).scalar()
 
     def add_org_user(self, email, first_name, last_name, hashed_password, organization, role_id):
         try:
@@ -370,7 +369,7 @@ class CustomSecurityManager(SupersetSecurityManager):
             return False
 
     def add_org(self, reg, user):
-        new_org = self.organizationModel()
+        new_org = self.organization_model()
         new_org.organization_name = reg.organization
         new_org.users.append(user)
         try:

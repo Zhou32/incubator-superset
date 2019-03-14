@@ -52,3 +52,37 @@ class ResetRequest(Model):
     reset_date = Column(DateTime, default=datetime.datetime.now, nullable=True)
     reset_hash = Column(String(256))
     used = Column(Boolean)
+
+
+assoc_group_site = Table(
+    'group_site', metadata,
+    Column('id', Integer, primary_key=True),
+    Column('group_id', Integer, ForeignKey('groups.id')),
+    Column('site_id', Integer, ForeignKey('sites.id'))
+)
+
+assoc_group_user = Table(
+    'group_user', metadata,
+    Column('id', Integer, primary_key=True),
+    Column('group_id', Integer, ForeignKey('groups.id')),
+    Column('user_id', Integer, ForeignKey('ab_user.id'))
+)
+
+
+class Group(Model):
+    __tablename__ = 'groups'
+    id = Column(Integer, primary_key=True)
+    group_name = Column(String(64), nullable=False)
+    organization_id = Column(Integer, ForeignKey('organizations.id'))
+    sites = relationship('Site',
+                         secondary=assoc_group_site)
+    users = relationship('User',
+                         secondary=assoc_group_user)
+
+
+class Site(Model):
+    __tablename__ = 'sites'
+    id = Column(Integer, primary_key=True)
+
+
+
