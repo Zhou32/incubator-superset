@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 
 from flask import flash, redirect, request, url_for, g
 from flask_babel import lazy_gettext
@@ -12,7 +13,7 @@ from flask_appbuilder._compat import as_unicode
 from flask_appbuilder.views import expose, PublicFormView
 from flask_appbuilder.security.decorators import has_access
 from flask_appbuilder.security.forms import ResetPasswordForm
-from flask_appbuilder.security.views import UserDBModelView
+from flask_appbuilder.security.views import UserDBModelView, UserStatsChartView
 from flask_appbuilder.security.registerviews import RegisterUserDBView, BaseRegisterUser
 from .filters import RoleFilter
 from flask_appbuilder.models.sqla.filters import FilterInFunction
@@ -315,6 +316,7 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
         aws_info = json.loads(info.text)
         access_key = aws_info['AccessKeyId']
         secret_key = aws_info['SecretAccessKey']
+        time.sleep(5)
         athena_link = f'awsathena+jdbc://{access_key}:{secret_key}@athena.us-west-2.amazonaws.com/market_report_prod_ore?s3_staging_dir=s3://druid.dts.input-bucket.oregon'
         self.testconn(athena_link, org, user)
 
@@ -488,7 +490,11 @@ class SavvyRegisterUserModelView(ModelView):
     base_permissions = ['can_list', 'can_show', 'can_delete']
     list_title = lazy_gettext('List of Registration Requests')
     show_title = lazy_gettext('Show Registration')
-    list_columns = ['registration_date','email','organization','inviter[email]']
+    list_columns = ['registration_date','email','organization']
     show_exclude_columns = ['password']
     search_exclude_columns = ['password']
     base_filters = [['inviter', FilterInFunction, get_user_id_list_form_org]]
+
+
+class SavvyUserStatsChartView(UserStatsChartView):
+    base_filters = [['id', FilterInFunction, get_user_id_list_form_org]]

@@ -30,6 +30,44 @@ def get_user_id_list_form_org():
     return user_ids
 
 
+def get_db_name_list_form_org():
+    from superset import security_manager, db
+    from superset.models.core import Database
+
+    for role in g.user.roles:
+        if role.name == 'Admin':
+            database_names = db.session.query(Database.database_name).all()
+            all_database_names = []
+            for i in database_names:
+                all_database_names.append(i[0])
+            return all_database_names
+    org = Organization
+
+    database_name_in_org = []
+
+    try:
+        database_in_org = db.session.query(org.organization_name).filter(org.users.any(id=g.user.id)).first()[0]
+        database_name_in_org.append(database_in_org)
+    except:
+        pass
+
+    users_in_org = []
+    try:
+        users_in_org = db.session.query(org).filter(org.users.any(id=g.user.id)).first().users
+    except:
+        pass
+    user_ids = []
+    for user_ in users_in_org:
+        user_ids.append(user_.id)
+    try:
+        database_in_org = db.session.query(Database.database_name).filter(Database.created_by_fk.in_(user_ids)).all()
+        for name in database_in_org:
+            database_name_in_org.append(name[0])
+    except:
+        pass
+
+    return database_name_in_org
+
 class RoleFilter(BaseFilter):
     def apply(self, query, func):
         from superset import security_manager, db

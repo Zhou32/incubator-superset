@@ -67,6 +67,8 @@ from .base import (
 )
 from .utils import bootstrap_user_data
 from superset.savvy.models import Organization
+from superset.savvy.filters import get_db_name_list_form_org
+from flask_appbuilder.models.sqla.filters import FilterInFunction
 
 config = app.config
 stats_logger = config.get('STATS_LOGGER')
@@ -295,6 +297,7 @@ class DatabaseView(SupersetModelView, DeleteMixin, YamlExportMixin):  # noqa
         'allow_multi_schema_metadata_fetch': _('Allow Multi Schema Metadata Fetch'),
         'backend': _('Backend'),
     }
+    base_filters = [['database_name', FilterInFunction, get_db_name_list_form_org]]
 
     def pre_add(self, db):
         self.check_extra(db)
