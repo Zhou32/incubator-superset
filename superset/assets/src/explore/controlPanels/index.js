@@ -22,6 +22,7 @@
  */
 import { isFeatureEnabled, FeatureFlag } from 'src/featureFlags';
 import * as sections from './sections';
+import extraOverrides from './extraOverrides';
 
 import Area from './Area';
 import Bar from './Bar';
@@ -73,7 +74,7 @@ import DeckScatter from './DeckScatter';
 import DeckScreengrid from './DeckScreengrid';
 import SolarBI from './SolarBI';
 
-export const controlPanelConfigs = {
+export const controlPanelConfigs = extraOverrides({
   area: Area,
   bar: Bar,
   big_number: BigNumber,
@@ -122,8 +123,8 @@ export const controlPanelConfigs = {
   deck_polygon: DeckPolygon,
   deck_scatter: DeckScatter,
   deck_screengrid: DeckScreengrid,
-  solarBI: SolarBI
-};
+  solarBI: SolarBI,
+});
 
 export default controlPanelConfigs;
 

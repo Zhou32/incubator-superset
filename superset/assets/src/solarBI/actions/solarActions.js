@@ -18,7 +18,8 @@
  */
 /* eslint camelcase: 0 */
 import { SupersetClient } from "@superset-ui/connection";
-import { Logger, LOG_ACTIONS_LOAD_CHART } from "../../logger";
+import { Logger, LOG_ACTIONS_LOAD_CHART } from "../../logger/LogUtils";
+import { logEvent } from "../../logger/actions";
 import getClientErrorObject from "../../utils/getClientErrorObject";
 import {
   getExploreUrlAndPayload,
@@ -86,7 +87,7 @@ export function fetchSolarData(formData, force = false, timeout = 60, key) {
       timeout: timeout * 1000
     })
       .then(({ json }) => {
-        Logger.append(LOG_ACTIONS_LOAD_CHART, {
+        logEvent(LOG_ACTIONS_LOAD_CHART, {
           slice_id: key,
           is_cached: json.is_cached,
           force_refresh: force,
@@ -98,12 +99,12 @@ export function fetchSolarData(formData, force = false, timeout = 60, key) {
             formData.extra_filters && formData.extra_filters.length > 0,
           viz_type: formData.viz_type
         });
-        dispatch(addSuccessToastAction(t("Successfully fetch data")));
+        dispatch(addSuccessToastAction(t("Successfully fetch data")));        
         return dispatch(solarUpdateSucceeded(json, key));
       })
       .catch(response => {
         const appendErrorLog = errorDetails => {
-          Logger.append(LOG_ACTIONS_LOAD_CHART, {
+          logEvent(LOG_ACTIONS_LOAD_CHART, {
             slice_id: key,
             has_err: true,
             error_details: errorDetails,

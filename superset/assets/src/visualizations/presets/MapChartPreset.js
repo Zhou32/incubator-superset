@@ -17,9 +17,9 @@
  * under the License.
  */
 import { Preset } from '@superset-ui/core';
-import CountryMapChartPlugin from '../CountryMap/CountryMapChartPlugin';
-import MapBoxChartPlugin from '../MapBox/MapBoxChartPlugin';
-import WorldMapChartPlugin from '../WorldMap/WorldMapChartPlugin';
+import WorldMapChartPlugin from '@superset-ui/legacy-plugin-chart-world-map';
+import CountryMapChartPlugin from '@superset-ui/legacy-plugin-chart-country-map';
+import MapBoxChartPlugin from '@superset-ui/legacy-plugin-chart-map-box';
 import SolarBIChartPlugin from '../SolarBI/SolarBIChartPlugin';
 
 export default class MapChartPreset extends Preset {

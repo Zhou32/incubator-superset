@@ -161,6 +161,10 @@ class MapView extends React.Component {
       var data1 = data[1];
       var xAxisData = data[0];
 
+      data1.forEach(function(i, index) {
+        this[index] = parseFloat(i).toFixed(4);
+      }, data1); // use data1 as this
+
       var option = {
         title: {
           text: "Irradiance Data"
