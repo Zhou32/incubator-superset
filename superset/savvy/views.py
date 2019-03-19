@@ -16,7 +16,8 @@ from flask_appbuilder.security.views import UserDBModelView
 from flask_appbuilder.security.registerviews import RegisterUserDBView, BaseRegisterUser
 from .filters import OrgFilter, RoleFilter
 from .forms import (
-    PasswordRecoverForm, SavvyRegisterInvitationUserDBForm, SavvyRegisterUserDBForm, RegisterInvitationForm
+    PasswordRecoverForm, SavvyGroupAddWidget,
+    SavvyRegisterInvitationUserDBForm, SavvyRegisterUserDBForm, RegisterInvitationForm
 )
 from .utils import post_request
 
@@ -484,6 +485,7 @@ class SavvyGroupModelView(ModelView):
     add_title = lazy_gettext('Add group')
     edit_title = lazy_gettext('Edit group')
 
+    add_widget = SavvyGroupAddWidget
     add_template = 'superset/models/group/add.html'
 
     add_columns = ['group_name', 'sites', 'users']
@@ -491,3 +493,24 @@ class SavvyGroupModelView(ModelView):
     label_columns = {'group_name': lazy_gettext('Group Name'), 'sites': lazy_gettext('Sites')}
     list_columns = ['group_name', 'sites']
     order_columns = ['group_name']
+
+    @expose('/add', methods=['GET', 'POST'])
+    @has_access
+    def add(self):
+        widget = self._add()
+        sites = ['3', '4', '5', '6', '7', '8', '9', '10']
+        if not widget:
+            return self.post_add_redirect()
+        else:
+            return self.render_template(self.add_template,
+                                        title=self.add_title,
+                                        widgets=widget,
+                                        sites=sites)
+
+    @expose('/filter', methods=['POST', 'GET'])
+    def filter(self):
+        state = request.json.get('state')
+        print(state)
+        sites = ['3']
+        print('received')
+        return sites

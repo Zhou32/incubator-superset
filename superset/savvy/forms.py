@@ -5,6 +5,7 @@ from wtforms.validators import DataRequired, EqualTo, Email, ValidationError
 from flask_appbuilder.security.sqla.models import User
 from flask_appbuilder.security.forms import DynamicForm
 from flask_appbuilder.fieldwidgets import BS3TextFieldWidget, BS3PasswordFieldWidget
+from flask_appbuilder.widgets import FormWidget
 
 from .models import Organization, OrgRegisterUser
 
@@ -76,3 +77,7 @@ class SavvyRegisterInvitationUserDBForm(DynamicForm):
     email = StringField(lazy_gettext('Email'), validators=[DataRequired(), Email()], widget=BS3TextFieldWidget())
     # inviter_id = HiddenField(lazy_gettext('Inviter'))
     # organization = HiddenField(lazy_gettext('Organization'))
+
+
+class SavvyGroupAddWidget(FormWidget):
+    template = 'superset/models/group/add_widget.html'
