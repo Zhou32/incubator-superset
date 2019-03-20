@@ -3,7 +3,7 @@ import datetime
 
 from flask_appbuilder import Model
 from sqlalchemy import (
-    Boolean, Column, DateTime, Integer, String, UniqueConstraint, ForeignKey, Sequence, Table)
+    Boolean, Column, DateTime, Integer, Float, String, UniqueConstraint, ForeignKey, Sequence, Table)
 from sqlalchemy.orm import relationship
 
 metadata = Model.metadata  # pylint: disable=no-member
@@ -58,7 +58,7 @@ assoc_group_site = Table(
     'group_site', metadata,
     Column('id', Integer, primary_key=True),
     Column('group_id', Integer, ForeignKey('groups.id')),
-    Column('site_id', Integer, ForeignKey('sites.id'))
+    Column('site_id', Integer, ForeignKey('sites_data.SiteID'))
 )
 
 assoc_group_user = Table(
@@ -81,8 +81,18 @@ class Group(Model):
 
 
 class Site(Model):
-    __tablename__ = 'sites'
-    id = Column(Integer, primary_key=True)
+    __tablename__ = 'sites_data'
+    SiteID = Column(Integer, primary_key=True)
+    SiteName = Column(String(64))
+    ClientID = Column(Integer)
+    ClientName = Column(String(64))
+    latitude = Column(Float)
+    longitude = Column(Float)
+    AddressLine = Column(String(64))
+    city = Column(String(64))
+    State = Column(String(16))
+    PostalCode = Column(Integer)
+    Country = Column(String(64))
 
 
 

@@ -27,7 +27,7 @@ from werkzeug.security import generate_password_hash
 from superset.savvy.views import SavvyGroupModelView,\
     SavvyRegisterInvitationUserDBView, SavvyRegisterInviteView, \
     SavvyRegisterUserDBView, SavvyUserDBModelView, EmailResetPasswordView, PasswordRecoverView
-from superset.savvy.models import Group, ResetRequest, OrgRegisterUser, Organization
+from superset.savvy.models import Group, ResetRequest, OrgRegisterUser, Organization, Site
 from superset.security import SupersetSecurityManager
 
 
@@ -461,6 +461,5 @@ class CustomSecurityManager(SupersetSecurityManager):
         # print('add role')
         return db_role
 
-
-
-
+    def search_site(self, state='', city=''):
+        return self.get_session.query(Site).all()

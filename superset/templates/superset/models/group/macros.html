@@ -16,7 +16,26 @@
   specific language governing permissions and limitations
   under the License.
 #}
-{% macro render_sites(field, sites=[], begin_sep_label='', end_sep_label='', begin_sep_field='', end_sep_field='') %}
+{% macro render_sites(field, sites=[], begin_sep_label='', end_sep_label='', begin_sep_field='', end_sep_field='', list_widget='') %}
+    <script>
+    function checkAll(ele) {
+     var checkboxes = document.getElementsByTagName('input');
+     if (ele.checked) {
+         for (var i = 0; i < checkboxes.length; i++) {
+             if (checkboxes[i].type == 'checkbox') {
+                 checkboxes[i].checked = true;
+             }
+         }
+     } else {
+         for (var i = 0; i < checkboxes.length; i++) {
+             if (checkboxes[i].type == 'checkbox') {
+                 checkboxes[i].checked = false;
+             }
+         }
+     }
+     }
+
+     </script>
 	  {% if field.id != 'csrf_token' %}
           {% if field.type == 'HiddenField' %}
             {{ field}}
@@ -46,19 +65,25 @@
 
                 </div>
                 <p>&nbsp;</p>
-                    <div id="sites-table" >
+                    <div id="sites-table" style="height:250px;overflow:auto;">
                     <table class="table table-condensed">
                         <thead>
                           <tr>
-                            <th>Site ID</th>
-                            <th>First name</th>
+                            <th><INPUT type="checkbox" onchange="checkAll(this)" name="chk[]" /></th>
+                            <th>Site Name</th>
+                            <th>Site Address</th>
+                            <th>State</th>
+                            <th>City</th>
                           </tr>
                         </thead>
-                        <tbody style="overflow:scroll;">
+                        <tbody>
                         {% for row in sites %}
                         <tr>
-                            <td><input type='checkbox' name='removal' value=row /></td>
-                            <td>{{ row }}</td>
+                            <td><input type='checkbox' name='removal' value=row[0] /></td>
+                            <td>{{ row[1] }}</td>
+                            <td>{{ row[2] }}</td>
+                            <td>{{ row[3] }}</td>
+                            <td>{{ row[4] }}</td>
                         </tr>
                         {% endfor %}
                         </tbody>
@@ -126,4 +151,8 @@
       return false;
     });
     </script>
+{% endmacro %}
+
+{% macro check_all() %}
+
 {% endmacro %}
