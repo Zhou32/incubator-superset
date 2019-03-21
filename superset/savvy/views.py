@@ -1,25 +1,29 @@
 import json
 import logging
+import time
 
 from flask import flash, redirect, request, url_for, g
 from flask_babel import lazy_gettext
 from flask_mail import Mail, Message
 from sqlalchemy import create_engine
 
-from flask_appbuilder import const
+from flask_appbuilder import const, ModelView
 from flask_appbuilder.validators import Unique
 from flask_appbuilder._compat import as_unicode
 from flask_appbuilder.views import expose, PublicFormView, ModelView
 from flask_appbuilder.security.decorators import has_access
 from flask_appbuilder.security.forms import ResetPasswordForm
-from flask_appbuilder.security.views import UserDBModelView
+from flask_appbuilder.security.views import UserDBModelView, UserStatsChartView
 from flask_appbuilder.security.registerviews import RegisterUserDBView, BaseRegisterUser
-from .filters import OrgFilter, RoleFilter
+from .filters import RoleFilter
+from flask_appbuilder.models.sqla.filters import FilterInFunction, FilterContains
 from .forms import (
     PasswordRecoverForm, SavvyGroupAddWidget,
     SavvyRegisterInvitationUserDBForm, SavvyRegisterUserDBForm, RegisterInvitationForm,
 
 )
+
+from .filters import get_user_id_list_form_org, get_roles_for_org
 from .utils import post_request
 
 log = logging.getLogger(__name__)
@@ -28,11 +32,19 @@ email_subject = 'SavvyBI - Email Confirmation'
 
 class SavvyUserDBModelView(UserDBModelView):
     base_filters = [['id', RoleFilter, lambda: []]]
+    edit_columns = ['first_name', 'last_name', 'active', 'email', 'roles']
+    edit_form_query_rel_fields = {'roles':[['name',FilterInFunction, get_roles_for_org]]}
 
     def pre_delete(self, user):
         print(user)
         organization = self.appbuilder.sm.find_org(user_id=user.id)
-        if len(organization.users) == 1:
+        for role in user.roles:
+            if role.name == 'org_owner' and organization and len(organization.users) > 0 :
+                for user_ in organization.users:
+                    if user_ != user:
+                        self.delete(user_)
+
+        if organization and len(organization.users) == 1:
             self.appbuilder.sm.delete_org(organization)
 
     @expose('/add', methods=['GET', 'POST'])
@@ -310,6 +322,7 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
         aws_info = json.loads(info.text)
         access_key = aws_info['AccessKeyId']
         secret_key = aws_info['SecretAccessKey']
+        time.sleep(5)
         athena_link = f'awsathena+jdbc://{access_key}:{secret_key}@athena.us-west-2.amazonaws.com/market_report_prod_ore?s3_staging_dir=s3://druid.dts.input-bucket.oregon'
         self.testconn(athena_link, org, user)
 
@@ -476,6 +489,21 @@ class SavvyRegisterInviteView(BaseRegisterUser):
                                         first_name=reg.first_name,
                                         last_name=reg.last_name,
                                         appbuilder=self.appbuilder)
+
+
+class SavvyRegisterUserModelView(ModelView):
+    route_base = '/registeruser'
+    base_permissions = ['can_list', 'can_show', 'can_delete']
+    list_title = lazy_gettext('List of Registration Requests')
+    show_title = lazy_gettext('Show Registration')
+    list_columns = ['registration_date','email','organization']
+    show_exclude_columns = ['password']
+    search_exclude_columns = ['password']
+    base_filters = [['inviter', FilterInFunction, get_user_id_list_form_org]]
+
+
+class SavvyUserStatsChartView(UserStatsChartView):
+    base_filters = [['id', FilterInFunction, get_user_id_list_form_org]]
 
 
 class SavvyGroupModelView(ModelView):
