@@ -16,12 +16,12 @@ from flask_appbuilder.security.forms import ResetPasswordForm
 from flask_appbuilder.security.views import UserDBModelView, UserStatsChartView
 from flask_appbuilder.security.registerviews import RegisterUserDBView, BaseRegisterUser
 from .filters import RoleFilter
-from flask_appbuilder.models.sqla.filters import FilterInFunction
+from flask_appbuilder.models.sqla.filters import FilterInFunction, FilterContains
 from .forms import (
     PasswordRecoverForm, SavvyRegisterInvitationUserDBForm, SavvyRegisterUserDBForm, RegisterInvitationForm
 )
 
-from .filters import get_user_id_list_form_org
+from .filters import get_user_id_list_form_org, get_roles_for_org
 from .utils import post_request
 
 log = logging.getLogger(__name__)
@@ -30,12 +30,19 @@ email_subject = 'SavvyBI - Email Confirmation'
 
 class SavvyUserDBModelView(UserDBModelView):
     base_filters = [['id', RoleFilter, lambda: []]]
-
+    edit_columns = ['first_name', 'last_name', 'active', 'email', 'roles']
+    edit_form_query_rel_fields = {'roles':[['name',FilterInFunction, get_roles_for_org]]}
 
     def pre_delete(self, user):
         print(user)
         organization = self.appbuilder.sm.find_org(user_id=user.id)
-        if len(organization.users) == 1:
+        for role in user.roles:
+            if role.name == 'org_owner' and organization and len(organization.users) > 0 :
+                for user_ in organization.users:
+                    if user_ != user:
+                        self.delete(user_)
+
+        if organization and len(organization.users) == 1:
             self.appbuilder.sm.delete_org(organization)
 
     @expose('/add', methods=['GET', 'POST'])

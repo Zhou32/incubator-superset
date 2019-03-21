@@ -4,6 +4,38 @@ from flask import g
 from .models import Organization
 
 
+def get_roles_for_org():
+    from superset import security_manager, db
+    role_model = security_manager.role_model
+
+    for role in g.user.roles:
+        if role.name == 'Admin':
+            roles = db.session.query(role_model).all()
+            all_role_name = []
+            for i in roles:
+                all_role_name.append(i.name)
+            return all_role_name
+    org = Organization
+    org_name = ''
+    try:
+        org_name = db.session.query(org).filter(org.users.any(id=g.user.id)).first().organization_name
+    except:
+        pass
+
+    org_owner = 'org_owner'
+    org_superuser = 'org_superuser'
+    org_user = 'org_user'
+    org_viewer = 'org_viewer'
+
+    for role in g.user.roles:
+        if role.name == org_owner:
+            return [org_owner,org_superuser,org_user,org_viewer,f'org_db_{org_name}']
+        if role.name == org_superuser:
+            return [org_superuser, org_user, org_viewer, f'org_db_{org_name}']
+
+    return []
+
+
 def get_user_id_list_form_org():
     from superset import security_manager, db
     user_model = security_manager.user_model
@@ -67,6 +99,7 @@ def get_db_name_list_form_org():
         pass
 
     return database_name_in_org
+
 
 class RoleFilter(BaseFilter):
     def apply(self, query, func):
