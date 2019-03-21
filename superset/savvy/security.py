@@ -18,15 +18,19 @@
 import datetime
 import logging
 import uuid
+import json
 
 from flask import url_for
-from flask_appbuilder import const
+from flask_appbuilder import const, urltools
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 from werkzeug.security import generate_password_hash
 
-from superset.savvy.views import SavvyRegisterInvitationUserDBView, SavvyRegisterInviteView, \
-    SavvyRegisterUserDBView, SavvyUserDBModelView, EmailResetPasswordView, PasswordRecoverView
-from superset.savvy.models import ResetRequest, OrgRegisterUser, Organization
+from superset.savvy.views import SavvyGroupModelView,\
+    SavvyRegisterInvitationUserDBView, SavvyRegisterInviteView, \
+    SavvyRegisterUserModelView, SavvyUserStatsChartView, \
+    SavvySiteModelView, SavvyRegisterUserDBView, SavvyUserDBModelView, \
+    EmailResetPasswordView, PasswordRecoverView
+from superset.savvy.models import Group, ResetRequest, OrgRegisterUser, Organization, Site
 from superset.security import SupersetSecurityManager
 
 
@@ -51,6 +55,8 @@ OWNER_PERMISSION_MODEL = {
     'DashboardModelView',
     'DashboardAddView',
     'SavvyRegisterInvitationUserDBView',
+    'SavvyRegisterUserModelView',
+    'SavvyUserStatsChartView'
 }
 
 OWNER_PERMISSION_MENU = {
@@ -80,6 +86,8 @@ VIEWER_NOT_ALLOWED = {
     'Sources', 'SavvyRegisterInvitationUserDBView',
 }
 
+DB_ROLE_PREFIX = 'org_db_'
+
 
 class CustomSecurityManager(SupersetSecurityManager):
 
@@ -87,21 +95,25 @@ class CustomSecurityManager(SupersetSecurityManager):
     passwordresetview = EmailResetPasswordView()
     invite_register_view = SavvyRegisterInviteView()
     invitation_view = SavvyRegisterInvitationUserDBView()
+    group_view = SavvyGroupModelView
+    site_view = SavvySiteModelView
 
     registeruserdbview = SavvyRegisterUserDBView
+    registerusermodelview = SavvyRegisterUserModelView
     userdbmodelview = SavvyUserDBModelView
+    userstatschartview = SavvyUserStatsChartView
 
-    resetRequestModel = ResetRequest
+    resetRequest_model = ResetRequest
     registeruser_model = OrgRegisterUser
-    organizationModel = Organization
+    organization_model = Organization
+    group_model = Group
+    site_model = Site
 
 
     def __init__(self, appbuilder):
         super(CustomSecurityManager, self).__init__(appbuilder)
-        self.organization_datamodel = SQLAInterface(self.organizationModel, session=self.appbuilder.get_session)
-
-    def get_organization_datamodel(self):
-        return self.organization_datamodel
+        self.group_view.datamodel = SQLAInterface(self.group_model, self.appbuilder.get_session)
+        self.site_view.datamodel = SQLAInterface(self.site_model, self.appbuilder.get_session)
 
     def register_views(self):
         super(CustomSecurityManager, self).register_views()
@@ -109,6 +121,12 @@ class CustomSecurityManager(SupersetSecurityManager):
         self.appbuilder.add_view_no_menu(self.passwordresetview)
         self.appbuilder.add_view_no_menu(self.invite_register_view)
         self.appbuilder.add_view_no_menu(self.invitation_view)
+        self.group_view = self.appbuilder.add_view(self.group_view, "List Groups",
+                                                   icon="fa-user", label="List Groups",
+                                                   category="Security", category_icon="fa-cogs")
+        self.site_view = self.appbuilder.add_view(self.site_view, "List Sites",
+                                                   icon="fa-user", label="List Sites",
+                                                   category="Security", category_icon="fa-cogs")
 
     def sync_role_definitions(self):
         """Inits the Superset application with security roles and such"""
@@ -147,28 +165,25 @@ class CustomSecurityManager(SupersetSecurityManager):
         result = result or (pvm.view_menu.name not in OWNER_NOT_ALLOWED_MENU)
         if pvm.view_menu.name in OWNER_NOT_ALLOWED_MENU or pvm.permission.name in NOT_ALLOWED_SQL_PERM:
             return False
-        return result
-
-    def is_superuser_pvm(self, pvm):
-        result = self.is_gamma_pvm(pvm)
-
-        for permission in PERMISSION_COMMON:
-            for view in OWNER_PERMISSION_MODEL:
-                result = result or (pvm.view_menu.name == view and
-                                    pvm.permission.name == permission)
-        result = result or (pvm.view_menu.name not in OWNER_NOT_ALLOWED_MENU)
-        if pvm.view_menu.name in OWNER_NOT_ALLOWED_MENU or pvm.permission.name in NOT_ALLOWED_SQL_PERM:
+        if self.is_user_defined_permission(pvm) or pvm.permission.name == 'all_database_access'\
+                or pvm.permission.name == 'all_datasource_access':
             return False
         return result
 
+    def is_superuser_pvm(self, pvm):
+        result = self.is_owner_pvm(pvm)
+
+        return result
+
     def is_user_pvm(self, pvm):
-        result = self.is_gamma_pvm(pvm)
-        if pvm.view_menu.name in USER_NOT_ALLOWED:
+        result = self.is_superuser_pvm(pvm)
+
+        if pvm.view_menu.name in USER_NOT_ALLOWED or self.is_admin_only(pvm):
             return False
         return result
 
     def is_viewer_pvm(self, pvm):
-        result = self.is_gamma_pvm(pvm)
+        result = self.is_user_pvm(pvm)
         if pvm.view_menu.name in VIEWER_NOT_ALLOWED:
             return False
         return result
@@ -188,12 +203,12 @@ class CustomSecurityManager(SupersetSecurityManager):
 
     def add_reset_request(self, email):
         """try look for not used existed hash for user"""
-        reset_request = self.get_session.query(self.resetRequestModel)\
+        reset_request = self.get_session.query(self.resetRequest_model)\
             .filter_by(email=email, used=False).first()
         if reset_request is not None:
             print(reset_request.id)
             self.set_token_used(reset_request.reset_hash)
-        reset_request = self.resetRequestModel()
+        reset_request = self.resetRequest_model()
         reset_request.email = email
         reset_request.used = False
         user = self.find_user(email=email)
@@ -212,7 +227,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         return None
 
     def find_user_by_token(self, token):
-        reset_request = self.get_session.query(self.resetRequestModel)\
+        reset_request = self.get_session.query(self.resetRequest_model)\
             .filter_by(reset_hash=token, used=False).first()
         if reset_request is not None:
             time = reset_request.reset_date
@@ -227,7 +242,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         return None
 
     def set_token_used(self, token):
-        reset_request = self.get_session.query(self.resetRequestModel)\
+        reset_request = self.get_session.query(self.resetRequest_model)\
             .filter_by(reset_hash=token).first()
         reset_request.used = True
         try:
@@ -332,10 +347,10 @@ class CustomSecurityManager(SupersetSecurityManager):
 
     def find_org(self, org_name=None, user_id=None):
         if org_name:
-            return self.get_session.query(self.organizationModel).filter_by(organization_name=org_name).first()
+            return self.get_session.query(self.organization_model).filter_by(organization_name=org_name).first()
         elif user_id:
-            return self.get_session.query(self.organizationModel).\
-                filter(self.organizationModel.users.any(id=user_id)).scalar()
+            return self.get_session.query(self.organization_model).\
+                filter(self.organization_model.users.any(id=user_id)).scalar()
 
     def add_org_user(self, email, first_name, last_name, hashed_password, organization, role_id):
         try:
@@ -351,6 +366,8 @@ class CustomSecurityManager(SupersetSecurityManager):
             user.roles.append(role)
             if org is not None:
                 org.users.append(user)
+                db_role = self.find_role(DB_ROLE_PREFIX+org.organization_name)
+                user.roles.append(db_role)
             self.get_session.add(user)
             self.get_session.commit()
             return user
@@ -359,7 +376,7 @@ class CustomSecurityManager(SupersetSecurityManager):
             return False
 
     def add_org(self, reg, user):
-        new_org = self.organizationModel()
+        new_org = self.organization_model()
         new_org.organization_name = reg.organization
         new_org.users.append(user)
         try:
@@ -387,6 +404,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         register_user.organization = kwargs['organization']
         register_user.password = generate_password_hash(kwargs['password'])
         register_user.registration_hash = str(uuid.uuid1())
+        register_user.inviter = '1'
         try:
             self.get_session.add(register_user)
             self.get_session.commit()
@@ -395,3 +413,86 @@ class CustomSecurityManager(SupersetSecurityManager):
             logging.error(const.LOGMSG_ERR_SEC_ADD_REGISTER_USER.format(str(e)))
             self.appbuilder.get_session.rollback()
             return None
+
+    def create_db_role(self, database_name, database_uri, owner):
+        from superset.models.core import Database
+        from superset.connectors.sqla.models import SqlaTable
+
+        session = self.appbuilder.get_session
+        db_model = SQLAInterface(Database, session=session)
+        table_model = SQLAInterface(SqlaTable, session=session)
+        db = db_model.obj()
+        permission_list = []
+        db.database_name = database_name
+        db.sqlalchemy_uri = database_uri
+        db.cache_timeout = None
+        db.force_ctas_schema = None
+        db.set_sqlalchemy_uri(db.sqlalchemy_uri)
+        self.merge_perm('database_access', db.perm)
+        permission_list.append(self.find_permission_view_menu('database_access', db.perm))
+        db_model.add(db)
+        # print('db finished')
+        for schema in db.all_schema_names():
+            if schema in database_uri:
+                schema_perm = self.get_schema_perm(db, schema)
+                self.merge_perm(
+                    'schema_access', schema_perm)
+                permission_list.append(self.find_permission_view_menu('schema_access', schema_perm))
+                # print('for schema ', schema)
+
+                for table_name in db.all_table_names_in_schema(schema=schema):
+                    table = table_model.obj()
+                    table.database = db
+                    table.table_name = table_name
+                    table.schema = schema
+                    with session.no_autoflush:
+                        table_query = session.query(SqlaTable).filter(
+                            SqlaTable.table_name == table.table_name,
+                            SqlaTable.schema == table.schema,
+                            SqlaTable.database_id == table.database.id)
+                        if session.query(table_query.exists()).scalar():
+                            logging.debug('Table already exists')
+                    # Fail before adding if the table can't be found
+                    try:
+                        # print('add table')
+                        # table.get_sqla_table_object()
+                        table_model.add(table)
+                        table.fetch_metadata()
+                        if table.get_perm():
+                            self.merge_perm('datasource_access', table.get_perm())
+                            permission_list.append(self.find_permission_view_menu('datasource_access', table.get_perm()))
+                        if table.schema:
+                            self.merge_perm('schema_access', table.schema_perm)
+                        # print('add table fin')
+                    except Exception as e:
+                        logging.exception(f'Got an error in pre_add for {table.name}')
+                break
+
+        print(permission_list)
+        permission_list_not_none = [permission for permission in permission_list if permission is not None]
+        db_role = self.rolemodelview.datamodel.obj()
+        db_role.name = DB_ROLE_PREFIX + db.database_name
+        db_role.permissions = permission_list_not_none
+
+        self.rolemodelview.datamodel.add(db_role)
+        # print('add role')
+
+        owner.roles.append(db_role)
+        self.get_session.merge(owner)
+        self.get_session.commit()
+
+        return db_role
+
+    def get_sites_list_widget(self):
+        if urltools.get_order_args().get(self.site_view.__class__.__name__):
+            order_column, order_direction = urltools.get_order_args().get(self.site_view.__class__.__name__)
+        else:
+            order_column, order_direction = '', ''
+        page = urltools.get_page_args().get(self.site_view.__class__.__name__)
+        page_size = urltools.get_page_size_args().get(self.site_view.__class__.__name__)
+        widgets = self.site_view._get_list_widget(filters=self.site_view._filters,
+                                        order_column=order_column,
+                                        order_direction=order_direction,
+                                        page=page,
+                                        page_size=page_size)
+        return widgets

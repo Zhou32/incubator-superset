@@ -1,0 +1,36 @@
+
+{% import 'appbuilder/general/lib.html' as lib %}
+{% import 'superset/models/group/macros.html' as macro %}
+
+{% set begin_sep_label = '<td class="col-lg-2">' %}
+{% set end_sep_label = '</td>' %}
+{% set begin_sep_field = '<td>' %}
+{% set end_sep_field = '</td>' %}
+
+
+{% if form_action %}
+    <form action="{{form_action}}" method="post" enctype="multipart/form-data">
+{% else %}
+    <form id="model_form" action="" method="post" enctype="multipart/form-data">
+{% endif %}
+    {{form.hidden_tag()}}
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                {% for col in include_cols %}
+                    {% set field = form[col] %}
+                    {% if field.name not in exclude_cols %}
+                    {% if field.name == 'sites' %}
+                        {{ macro.render_sites(field, sites, begin_sep_label, end_sep_label, begin_sep_field, end_sep_field, list_widget) }}
+                    {% else %}
+                        <tr>
+                            {{ lib.render_field(field, begin_sep_label, end_sep_label, begin_sep_field, end_sep_field) }}
+                        </tr>
+                    {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </table>
+        </div>
+
+
+    {{ lib.render_form_controls() }}
+</form>

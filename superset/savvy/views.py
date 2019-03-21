@@ -1,22 +1,30 @@
+import json
 import logging
+import time
 
 from flask import flash, redirect, request, url_for, g
 from flask_babel import lazy_gettext
 from flask_mail import Mail, Message
 from sqlalchemy import create_engine
 
-from flask_appbuilder import const
+from flask_appbuilder import const, ModelView
 from flask_appbuilder.validators import Unique
 from flask_appbuilder._compat import as_unicode
-from flask_appbuilder.views import expose, PublicFormView
+from flask_appbuilder.views import expose, PublicFormView, ModelView
 from flask_appbuilder.security.decorators import has_access
 from flask_appbuilder.security.forms import ResetPasswordForm
-from flask_appbuilder.security.views import UserDBModelView
+from flask_appbuilder.security.views import UserDBModelView, UserStatsChartView
 from flask_appbuilder.security.registerviews import RegisterUserDBView, BaseRegisterUser
-from .filters import OrgFilter, RoleFilter
+from .filters import RoleFilter
+from flask_appbuilder.models.sqla.filters import FilterInFunction, FilterContains
 from .forms import (
-    PasswordRecoverForm, SavvyRegisterInvitationUserDBForm, SavvyRegisterUserDBForm, RegisterInvitationForm
+    PasswordRecoverForm, SavvyGroupAddWidget, SavvySiteListWidget,
+    SavvyRegisterInvitationUserDBForm, SavvyRegisterUserDBForm, RegisterInvitationForm,
+
 )
+
+from .filters import get_user_id_list_form_org, get_roles_for_org
+from .utils import post_request
 
 log = logging.getLogger(__name__)
 email_subject = 'SavvyBI - Email Confirmation'
@@ -24,11 +32,19 @@ email_subject = 'SavvyBI - Email Confirmation'
 
 class SavvyUserDBModelView(UserDBModelView):
     base_filters = [['id', RoleFilter, lambda: []]]
+    edit_columns = ['first_name', 'last_name', 'active', 'email', 'roles']
+    edit_form_query_rel_fields = {'roles':[['name',FilterInFunction, get_roles_for_org]]}
 
     def pre_delete(self, user):
         print(user)
         organization = self.appbuilder.sm.find_org(user_id=user.id)
-        if len(organization.users) == 1:
+        for role in user.roles:
+            if role.name == 'org_owner' and organization and len(organization.users) > 0 :
+                for user_ in organization.users:
+                    if user_ != user:
+                        self.delete(user_)
+
+        if organization and len(organization.users) == 1:
             self.appbuilder.sm.delete_org(organization)
 
     @expose('/add', methods=['GET', 'POST'])
@@ -284,6 +300,7 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
             return redirect(self.appbuilder.get_url_for_index)
         else:
             org_reg = self.appbuilder.sm.add_org(reg, user)
+            self.handle_aws_info(org_reg, user)
             self.appbuilder.sm.del_register_user(reg)
             return self.render_template(self.activation_template,
                                         username=reg.email,
@@ -294,31 +311,30 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
     def add_form_unique_validations(self, form):
         datamodel_user = self.appbuilder.sm.get_user_datamodel
         datamodel_register_user = self.appbuilder.sm.get_register_user_datamodel
-        datamodel_organization = self.appbuilder.sm.get_organization_datamodel()
         if len(form.email.validators) == 2:
             form.email.validators.append(Unique(datamodel_user, 'email'))
             form.email.validators.append(Unique(datamodel_register_user, 'email'))
-        if len(form.organization.validators) == 1:
-            form.organization.validators.append(Unique(datamodel_organization, 'organization_name'))
 
     @expose('/here/')
-    def handle_aws_info(self):
-        access_key = 'AKIAIRQFEHI3X7KAETYA'
-        secret_key = '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'
+    def handle_aws_info(self, org, user):
+        info = post_request('https://3ozse3mao8.execute-api.ap-southeast-2.amazonaws.com/test/createorg',
+                            {"org_name": org.organization_name, "org_id": org.id})
+        aws_info = json.loads(info.text)
+        access_key = aws_info['AccessKeyId']
+        secret_key = aws_info['SecretAccessKey']
+        time.sleep(5)
+        athena_link = f'awsathena+jdbc://{access_key}:{secret_key}@athena.us-west-2.amazonaws.com/market_report_prod_ore?s3_staging_dir=s3://druid.dts.input-bucket.oregon'
+        self.testconn(athena_link, org, user)
 
-        athena_link = f'awsathena+jdbc://{access_key}:{secret_key}@athena.us-west-2.amazonaws.com/' \
-                      f'market_report_prod_ore?s3_staging_dir=s3://druid.dts.input-bucket.oregon'
-        self.testconn(athena_link)
-
-    @staticmethod
-    def testconn(athena_link):
+    def testconn(self, athena_link, org, user):
         """Tests a sqla connection"""
         from ..views.base import json_error_response
         try:
-            engine = create_engine(athena_link)
-            engine.connect()
-            table_list = engine.table_names()
-            print(table_list)
+            # engine = create_engine(athena_link)
+            # engine.connect()
+            # table_list = engine.table_names()
+            # print(table_list)
+            self.appbuilder.sm.create_db_role(org.organization_name, athena_link, user)
         except Exception as e:
             logging.exception(e)
             return json_error_response((
@@ -473,3 +489,85 @@ class SavvyRegisterInviteView(BaseRegisterUser):
                                         first_name=reg.first_name,
                                         last_name=reg.last_name,
                                         appbuilder=self.appbuilder)
+
+
+class SavvyRegisterUserModelView(ModelView):
+    route_base = '/registeruser'
+    base_permissions = ['can_list', 'can_show', 'can_delete']
+    list_title = lazy_gettext('List of Registration Requests')
+    show_title = lazy_gettext('Show Registration')
+    list_columns = ['registration_date','email','organization']
+    show_exclude_columns = ['password']
+    search_exclude_columns = ['password']
+    base_filters = [['inviter', FilterInFunction, get_user_id_list_form_org]]
+
+
+class SavvyUserStatsChartView(UserStatsChartView):
+    base_filters = [['id', FilterInFunction, get_user_id_list_form_org]]
+
+
+class SavvySiteModelView(ModelView):
+    route_base = '/sites'
+
+    list_title = lazy_gettext('List Sites')
+    show_title = lazy_gettext('Show Site')
+    add_title = lazy_gettext('Add Site')
+    edit_title = lazy_gettext('Edit Site')
+
+    list_columns = ['SiteName', 'AddressLine', 'State', 'city']
+    list_widget = SavvySiteListWidget
+    label_columns = {'SiteName': lazy_gettext('Site Name'), 'AddressLine': lazy_gettext('Address line')}
+    base_permissions = ['can_list']
+
+
+class SavvyGroupModelView(ModelView):
+    route_base = '/groups'
+
+    list_title = lazy_gettext('List Groups')
+    show_title = lazy_gettext('Show group')
+    add_title = lazy_gettext('Add group')
+    edit_title = lazy_gettext('Edit group')
+
+    add_widget = SavvyGroupAddWidget
+    add_template = 'superset/models/group/add.html'
+    # add_form = SavvyGroupAddForm
+
+    add_columns = ['group_name', 'sites', 'users', 'organization_id']
+    edit_columns = add_columns
+    label_columns = {'group_name': lazy_gettext('Group Name'), 'sites': lazy_gettext('Sites')}
+    list_columns = ['group_name', 'sites']
+    order_columns = ['group_name']
+
+    @expose('/add', methods=['GET', 'POST'])
+    @has_access
+    def add(self):
+        widget1 = self._add()
+        widget2 = self.appbuilder.sm.get_sites_list_widget()
+        # count = 0
+        all_sites = []
+
+        widget = {**widget1, **widget2}
+        # print(widget)
+        # print(count)
+        # search_site = self.appbuilder.sm.search_site()
+        # for site in search_site:
+        #     all_sites.append((site.SiteID, site.SiteName, site.AddressLine, site.State, site.city))
+
+        if not widget:
+            return self.post_add_redirect()
+        else:
+            return self.render_template(self.add_template,
+                                        title=self.add_title,
+                                        widgets=widget,
+                                        sites=all_sites)
+
+    @expose('/filter', methods=['POST', 'GET'])
+    def filter(self):
+        state = request.json.get('state')
+        print(state)
+        sites = ['3']
+        print('received')
+        return sites
+
+
+

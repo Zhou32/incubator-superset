@@ -1,0 +1,144 @@
+{#
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+#}
+{% macro render_sites(field, sites=[], begin_sep_label='', end_sep_label='', begin_sep_field='', end_sep_field='', list_widget='') %}
+    <script>
+    function checkAll(ele) {
+     var checkboxes = document.getElementsByTagName('input');
+     if (ele.checked) {
+         for (var i = 0; i < checkboxes.length; i++) {
+             if (checkboxes[i].type == 'checkbox') {
+                 checkboxes[i].checked = true;
+             }
+         }
+     } else {
+         for (var i = 0; i < checkboxes.length; i++) {
+             if (checkboxes[i].type == 'checkbox') {
+                 checkboxes[i].checked = false;
+             }
+         }
+     }
+     }
+
+     </script>
+	  {% if field.id != 'csrf_token' %}
+          {% if field.type == 'HiddenField' %}
+            {{ field}}
+          {% else %}
+            {{begin_sep_label|safe}}
+                <label for="{{field.id}}" control-label>
+                    {{ field.label.text }}
+                    {% if field.flags.required %}
+                        <strong style="color: red">&#42;</strong>
+                    {% endif %}
+                </label>
+            {{end_sep_label|safe}}
+            {{begin_sep_field|safe}}
+                <p>&nbsp;</p>
+                    {{ list_widget }}
+                    <!--<div id="sites-table" style="height:250px;overflow:auto;">-->
+                    <!--<table class="table table-condensed">-->
+                        <!--<thead>-->
+                          <!--<tr>-->
+                            <!--<th><INPUT type="checkbox" onchange="checkAll(this)" name="chk[]" /></th>-->
+                            <!--<th>Site Name</th>-->
+                            <!--<th>Site Address</th>-->
+                            <!--<th>State</th>-->
+                            <!--<th>City</th>-->
+                          <!--</tr>-->
+                        <!--</thead>-->
+                        <!--<tbody>-->
+                        <!--{% for row in sites %}-->
+                        <!--<tr>-->
+                            <!--<td><input type='checkbox' name='removal' value=row[0] /></td>-->
+                            <!--<td>{{ row[1] }}</td>-->
+                            <!--<td>{{ row[2] }}</td>-->
+                            <!--<td>{{ row[3] }}</td>-->
+                            <!--<td>{{ row[4] }}</td>-->
+                        <!--</tr>-->
+                        <!--{% endfor %}-->
+                        <!--</tbody>-->
+                    <!--</table>-->
+                    <!--</div>-->
+               <span class="help-block">{{ field.description }}</span>
+          {% endif %}
+          {% if field.errors %}
+            <div class="alert alert-danger">
+            {% for error in field.errors %}
+              {{ _(error) }}
+            {% endfor %}
+            </div>
+          {% endif %}
+            {{end_sep_field|safe}}
+      {% endif %}
+
+
+{% endmacro %}
+
+{% macro click_filter() %}
+    <script>
+        $("#state").parent()
+      .append('<button type="button" id="filter" name="filter" class="btn btn-sm btn-primary">Filter</button>');
+
+       $("#filter").click(function(e) {
+      e.preventDefault();
+      var url = "/groups/filter";
+      var csrf_token = "{{ csrf_token() if csrf_token else '' }}";
+
+      $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+          if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrf_token);
+          }
+        }
+      });
+
+      var data = {};
+      try{
+        data = JSON.stringify({
+          state: $('#state').val(),
+        })
+      } catch(parse_error){
+        alert("Malformed JSON in the extras field: " + parse_error);
+        return false
+      }
+
+      $.ajax({
+        method: "POST",
+        url: url,
+        data: data,
+        dataType: 'json',
+        contentType: "application/json; charset=utf-8"
+      }).done(function(data) {
+          alert("Seems OK!");
+      }).fail(function(error) {
+          var respJSON = error.responseJSON;
+          var errorMsg = error.responseText;
+          if (respJSON && respJSON.message) {
+              errorMsg = respJSON.message;
+          }
+          alert("ERROR: " + errorMsg);
+      });
+      return false;
+    });
+    </script>
+{% endmacro %}
+
+{% macro check_all() %}
+
+{% endmacro %}
