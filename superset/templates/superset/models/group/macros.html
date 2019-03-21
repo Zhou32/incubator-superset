@@ -49,46 +49,32 @@
                 </label>
             {{end_sep_label|safe}}
             {{begin_sep_field|safe}}
-                <div>
-                    <p id="state_name" style="font:15;">
-                        State:
-                    <select id="state" name="state"  class="btn btn-primary" style="margin:10px;">
-                        <option value="VIC">Victoria</option>
-                        <option value="TAS">Tasmania</option>
-                        <option value="NSW">New South Wales</option>
-                    </select>
-                    City:
-                    <select id="city" name="city"  class="btn btn-primary" style="margin:10px;">
-                        <option value="Melbourne">Melbourne</option>
-                    </select>
-                    </p>
-
-                </div>
                 <p>&nbsp;</p>
-                    <div id="sites-table" style="height:250px;overflow:auto;">
-                    <table class="table table-condensed">
-                        <thead>
-                          <tr>
-                            <th><INPUT type="checkbox" onchange="checkAll(this)" name="chk[]" /></th>
-                            <th>Site Name</th>
-                            <th>Site Address</th>
-                            <th>State</th>
-                            <th>City</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                        {% for row in sites %}
-                        <tr>
-                            <td><input type='checkbox' name='removal' value=row[0] /></td>
-                            <td>{{ row[1] }}</td>
-                            <td>{{ row[2] }}</td>
-                            <td>{{ row[3] }}</td>
-                            <td>{{ row[4] }}</td>
-                        </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                    </div>
+                    {{ list_widget }}
+                    <!--<div id="sites-table" style="height:250px;overflow:auto;">-->
+                    <!--<table class="table table-condensed">-->
+                        <!--<thead>-->
+                          <!--<tr>-->
+                            <!--<th><INPUT type="checkbox" onchange="checkAll(this)" name="chk[]" /></th>-->
+                            <!--<th>Site Name</th>-->
+                            <!--<th>Site Address</th>-->
+                            <!--<th>State</th>-->
+                            <!--<th>City</th>-->
+                          <!--</tr>-->
+                        <!--</thead>-->
+                        <!--<tbody>-->
+                        <!--{% for row in sites %}-->
+                        <!--<tr>-->
+                            <!--<td><input type='checkbox' name='removal' value=row[0] /></td>-->
+                            <!--<td>{{ row[1] }}</td>-->
+                            <!--<td>{{ row[2] }}</td>-->
+                            <!--<td>{{ row[3] }}</td>-->
+                            <!--<td>{{ row[4] }}</td>-->
+                        <!--</tr>-->
+                        <!--{% endfor %}-->
+                        <!--</tbody>-->
+                    <!--</table>-->
+                    <!--</div>-->
                <span class="help-block">{{ field.description }}</span>
           {% endif %}
           {% if field.errors %}

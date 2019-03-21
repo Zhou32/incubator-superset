@@ -21,15 +21,16 @@ import uuid
 import json
 
 from flask import url_for
-from flask_appbuilder import const
+from flask_appbuilder import const, urltools
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 from werkzeug.security import generate_password_hash
 
 from superset.savvy.views import SavvyGroupModelView,\
     SavvyRegisterInvitationUserDBView, SavvyRegisterInviteView, \
-    SavvyRegisterUserDBView, SavvyUserDBModelView, EmailResetPasswordView, PasswordRecoverView, \
-    SavvyRegisterUserModelView, SavvyUserStatsChartView
-from superset.savvy.models import Group, ResetRequest, OrgRegisterUser, Organization,  Site
+    SavvyRegisterUserModelView, SavvyUserStatsChartView, \
+    SavvySiteModelView, SavvyRegisterUserDBView, SavvyUserDBModelView, \
+    EmailResetPasswordView, PasswordRecoverView
+from superset.savvy.models import Group, ResetRequest, OrgRegisterUser, Organization, Site
 from superset.security import SupersetSecurityManager
 
 
@@ -95,6 +96,7 @@ class CustomSecurityManager(SupersetSecurityManager):
     invite_register_view = SavvyRegisterInviteView()
     invitation_view = SavvyRegisterInvitationUserDBView()
     group_view = SavvyGroupModelView
+    site_view = SavvySiteModelView
 
     registeruserdbview = SavvyRegisterUserDBView
     registerusermodelview = SavvyRegisterUserModelView
@@ -105,11 +107,13 @@ class CustomSecurityManager(SupersetSecurityManager):
     registeruser_model = OrgRegisterUser
     organization_model = Organization
     group_model = Group
+    site_model = Site
 
 
     def __init__(self, appbuilder):
         super(CustomSecurityManager, self).__init__(appbuilder)
         self.group_view.datamodel = SQLAInterface(self.group_model, self.appbuilder.get_session)
+        self.site_view.datamodel = SQLAInterface(self.site_model, self.appbuilder.get_session)
 
     def register_views(self):
         super(CustomSecurityManager, self).register_views()
@@ -119,6 +123,9 @@ class CustomSecurityManager(SupersetSecurityManager):
         self.appbuilder.add_view_no_menu(self.invitation_view)
         self.group_view = self.appbuilder.add_view(self.group_view, "List Groups",
                                                    icon="fa-user", label="List Groups",
+                                                   category="Security", category_icon="fa-cogs")
+        self.site_view = self.appbuilder.add_view(self.site_view, "List Sites",
+                                                   icon="fa-user", label="List Sites",
                                                    category="Security", category_icon="fa-cogs")
 
     def sync_role_definitions(self):
@@ -463,7 +470,6 @@ class CustomSecurityManager(SupersetSecurityManager):
 
         print(permission_list)
         permission_list_not_none = [permission for permission in permission_list if permission is not None]
-        # owner = self.find_user(email='bwhsdzf@gmail.com')
         db_role = self.rolemodelview.datamodel.obj()
         db_role.name = DB_ROLE_PREFIX + db.database_name
         db_role.permissions = permission_list_not_none
@@ -477,5 +483,16 @@ class CustomSecurityManager(SupersetSecurityManager):
 
         return db_role
 
-    def search_site(self, state='', city=''):
-        return self.get_session.query(Site).all()
+    def get_sites_list_widget(self):
+        if urltools.get_order_args().get(self.site_view.__class__.__name__):
+            order_column, order_direction = urltools.get_order_args().get(self.site_view.__class__.__name__)
+        else:
+            order_column, order_direction = '', ''
+        page = urltools.get_page_args().get(self.site_view.__class__.__name__)
+        page_size = urltools.get_page_size_args().get(self.site_view.__class__.__name__)
+        widgets = self.site_view._get_list_widget(filters=self.site_view._filters,
+                                        order_column=order_column,
+                                        order_direction=order_direction,
+                                        page=page,
+                                        page_size=page_size)
+        return widgets

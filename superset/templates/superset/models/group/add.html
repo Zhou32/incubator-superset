@@ -21,8 +21,8 @@
 {% import "superset/models/group/macros.html" as macro %}
 {% import "appbuilder/general/lib.html" as lib %}
 {% block add_form %}
-
-{{ widgets.get('add')(form_action=form_action, sites=sites)|safe }}
+{% set list_widget=widgets.get('list')()|safe %}
+{{ widgets.get('add')(form_action=form_action, sites=sites, list_widget=list_widget)|safe }}
 
 {% endblock %}
 

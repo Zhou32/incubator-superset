@@ -1,5 +1,5 @@
 from flask_babel import lazy_gettext
-from wtforms import StringField, PasswordField, SelectField
+from wtforms import StringField, PasswordField, SelectField, HiddenField
 from wtforms.validators import DataRequired, EqualTo, Email, ValidationError
 
 from flask_appbuilder.security.sqla.models import User
@@ -81,3 +81,15 @@ class SavvyRegisterInvitationUserDBForm(DynamicForm):
 
 class SavvyGroupAddWidget(FormWidget):
     template = 'superset/models/group/add_widget.html'
+
+
+class SavvySiteListWidget(FormWidget):
+    template = 'superset/models/site/list_widget.html'
+
+
+class SavvyGroupAddForm(DynamicForm):
+    group_name = StringField(lazy_gettext('Group Name'), validators=[DataRequired()])
+    organization_id = StringField(lazy_gettext('Organization ID'))
+    sites = HiddenField(lazy_gettext('Sites'))
+    users = HiddenField(lazy_gettext('Users'))
+

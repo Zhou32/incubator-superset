@@ -18,7 +18,7 @@ from flask_appbuilder.security.registerviews import RegisterUserDBView, BaseRegi
 from .filters import RoleFilter
 from flask_appbuilder.models.sqla.filters import FilterInFunction, FilterContains
 from .forms import (
-    PasswordRecoverForm, SavvyGroupAddWidget,
+    PasswordRecoverForm, SavvyGroupAddWidget, SavvySiteListWidget,
     SavvyRegisterInvitationUserDBForm, SavvyRegisterUserDBForm, RegisterInvitationForm,
 
 )
@@ -506,6 +506,20 @@ class SavvyUserStatsChartView(UserStatsChartView):
     base_filters = [['id', FilterInFunction, get_user_id_list_form_org]]
 
 
+class SavvySiteModelView(ModelView):
+    route_base = '/sites'
+
+    list_title = lazy_gettext('List Sites')
+    show_title = lazy_gettext('Show Site')
+    add_title = lazy_gettext('Add Site')
+    edit_title = lazy_gettext('Edit Site')
+
+    list_columns = ['SiteName', 'AddressLine', 'State', 'city']
+    list_widget = SavvySiteListWidget
+    label_columns = {'SiteName': lazy_gettext('Site Name'), 'AddressLine': lazy_gettext('Address line')}
+    base_permissions = ['can_list']
+
+
 class SavvyGroupModelView(ModelView):
     route_base = '/groups'
 
@@ -527,18 +541,17 @@ class SavvyGroupModelView(ModelView):
     @expose('/add', methods=['GET', 'POST'])
     @has_access
     def add(self):
-        widget = self._add()
-        session = self.appbuilder.sm.get_session
-        sites = session.execute('SELECT SiteID, SiteName, AddressLine, State, City '
-                                'FROM sites_data ORDER BY State, City, SiteName')
+        widget1 = self._add()
+        widget2 = self.appbuilder.sm.get_sites_list_widget()
         # count = 0
         all_sites = []
 
-
+        widget = {**widget1, **widget2}
+        # print(widget)
         # print(count)
-        search_site = self.appbuilder.sm.search_site()
-        for site in search_site:
-            all_sites.append((site.SiteID, site.SiteName, site.AddressLine, site.State, site.city))
+        # search_site = self.appbuilder.sm.search_site()
+        # for site in search_site:
+        #     all_sites.append((site.SiteID, site.SiteName, site.AddressLine, site.State, site.city))
 
         if not widget:
             return self.post_add_redirect()
@@ -555,3 +568,6 @@ class SavvyGroupModelView(ModelView):
         sites = ['3']
         print('received')
         return sites
+
+
+
