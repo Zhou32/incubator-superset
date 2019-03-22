@@ -7,7 +7,6 @@
 {% set begin_sep_field = '<td>' %}
 {% set end_sep_field = '</td>' %}
 
-
 {% if form_action %}
     <form action="{{form_action}}" method="post" enctype="multipart/form-data">
 {% else %}
@@ -20,7 +19,6 @@
                     {% set field = form[col] %}
                     {% if field.name not in exclude_cols %}
                     {% if field.name == 'sites' %}
-                        {{ macro.render_sites(field, sites, begin_sep_label, end_sep_label, begin_sep_field, end_sep_field, list_widget) }}
                     {% else %}
                         <tr>
                             {{ lib.render_field(field, begin_sep_label, end_sep_label, begin_sep_field, end_sep_field) }}

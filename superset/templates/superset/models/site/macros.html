@@ -1,0 +1,92 @@
+{% macro render_pagination(page, page_size, count, modelview_name) %}
+
+    {% if not page %} {% set page = 0 %} {% endif %}
+    {% set pages = ((count / page_size)|round(0,'ceil')|int)%}
+    {% if pages > 1 %}
+    <ul class="pagination pagination-sm" style="display:inherit;">
+
+        {% set init_page = 0 %}
+        {% set min = page - 3 %}
+        {% set max = page + 3 + 1 %}
+
+        {% if min < 0 %}
+            {% set max = max - min %}
+        {% endif %}
+        {% if max >= pages %}
+            {% set min = min - max + pages %}
+        {% endif %}
+
+        {% if min < 0 %}
+            {% set min = 0 %}
+        {% endif %}
+        {% if max >= pages %}
+            {% set max = pages %}
+        {% endif %}
+
+    {% if min > 0 %}
+    <li>
+        <a class="page" href="{{ init_page | link_page_ajax(modelview_name) }}">&laquo;</a>
+    </li>
+    {% endif %}
+    {% if page > 0 %}
+    <li>
+        <a class="page" href="{{ (page - 1) | link_page_ajax(modelview_name) }}">&lt;</a>
+    </li>
+    {% endif %}
+
+    {% for p in range(min, max) %}
+        {% if page == p %}
+        <li class="active">
+            <a class="page">{{ p }}</a>
+        </li>
+        {% else %}
+        <li>
+            <a class="page" href="{{ p | link_page_ajax(modelview_name) }}">{{ p }}</a>
+        </li>
+        {% endif %}
+    {% endfor %}
+
+    {% if page + 1 < pages %}
+        <li>
+            <a class="page" href="{{ (page + 1) | link_page_ajax(modelview_name) }}">&gt;</a>
+        </li>
+    {% endif %}
+    {% if max < pages %}
+        <li>
+            <a class="page" href="{{ (pages - 1) | link_page_ajax(modelview_name) }}">&raquo;</a>
+        </li>
+    {% endif %}
+</ul>
+{% endif %}
+<script>
+    $(".page").click(function(event) {
+        event.preventDefault()
+        console.log(event.target)
+        console.log('Target: ' + $(event.target).attr('href'))
+        var url = $(event.target).attr('href');
+        var csrf_token = "{{ csrf_token() if csrf_token else '' }}";
+
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                }
+            }
+        });
+        $.ajax({
+            method: "GET",
+            url: url,
+            contentType: "application/json; charset=utf-8"
+        }).done(function(data) {
+            $(".site-widget").html(data)
+        }).fail(function(error) {
+            var respJSON = error.responseJSON;
+            var errorMsg = error.responseText;
+            if (respJSON && respJSON.message) {
+                errorMsg = respJSON.message;
+            }
+            alert("ERROR: " + errorMsg);
+        });
+    });
+</script>
+{% endmacro %}

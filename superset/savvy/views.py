@@ -18,7 +18,7 @@ from flask_appbuilder.security.registerviews import RegisterUserDBView, BaseRegi
 from .filters import RoleFilter
 from flask_appbuilder.models.sqla.filters import FilterInFunction, FilterContains
 from .forms import (
-    PasswordRecoverForm, SavvyGroupAddWidget, SavvySiteListWidget,
+    PasswordRecoverForm, SavvyGroupAddWidget, SavvySiteListWidget, SavvySiteSearchWidget,
     SavvyRegisterInvitationUserDBForm, SavvyRegisterUserDBForm, RegisterInvitationForm,
 
 )
@@ -514,10 +514,19 @@ class SavvySiteModelView(ModelView):
     add_title = lazy_gettext('Add Site')
     edit_title = lazy_gettext('Edit Site')
 
+    search_widget = SavvySiteSearchWidget
+
     list_columns = ['SiteName', 'AddressLine', 'State', 'city']
     list_widget = SavvySiteListWidget
     label_columns = {'SiteName': lazy_gettext('Site Name'), 'AddressLine': lazy_gettext('Address line')}
     base_permissions = ['can_list']
+
+    @expose('/ajax', methods=['GET'])
+    def ajax(self):
+        widget = self.appbuilder.sm.get_sites_list_widget()
+        return self.render_template('superset/models/group/site_list.html',
+                                    widgets=widget)
+        pass
 
 
 class SavvyGroupModelView(ModelView):
@@ -530,7 +539,6 @@ class SavvyGroupModelView(ModelView):
 
     add_widget = SavvyGroupAddWidget
     add_template = 'superset/models/group/add.html'
-    # add_form = SavvyGroupAddForm
 
     add_columns = ['group_name', 'sites', 'users', 'organization_id']
     edit_columns = add_columns
@@ -543,12 +551,10 @@ class SavvyGroupModelView(ModelView):
     def add(self):
         widget1 = self._add()
         widget2 = self.appbuilder.sm.get_sites_list_widget()
-        # count = 0
         all_sites = []
 
         widget = {**widget1, **widget2}
         # print(widget)
-        # print(count)
         # search_site = self.appbuilder.sm.search_site()
         # for site in search_site:
         #     all_sites.append((site.SiteID, site.SiteName, site.AddressLine, site.State, site.city))
@@ -558,8 +564,7 @@ class SavvyGroupModelView(ModelView):
         else:
             return self.render_template(self.add_template,
                                         title=self.add_title,
-                                        widgets=widget,
-                                        sites=all_sites)
+                                        widgets=widget)
 
     @expose('/filter', methods=['POST', 'GET'])
     def filter(self):
@@ -568,6 +573,13 @@ class SavvyGroupModelView(ModelView):
         sites = ['3']
         print('received')
         return sites
+
+    @expose('/ajax', methods=['GET'])
+    def ajax(self):
+        widget = self.appbuilder.sm.get_sites_list_widget()
+        return self.render_template('superset/models/group/site_list.html',
+                                    widgets=widget)
+        pass
 
 
 
