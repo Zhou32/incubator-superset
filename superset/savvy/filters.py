@@ -1,7 +1,32 @@
 from flask_appbuilder.models.filters import BaseFilter
 from flask_appbuilder.models.sqla.filters import get_field_setup_query
 from flask import g
-from .models import Organization
+from .models import Organization, Group
+
+
+def get_groups_id_for_org():
+    from superset import security_manager, db
+    all_group_id = []
+    for role in g.user.roles:
+        if role.name == 'Admin':
+            groups = db.session.query(Group).all()
+
+            for i in groups:
+                all_group_id.append(i.id)
+            return all_group_id
+
+    org = Organization
+    all_groups = []
+    try:
+        org_id = db.session.query(org).filter(org.users.any(id=g.user.id)).first().id
+        all_groups = db.session.query(Group).filter(Group.organization_id.in_([org_id])).all()
+    except:
+        pass
+
+    for group in all_groups:
+        all_group_id.append(group.id)
+
+    return all_group_id
 
 
 def get_roles_for_org():

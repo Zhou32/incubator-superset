@@ -23,7 +23,7 @@ from .forms import (
 
 )
 
-from .filters import get_user_id_list_form_org, get_roles_for_org
+from .filters import get_user_id_list_form_org, get_roles_for_org, get_groups_id_for_org
 from .utils import post_request
 
 log = logging.getLogger(__name__)
@@ -32,14 +32,24 @@ email_subject = 'SavvyBI - Email Confirmation'
 
 class SavvyUserDBModelView(UserDBModelView):
     base_filters = [['id', RoleFilter, lambda: []]]
-    edit_columns = ['first_name', 'last_name', 'active', 'email', 'roles']
-    edit_form_query_rel_fields = {'roles':[['name',FilterInFunction, get_roles_for_org]]}
+    edit_columns = ['first_name', 'last_name', 'active', 'email', 'roles', 'groups']
+    edit_form_query_rel_fields = {'roles': [['name', FilterInFunction, get_roles_for_org]],
+                                  'groups': [['id', FilterInFunction, get_groups_id_for_org]]}
+    show_fieldsets = [
+        (lazy_gettext('User info'),
+         {'fields': ['username', 'active', 'roles', 'login_count','groups']}),
+        (lazy_gettext('Personal Info'),
+         {'fields': ['first_name', 'last_name', 'email'], 'expanded': True}),
+        (lazy_gettext('Audit Info'),
+         {'fields': ['last_login', 'fail_login_count', 'created_on',
+                     'created_by', 'changed_on', 'changed_by'], 'expanded': False}),
+    ]
 
     def pre_delete(self, user):
         print(user)
         organization = self.appbuilder.sm.find_org(user_id=user.id)
         for role in user.roles:
-            if role.name == 'org_owner' and organization and len(organization.users) > 0 :
+            if role.name == 'org_owner' and organization and len(organization.users) > 0:
                 for user_ in organization.users:
                     if user_ != user:
                         self.delete(user_)
@@ -323,7 +333,7 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
         access_key = aws_info['AccessKeyId']
         secret_key = aws_info['SecretAccessKey']
         time.sleep(5)
-        athena_link = f'awsathena+jdbc://{access_key}:{secret_key}@athena.us-west-2.amazonaws.com/market_report_prod_ore?s3_staging_dir=s3://druid.dts.input-bucket.oregon'
+        athena_link = f'awsathena+jdbc://{access_key}:{secret_key}@athena.ap-southeast-2.amazonaws.com/meter-ss.test?s3_staging_dir=s3://a.meter-test.dex/test_query_result'
         self.testconn(athena_link, org, user)
 
     def testconn(self, athena_link, org, user):
@@ -338,8 +348,8 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
         except Exception as e:
             logging.exception(e)
             return json_error_response((
-                'Connection failed!\n\n'
-                'The error message returned was:\n{}').format(e))
+                                           'Connection failed!\n\n'
+                                           'The error message returned was:\n{}').format(e))
 
     def form_post(self, form):
         self.add_form_unique_validations(form)
@@ -496,7 +506,7 @@ class SavvyRegisterUserModelView(ModelView):
     base_permissions = ['can_list', 'can_show', 'can_delete']
     list_title = lazy_gettext('List of Registration Requests')
     show_title = lazy_gettext('Show Registration')
-    list_columns = ['registration_date','email','organization']
+    list_columns = ['registration_date', 'email', 'organization']
     show_exclude_columns = ['password']
     search_exclude_columns = ['password']
     base_filters = [['inviter', FilterInFunction, get_user_id_list_form_org]]
@@ -538,6 +548,8 @@ class SavvyGroupModelView(ModelView):
     list_columns = ['group_name', 'sites']
     order_columns = ['group_name']
 
+    base_filters = [['id', FilterInFunction, get_groups_id_for_org]]
+
     @expose('/add', methods=['GET', 'POST'])
     @has_access
     def add(self):
@@ -568,6 +580,3 @@ class SavvyGroupModelView(ModelView):
         sites = ['3']
         print('received')
         return sites
-
-
-
