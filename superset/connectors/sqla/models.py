@@ -335,6 +335,13 @@ class SqlaTable(Model, BaseDatasource):
         return Markup(anchor)
 
     @property
+    def meter_link(self):
+        name = escape(self.name)
+        link = '/superset/meterdata/{table_id}'.format(table_id=self.id)
+        anchor = f'<a target="_blank" href="{link}">{name}</a>'
+        return Markup(anchor)
+
+    @property
     def schema_perm(self):
         """Returns schema permission if present, database one otherwise."""
         return security_manager.get_schema_perm(self.database, self.schema)
@@ -921,6 +928,7 @@ class SqlaTable(Model, BaseDatasource):
     @staticmethod
     def default_query(qry):
         return qry.filter_by(is_sqllab_view=False)
+
 
 
 sa.event.listen(SqlaTable, 'after_insert', security_manager.set_perm)

@@ -7,7 +7,7 @@ from flask_babel import lazy_gettext
 from flask_mail import Mail, Message
 from sqlalchemy import create_engine
 
-from flask_appbuilder import const, ModelView
+from flask_appbuilder import const
 from flask_appbuilder.validators import Unique
 from flask_appbuilder._compat import as_unicode
 from flask_appbuilder.views import expose, PublicFormView, ModelView
@@ -568,5 +568,3 @@ class SavvyGroupModelView(ModelView):
         sites = ['3']
         print('received')
         return sites
-
-

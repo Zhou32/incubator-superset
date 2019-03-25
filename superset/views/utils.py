@@ -76,3 +76,31 @@ def get_permissions(user):
         ]
 
     return roles, permissions
+
+def parse_sqalchemy_uri(str):
+    result = {}
+
+    main_param_split = str.split("?")
+    str_split1 = main_param_split[0].split("://")
+    driver = str_split1[0]
+
+    if driver == "awsathena+jdbc" or driver == "awsathena+rest":
+        str_split2 = str_split1[1].split("@")
+        credentials = str_split2[0]
+        access_key = credentials.split(":")[0]
+
+        str_split3 = str_split2[1].split("?")
+        region_schema_str = str_split3[0]
+        schema_name = region_schema_str.split("/")[1]
+        region_str = region_schema_str.split("/")[0]
+        region = region_str.replace("amazonaws.com", "").replace("athena", "").replace(".", "")
+
+        s3_bucket_str = main_param_split[1]
+        print("===============")
+        print(s3_bucket_str)
+        s3_staging_dir = s3_bucket_str.split("=")[1]
+        result = {'access_key': access_key, 'schema_name': schema_name, 'region_name': region, 's3_staging_dir': s3_staging_dir}
+    else:
+        raise ValueError("This table isn't from Athena DB")
+
+    return result

@@ -360,7 +360,7 @@ class MeterTableView(DatasourceModelView):
     add_columns = []
     edit_columns = []
     list_columns = [
-        'link', 'database_name',
+        'meter_link', 'database_name',
         'changed_by_', 'modified']
     order_columns = ['modified']
 
