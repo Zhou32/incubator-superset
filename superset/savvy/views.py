@@ -570,4 +570,3 @@ class SavvyGroupModelView(ModelView):
         return sites
 
 
-

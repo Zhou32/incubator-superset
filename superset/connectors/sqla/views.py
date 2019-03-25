@@ -351,3 +351,24 @@ appbuilder.add_link(
     category_icon='fa-table')
 
 appbuilder.add_separator('Sources')
+
+
+class MeterTableView(DatasourceModelView):
+    datamodel = SQLAInterface(models.SqlaTable)
+    route_base = "/tablemeterview"
+
+    add_columns = []
+    edit_columns = []
+    list_columns = [
+        'link', 'database_name',
+        'changed_by_', 'modified']
+    order_columns = ['modified']
+
+
+
+appbuilder.add_view(MeterTableView,
+                    "Tables For Meter",
+                    icon="fa-table",
+                    label=__('Tables For Meter'),
+                    category="Sources",
+                    category_icon="fa-table")

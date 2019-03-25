@@ -1,0 +1,12 @@
+Collecting PyAthenaJDBC
+  Downloading https://files.pythonhosted.org/packages/0f/7b/ea395e7b9a1eb3090bb93d3be17378a149174523199ee92ce0f6d650394c/PyAthenaJDBC-2.0.4-py2.py3-none-any.whl (7.1MB)
+Collecting jpype1>=0.6.0 (from PyAthenaJDBC)
+Requirement already satisfied: botocore>=1.0.0 in /Users/kjy/virtualenv/savvybi_superset/lib/python3.6/site-packages (from PyAthenaJDBC)
+Requirement already satisfied: future in /Users/kjy/virtualenv/savvybi_superset/lib/python3.6/site-packages (from PyAthenaJDBC)
+Requirement already satisfied: python-dateutil<3.0.0,>=2.1; python_version >= "2.7" in /Users/kjy/virtualenv/savvybi_superset/lib/python3.6/site-packages (from botocore>=1.0.0->PyAthenaJDBC)
+Requirement already satisfied: jmespath<1.0.0,>=0.7.1 in /Users/kjy/virtualenv/savvybi_superset/lib/python3.6/site-packages (from botocore>=1.0.0->PyAthenaJDBC)
+Requirement already satisfied: docutils>=0.10 in /Users/kjy/virtualenv/savvybi_superset/lib/python3.6/site-packages (from botocore>=1.0.0->PyAthenaJDBC)
+Requirement already satisfied: urllib3<1.25,>=1.20; python_version >= "3.4" in /Users/kjy/virtualenv/savvybi_superset/lib/python3.6/site-packages (from botocore>=1.0.0->PyAthenaJDBC)
+Requirement already satisfied: six>=1.5 in /Users/kjy/virtualenv/savvybi_superset/lib/python3.6/site-packages (from python-dateutil<3.0.0,>=2.1; python_version >= "2.7"->botocore>=1.0.0->PyAthenaJDBC)
+Installing collected packages: jpype1, PyAthenaJDBC
+Successfully installed PyAthenaJDBC-2.0.4 jpype1-0.6.3
