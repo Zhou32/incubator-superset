@@ -122,6 +122,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         self.appbuilder.add_view_no_menu(self.passwordresetview)
         self.appbuilder.add_view_no_menu(self.invite_register_view)
         self.appbuilder.add_view_no_menu(self.invitation_view)
+        # self.appbuilder.add_view_no_menu(CsvToSiteView)
         self.group_view = self.appbuilder.add_view(self.group_view, "List Groups",
                                                    icon="fa-user", label="List Groups",
                                                    category="Security", category_icon="fa-cogs")

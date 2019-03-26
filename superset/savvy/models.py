@@ -19,13 +19,25 @@ assoc_org_user = Table(
     UniqueConstraint('user_id', 'org_id')
 )
 
+assoc_org_site = Table(
+    'org_sites', metadata,
+    Column('id', Integer, primary_key=True),
+    Column('org_id', Integer, ForeignKey('organizations.id')),
+    Column('site_id', Integer, ForeignKey('sites_data.SiteID')),
+    UniqueConstraint('org_id', 'site_id')
+)
+
 
 class Organization(Model):
     __tablename__ = 'organizations'
     id = Column(Integer, Sequence('organizations_id_seq'), primary_key=True)
     organization_name = Column(String(250))
     users = relationship('SavvyUser', secondary=assoc_org_user, backref='organization')
+    sites = relationship('Site', secondary=assoc_org_site, backref='sites')
     superuser_number = Column('superuser_number', Integer, default=0)
+
+    def __repr__(self):
+        return self.organization_name
 
 
 class OrgRegisterUser(Model):
