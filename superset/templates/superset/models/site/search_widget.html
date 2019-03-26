@@ -73,12 +73,10 @@
 $('#search-action').click(function(event) {
     event.preventDefault()
     var $form = $(this).closest('form');
-    console.log($('#filter_form').serialize());
     $.ajax({
-        url: 'ajax?'+$('#filter_form').serialize(),
+        url: '/groups/ajax?'+$('#filter_form').serialize(),
         type: 'GET',
         success: function(data) {
-            console.log(data)
             $(".site-widget").html(data)
         }
     });

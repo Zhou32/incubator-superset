@@ -38,11 +38,19 @@
     {% block begin_loop_values %}
         {% for item in value_columns %}
             {% set pk = pks[loop.index-1] %}
+            {% set id = 'chk'~pk %}
+            {% if site_list and pk in site_list %}
+            <tr class="success">
+                <td>
+                    <input id="{{id}}" class="action_check" name="rowid" value="{{pk}}" type="checkbox"
+                            onchange="checkThis(this)", checked>
+
+            {% else %}
             <tr>
                 <td>
-                    {% set id = 'chk'~pk %}
                     <input id="{{id}}" class="action_check" name="rowid" value="{{pk}}" type="checkbox"
-                           onchange="checkThis(this)">
+                            onchange="checkThis(this)">
+            {% endif %}
                 </td>
                 {% for value in include_columns %}
                     {% set formatter = formatters_columns.get(value) %}

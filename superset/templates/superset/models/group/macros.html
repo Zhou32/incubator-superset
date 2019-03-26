@@ -17,7 +17,7 @@
   under the License.
 #}
 {% import 'appbuilder/general/lib.html' as lib %}
-{% macro render_sites(field, sites=[], begin_sep_label='', end_sep_label='', begin_sep_field='', end_sep_field='') %}
+{% macro render_sites(field, begin_sep_label='', end_sep_label='', begin_sep_field='', end_sep_field='') %}
 	  {% if field.id != 'csrf_token' %}
           {% if field.type == 'HiddenField' %}
             {{ field}}
@@ -39,17 +39,17 @@
                           </tr>
                         </thead>
                         <tbody>
-                        {% for row in sites %}
-                        <tr>
-                            <td>{{ row[1] }}</td>
-                            <td>{{ row[2] }}</td>
-                            <td>{{ row[3] }}</td>
-                            <td>{{ row[4] }}</td>
+                        {% for row in field._data %}
+                        <tr id="{{row.SiteID}}">
+                            <td>{{ row.SiteName }}</td>
+                            <td>{{ row.AddressLine }}</td>
+                            <td>{{ row.State }}</td>
+                            <td>{{ row.city }}</td>
                         </tr>
                         {% endfor %}
                         </tbody>
                     </table>
-                    </div>
+                </div>
           {% endif %}
           {% if field.errors %}
             <div class="alert alert-danger">
@@ -72,25 +72,20 @@
         <script>
             $('#submit_button').click( function(e) {
                 e.preventDefault();
-                console.log("hi")
                 list = []
                 table = document.getElementById('sites_table')
                 for(var i = 0, row; row = table.rows[i]; i++) {
-                    console.log(row);
                     if (row.id != ''){
                         list.push(row.id);
                     }
                 }
-                console.log(list)
                 form = document.getElementById('model_form');
                 var sites_list = document.createElement("input");
                 sites_list.type = 'hidden';
                 sites_list.name = 'sites';
                 sites_list.id = 'sites';
                 sites_list.value = list;
-                console.log(sites_list);
                 form.appendChild(sites_list);
-                console.log(form);
                 form.submit()
             })
         </script>

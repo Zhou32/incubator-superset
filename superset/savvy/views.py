@@ -541,6 +541,9 @@ class SavvyGroupModelView(ModelView):
     add_widget = SavvyGroupAddWidget
     add_template = 'superset/models/group/add.html'
 
+    edit_widget = SavvyGroupAddWidget
+    edit_template = 'superset/models/group/edit.html'
+
     add_columns = ['group_name', 'sites', 'users', 'organization_id']
     edit_columns = add_columns
     label_columns = {'group_name': lazy_gettext('Group Name'), 'sites': lazy_gettext('Sites')}
@@ -564,15 +567,17 @@ class SavvyGroupModelView(ModelView):
     @has_access
     def edit(self, pk):
         pk = self._deserialize_pk_if_composite(pk)
-        widget1 = self._edit(pk)
-        widget2 = self.appbuilder.sm.get_sites_list_widget()
-        widgets = {**widget1, **widget2}
+        widget1, site_list = self._edit(pk)
+
         if not widget1:
             return self.post_edit_redirect()
         else:
+            widget2 = self.appbuilder.sm.get_sites_list_widget()
+            widgets = {**widget1, **widget2}
             return self.render_template(self.edit_template,
                                         title=self.edit_title,
-                                        widgets=widgets)
+                                        widgets=widgets,
+                                        site_list=site_list)
 
     @expose('/ajax', methods=['GET'])
     def ajax(self):
@@ -602,7 +607,6 @@ class SavvyGroupModelView(ModelView):
                         self.post_add(item)
                     flash(*self.datamodel.message)
                 finally:
-                    print(item)
                     return None
             else:
                 is_valid_form = False
@@ -638,7 +642,11 @@ class SavvyGroupModelView(ModelView):
             if form.validate():
                 self.process_form(form, False)
                 form.populate_obj(item)
-                print(item)
+
+                # Here read raw data of sites field from front end and find list of sites then append
+                sites_list = form.sites.raw_data[0].split(',')
+                sites = self.appbuilder.sm.get_sites_list(sites_list)
+                item.sites = sites
                 try:
                     self.pre_update(item)
                 except Exception as e:
@@ -656,10 +664,10 @@ class SavvyGroupModelView(ModelView):
             form = self.edit_form.refresh(obj=item)
             # Perform additional actions to pre-fill the edit form.
             self.prefill_form(form, pk)
-
+        sites_list = [site.SiteID for site in item.sites]
         widgets = self._get_edit_widget(form=form, exclude_cols=exclude_cols)
         widgets = self._get_related_views_widgets(item, filters={},
                                                   orders=orders, pages=pages, page_sizes=page_sizes, widgets=widgets)
         if is_valid_form:
             self.update_redirect()
-        return widgets
+        return widgets, sites_list

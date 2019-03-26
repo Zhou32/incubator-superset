@@ -91,9 +91,4 @@ class SavvySiteSearchWidget(SearchWidget):
     template = 'superset/models/site/search_widget.html'
 
 
-class SavvyGroupAddForm(DynamicForm):
-    group_name = StringField(lazy_gettext('Group Name'), validators=[DataRequired()])
-    organization_id = StringField(lazy_gettext('Organization ID'))
-    sites = HiddenField(lazy_gettext('Sites'))
-    users = HiddenField(lazy_gettext('Users'))
 
