@@ -1,0 +1,42 @@
+{% extends 'superset/basic.html' %}
+{% import 'appbuilder/general/lib.html' as lib %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="panel panel-primary">
+                <div class="panel-body list-container">
+                  {% if count > 0 %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                  {% for column in label_columns %}
+                                      <th><a href="#">{{column}}</a></th>
+                                  {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                              {% for row in meter_data %}
+                                <tr>
+                                  {% for column_data in row %}
+                                    <td>{{ column_data }}</td>
+                                  {% endfor %}
+                                </tr>
+                              {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination-container pull-right">
+                        <strong>{{ _('Record Count') }}:</strong> {{ count }}
+                        {{ lib.render_pagination(page, page_size, count, modelview_name) }}
+                    </div>
+                  {% else %}
+                      <b>{{_("No records found")}}</b>
+                  {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

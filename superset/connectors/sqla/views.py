@@ -350,8 +350,6 @@ appbuilder.add_link(
     category_label=__('Sources'),
     category_icon='fa-table')
 
-appbuilder.add_separator('Sources')
-
 
 class MeterTableView(DatasourceModelView):
     datamodel = SQLAInterface(models.SqlaTable)
@@ -362,7 +360,15 @@ class MeterTableView(DatasourceModelView):
     list_columns = [
         'meter_link', 'database_name',
         'changed_by_', 'modified']
+    search_columns = (
+        'database', 'schema', 'table_name', 'owners', 'is_sqllab_view',
+    )
     order_columns = ['modified']
+    base_order = ('changed_on', 'desc')
+    base_permissions = ['can_list']
+    base_filters = [['id', DatasourceFilter, lambda: []]]
+
+    related_views = [TableColumnInlineView, SqlMetricInlineView]
 
 
 
@@ -372,3 +378,4 @@ appbuilder.add_view(MeterTableView,
                     label=__('Tables For Meter'),
                     category="Sources",
                     category_icon="fa-table")
+appbuilder.add_separator('Sources')

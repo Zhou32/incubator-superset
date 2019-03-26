@@ -96,8 +96,6 @@ def parse_sqalchemy_uri(str):
         region = region_str.replace("amazonaws.com", "").replace("athena", "").replace(".", "")
 
         s3_bucket_str = main_param_split[1]
-        print("===============")
-        print(s3_bucket_str)
         s3_staging_dir = s3_bucket_str.split("=")[1]
         result = {'access_key': access_key, 'schema_name': schema_name, 'region_name': region, 's3_staging_dir': s3_staging_dir}
     else:
