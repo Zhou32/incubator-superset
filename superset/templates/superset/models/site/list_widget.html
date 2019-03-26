@@ -8,24 +8,7 @@
     {% endblock %}
 
     {% block begin_loop_header scoped %}
-        <script>
-            function checkAll(ele) {
-             var checkboxes = document.getElementsByTagName('input');
-             if (ele.checked) {
-                 for (var i = 0; i < checkboxes.length; i++) {
-                     if (checkboxes[i].type == 'checkbox') {
-                         checkboxes[i].checked = true;
-                     }
-                 }
-             } else {
-                 for (var i = 0; i < checkboxes.length; i++) {
-                     if (checkboxes[i].type == 'checkbox') {
-                         checkboxes[i].checked = false;
-                     }
-                 }
-             }
-             }
-        </script>
+
         <thead>
         <tr>
 
@@ -57,14 +40,16 @@
             {% set pk = pks[loop.index-1] %}
             <tr>
                 <td>
-                    <input id="{{pk}}" class="action_check" name="rowid" value="{{pk}}" type="checkbox">
+                    {% set id = 'chk'~pk %}
+                    <input id="{{id}}" class="action_check" name="rowid" value="{{pk}}" type="checkbox"
+                           onchange="checkThis(this)">
                 </td>
                 {% for value in include_columns %}
                     {% set formatter = formatters_columns.get(value) %}
                     {% if formatter %}
-                        <td>{{ formatter(item[value]) }}</td>
+                        <td class="{{id}}">{{ formatter(item[value]) }}</td>
                     {% else %}
-                        <td>{{ item[value] }}</td>
+                        <td class="{{id}}">{{ item[value] }}</td>
                     {% endif %}
                 {% endfor %}
             </tr>
@@ -74,5 +59,83 @@
     {% block end_content scoped %}
         </table>
         </div>
+        <script>
+             // pre check checkboxes
+             var checkboxes = document.getElementsByTagName('input');
+             for (var i = 0; i < checkboxes.length; i++) {
+                 if (checkboxes[i].type == 'checkbox') {
+                     var id = checkboxes[i].value
+                     if (document.getElementById(id) != null) {
+                         checkboxes[i].checked = true;
+                         var thisClosest = checkboxes[i].parentNode.parentNode
+                         thisClosest.classList += 'success'
+                     }
+                 }
+             }
+
+             function checkAll(ele) {
+                 var checkboxes = document.getElementsByTagName('input');
+                 if (ele.checked) {
+                     for (var i = 1; i < checkboxes.length; i++) {
+                         if (checkboxes[i].type == 'checkbox') {
+                             checkboxes[i].checked = true;
+                             var id = checkboxes[i].id;
+                             $('#'+id).trigger('change')
+                         }
+                     }
+                 } else {
+                     for (var i = 1; i < checkboxes.length; i++) {
+                         if (checkboxes[i].type == 'checkbox') {
+                             checkboxes[i].checked = false;
+                             var id = checkboxes[i].id;
+                             $('#'+id).trigger('change')
+                         }
+                     }
+                 }
+             }
+
+             function checkThis(ele) {
+                var collection = document.getElementsByClassName(ele.id)
+                list = [ele.value]
+                for (var i=0;i<collection.length; i++) {
+                    list.push(collection[i].textContent)
+                }
+                if (ele.checked) {
+                    addSiteToTable(list)
+                }
+                else {
+                    removeSiteFromTable(list)
+                }
+             }
+
+             function addSiteToTable(list) {
+                var site_list = document.getElementById("sites_table")
+
+                var id = list[0]
+                if (document.getElementById(id) != null) {}
+                else {
+                    var rowCnt = site_list.rows.length;
+                    var tr = site_list.insertRow(rowCnt);
+                    tr.setAttribute('id',list[0])
+                    for (var i=1; i<list.length; i++){
+                        var td = document.createElement('td');
+                        td = tr.insertCell(i-1);
+                        td.appendChild(document.createTextNode(list[i]));
+                        tr.appendChild(td);
+                    }
+                    $('#sites_div').scrollTop($('#sites_div')[0].scrollHeight)
+                }
+             }
+
+             function removeSiteFromTable(list) {
+                var site_list = document.getElementById("sites_table");
+                var id = list[0]
+                if (document.getElementById(id) != null) {
+                    var rowIndex = document.getElementById(id).rowIndex
+                    site_list.deleteRow(rowIndex)
+                }
+             }
+
+        </script>
     {% endblock %}
 

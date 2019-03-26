@@ -16,27 +16,8 @@
   specific language governing permissions and limitations
   under the License.
 #}
-{% macro render_sites(field, sites=[], begin_sep_label='', end_sep_label='', begin_sep_field='', end_sep_field='', list_widget='') %}
-    <script>
-    function checkAll(ele) {
-     var checkboxes = document.getElementsByTagName('input');
-     if (ele.checked) {
-         for (var i = 0; i < checkboxes.length; i++) {
-             if (checkboxes[i].type == 'checkbox') {
-                 checkboxes[i].checked = true;
-             }
-         }
-     } else {
-         for (var i = 0; i < checkboxes.length; i++) {
-             if (checkboxes[i].type == 'checkbox') {
-                 checkboxes[i].checked = false;
-             }
-         }
-     }
-     }
-
-     </script>
-
+{% import 'appbuilder/general/lib.html' as lib %}
+{% macro render_sites(field, sites=[], begin_sep_label='', end_sep_label='', begin_sep_field='', end_sep_field='') %}
 	  {% if field.id != 'csrf_token' %}
           {% if field.type == 'HiddenField' %}
             {{ field}}
@@ -44,14 +25,31 @@
             {{begin_sep_label|safe}}
                 <label for="{{field.id}}" control-label>
                     {{ field.label.text }}
-                    {% if field.flags.required %}
-                        <strong style="color: red">&#42;</strong>
-                    {% endif %}
                 </label>
             {{end_sep_label|safe}}
             {{begin_sep_field|safe}}
-                <p>&nbsp;</p><p>&nbsp;</p>
-               <span class="help-block">{{ field.description }}</span>
+                <div id="sites_div" style="height:250px;overflow:auto;">
+                    <table id="sites_table" class="table table-condensed">
+                        <thead>
+                          <tr>
+                            <th>Site Name</th>
+                            <th>Site Address</th>
+                            <th>State</th>
+                            <th>City</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in sites %}
+                        <tr>
+                            <td>{{ row[1] }}</td>
+                            <td>{{ row[2] }}</td>
+                            <td>{{ row[3] }}</td>
+                            <td>{{ row[4] }}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    </div>
           {% endif %}
           {% if field.errors %}
             <div class="alert alert-danger">
@@ -64,4 +62,37 @@
       {% endif %}
 
 
+{% endmacro %}
+
+{% macro render_form_controls() %}
+    <div class="well well-sm">
+        <button id="submit_button" type="submit" class="btn  btn-sm btn-primary">{{_("Save")}}
+            <i class="fa fa-save"></i></button>
+        {{ lib.lnk_back() }}
+        <script>
+            $('#submit_button').click( function(e) {
+                e.preventDefault();
+                console.log("hi")
+                list = []
+                table = document.getElementById('sites_table')
+                for(var i = 0, row; row = table.rows[i]; i++) {
+                    console.log(row);
+                    if (row.id != ''){
+                        list.push(row.id);
+                    }
+                }
+                console.log(list)
+                form = document.getElementById('model_form');
+                var sites_list = document.createElement("input");
+                sites_list.type = 'hidden';
+                sites_list.name = 'sites';
+                sites_list.id = 'sites';
+                sites_list.value = list;
+                console.log(sites_list);
+                form.appendChild(sites_list);
+                console.log(form);
+                form.submit()
+            })
+        </script>
+    </div>
 {% endmacro %}

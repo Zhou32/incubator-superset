@@ -483,8 +483,11 @@ class CustomSecurityManager(SupersetSecurityManager):
 
         return db_role
 
-    def search_site(self):
-        return self.get_session.query(self.site_model).all()
+    def search_site(self, siteID=None):
+        if siteID:
+            return self.get_session.query(self.site_model).filter_by(SiteID=siteID).first()
+        else:
+            return self.get_session.query(self.site_model).all()
 
     def get_sites_list_widget(self):
         if urltools.get_order_args().get(self.site_view.__class__.__name__):
@@ -500,5 +503,10 @@ class CustomSecurityManager(SupersetSecurityManager):
                                         page=page,
                                         page_size=page_size)
         form = self.site_view.search_form.refresh()
-
         return self.site_view._get_search_widget(form=form, widgets=widgets)
+
+    def get_sites_list(self, sites):
+        return_list = []
+        for site in sites:
+            return_list.append(self.search_site(site))
+        return return_list

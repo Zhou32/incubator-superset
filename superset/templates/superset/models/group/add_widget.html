@@ -19,6 +19,9 @@
                     {% set field = form[col] %}
                     {% if field.name not in exclude_cols %}
                     {% if field.name == 'sites' %}
+                        <tr>
+                            {{ macro.render_sites(field, [], begin_sep_label, end_sep_label, begin_sep_field, end_sep_field) }}
+                        </tr>
                     {% else %}
                         <tr>
                             {{ lib.render_field(field, begin_sep_label, end_sep_label, begin_sep_field, end_sep_field) }}
@@ -30,5 +33,5 @@
         </div>
 
 
-    {{ lib.render_form_controls() }}
+    {{ macro.render_form_controls() }}
 </form>

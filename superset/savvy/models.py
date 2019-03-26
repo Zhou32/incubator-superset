@@ -94,5 +94,8 @@ class Site(Model):
     PostalCode = Column(Integer)
     Country = Column(String(64))
 
+    def __repr__(self):
+        return self.SiteName
+
 
 
