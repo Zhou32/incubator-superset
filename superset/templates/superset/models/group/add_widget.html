@@ -7,20 +7,21 @@
 {% set begin_sep_field = '<td>' %}
 {% set end_sep_field = '</td>' %}
 
-
 {% if form_action %}
     <form action="{{form_action}}" method="post" enctype="multipart/form-data">
 {% else %}
     <form id="model_form" action="" method="post" enctype="multipart/form-data">
 {% endif %}
     {{form.hidden_tag()}}
-        <div class="table-responsive">
+        <div class="table-responsive" style="width:100%;">
             <table class="table table-bordered">
                 {% for col in include_cols %}
                     {% set field = form[col] %}
                     {% if field.name not in exclude_cols %}
                     {% if field.name == 'sites' %}
-                        {{ macro.render_sites(field, sites, begin_sep_label, end_sep_label, begin_sep_field, end_sep_field, list_widget) }}
+                        <tr>
+                            {{ macro.render_sites(field, begin_sep_label, end_sep_label, begin_sep_field, end_sep_field) }}
+                        </tr>
                     {% else %}
                         <tr>
                             {{ lib.render_field(field, begin_sep_label, end_sep_label, begin_sep_field, end_sep_field) }}
@@ -32,5 +33,5 @@
         </div>
 
 
-    {{ lib.render_form_controls() }}
+    {{ macro.render_form_controls() }}
 </form>

@@ -11,7 +11,7 @@ from wtforms import (
 from flask_appbuilder.security.sqla.models import User
 from flask_appbuilder.security.forms import DynamicForm
 from flask_appbuilder.fieldwidgets import BS3TextFieldWidget, BS3PasswordFieldWidget
-from flask_appbuilder.widgets import FormWidget
+from flask_appbuilder.widgets import FormWidget, SearchWidget
 
 from .models import Organization, OrgRegisterUser
 
@@ -93,11 +93,10 @@ class SavvySiteListWidget(FormWidget):
     template = 'superset/models/site/list_widget.html'
 
 
-class SavvyGroupAddForm(DynamicForm):
-    group_name = StringField(lazy_gettext('Group Name'), validators=[DataRequired()])
-    organization_id = StringField(lazy_gettext('Organization ID'))
-    sites = HiddenField(lazy_gettext('Sites'))
-    users = HiddenField(lazy_gettext('Users'))
+class SavvySiteSearchWidget(SearchWidget):
+    template = 'superset/models/site/search_widget.html'
+
+
 
 
 class CSVToSitesForm(DynamicForm):

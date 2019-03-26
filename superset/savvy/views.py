@@ -15,10 +15,11 @@ from flask_appbuilder.security.decorators import has_access
 from flask_appbuilder.security.forms import ResetPasswordForm
 from flask_appbuilder.security.views import UserDBModelView, UserStatsChartView
 from flask_appbuilder.security.registerviews import RegisterUserDBView, BaseRegisterUser
+from flask_appbuilder.urltools import *
 from .filters import RoleFilter
 from flask_appbuilder.models.sqla.filters import FilterInFunction, FilterContains
 from .forms import (
-    PasswordRecoverForm, SavvyGroupAddWidget, SavvySiteListWidget,
+    PasswordRecoverForm, SavvyGroupAddWidget, SavvySiteListWidget, SavvySiteSearchWidget,
     SavvyRegisterInvitationUserDBForm, SavvyRegisterUserDBForm, RegisterInvitationForm,
     CSVToSitesForm
 
@@ -535,6 +536,9 @@ class SavvySiteModelView(ModelView):
     add_title = lazy_gettext('Add Sites to Organisation')
     edit_title = lazy_gettext('Edit Site')
 
+    search_widget = SavvySiteSearchWidget
+    page_size = 500
+
     list_columns = ['SiteName', 'AddressLine', 'State', 'city']
     list_widget = SavvySiteListWidget
     label_columns = {'SiteName': lazy_gettext('Site Name'), 'AddressLine': lazy_gettext('Address line')}
@@ -627,6 +631,12 @@ class SavvySiteModelView(ModelView):
         print('csv done')
         return redirect('/tablemodelview/list/')
 
+    @expose('/ajax', methods=['GET'])
+    def ajax(self):
+        widget = self.appbuilder.sm.get_sites_list_widget()
+        return self.render_template('superset/models/group/site_list.html',
+                                    widgets=widget)
+
 
 class SavvyGroupModelView(ModelView):
     route_base = '/groups'
@@ -638,7 +648,9 @@ class SavvyGroupModelView(ModelView):
 
     add_widget = SavvyGroupAddWidget
     add_template = 'superset/models/group/add.html'
-    # add_form = SavvyGroupAddForm
+
+    edit_widget = SavvyGroupAddWidget
+    edit_template = 'superset/models/group/edit.html'
 
     add_columns = ['group_name', 'sites', 'users', 'organization_id']
     edit_columns = add_columns
@@ -652,33 +664,123 @@ class SavvyGroupModelView(ModelView):
     @has_access
     def add(self):
         widget1 = self._add()
-        widget2 = self.appbuilder.sm.get_sites_list_widget()
-        # count = 0
-        all_sites = []
-
-        widget = {**widget1, **widget2}
-        # print(widget)
-        # print(count)
-        # search_site = self.appbuilder.sm.search_site()
-        # for site in search_site:
-        #     all_sites.append((site.SiteID, site.SiteName, site.AddressLine, site.State, site.city))
-
-        if not widget:
+        if not widget1:
             return self.post_add_redirect()
         else:
+            widget2 = self.appbuilder.sm.get_sites_list_widget()
+            widgets = {**widget1, **widget2}
             return self.render_template(self.add_template,
                                         title=self.add_title,
-                                        widgets=widget,
-                                        sites=all_sites)
+                                        widgets=widgets)
 
-    @expose('/filter', methods=['POST', 'GET'])
-    def filter(self):
-        state = request.json.get('state')
-        print(state)
-        sites = ['3']
-        print('received')
-        return sites
+    @expose('/edit/<pk>', methods=['GET', 'POST'])
+    @has_access
+    def edit(self, pk):
+        pk = self._deserialize_pk_if_composite(pk)
+        widget1, site_list = self._edit(pk)
 
+        if not widget1:
+            return self.post_edit_redirect()
+        else:
+            widget2 = self.appbuilder.sm.get_sites_list_widget()
+            widgets = {**widget1, **widget2}
+            return self.render_template(self.edit_template,
+                                        title=self.edit_title,
+                                        widgets=widgets,
+                                        site_list=site_list)
+
+    @expose('/ajax', methods=['GET'])
+    def ajax(self):
+        widget = self.appbuilder.sm.get_sites_list_widget()
+        return self.render_template('superset/models/group/site_list.html',
+                                    widgets=widget)
+
+    def _add(self):
+        is_valid_form = True
+        exclude_cols = self._filters.get_relation_cols()
+        form = self.add_form.refresh()
+        if request.method == 'POST':
+            self._fill_form_exclude_cols(exclude_cols, form)
+            if form.validate():
+                self.process_form(form, True)
+                item = self.datamodel.obj()
+                try:
+                    form.populate_obj(item)
+                    sites_list = form.sites.raw_data[0].split(',')
+                    sites = self.appbuilder.sm.get_sites_list(sites_list)
+                    item.sites = sites
+                    self.pre_add(item)
+                except Exception as e:
+                    print(e)
+                else:
+                    if self.datamodel.add(item):
+                        self.post_add(item)
+                    flash(*self.datamodel.message)
+                finally:
+                    return None
+            else:
+                is_valid_form = False
+        if is_valid_form:
+            self.update_redirect()
+        return self._get_add_widget(form=form, exclude_cols=exclude_cols)
+
+    def _edit(self, pk):
+        """
+            Edit function logic, override to implement different logic
+            returns Edit widget and related list or None
+        """
+        is_valid_form = True
+        pages = get_page_args()
+        page_sizes = get_page_size_args()
+        orders = get_order_args()
+        get_filter_args(self._filters)
+        exclude_cols = self._filters.get_relation_cols()
+
+        item = self.datamodel.get(pk, self._base_filters)
+        if not item:
+            return None
+            # abort(404)
+        # convert pk to correct type, if pk is non string type.
+        pk = self.datamodel.get_pk_value(item)
+
+        if request.method == 'POST':
+            form = self.edit_form.refresh(request.form)
+            # fill the form with the suppressed cols, generated from exclude_cols
+            self._fill_form_exclude_cols(exclude_cols, form)
+            # trick to pass unique validation
+            form._id = pk
+            if form.validate():
+                self.process_form(form, False)
+                form.populate_obj(item)
+
+                # Here read raw data of sites field from front end and find list of sites then append
+                sites_list = form.sites.raw_data[0].split(',')
+                sites = self.appbuilder.sm.get_sites_list(sites_list)
+                item.sites = sites
+                try:
+                    self.pre_update(item)
+                except Exception as e:
+                    flash(str(e), "danger")
+                else:
+                    if self.datamodel.edit(item):
+                        self.post_update(item)
+                    flash(*self.datamodel.message)
+                finally:
+                    return None
+            else:
+                is_valid_form = False
+        else:
+            # Only force form refresh for select cascade events
+            form = self.edit_form.refresh(obj=item)
+            # Perform additional actions to pre-fill the edit form.
+            self.prefill_form(form, pk)
+        sites_list = [site.SiteID for site in item.sites]
+        widgets = self._get_edit_widget(form=form, exclude_cols=exclude_cols)
+        widgets = self._get_related_views_widgets(item, filters={},
+                                                  orders=orders, pages=pages, page_sizes=page_sizes, widgets=widgets)
+        if is_valid_form:
+            self.update_redirect()
+        return widgets, sites_list
 
 # class CsvToSiteView(SimpleFormView):
 #     form = CSVToSitesForm

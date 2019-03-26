@@ -16,22 +16,20 @@
   specific language governing permissions and limitations
   under the License.
 #}
-{% extends "appbuilder/general/model/add.html" %}
-
-{% import "superset/models/group/macros.html" as macro %}
-{% import "appbuilder/general/lib.html" as lib %}
+{% extends "appbuilder/general/model/edit.html" %}
 
 
 
-{% block add_form %}
+
+{% block edit_form %}
   {% block site_list %}
 
     {{ widgets.get('search')()|safe }}
     <div class="site-widget">
-    {{ widgets.get('list')()|safe }}
+    {{ widgets.get('list')(site_list=site_list)|safe }}
     </div>
   {% endblock %}
-{{ widgets.get('add')(form_action=form_action)|safe }}
+{{ widgets.get('edit')(form_action=form_action)|safe }}
 
 {% endblock %}
 
