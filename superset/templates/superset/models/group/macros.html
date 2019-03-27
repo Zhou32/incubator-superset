@@ -18,10 +18,10 @@
 #}
 {% import 'appbuilder/general/lib.html' as lib %}
 {% macro render_sites(field, begin_sep_label='', end_sep_label='', begin_sep_field='', end_sep_field='') %}
-	  {% if field.id != 'csrf_token' %}
-          {% if field.type == 'HiddenField' %}
+    {% if field.id != 'csrf_token' %}
+        {% if field.type == 'HiddenField' %}
             {{ field}}
-          {% else %}
+        {% else %}
             {{begin_sep_label|safe}}
                 <label for="{{field.id}}" control-label>
                     {{ field.label.text }}
@@ -29,38 +29,49 @@
             {{end_sep_label|safe}}
             {{begin_sep_field|safe}}
                 <div id="sites_div" style="height:250px;overflow:auto;">
-                    <table id="sites_table" class="table table-condensed">
+                    <table id="sites_table" class="table table-bordered">
                         <thead>
-                          <tr>
-                            <th>Site Name</th>
-                            <th>Site Address</th>
-                            <th>State</th>
-                            <th>City</th>
-                          </tr>
+                            <tr>
+                                <th>&nbsp;</th>
+                                <th>Site Name</th>
+                                <th>Site Address</th>
+                                <th>State</th>
+                                <th>City</th>
+                            </tr>
                         </thead>
                         <tbody>
                         {% for row in field._data %}
-                        <tr id="{{row.SiteID}}">
-                            <td>{{ row.SiteName }}</td>
-                            <td>{{ row.AddressLine }}</td>
-                            <td>{{ row.State }}</td>
-                            <td>{{ row.city }}</td>
-                        </tr>
+                            <tr id="{{row.SiteID}}">
+                                <td><a class="remove-site"><span class="close-icon">&times;</span></a></td>
+                                <td>{{ row.SiteName }}</td>
+                                <td>{{ row.AddressLine }}</td>
+                                <td>{{ row.State }}</td>
+                                <td>{{ row.city }}</td>
+                            </tr>
                         {% endfor %}
                         </tbody>
                     </table>
                 </div>
-          {% endif %}
-          {% if field.errors %}
-            <div class="alert alert-danger">
-            {% for error in field.errors %}
-              {{ _(error) }}
-            {% endfor %}
-            </div>
-          {% endif %}
+            {% endif %}
+            {% if field.errors %}
+                <div class="alert alert-danger">
+                {% for error in field.errors %}
+                    {{ _(error) }}
+                {% endfor %}
+                </div>
+            {% endif %}
             {{end_sep_field|safe}}
-      {% endif %}
-
+        {% endif %}
+<script>
+    // Dynamic event listener for remove-site button
+    $('#sites_table').on('click','.remove-site', function(event) {
+        event.preventDefault();
+        id = this.parentNode.parentNode.id
+        removeSiteFromTable(id)
+        $('#chk'+id).prop('checked',false)
+        $('#chk'+id).trigger('change')
+    });
+</script>
 
 {% endmacro %}
 

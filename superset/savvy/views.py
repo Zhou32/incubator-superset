@@ -652,10 +652,11 @@ class SavvyGroupModelView(ModelView):
     edit_widget = SavvyGroupAddWidget
     edit_template = 'superset/models/group/edit.html'
 
-    add_columns = ['group_name', 'sites', 'users', 'organization_id']
+    add_columns = ['group_name', 'sites', 'users']
     edit_columns = add_columns
-    list_columns = ['group_name', 'sites']
     label_columns = {'group_name': lazy_gettext('Group Name'), 'sites': lazy_gettext('Sites')}
+    list_columns = ['group_name', 'sites', 'users']
+
     order_columns = ['group_name']
 
     base_filters = [['id', FilterInFunction, get_groups_id_for_org]]
@@ -709,6 +710,9 @@ class SavvyGroupModelView(ModelView):
                     sites_list = form.sites.raw_data[0].split(',')
                     sites = self.appbuilder.sm.get_sites_list(sites_list)
                     item.sites = sites
+                    user = g.user
+                    print(self.appbuilder.sm.find_org(user_id=user.id).organization_name)
+                    item.organization_id = self.appbuilder.sm.find_org(user_id=user.id).id
                     self.pre_add(item)
                 except Exception as e:
                     print(e)
@@ -766,7 +770,7 @@ class SavvyGroupModelView(ModelView):
                         self.post_update(item)
                     flash(*self.datamodel.message)
                 finally:
-                    return None
+                    return None, None
             else:
                 is_valid_form = False
         else:

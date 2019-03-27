@@ -38,12 +38,12 @@ PERMISSION_COMMON = {
     'can_add', 'can_list', 'can_show', 'can_edit', 'can_invitation', 'can_invitation_post'
 }
 
-OWNER_NOT_ALLOWED_MENU = {
+OWNER_NOT_ALLOWED = {
     'List Roles', 'Base Permissions', 'Views/Menus',
     'Permission on Views/Menus', 'Action Log',
     'Manage', 'Druid Clusters', 'Druid Datasources',
     'Scan New Datasources', 'Refresh Druid Metadata',
-    'SQL Lab',
+    'SQL Lab', 'SavvySiteModelView', 'List Sites',
 }
 
 OWNER_PERMISSION_MODEL = {
@@ -56,7 +56,7 @@ OWNER_PERMISSION_MODEL = {
     'DashboardAddView',
     'SavvyRegisterInvitationUserDBView',
     'SavvyRegisterUserModelView',
-    'SavvyUserStatsChartView'
+    'SavvyUserStatsChartView',
 }
 
 OWNER_PERMISSION_MENU = {
@@ -75,6 +75,7 @@ SUPERUSER_INVITE_ROLES = {
 
 USER_NOT_ALLOWED = {
     'Druid Clusters', 'Druid Datasources', 'Scan New Datasources', 'SavvyRegisterInvitationUserDBView',
+    'SavvyGroupModelView', 'List Group',
 }
 
 NOT_ALLOWED_SQL_PERM = {
@@ -83,7 +84,7 @@ NOT_ALLOWED_SQL_PERM = {
 }
 
 VIEWER_NOT_ALLOWED = {
-    'Sources', 'SavvyRegisterInvitationUserDBView',
+    'Sources',
 }
 
 DB_ROLE_PREFIX = 'org_db_'
@@ -164,8 +165,8 @@ class CustomSecurityManager(SupersetSecurityManager):
             for view in OWNER_PERMISSION_MODEL:
                 result = result or (pvm.view_menu.name == view and
                                     pvm.permission.name == permission)
-        result = result or (pvm.view_menu.name not in OWNER_NOT_ALLOWED_MENU)
-        if pvm.view_menu.name in OWNER_NOT_ALLOWED_MENU or pvm.permission.name in NOT_ALLOWED_SQL_PERM:
+        result = result or (pvm.view_menu.name not in OWNER_NOT_ALLOWED)
+        if pvm.view_menu.name in OWNER_NOT_ALLOWED or pvm.permission.name in NOT_ALLOWED_SQL_PERM:
             return False
         if self.is_user_defined_permission(pvm) or pvm.permission.name == 'all_database_access'\
                 or pvm.permission.name == 'all_datasource_access':
