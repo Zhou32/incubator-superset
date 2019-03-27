@@ -25,7 +25,7 @@ class MeterDataView(BaseView):
         conn = connect(access_key=url_parsed['access_key'],
                        secret_key=db_obj.password,
                        s3_staging_dir=url_parsed['s3_staging_dir'],
-                       schema_name=url_parsed['schema_name'],
+                       schema_name=tb_obj.schema,
                        region_name=url_parsed['region_name'])
         try:
             select_fields = ""
@@ -58,7 +58,7 @@ class MeterDataView(BaseView):
 
         return render_template('superset/meterdata_list.html',
                                label_columns=label_colums,
-                               count=row_count,
+                               count=row_count[0],
                                appbuilder=appbuilder,
                                meter_data=meter_data,
                                page_size=page_size,

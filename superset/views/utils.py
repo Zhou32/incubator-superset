@@ -91,13 +91,12 @@ def parse_sqalchemy_uri(str):
 
         str_split3 = str_split2[1].split("?")
         region_schema_str = str_split3[0]
-        schema_name = region_schema_str.split("/")[1]
         region_str = region_schema_str.split("/")[0]
         region = region_str.replace("amazonaws.com", "").replace("athena", "").replace(".", "")
 
         s3_bucket_str = main_param_split[1]
         s3_staging_dir = s3_bucket_str.split("=")[1]
-        result = {'access_key': access_key, 'schema_name': schema_name, 'region_name': region, 's3_staging_dir': s3_staging_dir}
+        result = {'access_key': access_key, 'region_name': region, 's3_staging_dir': s3_staging_dir}
     else:
         raise ValueError("This table isn't from Athena DB")
 
