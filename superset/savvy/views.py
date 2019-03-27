@@ -652,10 +652,10 @@ class SavvyGroupModelView(ModelView):
     edit_widget = SavvyGroupAddWidget
     edit_template = 'superset/models/group/edit.html'
 
-    add_columns = ['group_name', 'sites', 'users']
+    add_columns = ['group_name', 'sites']
     edit_columns = add_columns
     label_columns = {'group_name': lazy_gettext('Group Name'), 'sites': lazy_gettext('Sites')}
-    list_columns = ['group_name', 'sites', 'users']
+    list_columns = ['group_name', 'sites']
 
     order_columns = ['group_name']
 
