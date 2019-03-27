@@ -7,7 +7,7 @@ from flask_babel import lazy_gettext
 from flask_mail import Mail, Message
 from sqlalchemy import create_engine
 
-from flask_appbuilder import const, ModelView
+from flask_appbuilder import const, ModelView, SimpleFormView
 from flask_appbuilder.validators import Unique
 from flask_appbuilder._compat import as_unicode
 from flask_appbuilder.views import expose, PublicFormView, ModelView
@@ -21,10 +21,11 @@ from flask_appbuilder.models.sqla.filters import FilterInFunction, FilterContain
 from .forms import (
     PasswordRecoverForm, SavvyGroupAddWidget, SavvySiteListWidget, SavvySiteSearchWidget,
     SavvyRegisterInvitationUserDBForm, SavvyRegisterUserDBForm, RegisterInvitationForm,
+    CSVToSitesForm
 
 )
 
-from .filters import get_user_id_list_form_org, get_roles_for_org
+from .filters import get_user_id_list_form_org, get_roles_for_org, get_groups_id_for_org
 from .utils import post_request
 
 log = logging.getLogger(__name__)
@@ -33,20 +34,35 @@ email_subject = 'SavvyBI - Email Confirmation'
 
 class SavvyUserDBModelView(UserDBModelView):
     base_filters = [['id', RoleFilter, lambda: []]]
-    edit_columns = ['first_name', 'last_name', 'active', 'email', 'roles']
-    edit_form_query_rel_fields = {'roles':[['name',FilterInFunction, get_roles_for_org]]}
+    edit_columns = ['first_name', 'last_name', 'active', 'email', 'roles', 'groups']
+    edit_form_query_rel_fields = {'roles': [['name', FilterInFunction, get_roles_for_org]],
+                                  'groups': [['id', FilterInFunction, get_groups_id_for_org]]}
+    show_fieldsets = [
+        (lazy_gettext('User info'),
+         {'fields': ['username', 'active', 'roles', 'login_count', 'groups']}),
+        (lazy_gettext('Personal Info'),
+         {'fields': ['first_name', 'last_name', 'email'], 'expanded': True}),
+        (lazy_gettext('Audit Info'),
+         {'fields': ['last_login', 'fail_login_count', 'created_on',
+                     'created_by', 'changed_on', 'changed_by'], 'expanded': False}),
+    ]
 
     def pre_delete(self, user):
         print(user)
         organization = self.appbuilder.sm.find_org(user_id=user.id)
         for role in user.roles:
-            if role.name == 'org_owner' and organization and len(organization.users) > 0 :
+            if role.name == 'org_owner' and organization and len(organization.users) > 0:
                 for user_ in organization.users:
                     if user_ != user:
                         self.delete(user_)
 
         if organization and len(organization.users) == 1:
+            self.delete_athena_key(organization.id)
             self.appbuilder.sm.delete_org(organization)
+
+    def delete_athena_key(self, org_id):
+        post_request('https://3ozse3mao8.execute-api.ap-southeast-2.amazonaws.com/test/deleteorg',
+                     {"org_id": org_id})
 
     @expose('/add', methods=['GET', 'POST'])
     @has_access
@@ -323,24 +339,29 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
         aws_info = json.loads(info.text)
         access_key = aws_info['AccessKeyId']
         secret_key = aws_info['SecretAccessKey']
-        time.sleep(5)
-        athena_link = f'awsathena+jdbc://{access_key}:{secret_key}@athena.us-west-2.amazonaws.com/market_report_prod_ore?s3_staging_dir=s3://druid.dts.input-bucket.oregon'
+        athena_link = f'awsathena+jdbc://{access_key}:{secret_key}@athena.ap-southeast-2.amazonaws.com/meter_loader_new_test_db?s3_staging_dir=s3://a.meter-test.dex/test_query_result'
+        print(athena_link)
         self.testconn(athena_link, org, user)
 
     def testconn(self, athena_link, org, user):
         """Tests a sqla connection"""
         from ..views.base import json_error_response
-        try:
-            # engine = create_engine(athena_link)
-            # engine.connect()
-            # table_list = engine.table_names()
-            # print(table_list)
-            self.appbuilder.sm.create_db_role(org.organization_name, athena_link, user)
-        except Exception as e:
-            logging.exception(e)
-            return json_error_response((
-                'Connection failed!\n\n'
-                'The error message returned was:\n{}').format(e))
+
+        times_trail = 3
+
+        for i in range(times_trail):
+            while True:
+                try:
+                    time.sleep(8)
+                    self.appbuilder.sm.create_db_role(org.organization_name, athena_link, user)
+                except Exception as e:
+                    if i == times_trail-1:
+                        logging.exception(e)
+                        return json_error_response((
+                                                       'Connection failed!\n\n'
+                                                       'The error message returned was:\n{}').format(e))
+                    continue
+                break
 
     def form_post(self, form):
         self.add_form_unique_validations(form)
@@ -497,7 +518,7 @@ class SavvyRegisterUserModelView(ModelView):
     base_permissions = ['can_list', 'can_show', 'can_delete']
     list_title = lazy_gettext('List of Registration Requests')
     show_title = lazy_gettext('Show Registration')
-    list_columns = ['registration_date','email','organization']
+    list_columns = ['registration_date', 'email', 'organization']
     show_exclude_columns = ['password']
     search_exclude_columns = ['password']
     base_filters = [['inviter', FilterInFunction, get_user_id_list_form_org]]
@@ -512,7 +533,7 @@ class SavvySiteModelView(ModelView):
 
     list_title = lazy_gettext('List Sites')
     show_title = lazy_gettext('Show Site')
-    add_title = lazy_gettext('Add Site')
+    add_title = lazy_gettext('Add Sites to Organisation')
     edit_title = lazy_gettext('Edit Site')
 
     search_widget = SavvySiteSearchWidget
@@ -521,7 +542,94 @@ class SavvySiteModelView(ModelView):
     list_columns = ['SiteName', 'AddressLine', 'State', 'city']
     list_widget = SavvySiteListWidget
     label_columns = {'SiteName': lazy_gettext('Site Name'), 'AddressLine': lazy_gettext('Address line')}
-    base_permissions = ['can_list']
+    base_permissions = ['can_list', 'can_add']
+
+    add_form = CSVToSitesForm
+    add_columns = ['org', 'csv_file']
+
+
+
+    @expose('/add', methods=['POST','GET'])
+    def add(self):
+        if request.method == 'GET':
+
+            return super(SavvySiteModelView, self).add()
+
+
+        from werkzeug.utils import secure_filename
+        import os
+        from superset import app, db
+        from superset.utils import core as utils
+        from superset.models.core import Database
+        from superset.db_engine_specs import BaseEngineSpec
+        from superset.connectors.sqla.models import SqlaTable
+        config = app.config
+        org = request.form.org.data
+
+        csv_file = self.add_form.csv_file.data
+
+        database = db.session.query(
+            Database).filter_by(
+            id=1).all()
+
+        self.add_form.csv_file.data.filename = secure_filename(self.add_form.csv_file.data.filename)
+        csv_filename = self.add_form.csv_file.data.filename
+        path = os.path.join(config['UPLOAD_FOLDER'], csv_filename)
+        try:
+            utils.ensure_path_exists(config['UPLOAD_FOLDER'])
+            csv_file.save(path)
+
+            table = SqlaTable(table_name='sites_data')
+            table.database = database
+            table.database_id = database.id
+
+            kwargs = {
+                'filepath_or_buffer': self.add_form.csv_file.data.filename,
+                'sep': self.add_form.sep.data,
+                'header': self.add_form.header.data if self.add_form.header.data else 0,
+                'index_col': self.add_form.index_col.data,
+                'mangle_dupe_cols': self.add_form.mangle_dupe_cols.data,
+                'skipinitialspace': self.add_form.skipinitialspace.data,
+                'skiprows': self.add_form.skiprows.data,
+                'nrows': self.add_form.nrows.data,
+                'skip_blank_lines': self.add_form.skip_blank_lines.data,
+                'parse_dates': self.add_form.parse_dates.data,
+                'infer_datetime_format': self.add_form.infer_datetime_format.data,
+                'chunksize': 10000,
+            }
+            df = BaseEngineSpec.csv_to_df(**kwargs)
+
+            df_to_db_kwargs = {
+                'table': table,
+                'df': df,
+                'name': table.name,
+                'con': create_engine(database.sqlalchemy_uri, echo=False),
+                'schema': self.add_form.schema.data,
+                'if_exists': 'append',
+            }
+
+            SiteIDList = df['SiteID']
+            print(SiteIDList)
+            df.to_sql(**df_to_db_kwargs)
+        except Exception as e:
+            try:
+                os.remove(path)
+            except OSError:
+                pass
+
+            return redirect('/csvtodatabaseview/form')
+
+        os.remove(path)
+        # Go back to welcome page / splash screen
+        # db_name = table.database.database_name
+        # message = _('CSV file "{0}" uploaded to table "{1}" in '
+        #             'database "{2}"'.format(csv_filename,
+        #                                     form.name.data,
+        #                                     db_name))
+        # flash(message, 'info')
+        # stats_logger.incr('successful_csv_upload')
+        print('csv done')
+        return redirect('/tablemodelview/list/')
 
     @expose('/ajax', methods=['GET'])
     def ajax(self):
@@ -548,7 +656,10 @@ class SavvyGroupModelView(ModelView):
     edit_columns = add_columns
     label_columns = {'group_name': lazy_gettext('Group Name'), 'sites': lazy_gettext('Sites')}
     list_columns = ['group_name', 'sites', 'users']
+
     order_columns = ['group_name']
+
+    base_filters = [['id', FilterInFunction, get_groups_id_for_org]]
 
     @expose('/add', methods=['GET', 'POST'])
     @has_access
@@ -674,3 +785,95 @@ class SavvyGroupModelView(ModelView):
         if is_valid_form:
             self.update_redirect()
         return widgets, sites_list
+
+# class CsvToSiteView(SimpleFormView):
+#     form = CSVToSitesForm
+#     form_template = 'superset/form_view/csv_to_database_view/edit.html'
+#     form_title = lazy_gettext('Upload Sites')
+#
+#     def form_get(self, form):
+#         pass
+#
+#     def form_post(self, form):
+#         from werkzeug.utils import secure_filename
+#         import os
+#         from superset import app, db
+#         from superset.utils import core as utils
+#         from superset.models.core import Database
+#         from superset.db_engine_specs import BaseEngineSpec
+#         from superset.connectors.sqla.models import SqlaTable
+#         config = app.config
+#         org = form.org.data
+#
+#         csv_file = form.csv_file.data
+#
+#         database = db.session.query(
+#             Database).filter_by(
+#             id=1).all()
+#
+#         form.csv_file.data.filename = secure_filename(form.csv_file.data.filename)
+#         csv_filename = form.csv_file.data.filename
+#         path = os.path.join(config['UPLOAD_FOLDER'], csv_filename)
+#         try:
+#             utils.ensure_path_exists(config['UPLOAD_FOLDER'])
+#             csv_file.save(path)
+#
+#             table = SqlaTable(table_name='sites_data')
+#             table.database = database
+#             table.database_id = database.id
+#
+#             kwargs = {
+#                 'filepath_or_buffer': form.csv_file.data.filename,
+#                 'sep': form.sep.data,
+#                 'header': form.header.data if form.header.data else 0,
+#                 'index_col': form.index_col.data,
+#                 'mangle_dupe_cols': form.mangle_dupe_cols.data,
+#                 'skipinitialspace': form.skipinitialspace.data,
+#                 'skiprows': form.skiprows.data,
+#                 'nrows': form.nrows.data,
+#                 'skip_blank_lines': form.skip_blank_lines.data,
+#                 'parse_dates': form.parse_dates.data,
+#                 'infer_datetime_format': form.infer_datetime_format.data,
+#                 'chunksize': 10000,
+#             }
+#             df = BaseEngineSpec.csv_to_df(**kwargs)
+#
+#             df_to_db_kwargs = {
+#                 'table': table,
+#                 'df': df,
+#                 'name': table.name,
+#                 'con': create_engine(database.sqlalchemy_uri, echo=False),
+#                 'schema': form.schema.data,
+#                 'if_exists': 'append',
+#             }
+#
+#             SiteIDList = df['SiteID']
+#             print(SiteIDList)
+#             df.to_sql(**df_to_db_kwargs)
+#
+#
+#
+#         except Exception as e:
+#             try:
+#                 os.remove(path)
+#             except OSError:
+#                 pass
+#             message = 'Table name {} already exists. Please pick another'.format(
+#                 form.name.data) if isinstance(e, IntegrityError) else e
+#             flash(
+#                 message,
+#                 'danger')
+#             stats_logger.incr('failed_csv_upload')
+#             return redirect('/csvtodatabaseview/form')
+#
+#         os.remove(path)
+#         # Go back to welcome page / splash screen
+#         db_name = table.database.database_name
+#         message = _('CSV file "{0}" uploaded to table "{1}" in '
+#                     'database "{2}"'.format(csv_filename,
+#                                             form.name.data,
+#                                             db_name))
+#         flash(message, 'info')
+#         stats_logger.incr('successful_csv_upload')
+#         return redirect('/tablemodelview/list/')
+#     #

@@ -1,6 +1,12 @@
 from flask_babel import lazy_gettext
 from wtforms import StringField, PasswordField, SelectField, HiddenField
-from wtforms.validators import DataRequired, EqualTo, Email, ValidationError
+from wtforms.validators import DataRequired, EqualTo, Email, ValidationError, NumberRange, Optional
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
+from flask_babel import lazy_gettext as _
+from flask_wtf.file import FileAllowed, FileField, FileRequired
+from wtforms import (
+    BooleanField, Field, IntegerField, SelectField, StringField)
+
 
 from flask_appbuilder.security.sqla.models import User
 from flask_appbuilder.security.forms import DynamicForm
@@ -90,5 +96,24 @@ class SavvySiteListWidget(FormWidget):
 class SavvySiteSearchWidget(SearchWidget):
     template = 'superset/models/site/search_widget.html'
 
+
+
+
+class CSVToSitesForm(DynamicForm):
+    def get_all_organisations():
+        from superset import db
+        orgs = db.session.query(Organization).all()
+        return orgs
+
+    org = QuerySelectField(
+        _('Organisation'),
+        query_factory=get_all_organisations,
+        get_pk=lambda a: a.id, get_label=lambda a: a.organization_name)
+
+    csv_file = FileField(
+        _('CSV File'),
+        description=_('Select a CSV file to be uploaded to a database.'),
+        validators=[
+            FileRequired(), FileAllowed(['csv'], _('CSV Files Only!'))])
 
 

@@ -2,9 +2,11 @@ from datetime import timedelta
 import datetime
 
 from flask_appbuilder import Model
+from flask_appbuilder.security.sqla.models import User
 from sqlalchemy import (
     Boolean, Column, DateTime, Integer, Float, String, UniqueConstraint, ForeignKey, Sequence, Table)
 from sqlalchemy.orm import relationship
+
 
 metadata = Model.metadata  # pylint: disable=no-member
 register_valid_hours = 24
@@ -17,13 +19,25 @@ assoc_org_user = Table(
     UniqueConstraint('user_id', 'org_id')
 )
 
+assoc_org_site = Table(
+    'org_sites', metadata,
+    Column('id', Integer, primary_key=True),
+    Column('org_id', Integer, ForeignKey('organizations.id')),
+    Column('site_id', Integer, ForeignKey('sites_data.SiteID')),
+    UniqueConstraint('org_id', 'site_id')
+)
+
 
 class Organization(Model):
     __tablename__ = 'organizations'
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, Sequence('organizations_id_seq'), primary_key=True)
     organization_name = Column(String(250))
-    users = relationship('User', secondary=assoc_org_user, backref='organization')
+    users = relationship('SavvyUser', secondary=assoc_org_user, backref='organization')
+    sites = relationship('Site', secondary=assoc_org_site, backref='sites')
     superuser_number = Column('superuser_number', Integer, default=0)
+
+    def __repr__(self):
+        return self.organization_name
 
 
 class OrgRegisterUser(Model):
@@ -79,6 +93,9 @@ class Group(Model):
     users = relationship('User',
                          secondary=assoc_group_user)
 
+    def __repr__(self):
+        return self.group_name
+
 
 class Site(Model):
     __tablename__ = 'sites_data'
@@ -96,6 +113,13 @@ class Site(Model):
 
     def __repr__(self):
         return self.SiteName
+
+
+class SavvyUser(User):
+    __tablename__ = 'ab_user'
+    groups = relationship('Group', secondary=assoc_group_user, backref='user')
+
+    __table_args__ = {'extend_existing': True}
 
 
 
