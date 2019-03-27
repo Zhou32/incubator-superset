@@ -111,6 +111,19 @@ class Site(Model):
     PostalCode = Column(Integer)
     Country = Column(String(64))
 
+    def __init__(self, kwargs):
+        self.SiteID = int(kwargs[0])
+        self.SiteName = kwargs[1]
+        self.ClientID = int(kwargs[2])
+        self.ClientName = kwargs[3]
+        self.latitude = kwargs[4]
+        self.longitude = kwargs[5]
+        self.AddressLine = kwargs[6]
+        self.city = kwargs[7]
+        self.State = kwargs[8]
+        self.PostalCode = int(kwargs[9])
+        self.Country = kwargs[10]
+
     def __repr__(self):
         return self.SiteName
 
