@@ -546,7 +546,9 @@ class SavvySiteModelView(ModelView):
 
     add_form = CSVToSitesForm
     add_columns = ['org', 'csv_file']
+
     base_filters = [['SiteID', FilterInFunction, get_site_id_list_from_org]]
+
 
     @expose('/add', methods=['POST','GET'])
     def add(self):
