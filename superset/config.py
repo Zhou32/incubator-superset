@@ -166,10 +166,8 @@ RECAPTCHA_PRIVATE_KEY = '6LfkdoEUAAAAAOEGECGPA0BwBhVoxDSCyJUifWGi'
 
 # Uncomment to setup OpenID providers example for OpenID authentication
 # OPENID_PROVIDERS = [
-#    { 'name': 'Yahoo', 'url': 'https://me.yahoo.com' },
-#    { 'name': 'AOL', 'url': 'http://openid.aol.com/<username>' },
-#    { 'name': 'Flickr', 'url': 'http://www.flickr.com/<username>' },
-#    { 'name': 'MyOpenID', 'url': 'https://www.myopenid.com' }]
+#    { 'name': 'Yahoo', 'url': 'https://open.login.yahoo.com/' },
+#    { 'name': 'Flickr', 'url': 'https://www.flickr.com/<username>' },
 
 # ---------------------------------------------------
 # Roles config
@@ -320,7 +318,7 @@ ADDITIONAL_MODULE_DS_MAP = {}
 ADDITIONAL_MIDDLEWARE = []
 
 """
-1) http://docs.python-guide.org/en/latest/writing/logging/
+1) https://docs.python-guide.org/writing/logging/
 2) https://docs.python.org/2/library/logging.config.html
 """
 
@@ -371,6 +369,9 @@ DEFAULT_SQLLAB_LIMIT = 1000
 
 # Maximum number of tables/views displayed in the dropdown window in SQL Lab.
 MAX_TABLE_NAMES = 3000
+
+# Adds a warning message on sqllab save query modal.
+SQLLAB_SAVE_WARNING_MESSAGE = None
 
 # If defined, shows this text in an alert-warning box in the navbar
 # one example use case may be "STAGING" to make it clear that this is
