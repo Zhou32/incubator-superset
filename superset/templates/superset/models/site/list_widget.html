@@ -87,7 +87,9 @@
                      for (var i = 1; i < checkboxes.length; i++) {
                          if (checkboxes[i].type == 'checkbox') {
                              checkboxes[i].checked = true;
+
                              var id = checkboxes[i].id;
+                             console.log(id)
                              $('#'+id).trigger('change')
                          }
                      }
@@ -112,7 +114,7 @@
                     addSiteToTable(list)
                 }
                 else {
-                    removeSiteFromTable(list)
+                    removeSiteFromTable(list[0])
                 }
              }
 
@@ -125,6 +127,19 @@
                     var rowCnt = site_list.rows.length;
                     var tr = site_list.insertRow(rowCnt);
                     tr.setAttribute('id',list[0])
+
+                    // create a cross button on table to un select site
+                    var td = document.createElement('td')
+                    var anchor = document.createElement('a')
+                    var span = document.createElement('span')
+                    span.setAttribute('class','close-icon')
+                    span.innerHTML='&times;'
+                    anchor.classList += 'remove-site'
+                    anchor.appendChild(span)
+                    td.appendChild(anchor)
+                    tr.appendChild(td)
+
+                    //create rest table cells
                     for (var i=1; i<list.length; i++){
                         var td = document.createElement('td');
                         td = tr.insertCell(i-1);
@@ -135,14 +150,14 @@
                 }
              }
 
-             function removeSiteFromTable(list) {
+             function removeSiteFromTable(id) {
                 var site_list = document.getElementById("sites_table");
-                var id = list[0]
                 if (document.getElementById(id) != null) {
                     var rowIndex = document.getElementById(id).rowIndex
                     site_list.deleteRow(rowIndex)
                 }
              }
+
 
         </script>
     {% endblock %}
