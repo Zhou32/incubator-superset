@@ -15,7 +15,7 @@ class MeterDataView(BaseView):
     @expose('/meterdata/<string:table_id>', methods=['GET', 'POST'])
     def method1(self, table_id):
         page = int(request.args.get('page_meter', 0))
-        page_size = int(request.args.get('page_size', 5))
+        page_size = int(request.args.get('page_size', 20))
 
         tb_obj = db.session.query(SqlaTable).get(int(table_id))
         db_obj = db.session.query(Database).get(tb_obj.database_id)
@@ -34,14 +34,12 @@ class MeterDataView(BaseView):
             select_fields = select_fields[:-1]
 
             with conn.cursor() as cursor:
-                # cursor.execute("""
-                #         SELECT count(*)
-                #         FROM {table_name}
-                #         LIMIT 20
-                #     """.format(table_name=tb_obj.table_name)
-                # )
-                # row_count = cursor.fetchone()
-                row_count = 20
+                cursor.execute("""
+                        SELECT count(*)
+                        FROM {table_name}
+                    """.format(table_name=tb_obj.table_name)
+                )
+                row_count = cursor.fetchone()
 
                 cursor.execute("""
                         SELECT {fields} 
