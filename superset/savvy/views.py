@@ -547,8 +547,6 @@ class SavvySiteModelView(ModelView):
     add_form = CSVToSitesForm
     add_columns = ['org', 'csv_file']
 
-
-
     @expose('/add', methods=['POST','GET'])
     def add(self):
         if request.method == 'GET':
