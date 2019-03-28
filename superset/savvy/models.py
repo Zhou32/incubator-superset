@@ -88,9 +88,7 @@ class Group(Model):
     id = Column(Integer, primary_key=True)
     group_name = Column(String(64), nullable=False)
     organization_id = Column(Integer, ForeignKey('organizations.id'))
-    sites = relationship('Site',
-                         secondary=assoc_group_site)
-
+    sites = relationship('Site', secondary=assoc_group_site, backref='groups')
 
     def __repr__(self):
         return self.group_name
@@ -129,7 +127,7 @@ class Site(Model):
 
 class SavvyUser(User):
     __tablename__ = 'ab_user'
-    groups = relationship('Group', secondary=assoc_group_user, backref='user')
+    groups = relationship('Group', secondary=assoc_group_user, backref='users')
 
     __table_args__ = {'extend_existing': True}
 
