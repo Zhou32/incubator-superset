@@ -511,9 +511,9 @@ class CustomSecurityManager(SupersetSecurityManager):
             self.get_session.commit()
 
             return db_role
-        except Exception as e:
+        except Exception:
             db_model.delete(db)
-            print('error is ',e)
+            raise Exception
 
     def search_site(self, siteID=None):
         if siteID:
