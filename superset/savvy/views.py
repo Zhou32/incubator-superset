@@ -8,6 +8,7 @@ from flask_mail import Mail, Message
 from sqlalchemy import create_engine
 
 from flask_appbuilder import const, ModelView, SimpleFormView
+
 from flask_appbuilder.validators import Unique
 from flask_appbuilder._compat import as_unicode
 from flask_appbuilder.views import expose, PublicFormView, ModelView
@@ -872,3 +873,4 @@ class SavvyGroupModelView(ModelView):
 #         stats_logger.incr('successful_csv_upload')
 #         return redirect('/tablemodelview/list/')
 #     #
+
