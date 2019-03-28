@@ -392,10 +392,34 @@ class CustomSecurityManager(SupersetSecurityManager):
             return None
 
     def delete_org(self, organization):
+        from superset.models.core import Database
+        from superset.connectors.sqla.models import SqlaTable
         try:
+            print('deleting org')
             self.get_session.delete(organization)
+            database = self.get_session.query(Database).filter_by(database_name=organization.organization_name).first()
+            if database:
+                print('db id ', database.database_name or None)
+                role = self.get_session.query(self.role_model).\
+                    filter_by(name=DB_ROLE_PREFIX+organization.organization_name).first()
+                print('role name ', role.name or None)
+                tables = self.get_session.query(SqlaTable).filter_by(database_id=database.id).all() or []
+                for table in tables:
+                    self.get_session.delete(table)
+                self.get_session.delete(database)
+                self.get_session.delete(role)
+            register = self.get_session.query(self.registeruser_model).filter_by(organization=organization.organization_name).all()
+            if register:
+                for item in register:
+                    self.get_session.delete(item)
+            groups = self.get_session.query(self.group_model).filter_by(organization_id=organization.id).all()
+            if groups:
+                for group in groups:
+                    self.get_session.delete(group)
             self.get_session.commit()
-        except Exception:
+            print('deleted')
+        except Exception as e:
+            print(e)
             self.get_session.rollback()
 
     def add_register_user_org_admin(self, **kwargs):
@@ -433,58 +457,63 @@ class CustomSecurityManager(SupersetSecurityManager):
         db.set_sqlalchemy_uri(db.sqlalchemy_uri)
         self.merge_perm('database_access', db.perm)
         permission_list.append(self.find_permission_view_menu('database_access', db.perm))
-        db_model.add(db)
-        # print('db finished')
-        for schema in db.all_schema_names():
-            if schema in database_uri:
-                schema_perm = self.get_schema_perm(db, schema)
-                self.merge_perm(
-                    'schema_access', schema_perm)
-                permission_list.append(self.find_permission_view_menu('schema_access', schema_perm))
-                # print('for schema ', schema)
+        try:
+            db_model.add(db)
+            print('db finished')
+            for schema in db.all_schema_names():
+                if schema in database_uri:
+                    schema_perm = self.get_schema_perm(db, schema)
+                    self.merge_perm(
+                        'schema_access', schema_perm)
+                    permission_list.append(self.find_permission_view_menu('schema_access', schema_perm))
+                    print('for schema ', schema)
 
-                for table_name in db.all_table_names_in_schema(schema=schema):
-                    table = table_model.obj()
-                    table.database = db
-                    table.table_name = table_name
-                    table.schema = schema
-                    with session.no_autoflush:
-                        table_query = session.query(SqlaTable).filter(
-                            SqlaTable.table_name == table.table_name,
-                            SqlaTable.schema == table.schema,
-                            SqlaTable.database_id == table.database.id)
-                        if session.query(table_query.exists()).scalar():
-                            logging.debug('Table already exists')
-                    # Fail before adding if the table can't be found
-                    try:
-                        # print('add table')
-                        # table.get_sqla_table_object()
-                        table_model.add(table)
-                        table.fetch_metadata()
-                        if table.get_perm():
-                            self.merge_perm('datasource_access', table.get_perm())
-                            permission_list.append(self.find_permission_view_menu('datasource_access', table.get_perm()))
-                        if table.schema:
-                            self.merge_perm('schema_access', table.schema_perm)
-                        # print('add table fin')
-                    except Exception as e:
-                        logging.exception(f'Got an error in pre_add for {table.name}')
-                break
+                    for table_name in db.all_table_names_in_schema(schema=schema):
+                        table = table_model.obj()
+                        table.database = db
+                        table.table_name = table_name
+                        table.schema = schema
+                        with session.no_autoflush:
+                            table_query = session.query(SqlaTable).filter(
+                                SqlaTable.table_name == table.table_name,
+                                SqlaTable.schema == table.schema,
+                                SqlaTable.database_id == table.database.id)
+                            if session.query(table_query.exists()).scalar():
+                                logging.debug('Table already exists')
+                        # Fail before adding if the table can't be found
+                            print('add table')
+                            # table.get_sqla_table_object()
+                            table_model.add(table)
+                            print('fetch metadata')
+                            table.fetch_metadata()
 
-        print(permission_list)
-        permission_list_not_none = [permission for permission in permission_list if permission is not None]
-        db_role = self.rolemodelview.datamodel.obj()
-        db_role.name = DB_ROLE_PREFIX + db.database_name
-        db_role.permissions = permission_list_not_none
+                            if table.get_perm():
+                                self.merge_perm('datasource_access', table.get_perm())
+                                permission_list.append(self.find_permission_view_menu('datasource_access', table.get_perm()))
+                            if table.schema:
+                                self.merge_perm('schema_access', table.schema_perm)
+                            print('add table fin')
+                            # logging.exception(f'Got an error in pre_add for {table.name}')
+                    break
 
-        self.rolemodelview.datamodel.add(db_role)
-        # print('add role')
 
-        owner.roles.append(db_role)
-        self.get_session.merge(owner)
-        self.get_session.commit()
+            print(permission_list)
+            permission_list_not_none = [permission for permission in permission_list if permission is not None]
+            db_role = self.rolemodelview.datamodel.obj()
+            db_role.name = DB_ROLE_PREFIX + db.database_name
+            db_role.permissions = permission_list_not_none
 
-        return db_role
+            self.rolemodelview.datamodel.add(db_role)
+            # print('add role')
+
+            owner.roles.append(db_role)
+            self.get_session.merge(owner)
+            self.get_session.commit()
+
+            return db_role
+        except Exception as e:
+            db_model.delete(db)
+            print('error is ',e)
 
     def search_site(self, siteID=None):
         if siteID:
@@ -500,7 +529,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         page = urltools.get_page_args().get(self.site_view.__class__.__name__)
         page_size = urltools.get_page_size_args().get(self.site_view.__class__.__name__)
         urltools.get_filter_args(self.site_view._filters)
-        widgets = self.site_view._get_list_widget(filters=self.site_view._filters,
+        widgets = self.site_view.get_select_widget(filters=self.site_view._filters,
                                         order_column=order_column,
                                         order_direction=order_direction,
                                         page=page,

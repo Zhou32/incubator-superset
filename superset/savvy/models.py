@@ -33,7 +33,7 @@ class Organization(Model):
     id = Column(Integer, Sequence('organizations_id_seq'), primary_key=True)
     organization_name = Column(String(250))
     users = relationship('SavvyUser', secondary=assoc_org_user, backref='organization')
-    sites = relationship('Site', secondary=assoc_org_site, backref='sites')
+    sites = relationship('Site', secondary=assoc_org_site, backref='organization')
     superuser_number = Column('superuser_number', Integer, default=0)
 
     def __repr__(self):
