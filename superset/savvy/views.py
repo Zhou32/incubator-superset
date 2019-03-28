@@ -48,7 +48,6 @@ class SavvyUserDBModelView(UserDBModelView):
     ]
 
     def pre_delete(self, user):
-        print(user)
         organization = self.appbuilder.sm.find_org(user_id=user.id)
         for role in user.roles:
             if role.name == 'org_owner' and organization and len(organization.users) > 0:
@@ -57,6 +56,7 @@ class SavvyUserDBModelView(UserDBModelView):
                         self.delete(user_)
 
         if organization and len(organization.users) == 1:
+            print('last one')
             self.delete_athena_key(organization.id)
             self.appbuilder.sm.delete_org(organization)
 
@@ -350,18 +350,19 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
         times_trail = 3
 
         for i in range(times_trail):
-            while True:
-                try:
-                    time.sleep(8)
-                    self.appbuilder.sm.create_db_role(org.organization_name, athena_link, user)
-                except Exception as e:
-                    if i == times_trail-1:
-                        logging.exception(e)
-                        return json_error_response((
-                                                       'Connection failed!\n\n'
-                                                       'The error message returned was:\n{}').format(e))
-                    continue
+            try:
+                print('try time ' + str(i))
+                time.sleep(5)
+                self.appbuilder.sm.create_db_role(org.organization_name, athena_link, user)
                 break
+            except Exception as e:
+                if i == times_trail-1:
+                    logging.exception(e)
+                    return json_error_response((
+                                                   'Connection failed!\n\n'
+                                                   'The error message returned was:\n{}').format(e))
+
+
 
     def form_post(self, form):
         self.add_form_unique_validations(form)
@@ -539,8 +540,8 @@ class SavvySiteModelView(ModelView):
     search_widget = SavvySiteSearchWidget
     page_size = 500
 
-    list_columns = ['SiteID','SiteName', 'AddressLine', 'State', 'city']
-    list_widget = SavvySiteListWidget
+    list_columns = ['SiteName', 'AddressLine', 'State', 'city']
+    list_widget_2 = SavvySiteListWidget
     label_columns = {'SiteName': lazy_gettext('Site Name'), 'AddressLine': lazy_gettext('Address line')}
     base_permissions = ['can_list', 'can_add']
 
@@ -548,6 +549,42 @@ class SavvySiteModelView(ModelView):
     add_columns = ['org', 'csv_file']
 
     base_filters = [['SiteID', FilterInFunction, get_site_id_list_from_org]]
+    def get_select_widget(self, filters,
+                         actions=None,
+                         order_column='',
+                         order_direction='',
+                         page=None,
+                         page_size=None,
+                         widgets=None,
+                         **args):
+
+        """ get joined base filter and current active filter for query """
+        widgets = widgets or {}
+        actions = actions or self.actions
+        page_size = page_size or self.page_size
+        if not order_column and self.base_order:
+            order_column, order_direction = self.base_order
+        joined_filters = filters.get_joined_filters(self._base_filters)
+        count, lst = self.datamodel.query(joined_filters, order_column, order_direction, page=page, page_size=page_size)
+        pks = self.datamodel.get_keys(lst)
+
+        # serialize composite pks
+        pks = [self._serialize_pk_if_composite(pk) for pk in pks]
+
+        widgets['list'] = self.list_widget_2(label_columns=self.label_columns,
+                                             include_columns=self.list_columns,
+                                             value_columns=self.datamodel.get_values(lst, self.list_columns),
+                                             order_columns=self.order_columns,
+                                             formatters_columns=self.formatters_columns,
+                                             page=page,
+                                             page_size=page_size,
+                                             count=count,
+                                             pks=pks,
+                                             actions=actions,
+                                             filters=filters,
+                                             modelview_name=self.__class__.__name__)
+        return widgets
+
 
 
     @expose('/add', methods=['POST','GET'])
