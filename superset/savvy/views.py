@@ -8,6 +8,7 @@ from flask_mail import Mail, Message
 from sqlalchemy import create_engine
 
 from flask_appbuilder import const, ModelView, SimpleFormView
+
 from flask_appbuilder.validators import Unique
 from flask_appbuilder._compat import as_unicode
 from flask_appbuilder.views import expose, PublicFormView, ModelView
@@ -549,6 +550,7 @@ class SavvySiteModelView(ModelView):
     add_columns = ['org', 'csv_file']
 
     base_filters = [['SiteID', FilterInFunction, get_site_id_list_from_org]]
+
     def get_select_widget(self, filters,
                          actions=None,
                          order_column='',
@@ -557,6 +559,7 @@ class SavvySiteModelView(ModelView):
                          page_size=None,
                          widgets=None,
                          **args):
+
 
         """ get joined base filter and current active filter for query """
         widgets = widgets or {}
@@ -909,3 +912,4 @@ class SavvyGroupModelView(ModelView):
 #         stats_logger.incr('successful_csv_upload')
 #         return redirect('/tablemodelview/list/')
 #     #
+

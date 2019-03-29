@@ -11,7 +11,7 @@ from wtforms import (
 from flask_appbuilder.security.sqla.models import User
 from flask_appbuilder.security.forms import DynamicForm
 from flask_appbuilder.fieldwidgets import BS3TextFieldWidget, BS3PasswordFieldWidget
-from flask_appbuilder.widgets import FormWidget, SearchWidget
+from flask_appbuilder.widgets import FormWidget, SearchWidget, ListWidget
 
 from .models import Organization, OrgRegisterUser
 
@@ -26,7 +26,7 @@ class RegisterInvitationForm(DynamicForm):
     role = StringField(lazy_gettext('Role'), widget=BS3TextFieldWidget(), render_kw={'readonly': True})
     first_name = StringField(lazy_gettext('First Name'), validators=[DataRequired()], widget=BS3TextFieldWidget())
     last_name = StringField(lazy_gettext('Last Name'), validators=[DataRequired()], widget=BS3TextFieldWidget())
-    email = StringField(lazy_gettext('Email'), validators=[DataRequired(), Email()], widget=BS3TextFieldWidget())
+    email = StringField(lazy_gettext('Email'), widget=BS3TextFieldWidget(), render_kw={'readonly': True})
     password = PasswordField(lazy_gettext('Password'),
                              description=lazy_gettext(
                                  'Please use a good password policy, this application does not check this for you'),
@@ -89,7 +89,7 @@ class SavvyGroupAddWidget(FormWidget):
     template = 'superset/models/group/add_widget.html'
 
 
-class SavvySiteListWidget(FormWidget):
+class SavvySiteListWidget(ListWidget):
     template = 'superset/models/site/list_widget.html'
 
 
