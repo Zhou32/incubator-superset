@@ -11,7 +11,7 @@ from wtforms import (
 from flask_appbuilder.security.sqla.models import User
 from flask_appbuilder.security.forms import DynamicForm
 from flask_appbuilder.fieldwidgets import BS3TextFieldWidget, BS3PasswordFieldWidget
-from flask_appbuilder.widgets import FormWidget, SearchWidget
+from flask_appbuilder.widgets import FormWidget, SearchWidget, ListWidget
 
 from .models import Organization, OrgRegisterUser
 
@@ -89,7 +89,7 @@ class SavvyGroupAddWidget(FormWidget):
     template = 'superset/models/group/add_widget.html'
 
 
-class SavvySiteListWidget(FormWidget):
+class SavvySiteListWidget(ListWidget):
     template = 'superset/models/site/list_widget.html'
 
 

@@ -25,14 +25,6 @@
 {% set can_delete = "can_delete" | is_item_visible(modelview_name) %}
 {% set actions = actions | get_actions_on_list(modelview_name) %}
 
-{% if can_add %}
-    <span class="list-add-action">
-    {% set path = url_for(modelview_name + '.add') %}
-    {% set path = path | set_link_filters(filters) %}
-    &nbsp;{{ lib.lnk_add(path) }}
-    </span>
-{% endif %}
-
 {% if count > 0 %}
 
     {% block begin_content scoped %}

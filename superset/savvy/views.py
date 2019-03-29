@@ -548,6 +548,7 @@ class SavvySiteModelView(ModelView):
 
     add_form = CSVToSitesForm
     add_columns = ['org', 'csv_file']
+    base_filters = [['SiteID', FilterInFunction, get_site_id_list_from_org]]
 
     def get_select_widget(self, filters,
                          actions=None,
@@ -557,7 +558,7 @@ class SavvySiteModelView(ModelView):
                          page_size=None,
                          widgets=None,
                          **args):
-    base_filters = [['SiteID', FilterInFunction, get_site_id_list_from_org]]
+
 
         """ get joined base filter and current active filter for query """
         widgets = widgets or {}
