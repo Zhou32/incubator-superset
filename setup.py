@@ -76,7 +76,7 @@ setup(
         'click>=6.0, <7.0.0',  # `click`>=7 forces "-" instead of "_"
         'colorama',
         'contextlib2',
-        'croniter>=0.3.26',
+        'croniter>=0.3.28',
         'cryptography>=2.4.2',
         'flask>=1.0.0, <2.0.0',
         'flask-appbuilder>=1.12.5, <2.0.0',
@@ -117,12 +117,10 @@ setup(
         'cors': ['flask-cors>=2.0.0'],
         'console_log': ['console_log==0.2.10'],
         'hive': [
-            'pyhive>=0.6.1',
+            'pyhive[hive]>=0.6.1',
             'tableschema',
-            'thrift-sasl>=0.2.1',
-            'thrift>=0.9.3',
         ],
-        'presto': ['pyhive>=0.4.0'],
+        'presto': ['pyhive[presto]>=0.4.0'],
         'gsheets': ['gsheetsdb>=0.1.9'],
     },
     author='Apache Software Foundation',
