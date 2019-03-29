@@ -8,6 +8,7 @@ from flask_mail import Mail, Message
 from sqlalchemy import create_engine
 
 from flask_appbuilder import const, ModelView, SimpleFormView
+
 from flask_appbuilder.validators import Unique
 from flask_appbuilder._compat import as_unicode
 from flask_appbuilder.views import expose, PublicFormView, ModelView
@@ -24,8 +25,8 @@ from .forms import (
     CSVToSitesForm
 
 )
-
-from .filters import get_user_id_list_form_org, get_roles_for_org, get_groups_id_for_org
+from .models import Site
+from .filters import get_user_id_list_form_org, get_roles_for_org, get_groups_id_for_org, get_site_id_list_from_org
 from .utils import post_request
 
 log = logging.getLogger(__name__)
@@ -540,7 +541,6 @@ class SavvySiteModelView(ModelView):
     search_widget = SavvySiteSearchWidget
     page_size = 500
 
-
     list_columns = ['SiteName', 'AddressLine', 'State', 'city']
     list_widget_2 = SavvySiteListWidget
     label_columns = {'SiteName': lazy_gettext('Site Name'), 'AddressLine': lazy_gettext('Address line')}
@@ -557,6 +557,7 @@ class SavvySiteModelView(ModelView):
                          page_size=None,
                          widgets=None,
                          **args):
+    base_filters = [['SiteID', FilterInFunction, get_site_id_list_from_org]]
 
         """ get joined base filter and current active filter for query """
         widgets = widgets or {}
@@ -593,7 +594,6 @@ class SavvySiteModelView(ModelView):
 
             return super(SavvySiteModelView, self).add()
 
-
         from werkzeug.utils import secure_filename
         import os
         from superset import app, db
@@ -602,62 +602,57 @@ class SavvySiteModelView(ModelView):
         from superset.db_engine_specs import BaseEngineSpec
         from superset.connectors.sqla.models import SqlaTable
         config = app.config
-        org = request.form.org.data
+        form = self.add_form.refresh()
+        org = form.org.data
 
-        csv_file = self.add_form.csv_file.data
+        csv_file = form.csv_file.data
 
         database = db.session.query(
             Database).filter_by(
             id=1).all()
 
-        self.add_form.csv_file.data.filename = secure_filename(self.add_form.csv_file.data.filename)
-        csv_filename = self.add_form.csv_file.data.filename
+        form.csv_file.data.filename = secure_filename(form.csv_file.data.filename)
+        csv_filename = form.csv_file.data.filename
         path = os.path.join(config['UPLOAD_FOLDER'], csv_filename)
         try:
             utils.ensure_path_exists(config['UPLOAD_FOLDER'])
             csv_file.save(path)
 
             table = SqlaTable(table_name='sites_data')
-            table.database = database
-            table.database_id = database.id
+            table.database = database[0]
+            table.database_id = database[0].id
 
             kwargs = {
-                'filepath_or_buffer': self.add_form.csv_file.data.filename,
-                'sep': self.add_form.sep.data,
-                'header': self.add_form.header.data if self.add_form.header.data else 0,
-                'index_col': self.add_form.index_col.data,
-                'mangle_dupe_cols': self.add_form.mangle_dupe_cols.data,
-                'skipinitialspace': self.add_form.skipinitialspace.data,
-                'skiprows': self.add_form.skiprows.data,
-                'nrows': self.add_form.nrows.data,
-                'skip_blank_lines': self.add_form.skip_blank_lines.data,
-                'parse_dates': self.add_form.parse_dates.data,
-                'infer_datetime_format': self.add_form.infer_datetime_format.data,
+                'filepath_or_buffer': form.csv_file.data.filename,
+                'header': 0,
+                'mangle_dupe_cols': True,
+                'skipinitialspace': False,
+                'skip_blank_lines': True,
+                'parse_dates': False,
+                'infer_datetime_format': False,
                 'chunksize': 10000,
             }
             df = BaseEngineSpec.csv_to_df(**kwargs)
+            existing_site_ids = []
+            for s in org.sites:
+                existing_site_ids.append(s.SiteID)
 
-            df_to_db_kwargs = {
-                'table': table,
-                'df': df,
-                'name': table.name,
-                'con': create_engine(database.sqlalchemy_uri, echo=False),
-                'schema': self.add_form.schema.data,
-                'if_exists': 'append',
-            }
+            for i in range(df.shape[0]):
+                site = Site(df.iloc[i].values.tolist())
+                if site.SiteID in existing_site_ids:
+                    continue
+                org.sites.append(site)
+            db.session.merge(org)
+            db.session.commit()
 
-            SiteIDList = df['SiteID']
-            print(SiteIDList)
-            df.to_sql(**df_to_db_kwargs)
         except Exception as e:
+            print(e)
             try:
                 os.remove(path)
             except OSError:
                 pass
+            return redirect('/sites/list')
 
-            return redirect('/csvtodatabaseview/form')
-
-        os.remove(path)
         # Go back to welcome page / splash screen
         # db_name = table.database.database_name
         # message = _('CSV file "{0}" uploaded to table "{1}" in '
@@ -667,7 +662,7 @@ class SavvySiteModelView(ModelView):
         # flash(message, 'info')
         # stats_logger.incr('successful_csv_upload')
         print('csv done')
-        return redirect('/tablemodelview/list/')
+        return redirect('/sites/list/')
 
     @expose('/ajax', methods=['GET'])
     def ajax(self):
@@ -915,3 +910,4 @@ class SavvyGroupModelView(ModelView):
 #         stats_logger.incr('successful_csv_upload')
 #         return redirect('/tablemodelview/list/')
 #     #
+
