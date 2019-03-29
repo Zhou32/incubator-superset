@@ -38,8 +38,7 @@ class MeterDataView(BaseView):
 
             with conn.cursor() as cursor:
 
-                # if 'Admin' in roles or 'org_owner' in roles or 'org_superuser' in roles:
-                if 'Admin' in roles:
+                if 'Admin' in roles or 'org_owner' in roles or 'org_superuser' in roles:
                     cursor.execute("""
                             SELECT count(*)
                             FROM {table_name}
@@ -49,7 +48,7 @@ class MeterDataView(BaseView):
                     sites_filter_clause = ""
                 else:
                     sites = db.session.query(Site).filter(
-                        Site.groups.any(Group.users.any(SavvyUser.id == g.user.id))).all()
+                        Site.groups.any(Group.user.any(SavvyUser.id == g.user.id))).all()
                     SITE_IDS = [row.SiteID for row in sites]
 
                     sites_filter_clause = "WHERE"

@@ -127,7 +127,7 @@ class Site(Model):
 
 class SavvyUser(User):
     __tablename__ = 'ab_user'
-    groups = relationship('Group', secondary=assoc_group_user, backref='users')
+    groups = relationship('Group', secondary=assoc_group_user, backref='user')
 
     __table_args__ = {'extend_existing': True}
 
