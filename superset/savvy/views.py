@@ -362,7 +362,7 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
                     return json_error_response((
                                                    'Connection failed!\n\n'
                                                    'The error message returned was:\n{}').format(e))
-                continue
+
 
 
     def form_post(self, form):
@@ -548,6 +548,7 @@ class SavvySiteModelView(ModelView):
 
     add_form = CSVToSitesForm
     add_columns = ['org', 'csv_file']
+
     base_filters = [['SiteID', FilterInFunction, get_site_id_list_from_org]]
 
     def get_select_widget(self, filters,
