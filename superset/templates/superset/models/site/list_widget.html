@@ -18,14 +18,14 @@
             {% if item in order_columns %}
                 {% set res = item | get_link_order_ajax(modelview_name) %}
                     {% if res == 2 %}
-                    <th><a class="page" href={{ item | link_order_ajax(modelview_name) }}>{{label_columns.get(item)}}</a>
-                    <i class="fa fa-chevron-up pull-right"></i></th>
+                    <th><a class="page" href={{ item | link_order_ajax(modelview_name) }}>{{label_columns.get(item)}}
+                    <i class="fa fa-chevron-up pull-right"></i></a></th>
                 {% elif res == 1 %}
-                    <th><a class="page" href={{ item | link_order_ajax(modelview_name) }}>{{label_columns.get(item)}}</a>
-                    <i class="fa fa-chevron-down pull-right"></i></th>
+                    <th><a class="page" href={{ item | link_order_ajax(modelview_name) }}>{{label_columns.get(item)}}
+                    <i class="fa fa-chevron-down pull-right"></i></a></th>
                 {% else %}
-                    <th><a class="page" href={{ item | link_order_ajax(modelview_name) }}>{{label_columns.get(item)}}</a>
-                    <i class="fa fa-arrows-v pull-right"></i></th>
+                    <th><a class="page" href={{ item | link_order_ajax(modelview_name) }}>{{label_columns.get(item)}}
+                    <i class="fa fa-arrows-v pull-right"></i></a></th>
                 {% endif %}
             {% else %}
                 <th>{{label_columns.get(item)}}</th>
