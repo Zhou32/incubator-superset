@@ -88,9 +88,7 @@ class Group(Model):
     id = Column(Integer, primary_key=True)
     group_name = Column(String(64), nullable=False)
     organization_id = Column(Integer, ForeignKey('organizations.id'))
-    sites = relationship('Site',
-                         secondary=assoc_group_site)
-
+    sites = relationship('Site', secondary=assoc_group_site, backref='groups')
 
     def __repr__(self):
         return self.group_name
