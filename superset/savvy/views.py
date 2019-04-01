@@ -339,7 +339,7 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
         aws_info = json.loads(info.text)
         access_key = aws_info['AccessKeyId']
         secret_key = aws_info['SecretAccessKey']
-        athena_link = f'awsathena+jdbc://{access_key}:{secret_key}@athena.ap-southeast-2.amazonaws.com/meter_loader_new_test_db?s3_staging_dir=s3://a.meter-test.dex/test_query_result'
+        athena_link = f'awsathena+jdbc://{access_key}:{secret_key}@athena.ap-southeast-2.amazonaws.com/awesome_demo?s3_staging_dir=s3://a.meter-test.dex/test_query_result'
         print(athena_link)
         self.testconn(athena_link, org, user)
 
@@ -649,11 +649,6 @@ class SavvySiteModelView(ModelView):
 
         except Exception as e:
             print(e)
-            try:
-                os.remove(path)
-            except OSError:
-                pass
-            return redirect('/sites/list')
 
         # Go back to welcome page / splash screen
         # db_name = table.database.database_name
@@ -663,7 +658,11 @@ class SavvySiteModelView(ModelView):
         #                                     db_name))
         # flash(message, 'info')
         # stats_logger.incr('successful_csv_upload')
-        return redirect('/sites/list/')
+        try:
+            os.remove(path)
+        except OSError:
+            pass
+        return redirect('/sites/list')
 
     @expose('/ajax', methods=['GET'])
     def ajax(self):

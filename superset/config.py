@@ -216,10 +216,12 @@ IMG_UPLOAD_URL = '/static/uploads/'
 # IMG_SIZE = (300, 200, True)
 
 CACHE_DEFAULT_TIMEOUT = 60 * 60 * 24
-CACHE_CONFIG = {'CACHE_TYPE': 'redis',
-                'CACHE_DEFAULT_TIMEOUT': CACHE_DEFAULT_TIMEOUT,
-                'CACHE_KEY_PREFIX': 'superset_results',
-                'CACHE_REDIS_URL': 'redis://redis:6379/0'}
+# CACHE_CONFIG = {'CACHE_TYPE': 'redis',
+#                 'CACHE_DEFAULT_TIMEOUT': CACHE_DEFAULT_TIMEOUT,
+#                 'CACHE_KEY_PREFIX': 'superset_results',
+#                 'CACHE_REDIS_URL': 'redis://redis:6379/0'}
+CACHE_CONFIG = {'CACHE_TYPE': 'null'}
+
 TABLE_NAMES_CACHE_CONFIG = {'CACHE_TYPE': 'null'}
 
 # CORS Options
@@ -387,9 +389,9 @@ CELERY_CONFIG = CeleryConfig
 
 """
 # Set celery config to None to disable all the above configuration
-CELERY_CONFIG = None
-"""
 
+"""
+CELERY_CONFIG = None
 # static http headers to be served by your Superset server.
 # This header prevents iFrames from other domains and
 # "clickjacking" as a result
