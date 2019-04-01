@@ -18,7 +18,7 @@ from flask_appbuilder.security.views import UserDBModelView, UserStatsChartView
 from flask_appbuilder.security.registerviews import RegisterUserDBView, BaseRegisterUser
 from flask_appbuilder.urltools import *
 from .filters import RoleFilter
-from flask_appbuilder.models.sqla.filters import FilterInFunction, FilterContains
+from flask_appbuilder.models.sqla.filters import FilterInFunction, FilterNotEndsWith
 from .forms import (
     PasswordRecoverForm, SavvyGroupAddWidget, SavvySiteListWidget, SavvySiteSearchWidget,
     SavvyRegisterInvitationUserDBForm, SavvyRegisterUserDBForm, RegisterInvitationForm,
@@ -37,7 +37,8 @@ class SavvyUserDBModelView(UserDBModelView):
     base_filters = [['id', RoleFilter, lambda: []]]
     edit_columns = ['first_name', 'last_name', 'active', 'email', 'roles', 'groups']
     edit_form_query_rel_fields = {'roles': [['name', FilterInFunction, get_roles_for_org]],
-                                  'groups': [['id', FilterInFunction, get_groups_id_for_org]]}
+                                  'groups': [['id', FilterInFunction, get_groups_id_for_org],
+                                             ['group_name', FilterNotEndsWith, '_default_group']]}
     show_fieldsets = [
         (lazy_gettext('User info'),
          {'fields': ['username', 'active', 'roles', 'login_count', 'groups']}),
@@ -57,7 +58,6 @@ class SavvyUserDBModelView(UserDBModelView):
                         self.delete(user_)
 
         if organization and len(organization.users) == 1:
-            print('last one')
             self.delete_athena_key(organization.id)
             self.appbuilder.sm.delete_org(organization)
 
@@ -173,7 +173,6 @@ class PasswordRecoverView(PublicFormView):
         msg = Message()
         msg.subject = self.email_subject
         url = url_for('.reset', _external=True, reset_hash=hash_val)
-        print(url)
         msg.html = self.render_template(self.email_template,
                                         url=url)
         msg.recipients = [email]
@@ -352,7 +351,6 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
 
         for i in range(times_trail):
             try:
-                print('try time ' + str(i))
                 time.sleep(5)
                 self.appbuilder.sm.create_db_role(org.organization_name, athena_link, user)
                 break
@@ -425,7 +423,6 @@ class SavvyRegisterInviteView(BaseRegisterUser):
         msg = Message()
         msg.subject = self.email_subject
         url = url_for('.activate', _external=True, invitation_hash=register_user.registration_hash)
-        print(url)
         msg.html = self.render_template(self.email_template,
                                         url=url)
         msg.recipients = [register_user.email]
@@ -639,12 +636,15 @@ class SavvySiteModelView(ModelView):
             for s in org.sites:
                 existing_site_ids.append(s.SiteID)
 
+            default_group = self.appbuilder.sm.search_group(org.id, group_name=org.organization_name+'_default_group')
             for i in range(df.shape[0]):
                 site = Site(df.iloc[i].values.tolist())
                 if site.SiteID in existing_site_ids:
                     continue
                 org.sites.append(site)
+                default_group.sites.append(site)
             db.session.merge(org)
+            db.session.merge(default_group)
             db.session.commit()
 
         except Exception as e:
@@ -663,7 +663,6 @@ class SavvySiteModelView(ModelView):
         #                                     db_name))
         # flash(message, 'info')
         # stats_logger.incr('successful_csv_upload')
-        print('csv done')
         return redirect('/sites/list/')
 
     @expose('/ajax', methods=['GET'])
@@ -694,7 +693,7 @@ class SavvyGroupModelView(ModelView):
 
     order_columns = ['group_name']
 
-    base_filters = [['id', FilterInFunction, get_groups_id_for_org]]
+    base_filters = [['id', FilterInFunction, get_groups_id_for_org], ['group_name', FilterNotEndsWith, '_default_group']]
 
     @expose('/add', methods=['GET', 'POST'])
     @has_access
@@ -746,7 +745,6 @@ class SavvyGroupModelView(ModelView):
                     sites = self.appbuilder.sm.get_sites_list(sites_list)
                     item.sites = sites
                     user = g.user
-                    print(self.appbuilder.sm.find_org(user_id=user.id).organization_name)
                     item.organization_id = self.appbuilder.sm.find_org(user_id=user.id).id
                     self.pre_add(item)
                 except Exception as e:

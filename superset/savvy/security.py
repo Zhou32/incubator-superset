@@ -218,7 +218,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         reset_request = self.get_session.query(self.resetRequest_model)\
             .filter_by(email=email, used=False).first()
         if reset_request is not None:
-            print(reset_request.id)
+            # print(reset_request.id)
             self.set_token_used(reset_request.reset_hash)
         reset_request = self.resetRequest_model()
         reset_request.email = email
@@ -286,6 +286,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         # email and organization parameters should be always available.
         invited_user.email = email
         invited_user.organization = organization.organization_name
+        invited_user.username = email
 
         if first_name:
             invited_user.first_name = first_name
@@ -394,6 +395,13 @@ class CustomSecurityManager(SupersetSecurityManager):
         try:
             self.get_session.add(new_org)
             self.get_session.commit()
+            new_group = self.group_model()
+            new_group.group_name = new_org.organization_name + '_default_group'
+            new_group.organization_id = new_org.id
+            user.groups.append(new_group)
+            self.get_session.add(new_group)
+            self.get_session.merge(user)
+            self.get_session.commit()
             return new_org
         except Exception as e:
             logging.error(const.LOGMSG_ERR_SEC_ADD_REGISTER_USER.format(str(e)))
@@ -404,14 +412,11 @@ class CustomSecurityManager(SupersetSecurityManager):
         from superset.models.core import Database
         from superset.connectors.sqla.models import SqlaTable
         try:
-            print('deleting org')
             self.get_session.delete(organization)
             database = self.get_session.query(Database).filter_by(database_name=organization.organization_name).first()
             if database:
-                print('db id ', database.database_name or None)
                 role = self.get_session.query(self.role_model).\
                     filter_by(name=DB_ROLE_PREFIX+organization.organization_name).first()
-                print('role name ', role.name or None)
                 tables = self.get_session.query(SqlaTable).filter_by(database_id=database.id).all() or []
                 for table in tables:
                     self.get_session.delete(table)
@@ -426,7 +431,6 @@ class CustomSecurityManager(SupersetSecurityManager):
                 for group in groups:
                     self.get_session.delete(group)
             self.get_session.commit()
-            print('deleted')
         except Exception as e:
             print(e)
             self.get_session.rollback()
@@ -468,14 +472,14 @@ class CustomSecurityManager(SupersetSecurityManager):
         permission_list.append(self.find_permission_view_menu('database_access', db.perm))
         try:
             db_model.add(db)
-            print('db finished')
+            # print('db finished')
             for schema in db.all_schema_names():
                 if schema in database_uri:
                     schema_perm = self.get_schema_perm(db, schema)
                     self.merge_perm(
                         'schema_access', schema_perm)
                     permission_list.append(self.find_permission_view_menu('schema_access', schema_perm))
-                    print('for schema ', schema)
+                    # print('for schema ', schema)
 
                     for table_name in db.all_table_names_in_schema(schema=schema):
                         table = table_model.obj()
@@ -490,10 +494,10 @@ class CustomSecurityManager(SupersetSecurityManager):
                             if session.query(table_query.exists()).scalar():
                                 logging.debug('Table already exists')
                         # Fail before adding if the table can't be found
-                            print('add table')
+                        #     print('add table')
                             # table.get_sqla_table_object()
                             table_model.add(table)
-                            print('fetch metadata')
+                            # print('fetch metadata')
                             table.fetch_metadata()
 
                             if table.get_perm():
@@ -501,12 +505,12 @@ class CustomSecurityManager(SupersetSecurityManager):
                                 permission_list.append(self.find_permission_view_menu('datasource_access', table.get_perm()))
                             if table.schema:
                                 self.merge_perm('schema_access', table.schema_perm)
-                            print('add table fin')
+                            # print('add table fin')
                             # logging.exception(f'Got an error in pre_add for {table.name}')
                     break
 
 
-            print(permission_list)
+            # print(permission_list)
             permission_list_not_none = [permission for permission in permission_list if permission is not None]
             db_role = self.rolemodelview.datamodel.obj()
             db_role.name = DB_ROLE_PREFIX + db.database_name
@@ -523,6 +527,12 @@ class CustomSecurityManager(SupersetSecurityManager):
         except Exception:
             db_model.delete(db)
             raise Exception
+
+    def search_group(self, org_id, group_name=None):
+        if group_name:
+            return self.get_session.query(self.group_model).filter_by(group_name=group_name).first()
+        else:
+            return self.get_session.query(self.group_model).filter_by(organization_id=org_id).all()
 
     def search_site(self, siteID=None):
         if siteID:
