@@ -26,7 +26,8 @@ from .forms import (
 
 )
 from .models import Site
-from .filters import get_user_id_list_form_org, get_roles_for_org, get_groups_id_for_org, get_site_id_list_from_org
+from .filters import get_user_id_list_form_org, get_roles_for_org, get_groups_id_for_org, get_site_id_list_from_org, \
+    get_site_id_list_from_group
 from .utils import post_request
 
 log = logging.getLogger(__name__)
@@ -547,7 +548,8 @@ class SavvySiteModelView(ModelView):
     add_form = CSVToSitesForm
     add_columns = ['org', 'csv_file']
 
-    base_filters = [['SiteID', FilterInFunction, get_site_id_list_from_org]]
+    base_filters = [['SiteID', FilterInFunction, get_site_id_list_from_org],
+                    ['SiteID', FilterInFunction, get_site_id_list_from_group]]
 
     def get_select_widget(self, filters,
                          actions=None,
@@ -904,4 +906,5 @@ class SavvyGroupModelView(ModelView):
 #         stats_logger.incr('successful_csv_upload')
 #         return redirect('/tablemodelview/list/')
 #     #
+
 
