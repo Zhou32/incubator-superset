@@ -20,6 +20,23 @@ def get_site_id_list_from_org():
         all_site_id.append(i.SiteID)
     return all_site_id
 
+
+def get_site_id_list_from_group():
+    from superset import security_manager, db
+    all_site_id = []
+    for role in g.user.roles:
+        if role.name == 'Admin':
+            sites = db.session.query(Site).all()
+
+            for i in sites:
+                all_site_id.append(i.SiteID)
+            return all_site_id
+
+    for group in g.user.groups:
+        for i in group.sites:
+            all_site_id.append(i.SiteID)
+    return all_site_id
+
 def get_groups_id_for_org():
     from superset import security_manager, db
     all_group_id = []
