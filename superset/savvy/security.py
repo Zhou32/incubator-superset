@@ -200,7 +200,6 @@ class CustomSecurityManager(SupersetSecurityManager):
             return False
         return result
 
-    @property
     def get_url_for_recover(self):
         return url_for('%s.%s' % (self.passwordrecoverview.endpoint,
                                   self.passwordrecoverview.default_view))

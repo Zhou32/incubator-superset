@@ -58,12 +58,12 @@ class SavvyUserDBModelView(UserDBModelView):
                         self.delete(user_)
 
         if organization and len(organization.users) == 1:
-            self.delete_athena_key(organization.id)
+            self.delete_athena_key(organization)
             self.appbuilder.sm.delete_org(organization)
 
-    def delete_athena_key(self, org_id):
+    def delete_athena_key(self, org):
         post_request('https://3ozse3mao8.execute-api.ap-southeast-2.amazonaws.com/test/deleteorg',
-                     {"org_id": org_id})
+                     {"org_id": org.id, "org_name": org.organization_name})
 
     @expose('/add', methods=['GET', 'POST'])
     @has_access
@@ -536,6 +536,7 @@ class SavvySiteModelView(ModelView):
     edit_title = lazy_gettext('Edit Site')
 
     search_widget = SavvySiteSearchWidget
+    search_columns = ['SiteName', 'AddressLine', 'State', 'city']
     page_size = 500
 
     list_columns = ['SiteName', 'AddressLine', 'State', 'city']
@@ -606,20 +607,12 @@ class SavvySiteModelView(ModelView):
 
         csv_file = form.csv_file.data
 
-        database = db.session.query(
-            Database).filter_by(
-            id=1).all()
-
         form.csv_file.data.filename = secure_filename(form.csv_file.data.filename)
         csv_filename = form.csv_file.data.filename
         path = os.path.join(config['UPLOAD_FOLDER'], csv_filename)
         try:
             utils.ensure_path_exists(config['UPLOAD_FOLDER'])
             csv_file.save(path)
-
-            table = SqlaTable(table_name='sites_data')
-            table.database = database[0]
-            table.database_id = database[0].id
 
             kwargs = {
                 'filepath_or_buffer': form.csv_file.data.filename,
@@ -638,7 +631,8 @@ class SavvySiteModelView(ModelView):
 
             default_group = self.appbuilder.sm.search_group(org.id, group_name=org.organization_name+'_default_group')
             for i in range(df.shape[0]):
-                site = Site(df.iloc[i].values.tolist())
+                site_info = df.iloc[i].values.tolist()
+                site = self.appbuilder.get_session.query(Site).filter_by(SiteID=str(site_info[0])).first() or Site(site_info)
                 if site.SiteID in existing_site_ids:
                     continue
                 org.sites.append(site)
@@ -663,6 +657,7 @@ class SavvySiteModelView(ModelView):
         except OSError:
             pass
         return redirect('/sites/list')
+
 
     @expose('/ajax', methods=['GET'])
     def ajax(self):
