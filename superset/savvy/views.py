@@ -664,6 +664,10 @@ class SavvySiteModelView(ModelView):
                 flash(u'The CSV file is in wrong format.', 'danger')
             else:
                 flash(str(e), 'danger')
+            try:
+                os.remove(path)
+            except OSError:
+                pass
             return redirect('/sites/add')
 
         # Go back to welcome page / splash screen
