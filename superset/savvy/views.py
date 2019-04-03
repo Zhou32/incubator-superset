@@ -38,8 +38,7 @@ class SavvyUserDBModelView(UserDBModelView):
     base_filters = [['id', RoleFilter, lambda: []]]
     edit_columns = ['first_name', 'last_name', 'active', 'email', 'roles', 'groups']
     edit_form_query_rel_fields = {'roles': [['name', FilterInFunction, get_roles_for_org]],
-                                  'groups': [['id', FilterInFunction, get_groups_id_for_org],
-                                             ['group_name', FilterNotEndsWith, '_default_group']]}
+                                  'groups': [['id', FilterInFunction, get_groups_id_for_org]]}
     show_fieldsets = [
         (lazy_gettext('User info'),
          {'fields': ['username', 'active', 'roles', 'login_count', 'groups']}),
@@ -49,6 +48,11 @@ class SavvyUserDBModelView(UserDBModelView):
          {'fields': ['last_login', 'fail_login_count', 'created_on',
                      'created_by', 'changed_on', 'changed_by'], 'expanded': False}),
     ]
+
+    description_columns = {
+        'groups': lazy_gettext('The default group has access to all sites belong to your organization and '
+                               'is only visible to you as the organization owner.\n ')
+    }
 
     def pre_delete(self, user):
         organization = self.appbuilder.sm.find_org(user_id=user.id)
