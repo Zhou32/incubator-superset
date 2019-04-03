@@ -540,7 +540,7 @@ class SavvySiteModelView(ModelView):
     add_title = lazy_gettext('Add Sites to Organisation')
     edit_title = lazy_gettext('Edit Site')
 
-    search_widget = SavvySiteSearchWidget
+    search_widget_2 = SavvySiteSearchWidget
     search_columns = ['SiteName', 'AddressLine', 'State', 'city']
     page_size = 500
 
@@ -592,6 +592,16 @@ class SavvySiteModelView(ModelView):
                                              modelview_name=self.__class__.__name__)
         return widgets
 
+    def get_search_widget(self, form=None, exclude_cols=None, widgets=None):
+        exclude_cols = exclude_cols or []
+        widgets = widgets or {}
+        widgets['search'] = self.search_widget_2(route_base=self.route_base,
+                                               form=form,
+                                               include_cols=self.search_columns,
+                                               exclude_cols=exclude_cols,
+                                               filters=self._filters
+        )
+        return widgets
 
 
     @expose('/add', methods=['POST','GET'])
@@ -646,9 +656,15 @@ class SavvySiteModelView(ModelView):
             db.session.merge(org)
             db.session.merge(default_group)
             db.session.commit()
+            flash(u'Sites added', 'info')
 
         except Exception as e:
-            print(e)
+            # print(e)
+            if e.__class__.__name__ == 'ParserError':
+                flash(u'The CSV file is in wrong format.', 'danger')
+            else:
+                flash(str(e), 'danger')
+            return redirect('/sites/add')
 
         # Go back to welcome page / splash screen
         # db_name = table.database.database_name
@@ -663,7 +679,6 @@ class SavvySiteModelView(ModelView):
         except OSError:
             pass
         return redirect('/sites/list')
-
 
     @expose('/ajax', methods=['GET'])
     def ajax(self):

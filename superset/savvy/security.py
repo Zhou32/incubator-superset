@@ -553,7 +553,7 @@ class CustomSecurityManager(SupersetSecurityManager):
                                         page=page,
                                         page_size=page_size)
         form = self.site_view.search_form.refresh()
-        return self.site_view._get_search_widget(form=form, widgets=widgets)
+        return self.site_view.get_search_widget(form=form, widgets=widgets)
 
     def get_sites_list(self, sites):
         return_list = []

@@ -49,14 +49,17 @@ class MeterDataView(BaseView):
                 else:
                     sites = db.session.query(Site).filter(
                         Site.groups.any(Group.user.any(SavvyUser.id == g.user.id))).all()
-                    SITE_IDS = [row.SiteID for row in sites]
+                    SITE_IDS = [str(row.SiteID) for row in sites]
 
-                    sites_filter_clause = "WHERE"
-                    for index, site_id in enumerate(SITE_IDS):
-                        if index != len(SITE_IDS)-1:
-                            sites_filter_clause = sites_filter_clause+" site_id={} OR ".format(site_id)
-                        else:
-                            sites_filter_clause = sites_filter_clause + " site_id={}".format(site_id)
+                    if len(SITE_IDS) > 0:
+                        sites_filter_clause = "WHERE site_id IN ( "
+                        for index, site_id in enumerate(SITE_IDS):
+                            if index != len(SITE_IDS)-1:
+                                sites_filter_clause = sites_filter_clause+site_id + ','
+                            else:
+                                sites_filter_clause = sites_filter_clause + site_id + ')'
+                    else:
+                        sites_filter_clause = "WHERE site_id IN ( -1 )"
 
                     cursor.execute("""
                             SELECT count(*)
