@@ -38,7 +38,7 @@ class MeterDataView(BaseView):
 
             with conn.cursor() as cursor:
 
-                if 'Admin' in roles or 'org_owner' in roles or 'org_superuser' in roles:
+                if 'Admin' in roles:
                     cursor.execute("""
                             SELECT count(*)
                             FROM {table_name}
