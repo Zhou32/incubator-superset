@@ -40,6 +40,7 @@ def get_site_id_list_from_group():
 def get_groups_id_for_org():
     from superset import security_manager, db
     all_group_id = []
+    is_owner = False
     for role in g.user.roles:
         if role.name == 'Admin':
             groups = db.session.query(Group).all()
@@ -48,16 +49,25 @@ def get_groups_id_for_org():
                 all_group_id.append(i.id)
             return all_group_id
 
-    org = Organization
+        elif role.name == 'org_owner':
+            is_owner = True
+
     all_groups = []
     try:
-        org_id = db.session.query(org).filter(org.users.any(id=g.user.id)).first().id
-        all_groups = db.session.query(Group).filter(Group.organization_id.in_([org_id])).all()
+        org = db.session.query(Organization).filter(Organization.users.any(id=g.user.id)).first()
+        all_groups = db.session.query(Group).filter(Group.organization_id.in_([org.id])).all()
     except:
         pass
 
     for group in all_groups:
-        all_group_id.append(group.id)
+        if group.group_name == org.organization_name + '_default_group':
+            if is_owner:
+                all_group_id.append(group.id)
+                continue
+            else:
+                continue
+        else:
+            all_group_id.append(group.id)
 
     return all_group_id
 
