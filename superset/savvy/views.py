@@ -292,7 +292,7 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
 
 
 class SavvyRegisterUserDBView(RegisterUserDBView):
-    redirect_url = '/'
+    redirect_url = '/login'
     form = SavvyRegisterUserDBForm
     email_subject = email_subject
 
@@ -337,7 +337,6 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
             form.email.validators.append(Unique(datamodel_user, 'email'))
             form.email.validators.append(Unique(datamodel_register_user, 'email'))
 
-    @expose('/here/')
     def handle_aws_info(self, org, user):
         info = post_request('https://3ozse3mao8.execute-api.ap-southeast-2.amazonaws.com/test/createorg',
                             {"org_name": org.organization_name, "org_id": org.id})
@@ -366,8 +365,6 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
                                                    'Connection failed!\n\n'
                                                    'The error message returned was:\n{}').format(e))
 
-
-
     def form_post(self, form):
         self.add_form_unique_validations(form)
         self.add_registration_org_admin(organization=form.organization.data,
@@ -375,6 +372,7 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
                                         last_name=form.last_name.data,
                                         email=form.email.data,
                                         password=form.password.data)
+        return redirect(self.redirect_url)
 
     def add_registration_org_admin(self, **kwargs):
         """
