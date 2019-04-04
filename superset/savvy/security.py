@@ -279,7 +279,7 @@ class CustomSecurityManager(SupersetSecurityManager):
             elif role.name == 'Admin':
                 return [(str(invite_role.id), invite_role.name) for invite_role in self.get_all_roles()]
 
-    def add_invite_register_user(self, email, organization, first_name=None, last_name=None, role=None,
+    def add_invite_register_user(self, email, organization, first_name=None, last_name=None, role=None, group=None,
                                  inviter=None, password='', hashed_password=''):
         invited_user = self.registeruser_model()
         # email and organization parameters should be always available.
@@ -298,6 +298,8 @@ class CustomSecurityManager(SupersetSecurityManager):
             if role == str(self.find_role('org_superuser').id) and organization.superuser_number >= 3:
                 logging.error(u'Superusers reach limit for %s.' % organization.organization_name)
                 raise ValueError('Superuser reaches limit.')
+        if group:
+            invited_user.group = group
         if hashed_password:
             invited_user.password = hashed_password
         else:
@@ -350,12 +352,13 @@ class CustomSecurityManager(SupersetSecurityManager):
             inviter = inviter.get_full_name()
             email = reg_user.email
             role = self.get_session.query(self.role_model).filter_by(id=reg_user.role_assigned).first()
+            group = self.search_group(None, group_id=reg_user.group)
             if datetime.datetime.now() > reg_user.valid_date:
                 raise Exception
-            return org_name, inviter, email, role.name
+            return org_name, inviter, email, role.name, group.group_name
         except Exception as e:
             logging.error(e)
-            return None, None, None, None
+            return None, None, None, None, None
 
     def find_org(self, org_name=None, user_id=None):
         if org_name:
@@ -364,7 +367,7 @@ class CustomSecurityManager(SupersetSecurityManager):
             return self.get_session.query(self.organization_model).\
                 filter(self.organization_model.users.any(id=user_id)).scalar()
 
-    def add_org_user(self, email, first_name, last_name, hashed_password, organization, role_id):
+    def add_org_user(self, email, first_name, last_name, hashed_password, organization, group, role_id):
         try:
             org = self.find_org(organization)
             user = self.user_model()
@@ -374,6 +377,7 @@ class CustomSecurityManager(SupersetSecurityManager):
             user.last_name = last_name
             user.active = True
             user.password = hashed_password
+            user.groups.append(self.search_group(None, group_id=group))
             role = self.get_session.query(self.role_model).filter_by(id=role_id).first()
             user.roles.append(role)
             if org is not None:
@@ -527,9 +531,11 @@ class CustomSecurityManager(SupersetSecurityManager):
             db_model.delete(db)
             raise Exception
 
-    def search_group(self, org_id, group_name=None):
+    def search_group(self, org_id, group_name=None, group_id=None):
         if group_name:
             return self.get_session.query(self.group_model).filter_by(group_name=group_name).first()
+        elif group_id:
+            return self.get_session.query(self.group_model).filter_by(id=group_id).first()
         else:
             return self.get_session.query(self.group_model).filter_by(organization_id=org_id).all()
 

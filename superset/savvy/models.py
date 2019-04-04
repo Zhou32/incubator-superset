@@ -27,6 +27,12 @@ assoc_org_site = Table(
     UniqueConstraint('org_id', 'site_id')
 )
 
+assoc_group_user = Table(
+    'group_user', metadata,
+    Column('id', Integer, primary_key=True),
+    Column('group_id', Integer, ForeignKey('groups.id')),
+    Column('user_id', Integer, ForeignKey('ab_user.id'))
+)
 
 class Organization(Model):
     __tablename__ = 'organizations'
@@ -55,6 +61,7 @@ class OrgRegisterUser(Model):
     inviter = Column('inviter_id', Integer, ForeignKey('ab_user.id'), nullable=True)
     valid_date = Column(DateTime, default=(lambda: datetime.datetime.now() + timedelta(hours=register_valid_hours)),
                         nullable=True)
+    group = Column('group_id', Integer, ForeignKey('groups.id'))
     role_assigned = Column('role_id', Integer, ForeignKey('ab_role.id'), nullable=True)
 
 
@@ -73,13 +80,6 @@ assoc_group_site = Table(
     Column('id', Integer, primary_key=True),
     Column('group_id', Integer, ForeignKey('groups.id')),
     Column('site_id', Integer, ForeignKey('sites_data.SiteID'))
-)
-
-assoc_group_user = Table(
-    'group_user', metadata,
-    Column('id', Integer, primary_key=True),
-    Column('group_id', Integer, ForeignKey('groups.id')),
-    Column('user_id', Integer, ForeignKey('ab_user.id'))
 )
 
 
