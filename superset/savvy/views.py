@@ -213,7 +213,7 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
     redirect_url = '/'
     form = SavvyRegisterInvitationUserDBForm
     msg = 'Invitation has been sent to the email.'
-    email_subject = 'Invitation Registration'
+    email_subject = 'You are invited to join SavvyBI'
 
     def send_email(self, register_user):
         """
@@ -706,6 +706,11 @@ class SavvyGroupModelView(ModelView):
     edit_columns = add_columns
     label_columns = {'group_name': lazy_gettext('Group Name'), 'sites': lazy_gettext('Sites')}
     list_columns = ['group_name', 'sites']
+
+    formatters_columns = {
+        'sites': lambda x: [site.SiteName for site in x[:19]]+['......'] if len(x) > 20
+        else [site.SiteName for site in x],
+    }
 
     order_columns = ['group_name']
 
