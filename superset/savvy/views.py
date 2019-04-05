@@ -244,12 +244,16 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
 
 
     def get_group_choices(self):
-        groups = self.appbuilder.sm.search_group(self.appbuilder.sm.find_org(user_id=g.user.id).id)
-        if groups:
-            return [(str(group.id), group.group_name) for group in groups
-                                  if not group.group_name.endswith('_default_group')]
-        else:
-            return [('-1', 'None')]
+        org = self.appbuilder.sm.find_org(user_id=g.user.id)
+        groups = None
+        result = [('-1', 'None')]
+        if org:
+            groups = self.appbuilder.sm.search_group(org.id)
+        if len(groups) > 1:
+            list = [(str(group.id), group.group_name) for group in groups
+                    if not group.group_name.endswith('_default_group')]
+            result = result + list
+        return result
 
     @expose('/invite', methods=['GET'])
     @has_access
@@ -278,9 +282,10 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
         form.group.choices = self.get_group_choices()
         if form.validate_on_submit():
             user_id = g.user.id
-            organization = self.appbuilder.sm.find_org(user_id=user_id)
+
 
             try:
+                organization = self.appbuilder.sm.find_org(user_id=user_id)
                 reg_user = self.appbuilder.sm.add_invite_register_user(email=form.email.data,
                                                                        organization=organization,
                                                                        role=form.role.data,
