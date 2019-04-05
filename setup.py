@@ -108,7 +108,6 @@ setup(
         'unicodecsv',
         'unidecode>=0.04.21',
         'redis',
-        'croniter==0.3.26',
         'selenium==3.141.0',
         'retry==0.9.2',
         'wtforms-json',
