@@ -24,6 +24,7 @@ class RegisterInvitationForm(DynamicForm):
     organization = StringField(lazy_gettext('Organization'), widget=BS3TextFieldWidget(), render_kw={'readonly': True})
     inviter = StringField(lazy_gettext('Inviter'), widget=BS3TextFieldWidget(), render_kw={'readonly': True})
     role = StringField(lazy_gettext('Role'), widget=BS3TextFieldWidget(), render_kw={'readonly': True})
+    group = StringField(lazy_gettext('Group'), widget=BS3TextFieldWidget(), render_kw={'readonly': True})
     first_name = StringField(lazy_gettext('First Name'), validators=[DataRequired()], widget=BS3TextFieldWidget())
     last_name = StringField(lazy_gettext('Last Name'), validators=[DataRequired()], widget=BS3TextFieldWidget())
     email = StringField(lazy_gettext('Email'), widget=BS3TextFieldWidget(), render_kw={'readonly': True})
@@ -80,6 +81,7 @@ class SavvyRegisterUserDBForm(DynamicForm):
 
 class SavvyRegisterInvitationUserDBForm(DynamicForm):
     role = SelectField(label=lazy_gettext('Invitation Role'))
+    group = SelectField(label=lazy_gettext('Group'))
     email = StringField(lazy_gettext('Email'), validators=[DataRequired(), Email()], widget=BS3TextFieldWidget())
     # inviter_id = HiddenField(lazy_gettext('Inviter'))
     # organization = HiddenField(lazy_gettext('Organization'))

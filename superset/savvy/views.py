@@ -213,7 +213,7 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
     redirect_url = '/'
     form = SavvyRegisterInvitationUserDBForm
     msg = 'Invitation has been sent to the email.'
-    email_subject = 'Invitation Registration'
+    email_subject = 'You are invited to join SavvyBI'
 
     def send_email(self, register_user):
         """
@@ -242,12 +242,22 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
             form.email.validators.append(Unique(datamodel_user, 'email'))
             form.email.validators.append(Unique(datamodel_register_user, 'email'))
 
+
+    def get_group_choices(self):
+        groups = self.appbuilder.sm.search_group(self.appbuilder.sm.find_org(user_id=g.user.id).id)
+        if groups:
+            return [(str(group.id), group.group_name) for group in groups
+                                  if not group.group_name.endswith('_default_group')]
+        else:
+            return [('-1', 'None')]
+
     @expose('/invite', methods=['GET'])
     @has_access
     def invitation(self):
         self._init_vars()
         form = self.form.refresh()
         form.role.choices = self.appbuilder.sm.find_invite_roles(g.user.id)
+        form.group.choices = self.get_group_choices()
         widgets = self._get_edit_widget(form=form)
         self.update_redirect()
         self.add_form_unique_validations(form)
@@ -261,8 +271,11 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
     @has_access
     def invitation_post(self):
         form = self.form.refresh()
-        form.role.choices = self.appbuilder.sm.find_invite_roles(g.user.id)
         self.add_form_unique_validations(form)
+
+        # choices placeholder to pass validation
+        form.role.choices = self.appbuilder.sm.find_invite_roles(g.user.id)
+        form.group.choices = self.get_group_choices()
         if form.validate_on_submit():
             user_id = g.user.id
             organization = self.appbuilder.sm.find_org(user_id=user_id)
@@ -271,6 +284,7 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
                 reg_user = self.appbuilder.sm.add_invite_register_user(email=form.email.data,
                                                                        organization=organization,
                                                                        role=form.role.data,
+                                                                       group=form.group.data,
                                                                        inviter=user_id)
                 if reg_user:
                     if self.send_email(reg_user):
@@ -444,12 +458,13 @@ class SavvyRegisterInviteView(BaseRegisterUser):
         self._init_vars()
         form = self.form.refresh()
         # Find org inviter and email by invitation hash
-        org_name, inviter, email, role = self.appbuilder.sm.find_invite_hash(invitation_hash)
+        org_name, inviter, email, role, group = self.appbuilder.sm.find_invite_hash(invitation_hash)
         if email is not None:
             form.email.data = email
             form.organization.data = org_name
             form.inviter.data = inviter
             form.role.data = role
+            form.group.data = group
             widgets = self._get_edit_widget(form=form)
             self.update_redirect()
             return self.render_template(self.form_template,
@@ -505,6 +520,7 @@ class SavvyRegisterInviteView(BaseRegisterUser):
                                                last_name=reg.last_name,
                                                role_id=reg.role_assigned,
                                                organization=reg.organization,
+                                               group=reg.group,
                                                hashed_password=reg.password):
             flash(as_unicode(self.error_message), 'danger')
             return redirect(self.appbuilder.get_url_for_index)
@@ -709,6 +725,11 @@ class SavvyGroupModelView(ModelView):
     edit_columns = add_columns
     label_columns = {'group_name': lazy_gettext('Group Name'), 'sites': lazy_gettext('Sites')}
     list_columns = ['group_name', 'sites']
+
+    formatters_columns = {
+        'sites': lambda x: [site.SiteName for site in x[:19]]+['......'] if len(x) > 20
+        else [site.SiteName for site in x],
+    }
 
     order_columns = ['group_name']
 
