@@ -47,27 +47,6 @@
   </a>
 </li>
 {% endif %}
-{% if languages.keys()|length > 1 %}
-<li class="dropdown">
-    <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
-       <div class="f16"><i class="flag {{languages[locale].get('flag')}}"></i>&nbsp;<b class="caret"></b>
-       </div>
-    </a>
-    <ul class="dropdown-menu" id="language-picker">
-      <li class="dropdown">
-        {% for lang in languages %}
-            {% if lang != locale %}
-                <a tabindex="-1" href="{{appbuilder.get_url_for_locale(lang)}}">
-                  <div class="f16">
-                    <i class="flag {{languages[lang].get('flag')}}"></i> - {{languages[lang].get('name')}}
-                  </div>
-                </a>
-            {% endif %}
-        {% endfor %}
-      </li>
-    </ul>
-</li>
-{% endif %}
 
 {% if not current_user.is_anonymous %}
     <li class="dropdown">
@@ -85,6 +64,11 @@
         </ul>
     </li>
 {% else %}
-    <li><a href="{{appbuilder.get_url_for_login}}">
-    <i class="fa fa-fw fa-sign-in"></i>{{_("Login")}}</a></li>
+    {% if request.path == '/register/form' %}
+        <li style="font-size:large;font-weight:900;"><a href="{{appbuilder.get_url_for_login}}">
+        {{_("Already Signed Up?")}}</a></li>
+    {% else %}
+        <li style="font-size:large;font-weight:900;"><a href="/register/form">
+        {{_("Need Account?")}}</a></li>
+    {% endif %}
 {% endif %}
