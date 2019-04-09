@@ -22,7 +22,7 @@ from flask_appbuilder.models.sqla.filters import FilterInFunction, FilterNotEnds
 from .forms import (
     PasswordRecoverForm, SavvyGroupAddWidget, SavvySiteListWidget, SavvySiteSearchWidget,
     SavvyRegisterInvitationUserDBForm, SavvyRegisterUserDBForm, RegisterInvitationForm,
-    CSVToSitesForm
+    CSVToSitesForm, SavvyRegisterFormWidget
 
 )
 from .models import Site
@@ -308,6 +308,8 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
 class SavvyRegisterUserDBView(RegisterUserDBView):
     redirect_url = '/'
     form = SavvyRegisterUserDBForm
+    edit_widget = SavvyRegisterFormWidget
+    form_template = 'appbuilder/general/security/form_template.html'
     email_subject = email_subject
 
     @expose('/activation/<string:activation_hash>')
@@ -385,8 +387,6 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
     def form_post(self, form):
         self.add_form_unique_validations(form)
         self.add_registration_org_admin(organization=form.organization.data,
-                                        first_name=form.first_name.data,
-                                        last_name=form.last_name.data,
                                         email=form.email.data,
                                         password=form.password.data)
 
