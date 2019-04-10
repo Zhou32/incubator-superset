@@ -1,4 +1,13 @@
-{% macro render_borderless_field(field) %}
-    <input class="form-control login-form" placeholder={{field.id}} size="80"/>
+{% macro render_borderless_field(form, field) %}
+    {% if field.type == 'HiddenField' %}
+            {{ field}}
+    {% else %}
+    {% if field.id == 'password' %}
+        {{ form.password(class_='form-control login-form') }}
     <p>&nbsp;</p>
+    {% else %}
+        {{ field(class_='form-control login-form') }}
+    <p>&nbsp;</p>
+    {% endif %}
+{% endif %}
 {% endmacro %}

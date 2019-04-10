@@ -25,12 +25,20 @@
 
     {% if min > 0 %}
     <li>
-        <a class="page" href="{{ init_page | link_page_ajax(modelview_name) }}">&laquo;</a>
+        <a class="page" data="{{ init_page | link_page_ajax(modelview_name) }}">&laquo;</a>
+    </li>
+    {% else %}
+    <li class="disabled">
+        <a href="javascript:void(0)">&laquo;</a>
     </li>
     {% endif %}
     {% if page > 0 %}
     <li>
-        <a class="page" href="{{ (page - 1) | link_page_ajax(modelview_name) }}">&lt;</a>
+        <a class="page" data="{{ (page - 1) | link_page_ajax(modelview_name) }}">&lt;</a>
+    </li>
+    {% else %}
+    <li class="disabled">
+        <a href="javascript:void(0)">&lt;</a>
     </li>
     {% endif %}
 
@@ -41,19 +49,27 @@
         </li>
         {% else %}
         <li>
-            <a class="page" href="{{ p | link_page_ajax(modelview_name) }}">{{ p }}</a>
+            <a class="page" data="{{ p | link_page_ajax(modelview_name) }}">{{ p }}</a>
         </li>
         {% endif %}
     {% endfor %}
 
     {% if page + 1 < pages %}
         <li>
-            <a class="page" href="{{ (page + 1) | link_page_ajax(modelview_name) }}">&gt;</a>
+            <a class="page" data="{{ (page + 1) | link_page_ajax(modelview_name) }}">&gt;</a>
+        </li>
+    {% else %}
+        <li class="disabled">
+            <a href="javascript:void(0)">&gt;</a>
         </li>
     {% endif %}
     {% if max < pages %}
         <li>
-            <a class="page" href="{{ (pages - 1) | link_page_ajax(modelview_name) }}">&raquo;</a>
+            <a class="page" data="{{ (pages - 1) | link_page_ajax(modelview_name) }}">&raquo;</a>
+        </li>
+    {% else %}
+        <li class="disabled">
+            <a href="javascript:void(0)">&raquo;</a>
         </li>
     {% endif %}
 </ul>
@@ -61,8 +77,8 @@
 <script>
     $(".page").click(function(event) {
         event.preventDefault()
-        if ($(event.target).attr('href') != null) {
-            var url = $(event.target).attr('href');
+        if ($(event.target).attr('data') != null) {
+            var url = $(event.target).attr('data');
             var csrf_token = "{{ csrf_token() if csrf_token else '' }}";
 
 
