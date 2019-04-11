@@ -298,7 +298,7 @@ class CustomSecurityManager(SupersetSecurityManager):
             if role == str(self.find_role('org_superuser').id) and organization.superuser_number >= 3:
                 logging.error(u'Superusers reach limit for %s.' % organization.organization_name)
                 raise ValueError('Superuser reaches limit.')
-        if group:
+        if group != '-1':
             invited_user.group = group
         if hashed_password:
             invited_user.password = hashed_password
@@ -355,7 +355,7 @@ class CustomSecurityManager(SupersetSecurityManager):
             group = self.search_group(None, group_id=reg_user.group)
             if datetime.datetime.now() > reg_user.valid_date:
                 raise Exception
-            return org_name, inviter, email, role.name, group.group_name
+            return org_name, inviter, email, role.name, (group.group_name if group else None)
         except Exception as e:
             logging.error(e)
             return None, None, None, None, None
@@ -559,7 +559,7 @@ class CustomSecurityManager(SupersetSecurityManager):
                                         page=page,
                                         page_size=page_size)
         form = self.site_view.search_form.refresh()
-        return self.site_view._get_search_widget(form=form, widgets=widgets)
+        return self.site_view.get_search_widget(form=form, widgets=widgets)
 
     def get_sites_list(self, sites):
         return_list = []

@@ -36,7 +36,7 @@ assoc_group_user = Table(
 
 class Organization(Model):
     __tablename__ = 'organizations'
-    id = Column(Integer, Sequence('organizations_id_seq'), primary_key=True)
+    id = Column(Integer, Sequence('organizations_id_seq'), primary_key=True, autoincrement=True)
     organization_name = Column(String(250))
     users = relationship('SavvyUser', secondary=assoc_org_user, backref='organization')
     sites = relationship('Site', secondary=assoc_org_site, backref='organization')
@@ -49,7 +49,7 @@ class Organization(Model):
 class OrgRegisterUser(Model):
     """ the register model for users who are invited by admin """
     __tablename__ = 'ab_register_user'
-    id = Column(Integer, Sequence('ab_register_user_id_seq'), primary_key=True)
+    id = Column(Integer, Sequence('ab_register_user_id_seq'), primary_key=True, autoincrement=True)
     username = Column(String(64))
     first_name = Column(String(64), nullable=True)
     last_name = Column(String(64), nullable=True)
@@ -67,7 +67,7 @@ class OrgRegisterUser(Model):
 
 class ResetRequest(Model):
     ___tablename__ = 'reset_request'
-    id = Column(Integer, Sequence('reset_request_id_seq'), primary_key=True)
+    id = Column(Integer, Sequence('reset_request_id_seq'), primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('ab_user.id'))
     email = Column(String(64), nullable=False)
     reset_date = Column(DateTime, default=datetime.datetime.now, nullable=True)
@@ -85,7 +85,7 @@ assoc_group_site = Table(
 
 class Group(Model):
     __tablename__ = 'groups'
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     group_name = Column(String(64), nullable=False)
     organization_id = Column(Integer, ForeignKey('organizations.id'))
     sites = relationship('Site', secondary=assoc_group_site, backref='groups')
@@ -96,7 +96,7 @@ class Group(Model):
 
 class Site(Model):
     __tablename__ = 'sites_data'
-    SiteID = Column(Integer, primary_key=True)
+    SiteID = Column(Integer, primary_key=True, autoincrement=True)
     SiteName = Column(String(64))
     ClientID = Column(Integer)
     ClientName = Column(String(64))
