@@ -65,10 +65,10 @@
     </li>
 {% else %}
     {% if request.path == '/register/form' %}
-        <li style="font-size:large;font-weight:900;"><a href="{{appbuilder.get_url_for_login}}">
+        <li><a class="auth-link" href="{{appbuilder.get_url_for_login}}">
         {{_("Already Signed Up?")}}</a></li>
     {% else %}
-        <li style="font-size:large;font-weight:900;"><a href="/register/form">
+        <li><a class="auth-link" href="/register/form">
         {{_("Need Account?")}}</a></li>
     {% endif %}
 {% endif %}

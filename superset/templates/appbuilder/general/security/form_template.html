@@ -1,6 +1,35 @@
 {% extends "appbuilder/base.html" %}
 {% import 'appbuilder/general/lib.html' as lib %}
 
+{% set languages = appbuilder.languages %}
+{% set WARNING_MSG = appbuilder.app.config.get('WARNING_MSG') %}
+{% set app_icon_width = appbuilder.app.config.get('APP_ICON_WIDTH', 126) %}
+{% block head_css %}
+  {{ super() }}
+   <link href="{{url_for('static',filename='assets/stylesheets/savvybi.css')}}" rel="stylesheet">
+{% endblock %}
+{% block navbar %}
+  <div class="navbar navbar-static-top reg-navbar" role="navigation">
+    <div class="container-fluid">
+      <div class="navbar-header">
+
+        <a class="navbar-brand">
+          <img
+            width="250"
+            src="{{ url_for('static', filename='assets/images/SavvyBI-Logo-Large.png') }}"
+            alt="{{ appbuilder.app_name }}"
+          />
+        </a>
+      </div>
+      <div class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-right">
+          {% include 'appbuilder/navbar_right.html' %}
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div style="clear:both"></div>
+{% endblock %}
 {% block content %}
 
 {% if related_views %}

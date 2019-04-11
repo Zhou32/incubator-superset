@@ -116,7 +116,7 @@ APP_NAME = 'Superset'
 
 # Uncomment to setup an App icon
 APP_ICON = '/static/assets/images/SavyBI-Logo-White.png'
-APP_ICON_WIDTH = 126
+APP_ICON_WIDTH = 125
 
 # Druid query timezone
 # tz.tzutc() : Using utc timezone
