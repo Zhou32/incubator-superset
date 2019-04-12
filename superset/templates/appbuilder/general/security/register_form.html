@@ -13,7 +13,8 @@
     <div class="register-form" style="margin:auto; width:40%;">
 
         <div class="input-group">
-            {{ form.organization(size = 60, class = "form-control login-form", placeholder='Organization') }}
+            {{ form.organization(size = 60, class = "form-control login-form", placeholder='Organization',
+            onfocusout="validField(this)") }}
 
         </div>
         {% for error in form.errors.openid %}
@@ -21,28 +22,32 @@
         {% endfor %}
         <a>&nbsp;</a>
         <div class="input-group">
-            {{ form.first_name(size = 80, class = "form-control login-form", placeholder='First Name') }}
+            {{ form.first_name(size = 80, class = "form-control login-form", placeholder='First Name',
+            onfocusout="validField(this)") }}
         </div>
         {% for error in form.errors.openid %}
         <span class="help-inline">[{{error}}]</span><br>
         {% endfor %}
         <a>&nbsp;</a>
         <div class="input-group">
-            {{ form.last_name(size = 80, class = "form-control login-form", placeholder='Last Name') }}
+            {{ form.last_name(size = 80, class = "form-control login-form", placeholder='Last Name',
+            onfocusout="validField(this)") }}
         </div>
         {% for error in form.errors.openid %}
         <span class="help-inline">[{{error}}]</span><br>
         {% endfor %}
         <a>&nbsp;</a>
         <div class="input-group">
-            {{ form.email(size = 80, class = "form-control login-form", placeholder='E-mail') }}
+            {{ form.email(size = 80, class = "form-control login-form", placeholder='E-mail',
+            onfocusout="validField(this)") }}
         </div>
         {% for error in form.errors.openid %}
         <span class="help-inline">[{{error}}]</span><br>
         {% endfor %}
         <a>&nbsp;</a>
         <div class="input-group">
-            {{ form.password(size = 80, class = "form-control login-form", placeholder='Password') }}
+            {{ form.password(size = 80, class = "form-control login-form", placeholder='Password',
+            onfocusout="validField(this)") }}
         </div>
         {% for error in form.errors.openid %}
         <span class="help-inline">[{{error}}]</span><br>
@@ -74,12 +79,6 @@
     </div>
     </form>
     <script>
-        $('.login-form').on('input', function(event){
-            console.log(this.value)
-            if (this.value != '') {
-                
-            }
-        })
         let password = document.getElementsByName('password')[0]
         password.addEventListener("keyup", function(event) {
             // If "caps lock" is pressed, display the warning text
@@ -92,10 +91,17 @@
             }
         });
         $('.login-form').each(function() {
-            console.log(this)
             $(this).parent().append('<span class="fa fa-check" style="color:#079493;position:absolute;top:13px;right: 10px;' +
                 'float:right;z-index:10;" hidden></span>')
         })
+        function validField(field){
+            if (field.value != '') {
+                field.parentNode.childNodes[3].hidden = false
+            }
+            else{
+                field.parentNode.childNodes[3].hidden = true
+            }
+        }
     </script>
 {% endblock %}
 
