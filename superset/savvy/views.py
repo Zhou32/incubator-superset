@@ -388,7 +388,6 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
                                                    'The error message returned was:\n{}').format(e))
 
 
-
     def form_post(self, form):
         self.add_form_unique_validations(form)
         self.add_registration_org_admin(organization=form.organization.data,

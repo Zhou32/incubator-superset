@@ -11,49 +11,30 @@
 {% endif %}
     {{ form.hidden_tag() }}
     <div class="register-form" style="margin:auto; width:40%;">
-
-        <div class="input-group">
-            {{ form.organization(size = 60, class = "form-control login-form", placeholder='Organization',
-            onfocusout="validField(this)") }}
-
-        </div>
-        {% for error in form.errors.openid %}
-        <span class="help-inline">[{{error}}]</span><br>
+        {% for field in form %}
+            <div class="input-group">
+                {{ field(size = 60, class = "form-control login-form", placeholder=field.label.text,
+                    onfocusout="validField(this)") }}
+                {% if field.errors %}
+                    <span class="fa fa-times-circle-o fa-1x" style="color:RGBA(184,16,56,0.5);
+                                                 position:absolute;
+                                                 top:13px;
+                                                 right:10px;
+                                                 float:right;
+                                                 font-size: 20px;
+                                                 z-index:10;"></span>
+                {% else %}
+                    <span class="fa fa-check" style="color:#079493;
+                                                 position:absolute;
+                                                 top:13px;
+                                                 right:10px;
+                                                 float:right;
+                                                 font-size: 20px;
+                                                 z-index:10;" hidden></span>
+                {% endif %}
+            </div>
+            <a>&nbsp;</a>
         {% endfor %}
-        <a>&nbsp;</a>
-        <div class="input-group">
-            {{ form.first_name(size = 80, class = "form-control login-form", placeholder='First Name',
-            onfocusout="validField(this)") }}
-        </div>
-        {% for error in form.errors.openid %}
-        <span class="help-inline">[{{error}}]</span><br>
-        {% endfor %}
-        <a>&nbsp;</a>
-        <div class="input-group">
-            {{ form.last_name(size = 80, class = "form-control login-form", placeholder='Last Name',
-            onfocusout="validField(this)") }}
-        </div>
-        {% for error in form.errors.openid %}
-        <span class="help-inline">[{{error}}]</span><br>
-        {% endfor %}
-        <a>&nbsp;</a>
-        <div class="input-group">
-            {{ form.email(size = 80, class = "form-control login-form", placeholder='E-mail',
-            onfocusout="validField(this)") }}
-        </div>
-        {% for error in form.errors.openid %}
-        <span class="help-inline">[{{error}}]</span><br>
-        {% endfor %}
-        <a>&nbsp;</a>
-        <div class="input-group">
-            {{ form.password(size = 80, class = "form-control login-form", placeholder='Password',
-            onfocusout="validField(this)") }}
-        </div>
-        {% for error in form.errors.openid %}
-        <span class="help-inline">[{{error}}]</span><br>
-        {% endfor %}
-        <a>&nbsp;</a>
-
     </div>
     <div class="control-group">
         <div class="reg-footer">
@@ -70,6 +51,11 @@
                             </div>
                         {% endfor %}
                     {% endif %}
+                    {% for error in form.errors.items() %}
+                      {% if loop.first %}
+                        <div class="savvybi-alert alert-danger">{{ error[1][0] }}</div>
+                      {% endif %}
+                    {% endfor %}
                 {% endwith %}
             </div>
             <div style="float: right;">
@@ -79,6 +65,17 @@
     </div>
     </form>
     <script>
+        $('.login-form').each(function() {
+            if($(this).attr('name') != 'csrf_token'){
+                if ($(this).val() != ''){
+                    $(this).siblings('span').show();
+                }else{
+                   $(this).siblings('span').hide();
+                }
+            }
+
+        })
+
         let password = document.getElementsByName('password')[0]
         password.addEventListener("keyup", function(event) {
             // If "caps lock" is pressed, display the warning text
@@ -90,10 +87,7 @@
                 }
             }
         });
-        $('.login-form').each(function() {
-            $(this).parent().append('<span class="fa fa-check" style="color:#079493;position:absolute;top:13px;right: 10px;' +
-                'float:right;z-index:10;" hidden></span>')
-        })
+
         function validField(field){
             if (field.value != '') {
                 field.parentNode.childNodes[3].hidden = false
