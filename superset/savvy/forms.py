@@ -70,13 +70,16 @@ class SavvyRegisterUserDBForm(DynamicForm):
                                  'Please use a good password policy, this application does not check this for you'),
                              validators=[DataRequired()],
                              )
-
+    conf_password = PasswordField(lazy_gettext('Confirm Password'),
+                                  description=lazy_gettext('Please rewrite the password to confirm'),
+                                  validators=[EqualTo('password', message=lazy_gettext('Passwords must match'))],
+                                  widget=BS3PasswordFieldWidget())
 
 
 
 class SavvyRegisterInvitationUserDBForm(DynamicForm):
-    role = SelectField(label=lazy_gettext('Invitation Role'))
-    group = SelectField(label=lazy_gettext('Group'))
+    role = SelectField(lazy_gettext('Invitation Role'))
+    group = SelectField(lazy_gettext('Group'))
     email = StringField(lazy_gettext('Email'), validators=[DataRequired(), Email()], widget=BS3TextFieldWidget())
     # inviter_id = HiddenField(lazy_gettext('Inviter'))
     # organization = HiddenField(lazy_gettext('Organization'))
