@@ -21,7 +21,7 @@ chardet==3.0.4            # via requests
 click==6.7
 colorama==0.3.9
 contextlib2==0.5.5
-croniter==0.3.26
+croniter==0.3.25
 cryptography==2.4.2
 decorator==4.3.0          # via retry
 defusedxml==0.5.0         # via python3-openid
@@ -31,6 +31,7 @@ flask-caching==1.4.0
 flask-compress==1.4.0
 flask-login==0.4.1        # via flask-appbuilder
 flask-migrate==2.1.1
+flask-mail==0.9.1
 flask-openid==1.2.5       # via flask-appbuilder
 flask-sqlalchemy==2.3.2   # via flask-appbuilder, flask-migrate
 flask-wtf==0.14.2

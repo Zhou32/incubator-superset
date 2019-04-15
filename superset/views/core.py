@@ -66,6 +66,9 @@ from .base import (
     SupersetFilter, SupersetModelView, YamlExportMixin,
 )
 from .utils import bootstrap_user_data
+from superset.savvy.models import Organization
+from superset.savvy.filters import get_db_name_list_form_org
+from flask_appbuilder.models.sqla.filters import FilterInFunction
 
 config = app.config
 stats_logger = config.get('STATS_LOGGER')
@@ -126,12 +129,44 @@ class DashboardFilter(SupersetFilter):
             .query(Slice.id)
             .filter(Slice.perm.in_(datasource_perms))
         )
-        owner_ids_qry = (
-            db.session
-            .query(Dash.id)
-            .join(Dash.owners)
-            .filter(User.id == User.get_user_id())
-        )
+
+        is_org_owner = False
+        for role in g.user.roles:
+            if role.name == 'org_owner':
+                is_org_owner = True
+                break
+
+        if is_org_owner:
+            org = Organization
+            try:
+                users_in_org = db.session.query(org).filter(org.users.any(id=g.user.id)).first().users
+            except:
+                pass
+
+            user_ids = []
+            for user_ in users_in_org:
+                user_ids.append(user_.id)
+
+            org_users = db.session.query(User.id).filter(org.users.any(id=g.user.id))
+
+            owner_ids_qry = (
+                db.session
+                    .query(Dash.id)
+                    .join(Dash.owners)
+                    .filter(User.id.in_(org_users))
+            )
+
+            query = query.filter(
+                Dash.id.in_(owner_ids_qry)
+            )
+            return query
+        else:
+            owner_ids_qry = (
+                db.session
+                .query(Dash.id)
+                .join(Dash.owners)
+                .filter(User.id == User.get_user_id())
+            )
         query = query.filter(
             or_(Dash.id.in_(
                 db.session.query(Dash.id)
@@ -262,6 +297,7 @@ class DatabaseView(SupersetModelView, DeleteMixin, YamlExportMixin):  # noqa
         'allow_multi_schema_metadata_fetch': _('Allow Multi Schema Metadata Fetch'),
         'backend': _('Backend'),
     }
+    base_filters = [['database_name', FilterInFunction, get_db_name_list_form_org]]
 
     def pre_add(self, db):
         self.check_extra(db)

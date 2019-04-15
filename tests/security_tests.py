@@ -247,11 +247,17 @@ class RolePermissionTests(SupersetTestCase):
             ['Superset', 'log'],
             ['Superset', 'theme'],
             ['Superset', 'welcome'],
+            ['EmailResetPasswordView', 'this_form_get'],
+            ['EmailResetPasswordView', 'this_form_post'],
+            ['PasswordRecoverView', 'this_form_get'],
+            ['PasswordRecoverView', 'this_form_post'],
+            ['PasswordRecoverView', 'reset'],
         ]
         unsecured_views = []
         for view_class in appbuilder.baseviews:
             class_name = view_class.__class__.__name__
             for name, value in inspect.getmembers(view_class, predicate=inspect.ismethod):
+                print('view_name ', class_name, name, value)
                 if (
                         name not in method_whitelist and
                         [class_name, name] not in views_whitelist and

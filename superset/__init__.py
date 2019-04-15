@@ -21,7 +21,7 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
 
-from flask import Flask, redirect
+from flask import Flask, redirect, url_for, request
 from flask_appbuilder import AppBuilder, IndexView, SQLA
 from flask_appbuilder.baseviews import expose
 from flask_compress import Compress
@@ -224,3 +224,44 @@ if flask_app_mutator:
     flask_app_mutator(app)
 
 from superset import views  # noqa
+
+
+@app.template_filter('link_page_ajax')
+def link_page_filter_ajax(page, modelview_name):
+    """
+        Arguments are passed like: page_<VIEW_NAME>=<PAGE_NUMBER>
+    """
+    new_args = request.view_args.copy()
+    args = request.args.copy()
+    args['page_' + modelview_name] = page
+    return url_for(request.blueprint + '.ajax', **dict(list(new_args.items()) + list(args.to_dict().items())))
+
+
+@app.template_filter('link_order_ajax')
+def link_order_filter(column, modelview_name):
+    """
+        Arguments are passed like: _oc_<VIEW_NAME>=<COL_NAME>&_od_<VIEW_NAME>='asc'|'desc'
+    """
+    new_args = request.view_args.copy()
+    args = request.args.copy()
+    if ('_oc_' + modelview_name) in args:
+        args['_oc_' + modelview_name] = column
+        if args.get('_od_' + modelview_name) == 'asc':
+            args['_od_' + modelview_name] = 'desc'
+        else:
+            args['_od_' + modelview_name] = 'asc'
+    else:
+        args['_oc_' + modelview_name] = column
+        args['_od_' + modelview_name] = 'asc'
+    return url_for(request.blueprint + '.ajax', **dict(list(new_args.items()) + list(args.to_dict().items())))
+
+
+@app.template_filter('get_link_order_ajax')
+def get_link_order_filter(column, modelview_name):
+    if request.args.get('_oc_' + modelview_name) == column:
+        if request.args.get('_od_' + modelview_name) == 'asc':
+            return 2
+        else:
+            return 1
+    else:
+        return 0

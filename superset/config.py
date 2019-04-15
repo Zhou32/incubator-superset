@@ -31,6 +31,7 @@ from celery.schedules import crontab
 from dateutil import tz
 from flask_appbuilder.security.manager import AUTH_DB
 
+from superset.savvy.security import CustomSecurityManager
 from superset.stats_logger import DummyStatsLogger
 
 # Realtime stats logger, a StatsD implementation exists
@@ -57,12 +58,12 @@ FILTER_SELECT_ROW_LIMIT = 10000
 SUPERSET_WORKERS = 2  # deprecated
 SUPERSET_CELERY_WORKERS = 32  # deprecated
 
-SUPERSET_WEBSERVER_ADDRESS = '0.0.0.0'
+SUPERSET_WEBSERVER_ADDRESS = '10.61.3.115'
 SUPERSET_WEBSERVER_PORT = 8088
 SUPERSET_WEBSERVER_TIMEOUT = 60  # deprecated
 SUPERSET_DASHBOARD_POSITION_DATA_LIMIT = 65535
 EMAIL_NOTIFICATIONS = False
-CUSTOM_SECURITY_MANAGER = None
+CUSTOM_SECURITY_MANAGER = CustomSecurityManager
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 # ---------------------------------------------------------
 
@@ -73,7 +74,8 @@ SECRET_KEY = '\2\1thisismyscretkey\1\2\e\y\y\h'  # noqa
 # DB_USER = 'savvybi'
 # DB_PASSWORD = 'savvybi141428'
 # DB_URL = 'savvybi-test.ciimkozo2x5b.ap-southeast-2.rds.amazonaws.com'
-# SQLALCHEMY_DATABASE_URI = 'postgresql://{username}:{password}@{url}/savvybi'.format(username=DB_USER, password=DB_PASSWORD, url=DB_URL)
+# SQLALCHEMY_DATABASE_URI = 'postgresql://{username}:{password}@{url}
+# /savvybi'.format(username=DB_USER, password=DB_PASSWORD, url=DB_URL)
 # SQLALCHEMY_DATABASE_URI = 'mysql://myapp@localhost/myapp'
 # SQLALCHEMY_DATABASE_URI = 'postgresql://root:password@localhost/myapp'
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(DATA_DIR, 'superset.db')
@@ -144,10 +146,15 @@ AUTH_TYPE = AUTH_DB
 # AUTH_ROLE_PUBLIC = 'Public'
 
 # Will allow user self registration
-# AUTH_USER_REGISTRATION = True
+AUTH_USER_REGISTRATION = True
 
 # The default user self registration role
-# AUTH_USER_REGISTRATION_ROLE = "Public"
+AUTH_USER_REGISTRATION_ROLE = 'Public'
+
+RECAPTCHA_DISABLE = False
+RECAPTCHA_USE_SSL = False
+RECAPTCHA_PUBLIC_KEY = '6LfkdoEUAAAAABhKgDekc0LvM_w8oAP9cdaYe3VE'
+RECAPTCHA_PRIVATE_KEY = '6LfkdoEUAAAAAOEGECGPA0BwBhVoxDSCyJUifWGi'
 
 # When using LDAP Auth, setup the ldap server
 # AUTH_LDAP_SERVER = "ldap://ldapserver.new"
@@ -210,9 +217,9 @@ IMG_UPLOAD_URL = '/static/uploads/'
 
 CACHE_DEFAULT_TIMEOUT = 60 * 60 * 24
 CACHE_CONFIG = {'CACHE_TYPE': 'redis',
-    'CACHE_DEFAULT_TIMEOUT': CACHE_DEFAULT_TIMEOUT,
-    'CACHE_KEY_PREFIX': 'superset_results',
-    'CACHE_REDIS_URL': 'redis://redis:6379/0'}
+                'CACHE_DEFAULT_TIMEOUT': CACHE_DEFAULT_TIMEOUT,
+                'CACHE_KEY_PREFIX': 'superset_results',
+                'CACHE_REDIS_URL': 'redis://redis:6379/0'}
 TABLE_NAMES_CACHE_CONFIG = {'CACHE_TYPE': 'null'}
 
 # CORS Options
@@ -456,6 +463,15 @@ MAIL_DEFAULT_SENDER = 'noreply@solarbi.com.au'
 
 if not CACHE_DEFAULT_TIMEOUT:
     CACHE_DEFAULT_TIMEOUT = CACHE_CONFIG.get('CACHE_DEFAULT_TIMEOUT')
+
+# Following configs are for tests
+SMTP_HOST = 'localhost'
+SMTP_STARTTLS = True
+SMTP_SSL = False
+SMTP_USER = 'superset'
+SMTP_PORT = 25
+SMTP_PASSWORD = 'superset'
+SMTP_MAIL_FROM = 'superset@superset.com'
 
 # Whether to bump the logging level to ERRROR on the flask_appbiulder package
 # Set to False if/when debugging FAB related issues like

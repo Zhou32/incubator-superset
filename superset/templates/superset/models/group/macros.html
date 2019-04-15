@@ -1,0 +1,104 @@
+{#
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+#}
+{% import 'appbuilder/general/lib.html' as lib %}
+{% macro render_sites(field, begin_sep_label='', end_sep_label='', begin_sep_field='', end_sep_field='') %}
+    {% if field.id != 'csrf_token' %}
+        {% if field.type == 'HiddenField' %}
+            {{ field}}
+        {% else %}
+            {{begin_sep_label|safe}}
+                <label for="{{field.id}}" control-label>
+                    {{ field.label.text }}
+                </label>
+            {{end_sep_label|safe}}
+            {{begin_sep_field|safe}}
+                <div id="sites_div" style="height:250px;overflow:auto;">
+                    <table id="sites_table" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>&nbsp;</th>
+                                <th>Site Name</th>
+                                <th>Site Address</th>
+                                <th>State</th>
+                                <th>City</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in field._data %}
+                            <tr id="{{row.SiteID}}">
+                                <td><a class="remove-site"><span class="close-icon">&times;</span></a></td>
+                                <td>{{ row.SiteName }}</td>
+                                <td>{{ row.AddressLine }}</td>
+                                <td>{{ row.State }}</td>
+                                <td>{{ row.city }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+            {% if field.errors %}
+                <div class="alert alert-danger">
+                {% for error in field.errors %}
+                    {{ _(error) }}
+                {% endfor %}
+                </div>
+            {% endif %}
+            {{end_sep_field|safe}}
+        {% endif %}
+<script>
+    // Dynamic event listener for remove-site button
+    $('#sites_table').on('click','.remove-site', function(event) {
+        event.preventDefault();
+        id = this.parentNode.parentNode.id
+        removeSiteFromTable(id)
+        $('#chk'+id).prop('checked',false)
+        $('#chk'+id).trigger('change')
+    });
+</script>
+
+{% endmacro %}
+
+{% macro render_form_controls() %}
+    <div class="well well-sm">
+        <button id="submit_button" type="submit" class="btn  btn-sm btn-primary">{{_("Save")}}
+            <i class="fa fa-save"></i></button>
+        {{ lib.lnk_back() }}
+        <script>
+            $('#submit_button').click( function(e) {
+                e.preventDefault();
+                list = []
+                table = document.getElementById('sites_table')
+                for(var i = 0, row; row = table.rows[i]; i++) {
+                    if (row.id != ''){
+                        list.push(row.id);
+                    }
+                }
+                form = document.getElementById('model_form');
+                var sites_list = document.createElement("input");
+                sites_list.type = 'hidden';
+                sites_list.name = 'sites';
+                sites_list.id = 'sites';
+                sites_list.value = list;
+                form.appendChild(sites_list);
+                form.submit()
+            })
+        </script>
+    </div>
+{% endmacro %}

@@ -1,0 +1,164 @@
+{% import 'appbuilder/general/lib.html' as lib %}
+{% extends 'superset/models/site/base_list.html' %}
+
+
+    {% block begin_content scoped %}
+        <div class="table-responsive" style="overflow:auto;height:300px;">
+        <table class="table table-bordered table-hover" >
+    {% endblock %}
+
+    {% block begin_loop_header scoped %}
+
+        <thead>
+        <tr>
+
+
+        <th><INPUT type="checkbox" onchange="checkAll(this)" name="chk[]" /></th>
+        {% for item in include_columns %}
+            {% if item in order_columns %}
+                {% set res = item | get_link_order_ajax(modelview_name) %}
+                    {% if res == 2 %}
+                    <th><a class="page" href={{ item | link_order_ajax(modelview_name) }}>{{label_columns.get(item)}}
+                    <i class="fa fa-chevron-up pull-right"></i></a></th>
+                {% elif res == 1 %}
+                    <th><a class="page" href={{ item | link_order_ajax(modelview_name) }}>{{label_columns.get(item)}}
+                    <i class="fa fa-chevron-down pull-right"></i></a></th>
+                {% else %}
+                    <th><a class="page" href={{ item | link_order_ajax(modelview_name) }}>{{label_columns.get(item)}}
+                    <i class="fa fa-arrows-v pull-right"></i></a></th>
+                {% endif %}
+            {% else %}
+                <th>{{label_columns.get(item)}}</th>
+            {% endif %}
+        {% endfor %}
+        </tr>
+        </thead>
+    {% endblock %}
+
+    {% block begin_loop_values %}
+        {% for item in value_columns %}
+            {% set pk = pks[loop.index-1] %}
+            {% set id = 'chk'~pk %}
+            {% if site_list and pk in site_list %}
+            <tr class="success">
+                <td>
+                    <input id="{{id}}" class="action_check" name="rowid" value="{{pk}}" type="checkbox"
+                            onchange="checkThis(this)", checked>
+
+            {% else %}
+            <tr>
+                <td>
+                    <input id="{{id}}" class="action_check" name="rowid" value="{{pk}}" type="checkbox"
+                            onchange="checkThis(this)">
+            {% endif %}
+                </td>
+                {% for value in include_columns %}
+                    {% set formatter = formatters_columns.get(value) %}
+                    {% if formatter %}
+                        <td class="{{id}}">{{ formatter(item[value]) }}</td>
+                    {% else %}
+                        <td class="{{id}}">{{ item[value] }}</td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    {% endblock %}
+
+    {% block end_content scoped %}
+        </table>
+        </div>
+        <script>
+             // pre check checkboxes
+             var checkboxes = document.getElementsByTagName('input');
+             for (var i = 0; i < checkboxes.length; i++) {
+                 if (checkboxes[i].type == 'checkbox') {
+                     var id = checkboxes[i].value
+                     if (document.getElementById(id) != null) {
+                         checkboxes[i].checked = true;
+                         var thisClosest = checkboxes[i].parentNode.parentNode
+                         thisClosest.classList += 'success'
+                     }
+                 }
+             }
+
+             function checkAll(ele) {
+                 var checkboxes = document.getElementsByTagName('input');
+                 if (ele.checked) {
+                     for (var i = 1; i < checkboxes.length; i++) {
+                         if (checkboxes[i].type == 'checkbox') {
+                             checkboxes[i].checked = true;
+
+                             var id = checkboxes[i].id;
+                             console.log(id)
+                             $('#'+id).trigger('change')
+                         }
+                     }
+                 } else {
+                     for (var i = 1; i < checkboxes.length; i++) {
+                         if (checkboxes[i].type == 'checkbox') {
+                             checkboxes[i].checked = false;
+                             var id = checkboxes[i].id;
+                             $('#'+id).trigger('change')
+                         }
+                     }
+                 }
+             }
+
+             function checkThis(ele) {
+                var collection = document.getElementsByClassName(ele.id)
+                list = [ele.value]
+                for (var i=0;i<collection.length; i++) {
+                    list.push(collection[i].textContent)
+                }
+                if (ele.checked) {
+                    addSiteToTable(list)
+                }
+                else {
+                    removeSiteFromTable(list[0])
+                }
+             }
+
+             function addSiteToTable(list) {
+                var site_list = document.getElementById("sites_table")
+
+                var id = list[0]
+                if (document.getElementById(id) != null) {}
+                else {
+                    var rowCnt = site_list.rows.length;
+                    var tr = site_list.insertRow(rowCnt);
+                    tr.setAttribute('id',list[0])
+
+                    // create a cross button on table to un select site
+                    var td = document.createElement('td')
+                    var anchor = document.createElement('a')
+                    var span = document.createElement('span')
+                    span.setAttribute('class','close-icon')
+                    span.innerHTML='&times;'
+                    anchor.classList += 'remove-site'
+                    anchor.appendChild(span)
+                    td.appendChild(anchor)
+                    tr.appendChild(td)
+
+                    //create rest table cells
+                    for (var i=1; i<list.length; i++){
+                        var td = document.createElement('td');
+                        td = tr.insertCell(i-1);
+                        td.appendChild(document.createTextNode(list[i]));
+                        tr.appendChild(td);
+                    }
+                    $('#sites_div').scrollTop($('#sites_div')[0].scrollHeight)
+                }
+             }
+
+             function removeSiteFromTable(id) {
+                var site_list = document.getElementById("sites_table");
+                if (document.getElementById(id) != null) {
+                    var rowIndex = document.getElementById(id).rowIndex
+                    site_list.deleteRow(rowIndex)
+                }
+             }
+
+
+        </script>
+    {% endblock %}
+
