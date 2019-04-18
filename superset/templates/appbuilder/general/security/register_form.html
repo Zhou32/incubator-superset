@@ -13,25 +13,15 @@
     <div class="register-form" style="margin:auto; width:40%;">
         {% for field in form %}
             <div class="input-group">
-                {{ field(size = 60, class = "form-control login-form", placeholder=field.label.text,
-                    onfocusout="validField(this)") }}
-                {% if field.errors %}
-                    <span class="fa fa-times-circle-o fa-1x" style="color:RGBA(184,16,56,0.5);
-                                                 position:absolute;
-                                                 top:13px;
-                                                 right:10px;
-                                                 float:right;
-                                                 font-size: 20px;
-                                                 z-index:10;"></span>
-                {% else %}
-                    <span class="fa fa-check" style="color:#079493;
-                                                 position:absolute;
-                                                 top:13px;
-                                                 right:10px;
-                                                 float:right;
-                                                 font-size: 20px;
-                                                 z-index:10;" hidden></span>
+                {{ field(size = 60, class = "form-control login-form", placeholder=field.label.text) }}
+                {% if field.name == 'password' %}
+                    <span class="fa fa-hand-pointer-o" style="color: RGBA(218,211,56,0.5); z-index: 12;" hidden></span>
                 {% endif %}
+                {% if field.errors %}
+                    <span class="fa fa-times-circle-o fa-1x" style="color: RGBA(184,16,56,0.5); z-index: 10;"></span>
+                {% endif %}
+                <span class="fa fa-check" style="color: #079493; z-index: 11;" hidden></span>
+
             </div>
             <a>&nbsp;</a>
         {% endfor %}
@@ -39,23 +29,34 @@
     <div class="control-group">
         <div class="reg-footer">
             <div style="float: left">
+                <div class="savvybi-alert alert-info caplock-alert" hidden>
+                    You have your CAPS LOCK on. Is that what you want?
+                </div>
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         {% for category, m in messages %}
                             {% if category %}
-                                <div class="alert alert-{{ category }}">
+                                <div class="savvybi-alert alert-{{ category }} flush-message">
                             {% else %}
-                                <div class="alert alert-info">
+                                <div class="savvybi-alert alert-info flush-message">
                             {% endif %}
                             {{ m }}
                             </div>
                         {% endfor %}
+                    {% elif form.errors %}
+                        {% for error in form.errors.items() %}
+                          {% if loop.first %}
+                            <div class="savvybi-alert alert-danger error-message">{{ error[1][0] }}</div>
+                          {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <div class="savvybi-alert alert-note" >
+                            Make sure you save your password, make it secure!
+                        </div>
                     {% endif %}
-                    {% for error in form.errors.items() %}
-                      {% if loop.first %}
-                        <div class="savvybi-alert alert-danger">{{ error[1][0] }}</div>
-                      {% endif %}
-                    {% endfor %}
+                    <div class="savvybi-alert alert-success alert-ready" hidden>
+                        All good let's do it!
+                    </div>
                 {% endwith %}
             </div>
             <div style="float: right;">
@@ -65,15 +66,46 @@
     </div>
     </form>
     <script>
-        $('.login-form').each(function() {
+        $('.login-form').each(function(){
+            if($(this).val() == '')
+                $('input:submit').attr('disabled','disabled');
+                $('input:submit').removeClass('btn-primary').addClass('btn-disabled');
+
             if($(this).attr('name') != 'csrf_token'){
                 if ($(this).val() != ''){
-                    $(this).siblings('span').show();
+                    $(this).siblings('.fa-check').show();
                 }else{
-                   $(this).siblings('span').hide();
+                   $(this).siblings('.fa-check').hide();
                 }
             }
 
+        })
+
+
+        $('.login-form').on('focusout', function(){
+            if ($(this).val() != '') {
+                $(this).siblings('.fa-check').show();
+            }
+            else{
+                $(this).siblings('.fa-check').hide();
+            }
+
+            let submit_flag = true;
+            $('.login-form').each(function(){
+                if ($(this).val() == '')
+                    submit_flag = false
+            })
+            if(submit_flag == true) {
+                $('input:submit').removeAttr('disabled');
+                $('input:submit').removeClass('btn-disabled').addClass('btn-primary');
+                $('.alert-ready').show();
+                $('.error-message').hide().$('.flush-message').hide();
+            }
+            else {
+                $('input:submit').attr('disabled', 'disabled');
+                $('input:submit').removeClass('btn-primary').addClass('btn-disabled');
+                $('.error-message').show().$('.flush-message').show().$('.alert-ready').attr('hidden', 'hidden')
+            }
         })
 
         let password = document.getElementsByName('password')[0]
@@ -81,21 +113,19 @@
             // If "caps lock" is pressed, display the warning text
             if (event instanceof KeyboardEvent ) {
                 if (event.getModifierState("CapsLock")) {
-                    document.getElementsByClassName('cap-lock')[0].hidden = false
+
+                    $(".savvybi-alert:not(.capslock-alert)").hide();
+                    $(".caplock-alert").show();
+                    $(this).siblings('span').hide();
+                    $(this).siblings('.fa-hand-pointer-o').show();
                 } else {
-                    document.getElementsByClassName('cap-lock')[0].hidden = true
+                    $(".savvybi-alert:not(.capslock-alert):not(.alert-ready)").show();
+                    $(".caplock-alert").hide();
+                    $(this).siblings('span').hide()
                 }
             }
         });
 
-        function validField(field){
-            if (field.value != '') {
-                field.parentNode.childNodes[3].hidden = false
-            }
-            else{
-                field.parentNode.childNodes[3].hidden = true
-            }
-        }
     </script>
 {% endblock %}
 

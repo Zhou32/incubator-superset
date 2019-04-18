@@ -439,7 +439,7 @@ class CustomSecurityManager(SupersetSecurityManager):
             self.get_session.rollback()
 
     def add_register_user_org_admin(self, **kwargs):
-        register_user = self.registeruser_model()
+        register_user = OrgRegisterUser()
         register_user.first_name = kwargs['first_name']
         register_user.last_name = kwargs['last_name']
         register_user.username = kwargs['email']
@@ -447,12 +447,14 @@ class CustomSecurityManager(SupersetSecurityManager):
         register_user.organization = kwargs['organization']
         register_user.password = generate_password_hash(kwargs['password'])
         register_user.registration_hash = str(uuid.uuid1())
-        register_user.inviter = '1'
+
         try:
             self.get_session.add(register_user)
             self.get_session.commit()
             return register_user
         except Exception as e:
+            print("------------------------")
+            print(e)
             logging.error(const.LOGMSG_ERR_SEC_ADD_REGISTER_USER.format(str(e)))
             self.appbuilder.get_session.rollback()
             return None

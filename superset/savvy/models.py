@@ -61,7 +61,7 @@ class OrgRegisterUser(Model):
     inviter = Column('inviter_id', Integer, ForeignKey('ab_user.id'), nullable=True)
     valid_date = Column(DateTime, default=(lambda: datetime.datetime.now() + timedelta(hours=register_valid_hours)),
                         nullable=True)
-    group = Column('group_id', Integer, ForeignKey('groups.id'))
+    group = Column('group_id', Integer, ForeignKey('groups.id'), nullable=True)
     role_assigned = Column('role_id', Integer, ForeignKey('ab_role.id'), nullable=True)
 
 
