@@ -90,3 +90,17 @@
 .reg-footer .alert-info{
     background-color: RGBA(218,211,56,0.31);
 }
+.btn-disabled{
+    background-color: RGBA(112,112,112,0.22);
+    color: RGBA(112,112,112,0.35);
+
+}
+
+.register-form .fa{
+    position: absolute;
+    top: 13px;
+    right: 10px;
+    float: right;
+    font-size: 20px;
+    background: white;
+}
