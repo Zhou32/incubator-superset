@@ -1,11 +1,10 @@
 from flask_babel import lazy_gettext
-from wtforms import StringField, PasswordField, SelectField, HiddenField
 from wtforms.validators import DataRequired, EqualTo, Email, ValidationError, NumberRange, Optional
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from flask_babel import lazy_gettext as _
 from flask_wtf.file import FileAllowed, FileField, FileRequired
 from wtforms import (
-    BooleanField, Field, IntegerField, SelectField, StringField)
+    BooleanField, IntegerField, SelectField, StringField, PasswordField)
 
 
 from flask_appbuilder.security.sqla.models import User
@@ -74,7 +73,7 @@ class SavvyRegisterUserDBForm(DynamicForm):
                                   description=lazy_gettext('Please rewrite the password to confirm'),
                                   validators=[EqualTo('password', message=lazy_gettext('Passwords must match'))],
                             )
-
+    stay_login = BooleanField(lazy_gettext('Stay signed in'))
 
 
 class SavvyRegisterInvitationUserDBForm(DynamicForm):

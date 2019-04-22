@@ -12,18 +12,24 @@
     {{ form.hidden_tag() }}
     <div class="register-form" style="margin:auto; width:40%;">
         {% for field in form %}
-            <div class="input-group">
-                {{ field(size = 60, class = "form-control login-form", placeholder=field.label.text) }}
-                {% if field.name == 'password' %}
-                    <span class="fa fa-hand-pointer-o" style="color: RGBA(218,211,56,0.5); z-index: 12;" hidden></span>
-                {% endif %}
-                {% if field.errors %}
-                    <span class="fa fa-times-circle-o fa-1x" style="color: RGBA(184,16,56,0.5); z-index: 11;"></span>
-                {% endif %}
-                <span class="fa fa-check" style="color: #079493; z-index: 10;" hidden></span>
-
-            </div>
-            <a>&nbsp;</a>
+            {% if field.name=='stay_login' %}
+                <div class="input-group" style="display: block;">
+                    {{ field(value="0") }}
+                    <label for="stay_login">Stay signed in</label>
+                </div>
+            {% else %}
+                <div class="input-group">
+                    {{ field(size = 60, class = "form-control login-form", placeholder=field.label.text) }}
+                    {% if field.name == 'password' %}
+                        <span class="fa fa-hand-pointer-o" style="color: RGBA(218,211,56,0.5); z-index: 12;" hidden></span>
+                    {% endif %}
+                    {% if field.errors %}
+                        <span class="fa fa-times-circle-o fa-1x" style="color: RGBA(184,16,56,0.5); z-index: 11;"></span>
+                    {% endif %}
+                    <span class="fa fa-check" style="color: #079493; z-index: 10;" hidden></span>
+                </div>
+                <a>&nbsp;</a>
+            {% endif %}
         {% endfor %}
     </div>
     <div class="control-group">
@@ -75,6 +81,7 @@
 
             if($(this).attr('name') != 'csrf_token'){
                 if ($(this).val() != '' && $(this).parent().find($('.fa-times-circle-o')).length==0){
+                    alert("asdf")
                     $(this).siblings('span').hide();
                     $(this).siblings('.fa-check').show();
                 }else{
@@ -83,6 +90,13 @@
             }
         })
 
+        $('#stay_login').on('click', function(){
+            if($(this). prop("checked") == true){
+                $(this).val(1);
+            }else{
+                $(this).val(0);
+            }
+        })
 
         $('.login-form').on('focusout', function(){
             if ($(this).val() != '') {
