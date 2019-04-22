@@ -345,7 +345,7 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
             flash(as_unicode(self.error_message), 'danger')
         else:
             org_reg = self.appbuilder.sm.add_org(reg, user)
-            # self.handle_aws_info(org_reg, user)
+            self.handle_aws_info(org_reg, user)
             self.appbuilder.sm.del_register_user(reg)
             if request.args.get('login') == 'True':
                 login_user(user, remember=False)
