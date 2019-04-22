@@ -590,7 +590,7 @@ WEBDRIVER_BASEURL = 'http://0.0.0.0:8080/'
 # Send user to a link where they can report bugs
 BUG_REPORT_URL = None
 
-
+USER_AUTO_LOGIN_AFTER_CONFIRM = True
 try:
     if CONFIG_PATH_ENV_VAR in os.environ:
         # Explicitly import config module that is not in pythonpath; useful

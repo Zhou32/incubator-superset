@@ -1,11 +1,10 @@
 from flask_babel import lazy_gettext
-from wtforms import StringField, PasswordField, SelectField, HiddenField
 from wtforms.validators import DataRequired, EqualTo, Email, ValidationError, NumberRange, Optional
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from flask_babel import lazy_gettext as _
 from flask_wtf.file import FileAllowed, FileField, FileRequired
 from wtforms import (
-    BooleanField, Field, IntegerField, SelectField, StringField)
+    BooleanField, SelectField, StringField, PasswordField)
 
 
 from flask_appbuilder.security.sqla.models import User
@@ -45,7 +44,7 @@ def unique_required(form, field):
     if field.name == "organization":
         if db.session.query(Organization).filter_by(organization_name=field.data).first() is not None or \
                         db.session.query(OrgRegisterUser).filter_by(organization=field.data).first() is not None:
-            raise ValidationError("Name already exists")
+            raise ValidationError("This organization name already exists")
 
     # if field.name == "username":
     #     if db.session.query(User).filter_by(username=field.data).first() is not None or \
@@ -59,11 +58,11 @@ def unique_required(form, field):
 
 
 class SavvyRegisterUserDBForm(DynamicForm):
-    organization = StringField(lazy_gettext('Organization'),
+    organization = StringField(lazy_gettext('WorkPlace Name'),
                                validators=[DataRequired(), unique_required],
                                )
-    first_name = StringField(lazy_gettext('First Name'), validators=[DataRequired()])
-    last_name = StringField(lazy_gettext('Last Name'), validators=[DataRequired()])
+    # first_name = StringField(lazy_gettext('First Name'), validators=[DataRequired()])
+    # last_name = StringField(lazy_gettext('Last Name'), validators=[DataRequired()])
     email = StringField(lazy_gettext('Email'), validators=[DataRequired(), Email(), unique_required])
     password = PasswordField(lazy_gettext('Password'),
                              description=lazy_gettext(
@@ -74,7 +73,7 @@ class SavvyRegisterUserDBForm(DynamicForm):
                                   description=lazy_gettext('Please rewrite the password to confirm'),
                                   validators=[EqualTo('password', message=lazy_gettext('Passwords must match'))],
                             )
-
+    stay_login = BooleanField(lazy_gettext('Stay signed in'))
 
 
 class SavvyRegisterInvitationUserDBForm(DynamicForm):

@@ -9,21 +9,27 @@
 {% else %}
     <form id="model_form" action="" method="post" enctype="multipart/form-data">
 {% endif %}
-    {{ form.hidden_tag() }}
     <div class="register-form" style="margin:auto; width:40%;">
         {% for field in form %}
-            <div class="input-group">
-                {{ field(size = 60, class = "form-control login-form", placeholder=field.label.text) }}
-                {% if field.name == 'password' %}
-                    <span class="fa fa-hand-pointer-o" style="color: RGBA(218,211,56,0.5); z-index: 12;" hidden></span>
-                {% endif %}
-                {% if field.errors %}
-                    <span class="fa fa-times-circle-o fa-1x" style="color: RGBA(184,16,56,0.5); z-index: 11;"></span>
-                {% endif %}
-                <span class="fa fa-check" style="color: #079493; z-index: 10;" hidden></span>
-
-            </div>
-            <a>&nbsp;</a>
+            {% if field.name=='stay_login' %}
+                <div class="input-group" style="display: block;">
+                    {{ field(value="0") }}
+                    <label for="stay_login">Stay signed in</label>
+                </div>
+            {% else %}
+                <div class="input-group">
+                    {{ field(size = 60, class = "form-control login-form", placeholder=field.label.text) }}
+                    {% if field.name == 'password' %}
+                        <span class="fa fa-hand-pointer-o" style="color: RGBA(218,211,56,0.5); z-index: 12;" hidden></span>
+                    {% endif %}
+                    {% if field.errors %}
+                        <span class="fa fa-times-circle-o fa-1x" style="color: RGBA(184,16,56,0.5); z-index: 13;"></span>
+                    {% endif %}
+                    <span class="fa fa-times-circle-o fa-1x" style="color: RGBA(184,16,56,0.5); z-index: 11;" hidden></span>
+                    <span class="fa fa-check" style="color: #079493; z-index: 10;" hidden></span>
+                </div>
+                <a>&nbsp;</a>
+            {% endif %}
         {% endfor %}
     </div>
     <div class="control-group">
@@ -52,13 +58,14 @@
                     {% else %}
 
                     {% endif %}
-                <div class="savvybi-alert alert-note" >
+                <div class="savvybi-alert note-messge" >
                     Make sure you save your password, make it secure!
                 </div>
-                <div class="savvybi-alert alert-success alert-ready" hidden>
+                <div class="savvybi-alert alert-success ready-message" hidden>
                     All good let's do it!
                 </div>
-
+                <div class="savvybi-alert alert-danger warning-message" hidden>
+                </div>
                 {% endwith %}
             </div>
             <div style="float: right;">
@@ -68,49 +75,136 @@
     </div>
     </form>
     <script>
+        function emailValidation(emailAddress) {
+            var pattern = new RegExp(/^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i);
+            return pattern.test(emailAddress);
+        }
+
+        function passwordValidation(password) {
+            var pattern = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[_\-+!@#\$%\^&\*])(?=.{6,})/i);
+            return pattern.test(password);
+        }
+
+        // Initial validation check
         $('.login-form').each(function(){
-            if($(this).val() == '')
+            is_ready_submit = true;
+            is_valid = false;
+
+            if($(this).parent().find($('.fa-times-circle-o:visible')).length==0){
+                if ($(this).attr('id') == 'email'){
+                    if (!emailValidation($(this).val())){
+                        is_ready_submit = false && is_ready_submit;
+                    }else{
+                        is_valid = true;
+                    }
+                } // Organization name validation
+                else if ($(this).attr('id') == 'organization'){
+                    if ($(this).val().length <= 3){
+                        is_ready_submit = false && is_ready_submit;
+                    }else{
+                        is_valid = true;
+                    }
+                } // Password validation
+                else if ($(this).attr('id') == 'password'){
+                    if (!passwordValidation($(this).val())){
+                        is_ready_submit = false && is_ready_submit;
+                    }else{
+                        is_valid = true;
+                    }
+                }
+                else if ($(this).attr('id') == 'conf_password'){
+                    if ($(this).val()!=$('#password').val() || $(this).val()==''){
+                        is_ready_submit = false && is_ready_submit;
+                    }else{
+                        is_valid = true;
+                    }
+                }
+
+                if (is_valid){
+                    $(this).siblings('.fa-check').removeAttr('hidden');
+                }
+            }
+
+            if(!is_ready_submit)
                 $('input:submit').attr('disabled','disabled');
                 $('input:submit').removeClass('btn-primary').addClass('btn-disabled');
+        })
 
-            if($(this).attr('name') != 'csrf_token'){
-                if ($(this).val() != '' && $(this).parent().find($('.fa-times-circle-o')).length==0){
-                    $(this).siblings('span').hide();
-                    $(this).siblings('.fa-check').show();
-                }else{
-                   $(this).siblings('.fa-check').hide();
-                }
+        $('#stay_login').on('click', function(){
+            if($(this). prop("checked") == true){
+                $(this).val(1);
+            }else{
+                $(this).val(0);
             }
         })
 
-
         $('.login-form').on('focusout', function(){
-            if ($(this).val() != '') {
-                $(this).siblings('span').hide();
-                $(this).siblings('.fa-check').show();
+            var is_valid = true;
+            var warning_msg = "";
+
+            // Email validation
+            if ($(this).attr('id') == 'email'){
+                if (!emailValidation($(this).val())){
+                    is_valid = false;
+                    warning_msg = "Please input correct email address.";
+                }
+            } // Organization name validation
+            else if ($(this).attr('id') == 'organization'){
+                if ($(this).val().length <= 3){
+                    is_valid = false;
+                    warning_msg = "Workplace name should be more than 3 letters.";
+                }
+            } // Password validation
+            else if ($(this).attr('id') == 'password'){
+                if (!passwordValidation($(this).val())){
+                    is_valid = false;
+                    warning_msg = "Password must contain one symbol, one uppercase with at least 6 characters.";
+                }
             }
-            else{
-                $(this).siblings('.fa-check').hide();
+            else if ($(this).attr('id') == 'conf_password'){
+                if ($(this).val()!=$('#password').val()){
+                    is_valid = false;
+                    warning_msg = "Confirm password doesn't match!";
+                }
             }
 
-            let submit_flag = true;
+            if(is_valid) {
+                $(this).siblings('span').attr('hidden', true);
+                $(this).siblings('.fa-check').removeAttr('hidden');
+                $('.warning-message').attr('hidden', true);
+
+            }else {
+                $(this).siblings('.fa-check').attr('hidden', true);
+                $(this).siblings('.fa-times-circle-o').removeAttr('hidden');
+
+                $('.warning-message').removeAttr('hidden');
+                $('.warning-message').html(warning_msg);
+
+                $('.error-message').removeAttr('hidden');
+                $('.flush-message').removeAttr('hidden');
+
+                if($(this).attr('id')!='conf_password')
+                  $(this).focus();
+            }
+
+            // Check if submit is ready
+            var is_ready = true;
             $('.login-form').each(function(){
-                if ($(this).val() == '')
-                    submit_flag = false
-            })
-            if(submit_flag == true) {
+                if($(this).attr('id')!='csrf_token' && $(this).siblings('.fa-check:hidden').length>0)
+                {
+                    is_ready = false;
+                    return;
+                }
+            });
+            if(is_ready){
                 $('input:submit').removeAttr('disabled');
                 $('input:submit').removeClass('btn-disabled').addClass('btn-primary');
-                $('.savvybi-alert').hide();
-                $('.alert-ready').show();
-
-            }
-            else {
+                $('.savvybi-alert').attr('hidden', true);
+                $('.ready-message').removeAttr('hidden');
+            }else{
                 $('input:submit').attr('disabled', 'disabled');
                 $('input:submit').removeClass('btn-primary').addClass('btn-disabled');
-                $('.savvybi-alert').hide();
-                $('.error-message').show();
-                $('.flush-message').show();
+                $('.ready-message').attr('hidden', true);
             }
         })
 
@@ -120,18 +214,16 @@
             if (event instanceof KeyboardEvent ) {
                 if (event.getModifierState("CapsLock")) {
 
-                    $(".savvybi-alert:not(.capslock-alert)").hide();
-                    $(".caplock-alert").show();
-                    $(this).siblings('span').hide();
-                    $(this).siblings('.fa-hand-pointer-o').show();
+                    $(".savvybi-alert:not(.capslock-alert)").attr('hidden', true);
+                    $(".caplock-alert").removeAttr('hidden');
+                    $(this).siblings('span').attr('hidden', true);
+                    $(this).siblings('.fa-hand-pointer-o').removeAttr('hidden');
                 } else {
-                    $(".savvybi-alert:not(.capslock-alert):not(.alert-ready)").show();
-                    $(".caplock-alert").hide();
-                    $(this).siblings('span').hide()
+                    $(".caplock-alert").attr('hidden', true);
+                    $(this).siblings('span').attr('hidden', true);
                 }
             }
         });
-
     </script>
 {% endblock %}
 
