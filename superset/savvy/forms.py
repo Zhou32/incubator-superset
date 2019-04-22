@@ -59,11 +59,11 @@ def unique_required(form, field):
 
 
 class SavvyRegisterUserDBForm(DynamicForm):
-    organization = StringField(lazy_gettext('Organization'),
+    organization = StringField(lazy_gettext('WorkPlace Name'),
                                validators=[DataRequired(), unique_required],
                                )
-    first_name = StringField(lazy_gettext('First Name'), validators=[DataRequired()])
-    last_name = StringField(lazy_gettext('Last Name'), validators=[DataRequired()])
+    # first_name = StringField(lazy_gettext('First Name'), validators=[DataRequired()])
+    # last_name = StringField(lazy_gettext('Last Name'), validators=[DataRequired()])
     email = StringField(lazy_gettext('Email'), validators=[DataRequired(), Email(), unique_required])
     password = PasswordField(lazy_gettext('Password'),
                              description=lazy_gettext(

@@ -440,8 +440,6 @@ class CustomSecurityManager(SupersetSecurityManager):
 
     def add_register_user_org_admin(self, **kwargs):
         register_user = OrgRegisterUser()
-        register_user.first_name = kwargs['first_name']
-        register_user.last_name = kwargs['last_name']
         register_user.username = kwargs['email']
         register_user.email = kwargs['email']
         register_user.organization = kwargs['organization']

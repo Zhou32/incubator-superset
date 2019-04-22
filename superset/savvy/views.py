@@ -326,6 +326,10 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
             and activated
         """
         reg = self.appbuilder.sm.find_register_user(activation_hash)
+        if reg.first_name is None:
+            reg.first_name = ' '
+        if reg.last_name is None:
+            reg.last_name = ' '
 
         if not reg:
             log.error(const.LOGMSG_ERR_SEC_NO_REGISTER_HASH.format(activation_hash))
@@ -391,8 +395,6 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
     def form_post(self, form):
         self.add_form_unique_validations(form)
         self.add_registration_org_admin(organization=form.organization.data,
-                                        first_name=form.first_name.data,
-                                        last_name=form.last_name.data,
                                         email=form.email.data,
                                         password=form.password.data)
 
