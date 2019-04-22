@@ -92,7 +92,7 @@
     background-color: #e9e9c8;
 }
 
-.reg-footer .alert-note, .reg-footer .alert-ready{
+.reg-footer .note-message, .reg-footer .ready-message{
     z-index: 1;
 }
 .reg-footer .flush-message, .reg-footer .error-message{
