@@ -49,54 +49,156 @@
 {% block content %}
 
 <div class="container">
-    <div id="loginbox" style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
-        <div class="panel panel-primary" >
-            <div class="panel-heading">
-                <div class="panel-title">
-                    <h2 style="text-align: center; font-family: 'Futura PT Bold'">{{ _("Welcome back!") }}</h2></div>
-            </div>
-            <div style="padding-top:30px" class="panel-body" >
-
-                <form class="form" action="" method="post" name="login">
-                    {{form.hidden_tag()}}
-                    <div class="control-group{% if form.errors.openid %} error{% endif %}">
-
-                        <div class="controls">
-                            <div class="input-group">
-                                {{ form.username(size = 80, class = "form-control login-form", placeholder='E-mail') }}
-                            </div>
-                            {% for error in form.errors.openid %}
-                            <span class="help-inline">[{{error}}]</span><br>
-                            {% endfor %}
-                            <a>&nbsp;</a>
-                            <div class="input-group">
-                                {{ form.password(size = 80, class = "form-control login-form", placeholder='Password') }}
-                            </div>
-                            {% for error in form.errors.openid %}
-                            <span class="help-inline">[{{error}}]</span><br>
-                            {% endfor %}
-                        </div>
-                    </div>
-
-                    <div class="control-group">
-                        <div class="controls" style="position: fixed;bottom: 10%;width: 100%;left: 0;float: left">
-                            <br>
-                            <div style="float:left;padding-left:10%">
-                                <a
-                                    href="{{appbuilder.sm.get_url_for_recover}}">
-                                    {{_('Forgot your password?')}}
-                                </a>
-                            </div>
-                            <div style="float:right;padding-right:10%">
-                                <input
-                                       class="btn btn-primary btn-block form-submit" type="submit" value="{{_('Sign In')}}">
-                            </div>
-                        </div>
-                    </div>
-                </form>
-
-            </div>
+    <div id="Home" class="tab-pane active">
+        <div>
+            <h2 class="form-header">Welcome back!</h2>
+            <h4>&nbsp;</h4>
         </div>
+        <form class="form" action="" method="post" name="login">
+            {{form.hidden_tag()}}
+            <div class="register-form"  style="margin:auto; width:40%;">
+                <div class="input-group">
+                    {{ form.email(size = 80, class = "form-control login-form", placeholder=form.email.label.text) }}
+                </div>
+                <a>&nbsp;</a>
+                <div class="input-group">
+                    {{ form.password(size = 80, class = "form-control login-form", placeholder=form.password.label.text) }}
+                    <span class="fa fa-hand-pointer-o" style="color: RGBA(218,211,56,0.5); z-index: 12;" hidden></span>
+                </div>
+                <a>&nbsp;</a>
+                <div style="display: block; width: 100%;">
+                    <div style="float:left; font-size: 20px; font-family: 'Futura PT Light';">
+                        <a
+                            href="{{appbuilder.sm.get_url_for_recover}}">
+                            {{_('Forgot your password?')}}
+                        </a>
+                    </div>
+                    <div style="float:right;">
+                        {{ form.remember_me(class="form-control login-form", value="0") }}
+                        <label for="remember_me">{{ form.remember_me.label.text }}</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="reg-footer">
+                    <div style="float: left">
+                        <div class="savvybi-alert alert-info caplock-alert" hidden>
+                            You have your CAPS LOCK on. Is that what you want?
+                        </div>
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, m in messages %}
+                                    {% if category %}
+                                        <div class="savvybi-alert alert-{{ category }} flush-message">
+                                    {% else %}
+                                        <div class="savvybi-alert alert-info flush-message">
+                                    {% endif %}
+                                    {{ m }}
+                                    </div>
+                                {% endfor %}
+                            {% elif form.errors %}
+                                {% for error in form.errors.items() %}
+                                  {% if loop.first %}
+                                    <div class="savvybi-alert alert-danger error-message">{{ error[1][0] }}</div>
+                                  {% endif %}
+                                {% endfor %}
+                            {% else %}
+
+                            {% endif %}
+                        <div class="savvybi-alert alert-success ready-message" hidden>
+                            All good let's do it!
+                        </div>
+                        {% endwith %}
+                    </div>
+                    <div style="float: right;">
+                        <input class="btn btn-primary btn-block form-submit" type="submit" value="{{_('Sign In')}}">
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
+<script>
+    function emailValidation(emailAddress) {
+        var pattern = new RegExp(/^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i);
+        return pattern.test(emailAddress);
+    }
+
+    $('#remember_me').on('click', function(){
+        if($(this). prop("checked") == true){
+            $(this).val(1);
+        }else{
+            $(this).val(0);
+        }
+    })
+
+    var is_ready = true;
+
+    $('.login-form').on('change', function(){
+        var is_valid = true;
+        var warning_msg = "";
+
+        // Email validation
+        if ($(this).attr('id') == 'email'){
+            if (!emailValidation($(this).val())){
+                is_valid = false;
+                warning_msg = "Please input correct email address.";
+            }
+        }
+        else if ($(this).attr('id') == 'password'){
+            if ($(this).val() == ''){
+                is_valid = false;
+                warning_msg = "Please input password";
+            }
+        }
+
+        if(is_valid) {
+            $('.warning-message').attr('hidden', true);
+        }else {
+            $('.warning-message').removeAttr('hidden');
+            $('.warning-message').html(warning_msg);
+
+            $('.error-message').removeAttr('hidden');
+            $('.flush-message').removeAttr('hidden');
+        }
+
+        // Check if submit is ready
+
+        $('.login-form').each(function(){
+            if($(this).attr('id')!='csrf_token' && $(this).siblings('.fa-check:hidden').length>0)
+            {
+                is_ready = false;
+                return;
+            }
+        });
+        if(is_ready){
+            $('input:submit').removeAttr('disabled');
+            $('input:submit').removeClass('btn-disabled').addClass('btn-primary');
+            $('.savvybi-alert').attr('hidden', true);
+            $('.ready-message').removeAttr('hidden');
+        }else{
+            $('input:submit').attr('disabled', 'disabled');
+            $('input:submit').removeClass('btn-primary').addClass('btn-disabled');
+            $('.ready-message').attr('hidden', true);
+        }
+    })
+
+    let password = document.getElementsByName('password')[0]
+    password.addEventListener("keyup", function(event) {
+        // If "caps lock" is pressed, display the warning text
+        if (event instanceof KeyboardEvent ) {
+            if (event.getModifierState("CapsLock")) {
+
+                $(".savvybi-alert:not(.capslock-alert)").attr('hidden', true);
+                $(".caplock-alert").removeAttr('hidden');
+                $(this).siblings('span').attr('hidden', true);
+                $(this).siblings('.fa-hand-pointer-o').removeAttr('hidden');
+            } else {
+                $(".caplock-alert").attr('hidden', true);
+                $(this).siblings('span').attr('hidden', true);
+            }
+        }
+    });
+</script>
 {% endblock %}

@@ -19,6 +19,12 @@ class PasswordRecoverForm(DynamicForm):
     email = StringField(lazy_gettext('Email'), validators=[DataRequired(), Email()])
 
 
+class SavvyBILoginDBForm(DynamicForm):
+    email = StringField(lazy_gettext("Email"), validators=[DataRequired(), Email()])
+    password = PasswordField(lazy_gettext("Password"), validators=[DataRequired()])
+    remember_me = BooleanField(lazy_gettext('remember me'))
+
+
 class RegisterInvitationForm(DynamicForm):
     organization = StringField(lazy_gettext('Organization'), widget=BS3TextFieldWidget(), render_kw={'readonly': True})
     inviter = StringField(lazy_gettext('Inviter'), widget=BS3TextFieldWidget(), render_kw={'readonly': True})
