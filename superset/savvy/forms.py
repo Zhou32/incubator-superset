@@ -61,18 +61,12 @@ class SavvyRegisterUserDBForm(DynamicForm):
     organization = StringField(lazy_gettext('WorkPlace Name'),
                                validators=[DataRequired(), unique_required],
                                )
-    # first_name = StringField(lazy_gettext('First Name'), validators=[DataRequired()])
-    # last_name = StringField(lazy_gettext('Last Name'), validators=[DataRequired()])
     email = StringField(lazy_gettext('Email'), validators=[DataRequired(), Email(), unique_required])
     password = PasswordField(lazy_gettext('Password'),
                              description=lazy_gettext(
                                  'Please use a good password policy, this application does not check this for you'),
                              validators=[DataRequired()],
                              )
-    conf_password = PasswordField(lazy_gettext('Confirm Password'),
-                                  description=lazy_gettext('Please rewrite the password to confirm'),
-                                  validators=[EqualTo('password', message=lazy_gettext('Passwords must match'))],
-                            )
     stay_login = BooleanField(lazy_gettext('Stay signed in'))
 
 
