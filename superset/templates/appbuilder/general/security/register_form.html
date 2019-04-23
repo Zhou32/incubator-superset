@@ -112,13 +112,6 @@
                         is_valid = true;
                     }
                 }
-                else if ($(this).attr('id') == 'conf_password'){
-                    if ($(this).val()!=$('#password').val() || $(this).val()==''){
-                        is_ready_submit = false && is_ready_submit;
-                    }else{
-                        is_valid = true;
-                    }
-                }
 
                 if (is_valid){
                     $(this).siblings('.fa-check').removeAttr('hidden');
@@ -138,7 +131,7 @@
             }
         })
 
-        $('.login-form').on('focusout', function(){
+        $('.login-form').on('change', function(){
             var is_valid = true;
             var warning_msg = "";
 
@@ -161,12 +154,6 @@
                     warning_msg = "Password must contain one symbol, one uppercase with at least 6 characters.";
                 }
             }
-            else if ($(this).attr('id') == 'conf_password'){
-                if ($(this).val()!=$('#password').val()){
-                    is_valid = false;
-                    warning_msg = "Confirm password doesn't match!";
-                }
-            }
 
             if(is_valid) {
                 $(this).siblings('span').attr('hidden', true);
@@ -182,9 +169,6 @@
 
                 $('.error-message').removeAttr('hidden');
                 $('.flush-message').removeAttr('hidden');
-
-                if($(this).attr('id')!='conf_password')
-                  $(this).focus();
             }
 
             // Check if submit is ready

@@ -15,7 +15,7 @@ from flask_appbuilder._compat import as_unicode
 from flask_appbuilder.views import expose, PublicFormView, ModelView
 from flask_appbuilder.security.decorators import has_access
 from flask_appbuilder.security.forms import ResetPasswordForm
-from flask_appbuilder.security.views import UserDBModelView, UserStatsChartView
+from flask_appbuilder.security.views import UserDBModelView, UserStatsChartView,AuthDBView
 from flask_appbuilder.security.registerviews import RegisterUserDBView, BaseRegisterUser
 from flask_appbuilder.urltools import *
 from .filters import RoleFilter
@@ -23,7 +23,7 @@ from flask_appbuilder.models.sqla.filters import FilterInFunction, FilterNotEnds
 from .forms import (
     PasswordRecoverForm, SavvyGroupAddWidget, SavvySiteListWidget, SavvySiteSearchWidget,
     SavvyRegisterInvitationUserDBForm, SavvyRegisterUserDBForm, RegisterInvitationForm,
-    CSVToSitesForm, SavvyRegisterFormWidget
+    CSVToSitesForm, SavvyRegisterFormWidget, SavvyBILoginDBForm
 
 )
 from .models import Site
@@ -309,6 +309,27 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
                                         widgets=widgets,
                                         appbuilder=self.appbuilder
                                         )
+
+
+class SavvyBIAuthDBView(AuthDBView):
+
+    @expose("/login/", methods=["GET", "POST"])
+    def login(self):
+        if g.user is not None and g.user.is_authenticated:
+            return redirect(self.appbuilder.get_url_for_index)
+        form = SavvyBILoginDBForm()
+        if form.validate_on_submit():
+            user = self.appbuilder.sm.auth_user_db(
+                form.email.data, form.password.data
+            )
+            if not user:
+                flash(as_unicode(self.invalid_login_message), "warning")
+                return redirect(self.appbuilder.get_url_for_login)
+            login_user(user, remember=False)
+            return redirect(self.appbuilder.get_url_for_index)
+        return self.render_template(
+            self.login_template, title=self.title, form=form, appbuilder=self.appbuilder
+        )
 
 
 class SavvyRegisterUserDBView(RegisterUserDBView):

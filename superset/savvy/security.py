@@ -29,7 +29,7 @@ from superset.savvy.views import SavvyGroupModelView,\
     SavvyRegisterInvitationUserDBView, SavvyRegisterInviteView, \
     SavvyRegisterUserModelView, SavvyUserStatsChartView, \
     SavvySiteModelView, SavvyRegisterUserDBView, SavvyUserDBModelView, \
-    EmailResetPasswordView, PasswordRecoverView
+    EmailResetPasswordView, PasswordRecoverView, SavvyBIAuthDBView
 from superset.savvy.models import Group, ResetRequest, OrgRegisterUser, Organization, Site, SavvyUser
 from superset.security import SupersetSecurityManager
 
@@ -109,6 +109,7 @@ class CustomSecurityManager(SupersetSecurityManager):
     registerusermodelview = SavvyRegisterUserModelView
     userdbmodelview = SavvyUserDBModelView
     userstatschartview = SavvyUserStatsChartView
+    authdbview = SavvyBIAuthDBView
 
     resetRequest_model = ResetRequest
     registeruser_model = OrgRegisterUser
