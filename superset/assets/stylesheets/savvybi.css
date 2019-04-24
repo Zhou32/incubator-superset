@@ -55,8 +55,8 @@
 
 }
 
-#Home .register-form input:focus{
-    box-shadow: 1px 1px 3px 1px #079493;
+#Home .register-form input:hover,  #Home .register-form input:focus{
+    box-shadow: 1px 1px 5px 1px RGBA(7, 148, 147, 0.5);
 }
 
 .reg-footer{

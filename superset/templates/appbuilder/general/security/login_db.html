@@ -74,7 +74,7 @@
                         </a>
                     </div>
                     <div style="float:right;">
-                        {{ form.remember_me(class="form-control login-form", value="0") }}
+                        {{ form.remember_me(class="form-control", value="0") }}
                         <label for="remember_me">{{ form.remember_me.label.text }}</label>
                     </div>
                 </div>
@@ -112,7 +112,7 @@
                         {% endwith %}
                     </div>
                     <div style="float: right;">
-                        <input class="btn btn-primary btn-block form-submit" type="submit" value="{{_('Sign In')}}">
+                        <input class="btn btn-disabled btn-block form-submit" type="submit" value="{{_('Sign In')}}">
                     </div>
                 </div>
             </div>
@@ -120,10 +120,6 @@
     </div>
 </div>
 <script>
-    function emailValidation(emailAddress) {
-        var pattern = new RegExp(/^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i);
-        return pattern.test(emailAddress);
-    }
 
     $('#remember_me').on('click', function(){
         if($(this). prop("checked") == true){
@@ -133,43 +129,13 @@
         }
     })
 
-    var is_ready = true;
-
     $('.login-form').on('change', function(){
-        var is_valid = true;
-        var warning_msg = "";
-
-        // Email validation
-        if ($(this).attr('id') == 'email'){
-            if (!emailValidation($(this).val())){
-                is_valid = false;
-                warning_msg = "Please input correct email address.";
-            }
-        }
-        else if ($(this).attr('id') == 'password'){
-            if ($(this).val() == ''){
-                is_valid = false;
-                warning_msg = "Please input password";
-            }
-        }
-
-        if(is_valid) {
-            $('.warning-message').attr('hidden', true);
-        }else {
-            $('.warning-message').removeAttr('hidden');
-            $('.warning-message').html(warning_msg);
-
-            $('.error-message').removeAttr('hidden');
-            $('.flush-message').removeAttr('hidden');
-        }
-
+        var is_ready = true;
         // Check if submit is ready
-
         $('.login-form').each(function(){
-            if($(this).attr('id')!='csrf_token' && $(this).siblings('.fa-check:hidden').length>0)
+            if($(this).val() == '')
             {
-                is_ready = false;
-                return;
+                is_ready = is_ready && false;
             }
         });
         if(is_ready){
@@ -201,4 +167,7 @@
         }
     });
 </script>
+{% endblock %}
+
+{% block messages %}
 {% endblock %}
