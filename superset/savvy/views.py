@@ -325,7 +325,8 @@ class SavvyBIAuthDBView(AuthDBView):
             if not user:
                 flash(as_unicode(self.invalid_login_message), "warning")
                 return redirect(self.appbuilder.get_url_for_login)
-            login_user(user, remember=False)
+            remember = form.remember_me.data
+            login_user(user, remember=remember)
             return redirect(self.appbuilder.get_url_for_index)
         return self.render_template(
             self.login_template, title=self.title, form=form, appbuilder=self.appbuilder
