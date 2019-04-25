@@ -323,7 +323,7 @@ class SavvyBIAuthDBView(AuthDBView):
                 form.email.data, form.password.data
             )
             if not user:
-                flash("Something is wrong. This credential don't match our records.", "danger")
+                flash("Something is wrong. These credentials don't match our records.", "danger")
                 return redirect(self.appbuilder.get_url_for_login)
             remember = form.remember_me.data
             login_user(user, remember=remember)
