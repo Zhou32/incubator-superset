@@ -5,7 +5,7 @@ from flask_babel import lazy_gettext as _
 from flask_wtf.file import FileAllowed, FileField, FileRequired
 from wtforms import (
     BooleanField, SelectField, StringField, PasswordField)
-
+from wtforms.fields.html5 import EmailField
 
 from flask_appbuilder.security.sqla.models import User
 from flask_appbuilder.security.forms import DynamicForm
@@ -20,7 +20,7 @@ class PasswordRecoverForm(DynamicForm):
 
 
 class SavvyBILoginDBForm(DynamicForm):
-    email = StringField(lazy_gettext("Email"), validators=[DataRequired(), Email()])
+    email = EmailField(lazy_gettext("Email"), validators=[DataRequired()])
     password = PasswordField(lazy_gettext("Password"), validators=[DataRequired()])
     remember_me = BooleanField(lazy_gettext('remember me'))
 
@@ -50,7 +50,7 @@ def unique_required(form, field):
     if field.name == "organization":
         if db.session.query(Organization).filter_by(organization_name=field.data).first() is not None or \
                         db.session.query(OrgRegisterUser).filter_by(organization=field.data).first() is not None:
-            raise ValidationError("This organization name already exists")
+            raise ValidationError("Oops... someone has registered that name already, mix it up and try again!")
 
     # if field.name == "username":
     #     if db.session.query(User).filter_by(username=field.data).first() is not None or \
