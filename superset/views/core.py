@@ -22,12 +22,13 @@ import os
 import re
 import time
 import traceback
+from typing import List  # noqa: F401
 from urllib import parse
 
 from flask import (
     abort, flash, g, Markup, redirect, render_template, request, Response, url_for,
 )
-from flask_appbuilder import expose, Model, SimpleFormView
+from flask_appbuilder import expose, SimpleFormView
 from flask_appbuilder.actions import action
 from flask_appbuilder.models.sqla.filters import FilterEqual, \
     FilterEqualFunction, FilterNotEqual
@@ -38,8 +39,7 @@ from flask_babel import lazy_gettext as _
 import pandas as pd
 import simplejson as json
 import sqlalchemy as sqla
-from sqlalchemy import (
-    and_, Column, create_engine, ForeignKey, Integer, MetaData, or_, Table, update)
+from sqlalchemy import and_, create_engine, MetaData, or_, update
 from sqlalchemy.engine.url import make_url
 from sqlalchemy.exc import IntegrityError
 from werkzeug.routing import BaseConverter
@@ -53,7 +53,7 @@ from superset.connectors.sqla.models import AnnotationDatasource, SqlaTable
 from superset.exceptions import SupersetException
 from superset.forms import CsvToDatabaseForm
 from superset.jinja_context import get_template_processor
-from superset.legacy import cast_form_data, update_time_range
+from superset.legacy import update_time_range
 import superset.models.core as models
 from superset.models.sql_lab import Query
 from superset.models.user_attributes import UserAttribute
@@ -61,6 +61,7 @@ from superset.sql_parse import ParsedQuery
 from superset.utils import core as utils
 from superset.utils import dashboard_import_export
 from superset.utils.dates import now_as_float
+from superset.utils.decorators import etag_cache
 from .base import (
     api, BaseSupersetView,
     check_ownership,
@@ -68,9 +69,10 @@ from .base import (
     get_error_msg, handle_api_exception, json_error_response, json_success,
     SupersetFilter, SupersetModelView, YamlExportMixin,
 )
-from .utils import bootstrap_user_data
+from .utils import bootstrap_user_data, get_datasource_info, get_form_data, get_viz
 
 config = app.config
+CACHE_DEFAULT_TIMEOUT = config.get('CACHE_DEFAULT_TIMEOUT', 0)
 stats_logger = config.get('STATS_LOGGER')
 log_this = models.Log.log_this
 DAR = models.DatasourceAccessRequest
@@ -83,7 +85,7 @@ ACCESS_REQUEST_MISSING_ERR = __(
     'The access requests seem to have been deleted')
 USER_MISSING_ERR = __('The user seems to have been deleted')
 
-FORM_DATA_KEY_BLACKLIST = []
+FORM_DATA_KEY_BLACKLIST: List[str] = []
 if not config.get('ENABLE_JAVASCRIPT_CONTROLS'):
     FORM_DATA_KEY_BLACKLIST = [
         'js_tooltip',
@@ -102,39 +104,53 @@ def is_owner(obj, user):
     return obj and user in obj.owners
 
 
-SQLTable = Table(
-    'tables',
-    Model.metadata,  # pylint: disable=no-member
-    Column('id', Integer, primary_key=True),
-    Column('database_id', Integer, ForeignKey('dbs.id')),
-    extend_existing=True)
+def check_datasource_perms(self, datasource_type=None, datasource_id=None):
+    """
+    Check if user can access a cached response from explore_json.
+
+    This function takes `self` since it must have the same signature as the
+    the decorated method.
+
+    """
+    form_data = get_form_data()[0]
+    datasource_id, datasource_type = get_datasource_info(
+        datasource_id, datasource_type, form_data)
+    viz_obj = get_viz(
+        datasource_type=datasource_type,
+        datasource_id=datasource_id,
+        form_data=form_data,
+        force=False,
+    )
+    security_manager.assert_datasource_permission(viz_obj.datasource)
 
 
-class DatabaseFilter(SupersetFilter):
-    def apply(self, query, func):  # noqa
-        if security_manager.all_database_access():
-            return query
-        database_perms = self.get_view_menus('database_access')
-        return query.filter(self.model.perm.in_(database_perms))
+def check_slice_perms(self, slice_id):
+    """
+    Check if user can access a cached response from slice_json.
+
+    This function takes `self` since it must have the same signature as the
+    the decorated method.
+
+    """
+    form_data, slc = get_form_data(slice_id, use_slice_data=True)
+    datasource_type = slc.datasource.type
+    datasource_id = slc.datasource.id
+    viz_obj = get_viz(
+        datasource_type=datasource_type,
+        datasource_id=datasource_id,
+        form_data=form_data,
+        force=False,
+    )
+    security_manager.assert_datasource_permission(viz_obj.datasource)
 
 
 class SliceFilter(SupersetFilter):
     def apply(self, query, func):  # noqa
         if security_manager.all_datasource_access():
             return query
-
+        perms = self.get_view_menus('datasource_access')
         # TODO(bogdan): add `schema_access` support here
-        datasource_perms = self.get_view_menus('datasource_access')
-        database_perms = self.get_view_menus('database_access')
-        query = (
-            query.outerjoin(SQLTable, self.model.datasource_id == SQLTable.c.id)
-            .outerjoin(models.Database, models.Database.id == SQLTable.c.database_id)
-            .filter(or_(
-                models.Database.perm.in_(database_perms),
-                self.model.perm.in_(datasource_perms),
-            ))
-        )
-        return query
+        return query.filter(self.model.perm.in_(perms))
 
 
 class DashboardFilter(SupersetFilter):
@@ -151,12 +167,7 @@ class DashboardFilter(SupersetFilter):
         slice_ids_qry = (
             db.session
             .query(Slice.id)
-            .outerjoin(SQLTable, Slice.datasource_id == SQLTable.c.id)
-            .outerjoin(models.Database, models.Database.id == SQLTable.c.database_id)
-            .filter(or_(
-                models.Database.perm.in_(datasource_perms),
-                Slice.perm.in_(datasource_perms),
-            ))
+            .filter(Slice.perm.in_(datasource_perms))
         )
         owner_ids_qry = (
             db.session
@@ -294,7 +305,6 @@ class DatabaseView(SupersetModelView, DeleteMixin, YamlExportMixin):  # noqa
         'allow_multi_schema_metadata_fetch': _('Allow Multi Schema Metadata Fetch'),
         'backend': _('Backend'),
     }
-    base_filters = [['id', DatabaseFilter, lambda: []]]
 
     def pre_add(self, db):
         self.check_extra(db)
@@ -484,9 +494,6 @@ class SliceModelView(SupersetModelView, DeleteMixin):  # noqa
     edit_title = _('Edit Chart')
 
     can_add = False
-    label_columns = {
-        'datasource_link': _('Datasource'),
-    }
     search_columns = (
         'slice_name', 'description', 'viz_type', 'datasource_name', 'owners',
     )
@@ -642,7 +649,8 @@ class SliceAsync(SliceModelView):  # noqa
     route_base = '/sliceasync'
     list_columns = [
         'id', 'slice_link', 'viz_type', 'slice_name',
-        'creator', 'modified', 'icons']
+        'creator', 'modified', 'icons', 'changed_on_humanized',
+    ]
     label_columns = {
         'icons': ' ',
         'slice_link': _('Chart'),
@@ -658,7 +666,8 @@ class SliceAddView(SliceModelView):  # noqa
         'id', 'slice_name', 'slice_url', 'edit_url', 'viz_type', 'params',
         'description', 'description_markeddown', 'datasource_id', 'datasource_type',
         'datasource_name_text', 'datasource_link',
-        'owners', 'modified', 'changed_on']
+        'owners', 'modified', 'changed_on', 'changed_on_humanized',
+    ]
 
 
 appbuilder.add_view_no_menu(SliceAddView)
@@ -1132,10 +1141,6 @@ class Superset(BaseSupersetView):
                 url_form_data.update(form_data)
                 form_data = url_form_data
 
-        if request.args.get('viz_type'):
-            # Converting old URLs
-            form_data = cast_form_data(form_data)
-
         form_data = {
             k: v
             for k, v in form_data.items()
@@ -1192,7 +1197,7 @@ class Superset(BaseSupersetView):
     @has_access
     @expose('/slice/<slice_id>/')
     def slice(self, slice_id):
-        form_data, slc = self.get_form_data(slice_id, use_slice_data=True)
+        form_data, slc = get_form_data(slice_id, use_slice_data=True)
         if not slc:
             abort(404)
         endpoint = '/superset/explore/?form_data={}'.format(
@@ -1236,18 +1241,7 @@ class Superset(BaseSupersetView):
         })
 
     def generate_json(
-            self, datasource_type, datasource_id, form_data,
-            csv=False, query=False, force=False, results=False,
-            samples=False,
-    ):
-        viz_obj = self.get_viz(
-            datasource_type=datasource_type,
-            datasource_id=datasource_id,
-            form_data=form_data,
-            force=force,
-        )
-        security_manager.assert_datasource_permission(viz_obj.datasource)
-
+            self, viz_obj, csv=False, query=False, results=False, samples=False):
         if csv:
             return CsvResponse(
                 viz_obj.get_csv(),
@@ -1271,21 +1265,25 @@ class Superset(BaseSupersetView):
     @api
     @has_access_api
     @expose('/slice_json/<slice_id>')
+    @etag_cache(CACHE_DEFAULT_TIMEOUT, check_perms=check_slice_perms)
     def slice_json(self, slice_id):
-        form_data, slc = self.get_form_data(slice_id, use_slice_data=True)
+        form_data, slc = get_form_data(slice_id, use_slice_data=True)
         datasource_type = slc.datasource.type
         datasource_id = slc.datasource.id
-
-        return self.generate_json(datasource_type=datasource_type,
-                                  datasource_id=datasource_id,
-                                  form_data=form_data)
+        viz_obj = get_viz(
+            datasource_type=datasource_type,
+            datasource_id=datasource_id,
+            form_data=form_data,
+            force=False,
+        )
+        return self.generate_json(viz_obj)
 
     @log_this
     @api
     @has_access_api
     @expose('/annotation_json/<layer_id>')
     def annotation_json(self, layer_id):
-        form_data = self.get_form_data()[0]
+        form_data = get_form_data()[0]
         form_data['layer_id'] = layer_id
         form_data['filters'] = [{'col': 'layer_id',
                                  'op': '==',
@@ -1305,6 +1303,7 @@ class Superset(BaseSupersetView):
     @handle_api_exception
     @expose('/explore_json/<datasource_type>/<datasource_id>/', methods=['GET', 'POST'])
     @expose('/explore_json/', methods=['GET', 'POST'])
+    @etag_cache(CACHE_DEFAULT_TIMEOUT, check_perms=check_datasource_perms)
     def explore_json(self, datasource_type=None, datasource_id=None):
         """Serves all request that GET or POST form_data
 
@@ -1321,18 +1320,21 @@ class Superset(BaseSupersetView):
         samples = request.args.get('samples') == 'true'
         force = request.args.get('force') == 'true'
 
-        form_data = self.get_form_data()[0]
-        datasource_id, datasource_type = self.datasource_info(
+        form_data = get_form_data()[0]
+        datasource_id, datasource_type = get_datasource_info(
             datasource_id, datasource_type, form_data)
-
-        return self.generate_json(
+        viz_obj = get_viz(
             datasource_type=datasource_type,
             datasource_id=datasource_id,
             form_data=form_data,
+            force=force,
+        )
+
+        return self.generate_json(
+            viz_obj,
             csv=csv,
             query=query,
             results=results,
-            force=force,
             samples=samples,
         )
 
@@ -1358,34 +1360,15 @@ class Superset(BaseSupersetView):
             datasource_id=datasource_id,
             **request.args))
 
-    @staticmethod
-    def datasource_info(datasource_id, datasource_type, form_data):
-        """Compatibility layer for handling of datasource info
-
-        datasource_id & datasource_type used to be passed in the URL
-        directory, now they should come as part of the form_data,
-        This function allows supporting both without duplicating code"""
-        datasource = form_data.get('datasource', '')
-        if '__' in datasource:
-            datasource_id, datasource_type = datasource.split('__')
-            # The case where the datasource has been deleted
-            datasource_id = None if datasource_id == 'None' else datasource_id
-
-        if not datasource_id:
-            raise Exception(
-                'The datasource associated with this chart no longer exists')
-        datasource_id = int(datasource_id)
-        return datasource_id, datasource_type
-
     @log_this
     @has_access
     @expose('/explore/<datasource_type>/<datasource_id>/', methods=['GET', 'POST'])
     @expose('/explore/', methods=['GET', 'POST'])
     def explore(self, datasource_type=None, datasource_id=None):
         user_id = g.user.get_id() if g.user else None
-        form_data, slc = self.get_form_data(use_slice_data=True)
+        form_data, slc = get_form_data(use_slice_data=True)
 
-        datasource_id, datasource_type = self.datasource_info(
+        datasource_id, datasource_type = get_datasource_info(
             datasource_id, datasource_type, form_data)
 
         error_redirect = '/chart/list/'
@@ -1511,7 +1494,7 @@ class Superset(BaseSupersetView):
         """Save or overwrite a slice"""
         slice_name = args.get('slice_name')
         action = args.get('action')
-        form_data, unused_slc = self.get_form_data()
+        form_data = get_form_data()[0]
 
         if action in ('saveas'):
             if 'slice_id' in form_data:
@@ -1580,6 +1563,7 @@ class Superset(BaseSupersetView):
             'can_overwrite': is_owner(slc, g.user),
             'form_data': slc.form_data,
             'slice': slc.data,
+            'dashboard_id': dash.id if dash else None,
         }
 
         if request.args.get('goto_dash') == 'true':
@@ -1814,6 +1798,12 @@ class Superset(BaseSupersetView):
             {key: v for key, v in default_filters_data.items()
              if int(key) in slice_ids}
         md['default_filters'] = json.dumps(applicable_filters)
+        if data.get('color_namespace'):
+            md['color_namespace'] = data.get('color_namespace')
+        if data.get('color_scheme'):
+            md['color_scheme'] = data.get('color_scheme')
+        if data.get('label_colors'):
+            md['label_colors'] = data.get('label_colors')
         dashboard.json_metadata = json.dumps(md)
 
     @api
@@ -2187,8 +2177,8 @@ class Superset(BaseSupersetView):
 
         for slc in slices:
             try:
-                form_data = self.get_form_data(slc.id, use_slice_data=True)[0]
-                obj = self.get_viz(
+                form_data = get_form_data(slc.id, use_slice_data=True)[0]
+                obj = get_viz(
                     datasource_type=slc.datasource.type,
                     datasource_id=slc.datasource.id,
                     form_data=form_data,
@@ -2623,10 +2613,8 @@ class Superset(BaseSupersetView):
             )
 
         client_id = request.form.get('client_id') or utils.shortid()[:10]
-        limits = [mydb.db_engine_spec.get_limit_from_sql(sql), limit]
         query = Query(
             database_id=int(database_id),
-            limit=min(lim for lim in limits if lim is not None),
             sql=sql,
             schema=schema,
             select_as_cta=select_as_cta,
@@ -2655,6 +2643,10 @@ class Superset(BaseSupersetView):
         except Exception as e:
             return json_error_response(
                 'Template rendering failed: {}'.format(utils.error_msg_from_exception(e)))
+
+        # set LIMIT after template processing
+        limits = [mydb.db_engine_spec.get_limit_from_sql(rendered_query), limit]
+        query.limit = min(lim for lim in limits if lim is not None)
 
         # Async request.
         if async_:
@@ -2830,10 +2822,21 @@ class Superset(BaseSupersetView):
     @has_access
     @expose('/search_queries')
     @log_this
-    def search_queries(self):
-        """Search for queries."""
+    def search_queries(self) -> Response:
+        """
+        Search for previously run sqllab queries. Used for Sqllab Query Search
+        page /superset/sqllab#search.
+
+        Custom permission can_only_search_queries_owned restricts queries
+        to only queries run by current user.
+
+        :returns: Response with list of sql query dicts
+        """
         query = db.session.query(Query)
-        search_user_id = request.args.get('user_id')
+        if security_manager.can_only_access_owned_queries():
+            search_user_id = g.user.get_user_id()
+        else:
+            search_user_id = request.args.get('user_id')
         database_id = request.args.get('database_id')
         search_text = request.args.get('search_text')
         status = request.args.get('status')
@@ -2842,7 +2845,7 @@ class Superset(BaseSupersetView):
         to_time = request.args.get('to')
 
         if search_user_id:
-            # Filter on db Id
+            # Filter on user_id
             query = query.filter(Query.user_id == search_user_id)
 
         if database_id:
@@ -2937,7 +2940,8 @@ class Superset(BaseSupersetView):
         user_id = g.user.get_id() if g.user else None
         form_data, slc = self.get_form_data(use_slice_data=True)
 
-        datasource_id, datasource_type = self.datasource_info(
+        # datasource_id, datasource_type = self.datasource_info(
+        datasource_id, datasource_type = get_datasource_info(
             form_data['datasource_id'] if 'datasource_id' in form_data.keys() else None,
             form_data['datasource_type'] if 'datasource_type' in form_data.keys()
             else None, form_data)
@@ -3072,7 +3076,7 @@ class Superset(BaseSupersetView):
         This method exposes an API endpoint to
         get the database query string for this slice
         """
-        viz_obj = self.get_viz(slice_id)
+        viz_obj = get_viz(slice_id)
         security_manager.assert_datasource_permission(viz_obj.datasource)
         return self.get_query_string_response(viz_obj)
 
