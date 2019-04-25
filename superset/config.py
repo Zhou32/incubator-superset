@@ -116,7 +116,7 @@ APP_NAME = 'Superset'
 
 # Uncomment to setup an App icon
 APP_ICON = '/static/assets/images/SavyBI-Logo-White.png'
-APP_ICON_WIDTH = 126
+APP_ICON_WIDTH = 125
 
 # Druid query timezone
 # tz.tzutc() : Using utc timezone
@@ -219,7 +219,7 @@ CACHE_DEFAULT_TIMEOUT = 60 * 60 * 24
 CACHE_CONFIG = {'CACHE_TYPE': 'redis',
                 'CACHE_DEFAULT_TIMEOUT': CACHE_DEFAULT_TIMEOUT,
                 'CACHE_KEY_PREFIX': 'superset_results',
-                'CACHE_REDIS_URL': 'redis://redis:6379/0'}
+                'CACHE_REDIS_URL': 'redis://localhost:6379/0'}
 TABLE_NAMES_CACHE_CONFIG = {'CACHE_TYPE': 'null'}
 
 # CORS Options
@@ -355,12 +355,12 @@ WARNING_MSG = None
 
 
 class CeleryConfig(object):
-    BROKER_URL = 'redis://redis:6379/0'
+    BROKER_URL = 'redis://localhost:6379/0'
     CELERY_IMPORTS = (
         'superset.sql_lab',
         'superset.tasks',
     )
-    CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+    CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
     CELERYD_LOG_LEVEL = 'DEBUG'
     CELERYD_PREFETCH_MULTIPLIER = 1
     CELERY_ACKS_LATE = True
@@ -590,7 +590,7 @@ WEBDRIVER_BASEURL = 'http://0.0.0.0:8080/'
 # Send user to a link where they can report bugs
 BUG_REPORT_URL = None
 
-
+USER_AUTO_LOGIN_AFTER_CONFIRM = True
 try:
     if CONFIG_PATH_ENV_VAR in os.environ:
         # Explicitly import config module that is not in pythonpath; useful

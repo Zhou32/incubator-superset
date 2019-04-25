@@ -1,0 +1,149 @@
+@font-face {
+    font-family: 'Futura PT Light';
+    src: url('../savvy_fonts/FuturaPTLight.otf') format("opentype");
+}
+
+@font-face {
+    font-family: 'Futura PT Bold';
+    src: url('../savvy_fonts/FuturaPTBold.otf') format("opentype");
+}
+
+.reg-navbar .navbar-brand{
+    width: 250px;
+    height: 250px;
+    margin-left: 150px !important;
+}
+
+.auth-link{
+    color: #34495E;
+    font-size: 20px;
+    font-family: 'Futura PT Bold';
+    margin-top: 76px;
+    margin-right: 180px;
+}
+
+#Home{
+    text-align: center;
+}
+
+#Home .form-header{
+    color: #079493;
+    font-size: 36px;
+    font-weight: bold;
+    font-family: 'Futura PT Bold';
+}
+
+#Home .form-subheader{
+    color: #2D4A50;
+    font-size: 25px;
+    font-family: 'Futura PT Light';
+}
+
+#Home .form-submit{
+    width: 240px;
+    height: 69px;
+    font-size: 22px;
+    margin-right: 140px;
+    font-family: 'Futura PT Bold';
+}
+
+#Home .register-form input{
+    border: none;
+    font-family: 'Futura PT Light';
+    font-size: 20px;
+    color: #079493;
+
+}
+
+#Home .register-form input:hover,  #Home .register-form input:focus{
+    box-shadow: 1px 1px 5px 1px RGBA(7, 148, 147, 0.5);
+}
+
+.reg-footer{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 130px;
+    padding-top: 23px;
+    background-color: #edeef1;
+}
+
+.reg-footer .savvybi-alert{
+    height: 69px;
+    width: 800px;
+    padding: 20px 0 20px 104px;
+    font-size: 20px;
+    font-family: 'Futura PT Light';
+    text-align: left;
+    color: #707070;
+    position: fixed;
+}
+
+.reg-footer .alert-danger{
+    background-color: #e7d1d8;
+}
+
+.reg-footer .alert-success{
+    background-color: #b9d5d7;
+}
+
+.reg-footer .alert-info{
+    background-color: #e9e9c8;
+}
+
+.reg-footer .note-message, .reg-footer .ready-message{
+    z-index: 1;
+}
+.reg-footer .flush-message, .reg-footer .error-message{
+    z-index: 2;
+}
+.reg-footer .btn-disabled{
+    background-color: #d3d3d5;
+    color: #b1b1b2;
+
+}
+
+.register-form .fa{
+    position: absolute;
+    top: 13px;
+    right: 10px;
+    float: right;
+    font-size: 20px;
+    background: white;
+}
+
+#stay_login, #remember_me{
+    display:none;
+}
+#stay_login + label{
+    color: #707070;
+    font-size: 20px;
+    font-family: 'Futura PT Light';
+    float: right;
+}
+#stay_login + label:before, #remember_me + label:before{
+    background-color: white;
+    font-family: FontAwesome;
+    content: "\f096";
+    font-size: 20px;
+    display: inline-block;
+    color: white;
+    width: 20px;
+    height: 22px;
+    margin-right: 5px;
+    position: relative;
+    top: 4px;
+}
+
+#stay_login:checked + label:before, #remember_me:checked + label:before{
+    content: "\f00c";
+    letter-spacing: 5px;
+    color: rgb(7, 148, 147)
+}
+
+#remember_me + label{
+    color: #707070;
+    font-size: 20px;
+    font-family: 'Futura PT Light';
+}

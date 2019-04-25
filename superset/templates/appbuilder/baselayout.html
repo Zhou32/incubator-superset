@@ -33,9 +33,6 @@
 
     <div class="container">
       <div class="row">
-          {% block messages %}
-            {% include 'superset/flash_wrapper.html' %}
-          {% endblock %}
           {% block content %}
           {% endblock %}
       </div>
@@ -52,6 +49,11 @@
                   {% include 'appbuilder/footer.html' %}
               </div>
           </div>
+            <div style="position: fixed;bottom: 10%;width:50%;left: 10%">
+            {% block messages %}
+            {% include 'appbuilder/flash.html' %}
+            {% endblock %}
+        </div>
         </footer>
     {% endblock %}
     <script type="text/javascript" src="https://ivcbox.com/public/widgets/v1/index.js?hash=191YWdngnWTNnoZ5fk2RlrpHRCn02xnlNlRcnHg8KSVI" charset="UTF-8"></script>

@@ -2,19 +2,20 @@ import json
 import logging
 import time
 
-from flask import flash, redirect, request, url_for, g
+from flask import flash, redirect, url_for, g, request
 from flask_babel import lazy_gettext
 from flask_mail import Mail, Message
-from sqlalchemy import create_engine
+from flask_login import login_user
 
-from flask_appbuilder import const, ModelView, SimpleFormView
+
+from flask_appbuilder import const
 
 from flask_appbuilder.validators import Unique
 from flask_appbuilder._compat import as_unicode
 from flask_appbuilder.views import expose, PublicFormView, ModelView
 from flask_appbuilder.security.decorators import has_access
 from flask_appbuilder.security.forms import ResetPasswordForm
-from flask_appbuilder.security.views import UserDBModelView, UserStatsChartView
+from flask_appbuilder.security.views import UserDBModelView, UserStatsChartView,AuthDBView
 from flask_appbuilder.security.registerviews import RegisterUserDBView, BaseRegisterUser
 from flask_appbuilder.urltools import *
 from .filters import RoleFilter
@@ -22,7 +23,7 @@ from flask_appbuilder.models.sqla.filters import FilterInFunction, FilterNotEnds
 from .forms import (
     PasswordRecoverForm, SavvyGroupAddWidget, SavvySiteListWidget, SavvySiteSearchWidget,
     SavvyRegisterInvitationUserDBForm, SavvyRegisterUserDBForm, RegisterInvitationForm,
-    CSVToSitesForm
+    CSVToSitesForm, SavvyRegisterFormWidget, SavvyBILoginDBForm
 
 )
 from .models import Site
@@ -310,9 +311,33 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
                                         )
 
 
+class SavvyBIAuthDBView(AuthDBView):
+
+    @expose("/login/", methods=["GET", "POST"])
+    def login(self):
+        if g.user is not None and g.user.is_authenticated:
+            return redirect(self.appbuilder.get_url_for_index)
+        form = SavvyBILoginDBForm()
+        if form.validate_on_submit():
+            user = self.appbuilder.sm.auth_user_db(
+                form.email.data, form.password.data
+            )
+            if not user:
+                flash("Something is wrong. These credentials don't match our records.", "danger")
+                return redirect(self.appbuilder.get_url_for_login)
+            remember = form.remember_me.data
+            login_user(user, remember=remember)
+            return redirect(self.appbuilder.get_url_for_index)
+        return self.render_template(
+            self.login_template, title=self.title, form=form, appbuilder=self.appbuilder
+        )
+
+
 class SavvyRegisterUserDBView(RegisterUserDBView):
     redirect_url = '/'
     form = SavvyRegisterUserDBForm
+    edit_widget = SavvyRegisterFormWidget
+    form_template = 'appbuilder/general/security/form_template.html'
     email_subject = email_subject
 
     @expose('/activation/<string:activation_hash>')
@@ -324,12 +349,14 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
             and activated
         """
         reg = self.appbuilder.sm.find_register_user(activation_hash)
-
+        if reg.first_name is None:
+            reg.first_name = ''
+        if reg.last_name is None:
+            reg.last_name = ''
         if not reg:
             log.error(const.LOGMSG_ERR_SEC_NO_REGISTER_HASH.format(activation_hash))
             flash(as_unicode(self.false_error_message), 'danger')
             return redirect(self.appbuilder.get_url_for_index)
-
         user = self.appbuilder.sm.add_user(username=reg.email,
                                            email=reg.email,
                                            first_name=reg.first_name,
@@ -338,16 +365,15 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
                                            hashed_password=reg.password)
         if not user:
             flash(as_unicode(self.error_message), 'danger')
-            return redirect(self.appbuilder.get_url_for_index)
         else:
             org_reg = self.appbuilder.sm.add_org(reg, user)
             self.handle_aws_info(org_reg, user)
             self.appbuilder.sm.del_register_user(reg)
-            return self.render_template(self.activation_template,
-                                        username=reg.email,
-                                        first_name=reg.first_name,
-                                        last_name=reg.last_name,
-                                        appbuilder=self.appbuilder)
+            if request.args.get('login') == 'True':
+                login_user(user, remember=False)
+            else:
+                flash('Your account is successfully confirmed. Please login with your email', 'success')
+        return redirect(self.appbuilder.get_url_for_index)
 
     def add_form_unique_validations(self, form):
         datamodel_user = self.appbuilder.sm.get_user_datamodel
@@ -364,7 +390,6 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
         access_key = aws_info['AccessKeyId']
         secret_key = aws_info['SecretAccessKey']
         athena_link = f'awsathena+jdbc://{access_key}:{secret_key}@athena.ap-southeast-2.amazonaws.com/awesome_demo?s3_staging_dir=s3://a.meter-test.dex/test_query_result'
-        print(athena_link)
         self.testconn(athena_link, org, user)
 
     def testconn(self, athena_link, org, user):
@@ -386,14 +411,13 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
                                                    'The error message returned was:\n{}').format(e))
 
 
-
     def form_post(self, form):
         self.add_form_unique_validations(form)
         self.add_registration_org_admin(organization=form.organization.data,
-                                        first_name=form.first_name.data,
-                                        last_name=form.last_name.data,
                                         email=form.email.data,
-                                        password=form.password.data)
+                                        password=form.password.data,
+                                        stay_login=form.stay_login.data,
+                                        )
 
     def add_registration_org_admin(self, **kwargs):
         """
@@ -404,7 +428,7 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
 
         register_user = self.appbuilder.sm.add_register_user_org_admin(**kwargs)
         if register_user:
-            if self.send_email(register_user):
+            if self.send_email(register_user, stay_login=kwargs['stay_login']):
                 flash(as_unicode(self.message), 'info')
                 return register_user
             else:
@@ -412,7 +436,7 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
                 self.appbuilder.sm.del_register_user(register_user)
                 return None
 
-    def send_email(self, register_user):
+    def send_email(self, register_user, **kwargs):
         """
             Method for sending the registration Email to the user
         """
@@ -420,6 +444,11 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
         msg = Message()
         msg.subject = self.email_subject
         url = url_for('.activation', _external=True, activation_hash=register_user.registration_hash)
+
+        if kwargs['stay_login'] == True:
+            url = url + "?login=True"
+        else:
+            url = url + "?login=False"
         msg.html = self.render_template(self.email_template,
                                         url=url,
                                         first_name=register_user.first_name,
@@ -680,7 +709,6 @@ class SavvySiteModelView(ModelView):
             flash(u'Sites added', 'info')
 
         except Exception as e:
-            # print(e)
             if e.__class__.__name__ == 'ParserError':
                 flash(u'The CSV file is in wrong format.', 'danger')
             else:

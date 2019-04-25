@@ -19,65 +19,156 @@
 <!-- extend base layout -->
 {% extends "appbuilder/base.html" %}
 
+{% block head_css %}
+  {{ super() }}
+   <link href="{{url_for('static',filename='assets/stylesheets/savvybi.css')}}" rel="stylesheet">
+{% endblock %}
+{% block navbar %}
+  <div class="navbar navbar-static-top reg-navbar" role="navigation">
+    <div class="container-fluid">
+      <div class="navbar-header">
 
+        <a class="navbar-brand">
+          <img
+            width="250"
+            src="{{ url_for('static', filename='assets/images/SavvyBI-Logo-Large.png') }}"
+            alt="{{ appbuilder.app_name }}"
+          />
+        </a>
+      </div>
+      <div class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-right">
+          {% include 'appbuilder/navbar_right.html' %}
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div style="clear:both"></div>
+{% endblock %}
 
 {% block content %}
 
 <div class="container">
-    <div id="loginbox" style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
-        <div class="panel panel-primary" >
-            <div class="panel-heading">
-                <div class="panel-title">{{ title }}</div>
-            </div>
-            <div style="padding-top:30px" class="panel-body" >
-
-                <form class="form" action="" method="post" name="login">
-                    {{form.hidden_tag()}}
-                    <div class="help-block">{{_("Enter your login and password below")}}:</div>
-                    <div class="control-group{% if form.errors.openid %} error{% endif %}">
-                        <label class="control-label" for="openid">{{_("Username")}}:</label>
-
-                        <div class="controls">
-                            <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                                {{ form.username(size = 80, class = "form-control") }}
-                            </div>
-                            {% for error in form.errors.openid %}
-                            <span class="help-inline">[{{error}}]</span><br>
-                            {% endfor %}
-                            <label class="control-label" for="openid">{{_("Password")}}:</label>
-
-                            <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-key"></i></span>
-                                {{ form.password(size = 80, class = "form-control") }}
-                            </div>
-                            {% for error in form.errors.openid %}
-                            <span class="help-inline">[{{error}}]</span><br>
-                            {% endfor %}
-                        </div>
-                    </div>
-
-                    <div class="control-group">
-                        <div class="controls">
-                            <br>
-                            <div>
-                                <a href="{{appbuilder.sm.get_url_for_recover()}}">
-                                    {{_('Forgot your password?')}}
-                                </a>
-                                <input class="btn btn-primary btn-block" type="submit" value="{{_('Sign In')}}">
-                                {% if appbuilder.sm.auth_user_registration %}
-                                <a href="{{appbuilder.sm.get_url_for_registeruser}}" class="btn btn-block btn-primary" data-toggle="tooltip" rel="tooltip"
-                                title="{{_('If you are not already a user, please register')}}">
-                                    {{_('Register')}}
-                                </a>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </form>
-
-            </div>
+    <div id="Home" class="tab-pane active">
+        <div>
+            <h2 class="form-header">Welcome back!</h2>
+            <h4 class="form-subheader">hope you're having a great day!</h4>
+            <h4>&nbsp;</h4>
         </div>
+        <form class="form" action="" method="post" name="login">
+            {{form.hidden_tag()}}
+            <div class="register-form"  style="margin:auto; width:40%;">
+                <div class="input-group">
+                    {{ form.email(size = 80, class = "form-control login-form", placeholder=form.email.label.text) }}
+                </div>
+                <a>&nbsp;</a>
+                <div class="input-group">
+                    {{ form.password(size = 80, class = "form-control login-form", placeholder=form.password.label.text) }}
+                    <span class="fa fa-hand-pointer-o" style="color: RGBA(218,211,56,0.5); z-index: 12;" hidden></span>
+                </div>
+                <a>&nbsp;</a>
+                <div style="display: block; width: 100%;">
+                    <div style="float:left; font-size: 20px; font-family: 'Futura PT Light';">
+                        <a
+                            href="{{appbuilder.sm.get_url_for_recover}}">
+                            {{_('Forgot your password?')}}
+                        </a>
+                    </div>
+                    <div style="float:right;">
+                        {{ form.remember_me(class="form-control", value="0") }}
+                        <label for="remember_me">{{ form.remember_me.label.text }}</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="reg-footer">
+                    <div style="float: left">
+                        <div class="savvybi-alert alert-info caplock-alert" hidden>
+                            You have CAPS LOCK on
+                        </div>
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, m in messages %}
+                                    {% if category %}
+                                        <div class="savvybi-alert alert-{{ category }} flush-message">
+                                    {% else %}
+                                        <div class="savvybi-alert alert-info flush-message">
+                                    {% endif %}
+                                    {{ m }}
+                                    </div>
+                                {% endfor %}
+                            {% elif form.errors %}
+                                {% for error in form.errors.items() %}
+                                  {% if loop.first %}
+                                    <div class="savvybi-alert alert-danger error-message">{{ error[1][0] }}</div>
+                                  {% endif %}
+                                {% endfor %}
+                            {% else %}
+
+                            {% endif %}
+                        <div class="savvybi-alert alert-success ready-message" hidden>
+                            All good let's do it!
+                        </div>
+                        {% endwith %}
+                    </div>
+                    <div style="float: right;">
+                        <input class="btn btn-disabled btn-block form-submit" type="submit" value="{{_('Sign In')}}">
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
+<script>
+
+    $('#remember_me').on('click', function(){
+        if($(this). prop("checked") == true){
+            $(this).val(1);
+        }else{
+            $(this).val(0);
+        }
+    })
+
+    $('.login-form').on('change', function(){
+        var is_ready = true;
+        // Check if submit is ready
+        $('.login-form').each(function(){
+            if($(this).val() == '')
+            {
+                is_ready = is_ready && false;
+            }
+        });
+        if(is_ready){
+            $('input:submit').removeAttr('disabled');
+            $('input:submit').removeClass('btn-disabled').addClass('btn-primary');
+            $('.savvybi-alert').attr('hidden', true);
+            $('.ready-message').removeAttr('hidden');
+        }else{
+            $('input:submit').attr('disabled', 'disabled');
+            $('input:submit').removeClass('btn-primary').addClass('btn-disabled');
+            $('.ready-message').attr('hidden', true);
+        }
+    })
+
+    let password = document.getElementsByName('password')[0]
+    password.addEventListener("keyup", function(event) {
+        // If "caps lock" is pressed, display the warning text
+        if (event instanceof KeyboardEvent ) {
+            if (event.getModifierState("CapsLock")) {
+
+                $(".savvybi-alert:not(.capslock-alert)").attr('hidden', true);
+                $(".caplock-alert").removeAttr('hidden');
+                $(this).siblings('span').attr('hidden', true);
+                $(this).siblings('.fa-hand-pointer-o').removeAttr('hidden');
+            } else {
+                $(".caplock-alert").attr('hidden', true);
+                $(this).siblings('span').attr('hidden', true);
+            }
+        }
+    });
+</script>
+{% endblock %}
+
+{% block messages %}
 {% endblock %}

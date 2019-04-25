@@ -29,7 +29,7 @@ from superset.savvy.views import SavvyGroupModelView,\
     SavvyRegisterInvitationUserDBView, SavvyRegisterInviteView, \
     SavvyRegisterUserModelView, SavvyUserStatsChartView, \
     SavvySiteModelView, SavvyRegisterUserDBView, SavvyUserDBModelView, \
-    EmailResetPasswordView, PasswordRecoverView
+    EmailResetPasswordView, PasswordRecoverView, SavvyBIAuthDBView
 from superset.savvy.models import Group, ResetRequest, OrgRegisterUser, Organization, Site, SavvyUser
 from superset.security import SupersetSecurityManager
 
@@ -109,6 +109,7 @@ class CustomSecurityManager(SupersetSecurityManager):
     registerusermodelview = SavvyRegisterUserModelView
     userdbmodelview = SavvyUserDBModelView
     userstatschartview = SavvyUserStatsChartView
+    authdbview = SavvyBIAuthDBView
 
     resetRequest_model = ResetRequest
     registeruser_model = OrgRegisterUser
@@ -217,7 +218,6 @@ class CustomSecurityManager(SupersetSecurityManager):
         reset_request = self.get_session.query(self.resetRequest_model)\
             .filter_by(email=email, used=False).first()
         if reset_request is not None:
-            # print(reset_request.id)
             self.set_token_used(reset_request.reset_hash)
         reset_request = self.resetRequest_model()
         reset_request.email = email
@@ -233,7 +233,6 @@ class CustomSecurityManager(SupersetSecurityManager):
                 self.get_session.commit()
                 return hash_token
             except Exception as e:
-                print(e)
                 self.appbuilder.get_session.rollback()
         return None
 
@@ -248,7 +247,6 @@ class CustomSecurityManager(SupersetSecurityManager):
                 """Check time diff of reset hash time"""
                 email = reset_request.email
                 user = self.find_user(email=email)
-                # print(user)
                 return user
         return None
 
@@ -260,7 +258,6 @@ class CustomSecurityManager(SupersetSecurityManager):
             self.get_session.merge(reset_request)
             self.get_session.commit()
         except Exception as e:
-            print(e)
             self.get_session.rollback()
 
     def to_reset_view(self):
@@ -435,19 +432,16 @@ class CustomSecurityManager(SupersetSecurityManager):
                     self.get_session.delete(group)
             self.get_session.commit()
         except Exception as e:
-            print(e)
             self.get_session.rollback()
 
     def add_register_user_org_admin(self, **kwargs):
-        register_user = self.registeruser_model()
-        register_user.first_name = kwargs['first_name']
-        register_user.last_name = kwargs['last_name']
+        register_user = OrgRegisterUser()
         register_user.username = kwargs['email']
         register_user.email = kwargs['email']
         register_user.organization = kwargs['organization']
         register_user.password = generate_password_hash(kwargs['password'])
         register_user.registration_hash = str(uuid.uuid1())
-        register_user.inviter = '1'
+
         try:
             self.get_session.add(register_user)
             self.get_session.commit()
@@ -475,14 +469,12 @@ class CustomSecurityManager(SupersetSecurityManager):
         permission_list.append(self.find_permission_view_menu('database_access', db.perm))
         try:
             db_model.add(db)
-            # print('db finished')
             for schema in db.all_schema_names():
                 if schema in database_uri:
                     schema_perm = self.get_schema_perm(db, schema)
                     self.merge_perm(
                         'schema_access', schema_perm)
                     permission_list.append(self.find_permission_view_menu('schema_access', schema_perm))
-                    # print('for schema ', schema)
 
                     for table_name in db.all_table_names_in_schema(schema=schema):
                         table = table_model.obj()
@@ -497,10 +489,8 @@ class CustomSecurityManager(SupersetSecurityManager):
                             if session.query(table_query.exists()).scalar():
                                 logging.debug('Table already exists')
                         # Fail before adding if the table can't be found
-                        #     print('add table')
                             # table.get_sqla_table_object()
                             table_model.add(table)
-                            # print('fetch metadata')
                             table.fetch_metadata()
 
                             if table.get_perm():
@@ -508,19 +498,15 @@ class CustomSecurityManager(SupersetSecurityManager):
                                 permission_list.append(self.find_permission_view_menu('datasource_access', table.get_perm()))
                             if table.schema:
                                 self.merge_perm('schema_access', table.schema_perm)
-                            # print('add table fin')
                             # logging.exception(f'Got an error in pre_add for {table.name}')
                     break
 
-
-            # print(permission_list)
             permission_list_not_none = [permission for permission in permission_list if permission is not None]
             db_role = self.rolemodelview.datamodel.obj()
             db_role.name = DB_ROLE_PREFIX + db.database_name
             db_role.permissions = permission_list_not_none
 
             self.rolemodelview.datamodel.add(db_role)
-            # print('add role')
 
             owner.roles.append(db_role)
             self.get_session.merge(owner)
