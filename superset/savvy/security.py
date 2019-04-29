@@ -18,12 +18,11 @@
 import datetime
 import logging
 import uuid
-import json
 
 from flask import url_for
 from flask_appbuilder import const, urltools
 from flask_appbuilder.models.sqla.interface import SQLAInterface
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from superset.savvy.views import SavvyGroupModelView,\
     SavvyRegisterInvitationUserDBView, SavvyRegisterInviteView, \
@@ -32,7 +31,6 @@ from superset.savvy.views import SavvyGroupModelView,\
     EmailResetPasswordView, PasswordRecoverView, SavvyBIAuthDBView
 from superset.savvy.models import Group, ResetRequest, OrgRegisterUser, Organization, Site, SavvyUser
 from superset.security import SupersetSecurityManager
-
 
 PERMISSION_COMMON = {
     'can_add', 'can_list', 'can_show', 'can_edit', 'can_invitation', 'can_invitation_post'

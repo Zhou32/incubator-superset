@@ -26,7 +26,7 @@ from .forms import (
     CSVToSitesForm, SavvyRegisterFormWidget, SavvyBILoginDBForm
 
 )
-from .models import Site
+from .models import Site, SavvyUser
 from .filters import get_user_id_list_form_org, get_roles_for_org, get_groups_id_for_org, get_site_id_list_from_org, \
     get_site_id_list_from_group
 from .utils import post_request
@@ -40,16 +40,43 @@ class SavvyUserDBModelView(UserDBModelView):
     edit_columns = ['first_name', 'last_name', 'active', 'email', 'roles', 'groups']
     edit_form_query_rel_fields = {'roles': [['name', FilterInFunction, get_roles_for_org]],
                                   'groups': [['id', FilterInFunction, get_groups_id_for_org]]}
+    label_columns = {
+        "get_full_name": lazy_gettext("Full Name"),
+        "first_name": lazy_gettext("First Name"),
+        "last_name": lazy_gettext("Last Name"),
+        "username": lazy_gettext("User Name"),
+        "password": lazy_gettext("Password"),
+        "active": lazy_gettext("Is Active?"),
+        "email_confirm": lazy_gettext("Is Email verified?"),
+        "email": lazy_gettext("Email"),
+        "roles": lazy_gettext("Role"),
+        "last_login": lazy_gettext("Last login"),
+        "login_count": lazy_gettext("Login count"),
+        "fail_login_count": lazy_gettext("Failed login count"),
+        "created_on": lazy_gettext("Created on"),
+        "created_by": lazy_gettext("Created by"),
+        "changed_on": lazy_gettext("Changed on"),
+        "changed_by": lazy_gettext("Changed by"),
+    }
     show_fieldsets = [
         (lazy_gettext('User info'),
-         {'fields': ['username', 'active', 'roles', 'login_count', 'groups']}),
+         {'fields': ['email_confirm', 'active', 'roles', 'login_count', 'groups']}),
         (lazy_gettext('Personal Info'),
          {'fields': ['first_name', 'last_name', 'email'], 'expanded': True}),
         (lazy_gettext('Audit Info'),
          {'fields': ['last_login', 'fail_login_count', 'created_on',
                      'created_by', 'changed_on', 'changed_by'], 'expanded': False}),
     ]
-
+    user_show_fieldsets = [
+        (
+            lazy_gettext("User info"),
+            {"fields": ["email_confirm", "active", "roles", "login_count"]},
+        ),
+        (
+            lazy_gettext("Personal Info"),
+            {"fields": ["first_name", "last_name", "email"], "expanded": True},
+        ),
+    ]
     description_columns = {
         'groups': lazy_gettext('The default group has access to all sites belong to your organization and '
                                'is only visible to you as the organization owner.\n ')
@@ -70,6 +97,22 @@ class SavvyUserDBModelView(UserDBModelView):
     def delete_athena_key(self, org):
         post_request('https://3ozse3mao8.execute-api.ap-southeast-2.amazonaws.com/test/deleteorg',
                      {"org_id": org.id, "org_name": org.organization_name})
+
+    @expose("/userinfo/")
+    @has_access
+    def userinfo(self):
+        print("========================")
+        item = self.datamodel.get(g.user.id, self._base_filters)
+        widgets = self._get_show_widget(
+            g.user.id, item, show_fieldsets=self.user_show_fieldsets
+        )
+        self.update_redirect()
+        return self.render_template(
+            self.show_template,
+            title=self.user_info_title,
+            widgets=widgets,
+            appbuilder=self.appbuilder,
+        )
 
     @expose('/add', methods=['GET', 'POST'])
     @has_access
@@ -319,14 +362,14 @@ class SavvyBIAuthDBView(AuthDBView):
             return redirect(self.appbuilder.get_url_for_index)
         form = SavvyBILoginDBForm()
         if form.validate_on_submit():
-            user = self.appbuilder.sm.auth_user_db(
-                form.email.data, form.password.data
-            )
+            user = self.appbuilder.sm.auth_user_db(form.email.data, form.password.data)
             if not user:
                 flash("Something is wrong. These credentials don't match our records.", "danger")
                 return redirect(self.appbuilder.get_url_for_login)
             remember = form.remember_me.data
             login_user(user, remember=remember)
+            if user.email_confirm == False:
+                flash("You haven't verified your email account yet.", "warning")
             return redirect(self.appbuilder.get_url_for_index)
         return self.render_template(
             self.login_template, title=self.title, form=form, appbuilder=self.appbuilder
@@ -349,31 +392,25 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
             and activated
         """
         reg = self.appbuilder.sm.find_register_user(activation_hash)
-        if reg.first_name is None:
-            reg.first_name = ''
-        if reg.last_name is None:
-            reg.last_name = ''
         if not reg:
             log.error(const.LOGMSG_ERR_SEC_NO_REGISTER_HASH.format(activation_hash))
             flash(as_unicode(self.false_error_message), 'danger')
             return redirect(self.appbuilder.get_url_for_index)
-        user = self.appbuilder.sm.add_user(username=reg.email,
-                                           email=reg.email,
-                                           first_name=reg.first_name,
-                                           last_name=reg.last_name,
-                                           role=self.appbuilder.sm.find_role('org_owner'),
-                                           hashed_password=reg.password)
-        if not user:
-            flash(as_unicode(self.error_message), 'danger')
+
+        user = self.appbuilder.get_session.query(SavvyUser).filter_by(email=reg.email).first()
+        user.email_confirm = True
+        self.appbuilder.get_session.commit()
+
+        org_reg = self.appbuilder.sm.add_org(reg, user)
+        self.handle_aws_info(org_reg, user)
+        self.appbuilder.sm.del_register_user(reg)
+        if request.args.get('login') == 'True':
+            login_user(user, remember=False)
+            flash('Your account is successfully confirmed. Please update your profile.', 'success')
+            return redirect(self.appbuilder.get_url_for_userinfo)
         else:
-            org_reg = self.appbuilder.sm.add_org(reg, user)
-            self.handle_aws_info(org_reg, user)
-            self.appbuilder.sm.del_register_user(reg)
-            if request.args.get('login') == 'True':
-                login_user(user, remember=False)
-            else:
-                flash('Your account is successfully confirmed. Please login with your email', 'success')
-        return redirect(self.appbuilder.get_url_for_index)
+            flash('Your account is successfully confirmed. Please login with your email', 'success')
+            return redirect(self.appbuilder.get_url_for_index)
 
     def add_form_unique_validations(self, form):
         datamodel_user = self.appbuilder.sm.get_user_datamodel
@@ -428,9 +465,28 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
 
         register_user = self.appbuilder.sm.add_register_user_org_admin(**kwargs)
         if register_user:
+            user = self.appbuilder.sm.add_user(username=register_user.email,
+                                               email=register_user.email,
+                                               first_name='',
+                                               last_name='',
+                                               role=self.appbuilder.sm.find_role('org_owner'),
+                                               hashed_password=register_user.password)
+            if not user:
+                flash(as_unicode(self.error_message), 'danger')
+                self.appbuilder.sm.del_register_user(register_user)
+                return None
+            self.appbuilder.get_session.add(user)
+            self.appbuilder.get_session.commit()
+
             if self.send_email(register_user, stay_login=kwargs['stay_login']):
                 flash(as_unicode(self.message), 'info')
-                return register_user
+                if kwargs['stay_login'] == True:
+                    login_user(user, remember=False)
+                    if user.email_confirm == False:
+                        flash("You haven't verified your email account yet.", "warning")
+                    return redirect(self.appbuilder.get_url_for_userinfo)
+                else:
+                    return register_user
             else:
                 flash(as_unicode(self.error_message), 'danger')
                 self.appbuilder.sm.del_register_user(register_user)

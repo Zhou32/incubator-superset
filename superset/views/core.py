@@ -138,6 +138,7 @@ class DashboardFilter(SupersetFilter):
 
         if is_org_owner:
             org = Organization
+            users_in_org = []
             try:
                 users_in_org = db.session.query(org).filter(org.users.any(id=g.user.id)).first().users
             except:

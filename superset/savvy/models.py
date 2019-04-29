@@ -128,7 +128,7 @@ class Site(Model):
 class SavvyUser(User):
     __tablename__ = 'ab_user'
     groups = relationship('Group', secondary=assoc_group_user, backref='user')
-
+    email_confirm = Column(Boolean, default=False)
     __table_args__ = {'extend_existing': True}
 
 
