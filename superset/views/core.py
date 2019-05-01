@@ -2822,17 +2822,17 @@ class Superset(BaseSupersetView):
             'common': self.common_bootsrap_payload(),
         }
 
-        # return self.render_template(
-        #     'superset/basic.html',
-        #     entry='welcome',
-        #     title='Superset',
-        #     bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
-        # )
         return self.render_template(
-            'savvy/basic.html',
+            'superset/basic.html',
             entry='welcome',
             title='Superset',
+            bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
         )
+        # return self.render_template(
+        #     'savvy/basic.html',
+        #     entry='welcome',
+        #     title='Superset',
+        # )
 
     @has_access
     @expose('/profile/<username>/')

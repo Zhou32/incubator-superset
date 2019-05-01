@@ -362,6 +362,10 @@ class SavvyBIAuthDBView(AuthDBView):
             return redirect(self.appbuilder.get_url_for_index)
         form = SavvyBILoginDBForm()
         if form.validate_on_submit():
+            user = self.appbuilder.get_session.query(SavvyUser).filter_by(email=form.email.data).first()
+            if not user:
+                flash("Oops we don’t have this email in our records, need and account ?.", "none")
+                return redirect(self.appbuilder.get_url_for_login)
             user = self.appbuilder.sm.auth_user_db(form.email.data, form.password.data)
             if not user:
                 flash("Something is wrong. These credentials don't match our records.", "danger")

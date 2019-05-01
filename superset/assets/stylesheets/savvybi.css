@@ -75,7 +75,7 @@
     font-family: 'Futura PT Bold';
     text-align: center;
 }
-.savvybi-alert a{
+.savvybi-alert a i{
     float: right;
     margin-right: 50px;
     color: RGBA(45, 74, 80, 0.27);
