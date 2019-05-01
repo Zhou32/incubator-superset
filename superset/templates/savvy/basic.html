@@ -1,0 +1,44 @@
+{% extends 'superset/basic.html' %}
+
+{% block head_css %}
+  {{ super() }}
+  <link href="{{url_for('static',filename='assets/stylesheets/savvybi.css')}}" rel="stylesheet">
+{% endblock %}
+
+{% block navbar %}
+  {% if not standalone_mode %}
+    <header class="top" role="header">
+      {% include 'savvy/navbar.html' %}
+    </header>
+  {% endif %}
+{% endblock %}
+
+{% block body %}
+    {% block message %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, m in messages %}
+                    {% if category %}
+                        <div class="savvybi-alert alert-{{ category }} flush-message">
+                    {% else %}
+                        <div class="savvybi-alert alert-info flush-message">
+                    {% endif %}
+                    {{ m }}
+                    <a><i class="fa fa-times-rectangle-o"></i></a>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    {% endblock %}
+    {% block content %}
+        {% include 'savvy/welcome.html' %}
+    {% endblock %}
+{% endblock %}
+{% block tail_js %}
+    {{ super() }}
+    <script>
+        $('.savvybi-alert a i').click(function(){
+            $(this).parent().parent('.savvybi-alert').hide();
+        })
+    </script>
+{% endblock %}

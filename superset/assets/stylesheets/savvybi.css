@@ -68,7 +68,19 @@
     padding-top: 23px;
     background-color: #edeef1;
 }
-
+.savvybi-alert{
+    height: 69px;
+    padding: 20px 0;
+    font-size: 24px;
+    font-family: 'Futura PT Bold';
+    text-align: center;
+}
+.savvybi-alert a{
+    float: right;
+    margin-right: 50px;
+    color: RGBA(45, 74, 80, 0.27);
+    font-size: 28px;
+}
 .reg-footer .savvybi-alert{
     height: 69px;
     width: 800px;
@@ -80,16 +92,31 @@
     position: fixed;
 }
 
-.reg-footer .alert-danger{
+.savvybi-alert.alert-danger{
     background-color: #e7d1d8;
+    color: #F4F5F8;
 }
 
-.reg-footer .alert-success{
+.savvybi-alert.alert-success{
     background-color: #b9d5d7;
+    color: #F4F5F8;
 }
 
-.reg-footer .alert-info{
+.savvybi-alert.alert-info{
     background-color: #e9e9c8;
+    color: #F4F5F8;
+}
+
+.reg-footer .savvybi-alert.alert-danger{
+    color: #707070;
+}
+
+.reg-footer .savvybi-alert.alert-success{
+    color: #707070;
+}
+
+.reg-footer .savvybi-alert.alert-info{
+    color: #707070;
 }
 
 .reg-footer .note-message, .reg-footer .ready-message{
@@ -146,4 +173,135 @@
     color: #707070;
     font-size: 20px;
     font-family: 'Futura PT Light';
+}
+
+.savvy-btn{
+    width: 220px;
+    height: 60px;
+    font-family: 'Futura PT Bold';
+    font-size: 20px;
+    border-radius: 5px;
+}
+.savvy-submit-btn{
+    background: #079493;
+    color: white;
+}
+.savvy-submit-btn:hover, .savvy-submit-btn:active{
+    background: #06807F;
+}
+.savvy-submit-btn:disabled{
+    background: RGB(211,212,214);
+    color: RGB(177,178,179);
+}
+.savvy-default-btn{
+    background: transparent;
+    color: #66B6AB;
+    border-color: #079493;
+}
+.savvy-default-btn:active{
+    background: #F4F5F8;
+    color: #079493;
+    border-color: #079493;
+}
+.savvy-default-btn:hover{
+    background: white;
+    color: #203539;
+    border-color: #203539;
+}
+.savvy-default-btn:disabled{
+    background: white;
+    color: #CCCCCC;
+    border-color: #CCCCCC;
+}
+
+.savvy-navbar{
+    background-color: #2D4A50;
+    margin-bottom: 0px !important;
+}
+.savvy-navbar .navbar-brand{
+    height: 75px;
+    padding: 0;
+}
+.savvy-navbar .navbar-brand img{
+    background-color: #203539;
+}
+.savvy-navbar .navbar-right{
+    margin-top: 8px;
+    margin-right: 20px;
+}
+.savvy-navbar .navbar-right .fa{
+    font-size: 21px;
+    color: #CCCCCC;
+}
+.savvy-content{
+    text-align: center;
+    width: 900px;
+    margin: auto;
+}
+.welcome-text{
+    color: #079493;
+    font-size: 40px;
+    font-family: 'Futura PT Light';
+}
+.savvy-content .meter-description{
+    color: #34495E;
+    font-size: 20px;
+    font-family: 'Futura PT Light';
+    margin-top: 50px;
+    line-height: 0.8;
+}
+
+.meter-setup{
+    margin-top: 80px;
+}
+.meter-setup .title{
+    font-family: 'Futura PT Bold';
+    color: #34495E;
+    font-size: 22px;
+    margin-bottom: 30px;
+}
+.meter-box{
+    width: 100%;
+    height: 200px;
+    box-shadow: 1px 4px 5px RGBA(0, 0, 0, 0.16);
+    background-color: #F4F5F8;
+    border-radius: 5px;
+    padding: 30px 10px 15px 100px;
+    text-align: left;
+    margin-bottom: 20px;
+}
+.meter-box:hover, .meter-box:active{
+    background-color: white;
+}
+.meter-box .title{
+    font-size: 20px;
+    margin-bottom: 0;
+}
+.meter-box .content{
+    font-size: 20px;
+    width: 500px;
+    font-family: 'Futura PT Light';
+    float: left;
+    margin-top: 20px;
+    line-height: 0.8;
+}
+.meter-box .content .highlight{
+    color: #149999;
+    font-family: 'Futura PT Bold';
+}
+.meter-box .submit{
+    float: right;
+    position: relative;
+    top: -15px;
+}
+.meter-setup .go-to-main{
+    float: right;
+}
+.meter-setup .go-to-main a{
+    font-family: 'Futura PT Light';
+    color: #2D4A50;
+    font-size: 18px;
+}
+.meter-setup .go-to-main a:hover, .meter-setup .go-to-main a:focus{
+    text-decoration: none;
 }
