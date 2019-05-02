@@ -1,3 +1,4 @@
+<img id="savvy-onboard-img" src="{{ url_for('static', filename='assets/images/welcome-background.png') }}"/>
 <div class="savvy-content">
     <div class="welcome-text">
         Welcome To Workplace
@@ -47,7 +48,36 @@
             </div>
         </div>
         <div class="go-to-main">
-          <a href="#">I'll do it later</a>
+          <a href="#" data-toggle="modal" data-target="#meter-connect">I'll do it later</a>
+        </div>
+        <div id="meter-connect" class="modal fade" role="dialog">
+          <div class="modal-dialog" style="margin-top: 150px;">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+              <div class="modal-header">
+                <h4 class="modal-title">Are you sure?</h4>
+              </div>
+              <div class="modal-body">
+                <p>All this can be a bit overwhelming, but don’t worry</p>
+                <p>we are here to help you every step of the way.<p>
+                <p>If you need someone to walk you through click on the<p>
+                <p>chat-box and a member of our costumer support<p>
+                <p>team can help you out.<p>
+                <br/>
+                <p>Or send us an email at <span style="color: #079493;">meterdata@savvybi.io</span>, and<p>
+                <p>we will get in contact with you to help.<p>
+                <br/>
+                <p>However, the best way to get it is by trying so what<p>
+                <p>do you think?</p>
+              </div>
+              <div class="modal-footer">
+                <button class="savvy-btn savvy-default-btn" data-dismiss="modal" style="float:left;">I'll do it later</button>
+                <button class="savvy-btn savvy-submit-btn" data-dismiss="modal" style="float: right;">Let's try!</button>
+              </div>
+            </div>
+
+          </div>
         </div>
     </div>
 </div>

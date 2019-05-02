@@ -233,10 +233,17 @@
     font-size: 21px;
     color: #CCCCCC;
 }
+#savvy-onboard-img{
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    position: absolute;
+}
 .savvy-content{
     text-align: center;
     width: 900px;
     margin: auto;
+    z-index: 1;
 }
 .welcome-text{
     color: #079493;
@@ -304,4 +311,28 @@
 }
 .meter-setup .go-to-main a:hover, .meter-setup .go-to-main a:focus{
     text-decoration: none;
+}
+.modal-backdrop.in{
+    background-color: #F4F5F8;
+}
+.meter-setup .modal-header{
+    padding: 60px ;
+    border-bottom: none;
+}
+.meter-setup .modal-title{
+    font-size: 36px;
+    color: #079493;
+    font-family: 'Futura PT Light';
+}
+.meter-setup .modal-body{
+    font-size: 20px;
+    font-family: 'Futura PT Light';
+    color: #34495E;
+    line-height: 1;
+    padding: 0;
+}
+.meter-setup .modal-footer{
+    border-top: none;
+    padding: 20px 50px;
+    margin-top: 80px;
 }
