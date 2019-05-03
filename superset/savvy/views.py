@@ -101,7 +101,6 @@ class SavvyUserDBModelView(UserDBModelView):
     @expose("/userinfo/")
     @has_access
     def userinfo(self):
-        print("========================")
         item = self.datamodel.get(g.user.id, self._base_filters)
         widgets = self._get_show_widget(
             g.user.id, item, show_fieldsets=self.user_show_fieldsets
@@ -366,14 +365,30 @@ class SavvyBIAuthDBView(AuthDBView):
             if not user:
                 flash("Oops we don’t have this email in our records, need and account ?.", "none")
                 return redirect(self.appbuilder.get_url_for_login)
+
+            is_org_owner = False
+            for role in user.roles:
+                if role.name == 'org_owner':
+                    is_org_owner = True
+                    break
+            # If org owner's first login
+            is_first_login = False
+            if is_org_owner == True and (user.login_count == 0 or user.login_count is None):
+                    is_first_login = True
+
             user = self.appbuilder.sm.auth_user_db(form.email.data, form.password.data)
             if not user:
                 flash("Something is wrong. These credentials don't match our records.", "danger")
                 return redirect(self.appbuilder.get_url_for_login)
+
             remember = form.remember_me.data
             login_user(user, remember=remember)
-            if user.email_confirm == False:
-                flash("You haven't verified your email account yet.", "warning")
+            if user.email_confirm is False:
+                flash("You haven't verified your email account yet.", "info")
+            if is_first_login is True:
+                return redirect(url_for('Superset.meter_connect'))
+            if user.first_name == '' or user.last_name == '':
+                return redirect(self.appbuilder.get_url_for_userinfo)
             return redirect(self.appbuilder.get_url_for_index)
         return self.render_template(
             self.login_template, title=self.title, form=form, appbuilder=self.appbuilder
@@ -389,7 +404,6 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
 
     @expose('/activation/<string:activation_hash>')
     def activation(self, activation_hash):
-
         """
             Endpoint to expose an activation url, this url
             is sent to the user by email, when accessed the user is inserted
@@ -487,10 +501,10 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
                 if kwargs['stay_login'] == True:
                     login_user(user, remember=False)
                     if user.email_confirm == False:
-                        flash("You haven't verified your email account yet.", "warning")
-                    return redirect(self.appbuilder.get_url_for_userinfo)
+                        flash("You haven't verified your email account yet.", "info")
+                    return redirect(url_for('Superset.meter_connect'))
                 else:
-                    return register_user
+                    return redirect(self.appbuilder.get_url_for_login)
             else:
                 flash(as_unicode(self.error_message), 'danger')
                 self.appbuilder.sm.del_register_user(register_user)

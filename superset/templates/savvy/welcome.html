@@ -1,10 +1,12 @@
 <img id="savvy-onboard-img" src="{{ url_for('static', filename='assets/images/welcome-background.png') }}"/>
 <div class="savvy-content">
+    {% if entry=='welcome' %}
     <div class="welcome-text">
-        Welcome To Workplace
+        Welcome To {{ organization }}
     </div>
+    {% endif %}
     <div class="meter-description">
-      <p>  Hi {UserName}, we are working hard to make this process super fast and automated, sadly we  </p>
+      <p>  Hi {{ username }}, we are working hard to make this process super fast and automated, sadly we  </p>
       <p>depend on your meter data provider, and sometimes they are not very responsive, so it can take up to </p>
       <p>10 days to collect your data.</p>
     </div>
@@ -52,8 +54,6 @@
         </div>
         <div id="meter-connect" class="modal fade" role="dialog">
           <div class="modal-dialog" style="margin-top: 150px;">
-
-            <!-- Modal content-->
             <div class="modal-content">
               <div class="modal-header">
                 <h4 class="modal-title">Are you sure?</h4>
@@ -72,7 +72,7 @@
                 <p>do you think?</p>
               </div>
               <div class="modal-footer">
-                <button class="savvy-btn savvy-default-btn" data-dismiss="modal" style="float:left;">I'll do it later</button>
+                <button class="savvy-btn savvy-default-btn" data-dismiss="modal" style="float:left;"><a href="{{ link }}">I'll do it later</a></button>
                 <button class="savvy-btn savvy-submit-btn" data-dismiss="modal" style="float: right;">Let's try!</button>
               </div>
             </div>
