@@ -91,11 +91,18 @@
                             {% if messages %}
                                 {% for category, m in messages %}
                                     {% if category %}
-                                        <div class="savvybi-alert alert-{{ category }} flush-message">
+                                        {% if category=='none' %}
+                                            <div class="savvybi-alert alert-danger flush-message">
+                                        {% else %}
+                                            <div class="savvybi-alert alert-{{ category }} flush-message">
+                                        {% endif %}
                                     {% else %}
                                         <div class="savvybi-alert alert-info flush-message">
                                     {% endif %}
                                     {{ m }}
+                                    {% if category=='none' %}
+                                        Click <a href="{{ appbuilder.sm.get_url_for_registeruser }}">here</a>
+                                    {% endif %}
                                     </div>
                                 {% endfor %}
                             {% elif form.errors %}
