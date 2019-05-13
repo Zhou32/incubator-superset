@@ -1,0 +1,31 @@
+{% set menu = appbuilder.menu %}
+{% set languages = appbuilder.languages %}
+{% set WARNING_MSG = appbuilder.app.config.get('WARNING_MSG') %}
+{% set app_icon_width = appbuilder.app.config.get('APP_ICON_WIDTH', 126) %}
+
+<div class="savvy-navbar navbar navbar-static-top" role="navigation">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand">
+        <img
+          width="75"
+          src="{{ url_for('static', filename='assets/images/SavvyBI-Logo-Revise.png') }}"
+          alt="{{ appbuilder.app_name }}"
+        />
+      </a>
+    </div>
+    <div class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        {% if WARNING_MSG %}
+          <li class="alert alert-danger">
+            {{ WARNING_MSG | safe }}
+          </li>
+        {% endif %}
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li class="menu"><a><i class="fa fa-bell-o"></i></a></li>
+        <li class="menu"><a><i class="fa fa-cog"></i></a></li>
+      </ul>
+    </div>
+  </div>
+</div>

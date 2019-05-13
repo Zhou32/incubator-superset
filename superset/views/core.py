@@ -66,7 +66,7 @@ from .base import (
     SupersetFilter, SupersetModelView, YamlExportMixin,
 )
 from .utils import bootstrap_user_data
-from superset.savvy.models import Organization
+from superset.savvy.models import Organization, SavvyUser, OrgRegisterUser
 from superset.savvy.filters import get_db_name_list_form_org
 from flask_appbuilder.models.sqla.filters import FilterInFunction
 
@@ -138,6 +138,7 @@ class DashboardFilter(SupersetFilter):
 
         if is_org_owner:
             org = Organization
+            users_in_org = []
             try:
                 users_in_org = db.session.query(org).filter(org.users.any(id=g.user.id)).first().users
             except:
@@ -2826,6 +2827,38 @@ class Superset(BaseSupersetView):
             entry='welcome',
             title='Superset',
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
+        )
+
+    @expose('/connect-meter')
+    def meter_connect(self):
+        """Personalized welcome page"""
+        if not g.user or not g.user.get_id():
+            return redirect(appbuilder.get_url_for_login)
+
+        user = db.session.query(SavvyUser).filter_by(id=g.user.get_id()).first()
+
+        if user.login_count == 0 or user.login_count is None:
+            entry='welcome'
+        else:
+            entry='connect-meter'
+        if user.email_confirm is True:
+            organization = db.session.query(Organization).filter_by(user_id=user.id).first()
+            org_name = organization.organization_name
+        else:
+            org_register = db.session.query(OrgRegisterUser).filter_by(email=user.email).first()
+            org_name = org_register.organization
+        if user.first_name == '' or user.last_name == '':
+            later_link=appbuilder.get_url_for_userinfo
+        else:
+            later_link = appbuilder.get_url_for_index
+        username = '{} {}'.format(user.first_name, user.last_name)
+        return self.render_template(
+            'savvy/basic.html',
+            entry=entry,
+            title='Superset',
+            organization=org_name.capitalize(),
+            username=username,
+            link=later_link,
         )
 
     @has_access
