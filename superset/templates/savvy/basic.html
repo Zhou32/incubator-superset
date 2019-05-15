@@ -2,6 +2,10 @@
 
 {% block head_css %}
   {{ super() }}
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
   <link href="{{url_for('static',filename='assets/stylesheets/savvybi.css')}}" rel="stylesheet">
 {% endblock %}
 
@@ -14,25 +18,40 @@
 {% endblock %}
 
 {% block body %}
-    {% block message %}
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, m in messages %}
-                    {% if category %}
-                        <div class="savvybi-alert alert-{{ category }} flush-message">
-                    {% else %}
-                        <div class="savvybi-alert alert-info flush-message">
-                    {% endif %}
-                    {{ m }}
-                    <a><i class="fa fa-times-rectangle-o"></i></a>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-    {% endblock %}
-    {% block content %}
-        {% include 'savvy/welcome.html' %}
-    {% endblock %}
+  <img id="savvy-onboard-img" src="{{ url_for('static', filename='assets/images/welcome-background.png') }}"/>
+
+  <div style="padding-left: 75px;">
+      <div id="savvy-sidebar">
+          <ul class="sidebar-nav">
+              <li><i class="fa fa-home"></i></li>
+              <li><i class="fa fa-th"></i></li>
+              <li><i class="fas fa-building"></i></li>
+              <li><i class="far fa-paper-plane"></i></li>
+          </ul>
+      </div>
+      {% block message %}
+          {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                  {% for category, m in messages %}
+                      {% if category %}
+                          <div class="savvybi-alert alert-{{ category }} flush-message">
+                      {% else %}
+                          <div class="savvybi-alert alert-info flush-message">
+                      {% endif %}
+                      {{ m }}
+                      <a><i class="fa fa-times-rectangle-o"></i></a>
+                      </div>
+                  {% endfor %}
+              {% endif %}
+          {% endwith %}
+      {% endblock %}
+
+      <div id="savvy-content">
+      {% block content %}
+          {% include 'savvy/welcome.html' %}
+      {% endblock %}
+      </div>
+  </div>
 {% endblock %}
 {% block tail_js %}
     {{ super() }}
