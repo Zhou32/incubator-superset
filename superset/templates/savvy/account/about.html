@@ -1,0 +1,32 @@
+{% extends 'savvy/basic.html' %}
+
+{% block main_content %}
+<div id="about-div">
+  <p class="title">About This Workspace</p>
+  <div class="tab_menu">
+      <ul class="nav nav-pills">
+          <li class="active">
+              <a  href="#overview" data-toggle="tab">Overview</a>
+          </li>
+          <li>
+              <a href="#admin_owner" data-toggle="tab">Admins & Owners</a>
+          </li>
+          <li>
+              <a href="#bav" data-toggle="tab">BAV</a>
+          </li>
+      </ul>
+
+      <div class="tab-content clearfix">
+          <div class="tab-pane active" id="overview">
+              <h3>Content's background color is the same for the tab</h3>
+          </div>
+          <div class="tab-pane" id="admin_owner">
+              <h3>We use the class nav-pills instead of nav-tabs which automatically creates a background color for the tab</h3>
+          </div>
+          <div class="tab-pane" id="bav">
+              <h3>We applied clearfix to the tab-content to rid of the gap between the tab and the content</h3>
+        </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

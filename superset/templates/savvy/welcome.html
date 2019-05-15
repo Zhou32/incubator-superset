@@ -1,5 +1,8 @@
-<div id="welcome-content">
-    <div class="welcome-text">
+{% extends 'savvy/basic.html' %}
+
+{% block main_content %}
+<div id="welcome-div">
+    <div class="title">
         Welcome To {{ organization }}
     </div>
     <div class="meter-description">
@@ -78,3 +81,4 @@
         </div>
     </div>
 </div>
+{% endblock %}

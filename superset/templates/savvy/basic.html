@@ -23,33 +23,36 @@
   <div style="padding-left: 75px;">
       <div id="savvy-sidebar">
           <ul class="sidebar-nav">
-              <li><i class="fa fa-home"></i></li>
+              <li>
+                  <i class="fa fa-home"></i>
+              </li>
               <li><i class="fa fa-th"></i></li>
               <li><i class="fas fa-building"></i></li>
               <li><i class="far fa-paper-plane"></i></li>
           </ul>
       </div>
-      {% block message %}
-          {% with messages = get_flashed_messages(with_categories=true) %}
-              {% if messages %}
-                  {% for category, m in messages %}
-                      {% if category %}
-                          <div class="savvybi-alert alert-{{ category }} flush-message">
-                      {% else %}
-                          <div class="savvybi-alert alert-info flush-message">
-                      {% endif %}
-                      {{ m }}
-                      <a><i class="fa fa-times-rectangle-o"></i></a>
-                      </div>
-                  {% endfor %}
-              {% endif %}
-          {% endwith %}
-      {% endblock %}
-
       <div id="savvy-content">
-      {% block content %}
-          {% include 'savvy/welcome.html' %}
-      {% endblock %}
+          {% block message %}
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                      {% for category, m in messages %}
+                          {% if category %}
+                              <div class="savvybi-alert alert-{{ category }} flush-message">
+                          {% else %}
+                              <div class="savvybi-alert alert-info flush-message">
+                          {% endif %}
+                          {{ m }}
+                          <a><i class="fa fa-times-rectangle-o"></i></a>
+                          </div>
+                      {% endfor %}
+                  {% endif %}
+              {% endwith %}
+          {% endblock %}
+
+          <div id="main-content">
+              {% block main_content %}
+              {% endblock %}
+          </div>
       </div>
   </div>
 {% endblock %}

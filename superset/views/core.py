@@ -2849,7 +2849,7 @@ class Superset(BaseSupersetView):
             later_link = appbuilder.get_url_for_index
         username = '{} {}'.format(user.first_name, user.last_name)
         return self.render_template(
-            'savvy/basic.html',
+            'savvy/account/about.html',
             title='Superset',
             organization=org_name.capitalize(),
             username=username,

@@ -268,19 +268,20 @@
     position: relative;
 }
 
-#welcome-content{
+#main-content{
     width: 900px;
     margin: auto;
+    padding-top: 60px;
     text-align: center;
 }
 
 
-.welcome-text{
+#welcome-div > .title{
     color: #079493;
     font-size: 40px;
     font-family: 'Futura PT Light';
 }
-#welcome-content .meter-description{
+#welcome-div .meter-description{
     color: #34495E;
     font-size: 20px;
     font-family: 'Futura PT Light';
@@ -365,4 +366,23 @@
     border-top: none;
     padding: 20px 50px;
     margin-top: 80px;
+}
+
+#about-div > .title{
+    color: #079493;
+    font-family: 'Futura PT Light';
+    font-size: 48px;
+}
+
+.tab_menu > .nav-pills > li > a{
+    color: #34495E;
+    font-size: 18px;
+    font-family: 'Futura PT Bold';
+}
+
+.tab_menu > .nav-pills > li > a:hover, .tab_menu > .nav-pills > li > a:focus,
+.tab_menu > .nav-pills > li.active > a, .tab_menu > .nav-pills > li.active > a:focus, .tab_menu > .nav-pills > li.active > a:hover{
+    text-decoration: underline;
+    color: #34495E;
+    background: transparent;
 }
