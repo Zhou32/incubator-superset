@@ -266,6 +266,7 @@
 #savvy-content{
     width: 100%;
     position: relative;
+    background-color: #F4F5F8;
 }
 
 #main-content{
@@ -374,15 +375,52 @@
     font-size: 48px;
 }
 
-.tab_menu > .nav-pills > li > a{
+#about-div .nav-pills > li > a{
     color: #34495E;
     font-size: 18px;
     font-family: 'Futura PT Bold';
 }
 
-.tab_menu > .nav-pills > li > a:hover, .tab_menu > .nav-pills > li > a:focus,
-.tab_menu > .nav-pills > li.active > a, .tab_menu > .nav-pills > li.active > a:focus, .tab_menu > .nav-pills > li.active > a:hover{
+#about-div .nav-pills > li > a:hover, #about-div .nav-pills > li > a:focus,
+#about-div .nav-pills > li.active > a, #about-div .nav-pills > li.active > a:focus, #about-div .nav-pills > li.active > a:hover{
     text-decoration: underline;
     color: #34495E;
-    background: transparent;
+    background: white;
+}
+
+.tab-content{
+    background-color: white;
+    padding: 50px 30px 40px 30px;
+}
+
+#workspace-thumb{
+    border: 1px solid black;
+    width: 73px;
+    height: 66px;
+    float: left;
+    margin-right: 20px;
+}
+#workspace-name{
+    color: #34495E;
+    font-size: 24px;
+    font-family: 'Futura PT Bold';
+    line-height: 2.5;
+    float: left;
+}
+#about-div .tab-content > .tab-pane > .header{
+    margin-bottom: 30px;
+}
+#about-div #workspace-info{
+    width: 100%;
+}
+#about-div #workspace-info .field {
+    color: #34495E;
+    font-family: 'Futura PT Bold';
+    font-size: 18px;
+    padding: 20px 0;
+}
+
+#about-div #workspace-info tr{
+    border-bottom: 1px solid #ccc;
+
 }

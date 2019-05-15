@@ -3,7 +3,7 @@
 {% block main_content %}
 <div id="about-div">
   <p class="title">About This Workspace</p>
-  <div class="tab_menu">
+  <div>
       <ul class="nav nav-pills">
           <li class="active">
               <a  href="#overview" data-toggle="tab">Overview</a>
@@ -18,7 +18,31 @@
 
       <div class="tab-content clearfix">
           <div class="tab-pane active" id="overview">
-              <h3>Content's background color is the same for the tab</h3>
+              <div class="header">
+                  <div id="workspace-thumb">
+
+                  </div>
+                  <div id="workspace-name">
+                    {{ organization }}
+                  </div>
+                  <div style="clear:both;"></div>
+              </div>
+              <div>
+                  <table id="workspace-info">
+                      <tr>
+                          <td class="field" colspan="3">Date Created</td>
+                          <td class="value">2019-03-23</td>
+                      </tr>
+                      <tr>
+                          <td class="field" colspan="3">Number of Meters</td>
+                          <td class="value">2</td>
+                      </tr>
+                      <tr>
+                          <td class="field" colspan="3">Terms of Service</td>
+                          <td class="value"><a>review</a></td>
+                      </tr>
+                  </table>
+              </div>
           </div>
           <div class="tab-pane" id="admin_owner">
               <h3>We use the class nav-pills instead of nav-tabs which automatically creates a background color for the tab</h3>
