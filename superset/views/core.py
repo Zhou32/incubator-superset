@@ -2837,12 +2837,8 @@ class Superset(BaseSupersetView):
 
         user = db.session.query(SavvyUser).filter_by(id=g.user.get_id()).first()
 
-        if user.login_count == 0 or user.login_count is None:
-            entry='welcome'
-        else:
-            entry='connect-meter'
         if user.email_confirm is True:
-            organization = db.session.query(Organization).filter_by(user_id=user.id).first()
+            organization = db.session.query(Organization).filter(Organization.users.any(id=user.id)).scalar()
             org_name = organization.organization_name
         else:
             org_register = db.session.query(OrgRegisterUser).filter_by(email=user.email).first()
@@ -2853,8 +2849,7 @@ class Superset(BaseSupersetView):
             later_link = appbuilder.get_url_for_index
         username = '{} {}'.format(user.first_name, user.last_name)
         return self.render_template(
-            'savvy/basic.html',
-            entry=entry,
+            'savvy/account/about.html',
             title='Superset',
             organization=org_name.capitalize(),
             username=username,

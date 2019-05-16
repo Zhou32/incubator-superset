@@ -1,0 +1,96 @@
+{% extends 'savvy/basic.html' %}
+
+{% block main_content %}
+<div id="about-div">
+  <p class="title">About This Workspace</p>
+  <div>
+      <ul class="nav nav-pills">
+          <li class="active">
+              <a  href="#overview" data-toggle="tab">Overview</a>
+          </li>
+          <li>
+              <a href="#admin_owner" data-toggle="tab">Admins & Owners</a>
+          </li>
+          <li>
+              <a href="#bav" data-toggle="tab">BAV</a>
+          </li>
+      </ul>
+
+      <div class="tab-content clearfix">
+          <div class="tab-pane active" id="overview">
+              <div class="header">
+                  <div class="thumbnail">
+
+                  </div>
+                  <div id="workspace-name">
+                    {{ organization }}
+                  </div>
+                  <div style="clear:both;"></div>
+              </div>
+              <div class="content">
+                  <table>
+                      <tr>
+                          <td class="field">Date Created</td>
+                          <td class="value">2019-03-23</td>
+                      </tr>
+                      <tr>
+                          <td class="field">Number of Meters</td>
+                          <td class="value">2</td>
+                      </tr>
+                      <tr>
+                          <td class="field">Terms of Service</td>
+                          <td class="value"><a>review</a></td>
+                      </tr>
+                  </table>
+              </div>
+          </div>
+          <div class="tab-pane" id="admin_owner">
+              <div class="header">
+                  <div class="thumbnail">
+                  </div>
+                  <div class="form-group">
+                      <div class="form-group has-feedback">
+                          <input type="text" class="search-bar form-control" id="inputValidation" placeholder="Search Admins and Owner"/>
+                          <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                      </div>
+                  </div>
+                  <div style="clear:both;"></div>
+              </div>
+              <div class="content">
+                  <table>
+                      <tr>
+                          <td class="field">
+                              Date Created
+                              <p style="font-family: 'Futura PT Light';"> email_address </p>
+                          </td>
+                          <td class="value" style="text-align: right; padding-right: 50px;">2019-03-23</td>
+                      </tr>
+                  </table>
+              </div>
+          </div>
+          <div class="tab-pane" id="bav">
+              <div class="header">
+                  <p style="font-size: 22px; font-family: 'Futura PT Bold';">
+                      Business Authority Verification (BAV)
+                  </p>
+                  <p style="font-size: 18px; font-family: 'Futura PT Light';">
+                      The BAV ensures the member who registered this workspace have the authority to request energy data from meter data providers, retailers and network distribution businesses. Your privacy and security are paramount to Us.
+                  </p>
+                  <div style="clear:both;"></div>
+              </div>
+              <div class="content">
+                  <table>
+                      <tr>
+                          <td class="field">
+                              Linking Authentication
+                              <p style="font-family: 'Futura PT Light';"> More info soon </p>
+                          </td>
+                          <td class="value" style="text-align: right; padding-right: 50px;">Super User</td>
+                      </tr>
+                  </table>
+              </div>
+        </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

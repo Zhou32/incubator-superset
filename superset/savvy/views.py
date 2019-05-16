@@ -373,7 +373,7 @@ class SavvyBIAuthDBView(AuthDBView):
                     break
             # If org owner's first login
             is_first_login = False
-            if is_org_owner == True and (user.login_count == 0 or user.login_count is None):
+            if is_org_owner == True and user.last_login is None:
                     is_first_login = True
 
             user = self.appbuilder.sm.auth_user_db(form.email.data, form.password.data)
@@ -423,12 +423,25 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
         # self.handle_aws_info(org_reg, user)
         self.appbuilder.sm.del_register_user(reg)
         if request.args.get('login') == 'True':
+            if user.last_login is None:
+                is_first_login = True
+            else:
+                is_first_login = False
             login_user(user, remember=False)
-            flash('Your account is successfully confirmed. Please update your profile.', 'success')
-            return redirect(self.appbuilder.get_url_for_userinfo)
+
+            if is_first_login is True:
+                flash('Your account is successfully confirmed. Please connect meters to your organization.', 'success')
+                return redirect(url_for('Superset.meter_connect'))
+
+            if user.first_name == '' or user.last_name == '':
+                flash('Your account is successfully confirmed. Please update your profile.', 'success')
+                return redirect(self.appbuilder.get_url_for_userinfo)
+
+            flash('Your account is successfully confirmed.', 'success')
+            return redirect(self.appbuilder.get_url_for_index)
         else:
             flash('Your account is successfully confirmed. Please login with your email', 'success')
-            return redirect(self.appbuilder.get_url_for_index)
+            return redirect(self.appbuilder.get_url_for_login)
 
     def add_form_unique_validations(self, form):
         datamodel_user = self.appbuilder.sm.get_user_datamodel
