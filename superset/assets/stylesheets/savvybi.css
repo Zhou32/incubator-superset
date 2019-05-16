@@ -420,6 +420,9 @@
     margin-top: 80px;
 }
 
+#about-div{
+    color: #34495E;
+}
 #about-div > .title{
     color: #079493;
     font-family: 'Futura PT Light';
@@ -471,7 +474,6 @@
     color: #CCCCCC;
 }
 #workspace-name{
-    color: #34495E;
     font-size: 24px;
     font-family: 'Futura PT Bold';
     line-height: 2.5;
@@ -484,13 +486,11 @@
     width: 100%;
 }
 #about-div .tab-content .tab-pane > .content .field {
-    color: #34495E;
     font-family: 'Futura PT Bold';
     font-size: 18px;
     padding: 20px 0;
 }
 #about-div .tab-content .tab-pane > .content .value {
-    color: #34495E;
     font-family: 'Futura PT Light';
     font-size: 18px;
     padding: 20px 0;
