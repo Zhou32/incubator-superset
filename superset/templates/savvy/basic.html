@@ -25,6 +25,19 @@
           <ul class="sidebar-nav">
               <li>
                   <i class="fa fa-home"></i>
+                  <ul class="sidebar-menu">
+                      <li>
+                          <a href="#">Account</a>
+                          <ul class="sub-menu">
+                              <li class="active"><a href="#">About</a></li>
+                              <li><a href="#">Profile</a></li>
+                              <li><a href="#">Plan</a></li>
+                              <li><a href="#">Billing</a></li>
+                          </ul>
+                      </li>
+                      <li><a href="#">Administration</a></li>
+                      <li><a href="#">Other</a></li>
+                  </ul>
               </li>
               <li><i class="fa fa-th"></i></li>
               <li><i class="fas fa-building"></i></li>
@@ -61,6 +74,21 @@
     <script>
         $('.savvybi-alert a i').click(function(){
             $(this).parent().parent('.savvybi-alert').hide();
-        })
+        });
+
+        $('#savvy-sidebar .sidebar-nav>li>i').click(function(){
+            $(this).parent('li').siblings('li').removeClass('active');
+            $(this).parent('li').toggleClass('active');
+        });
+
+        $('#savvy-sidebar .sidebar-nav .sidebar-menu>li>a').click(function(){
+            $(this).parent('li').siblings('li').removeClass('active');
+            $(this).parent('li').toggleClass('active');
+        });
+
+        $('#savvy-sidebar .sidebar-nav .sidebar-menu .sub-menu>li>a').click(function(){
+            $(this).parent('li').siblings('li').removeClass('active');
+            $(this).parent('li').toggleClass('active');
+        });
     </script>
 {% endblock %}
