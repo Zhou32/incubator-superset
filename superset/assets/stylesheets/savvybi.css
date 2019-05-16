@@ -247,7 +247,7 @@
     height: 100%;
     margin-left: -75px;
     overflow-y: visible;
-    z-index: 1000;
+    z-index: 3;
     background-color: #079493;
 }
 
@@ -315,7 +315,8 @@
 
 #savvy-content{
     width: 100%;
-    position: relative;
+    height: 100%;
+    position: fixed;
     background-color: #F4F5F8;
 }
 
@@ -443,12 +444,31 @@
     padding: 50px 30px 40px 30px;
 }
 
-#workspace-thumb{
+#about-div .tab-content .tab-pane > .header > .thumbnail{
     border: 1px solid black;
     width: 73px;
     height: 66px;
     float: left;
     margin-right: 20px;
+    background-color: white;
+}
+
+#about-div #admin_owner > .header .search-bar{
+    float: right;
+    width: 280px;
+    height: 30px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 13px;
+    border: 1px solid #CCCCCC;
+    margin-top: 20px;
+    color: dimgrey;
+    padding-left: 15px;
+    padding-right: 40px;
+}
+#about-div #admin_owner > .header .form-control-feedback{
+    line-height: 5;
+    color: #CCCCCC;
 }
 #workspace-name{
     color: #34495E;
@@ -457,20 +477,24 @@
     line-height: 2.5;
     float: left;
 }
-#about-div .tab-content > .tab-pane > .header{
+#about-div #overview > .header{
     margin-bottom: 30px;
 }
-#about-div #workspace-info{
+#about-div .tab-content .tab-pane > .content table{
     width: 100%;
 }
-#about-div #workspace-info .field {
+#about-div .tab-content .tab-pane > .content .field {
     color: #34495E;
     font-family: 'Futura PT Bold';
     font-size: 18px;
     padding: 20px 0;
 }
-
-#about-div #workspace-info tr{
+#about-div .tab-content .tab-pane > .content .value {
+    color: #34495E;
+    font-family: 'Futura PT Light';
+    font-size: 18px;
+    padding: 20px 0;
+}
+#about-div .tab-content .tab-pane > .content tr{
     border-bottom: 1px solid #ccc;
-
 }

@@ -90,5 +90,8 @@
             $(this).parent('li').siblings('li').removeClass('active');
             $(this).parent('li').toggleClass('active');
         });
+        $('#savvy-content').click(function(){
+           $('#savvy-sidebar li').removeClass('active');
+        });
     </script>
 {% endblock %}
