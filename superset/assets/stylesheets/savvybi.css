@@ -254,6 +254,7 @@
 #savvy-sidebar .sidebar-nav{
     width: 75px;
     padding: 20px 0;
+    list-style: none;
 }
 
 #savvy-sidebar .sidebar-nav>li{
