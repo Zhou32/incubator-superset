@@ -2829,11 +2829,18 @@ class Superset(BaseSupersetView):
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
         )
 
+    @has_access
     @expose('/connect-meter')
     def meter_connect(self):
         """Personalized welcome page"""
-        if not g.user or not g.user.get_id():
-            return redirect(appbuilder.get_url_for_login)
+        is_orgowner = False
+        for role in g.user.roles:
+            if role.name == 'org_owner':
+                is_orgowner = True
+                break
+        if is_orgowner is False:
+            flash('Access is denied. Only organization owner can access it.', 'info')
+            return redirect(appbuilder.get_url_for_index)
 
         user = db.session.query(SavvyUser).filter_by(id=g.user.get_id()).first()
 
