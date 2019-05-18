@@ -2836,7 +2836,6 @@ class Superset(BaseSupersetView):
             return redirect(appbuilder.get_url_for_login)
 
         is_orgowner = False
-        print(g.user.roles)
         for role in g.user.roles:
             if role.name == 'org_owner':
                 is_orgowner = True
@@ -2859,7 +2858,7 @@ class Superset(BaseSupersetView):
             later_link = appbuilder.get_url_for_index
         username = '{} {}'.format(user.first_name, user.last_name)
         return self.render_template(
-            'savvy/account/about.html',
+            'savvy/account/profile.html',
             title='Superset',
             organization=org_name.capitalize(),
             username=username,
