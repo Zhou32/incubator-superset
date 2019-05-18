@@ -324,7 +324,7 @@
 #main-content{
     width: 900px;
     margin: auto;
-    padding-top: 60px;
+    padding-top: 20px;
     text-align: center;
 }
 
@@ -421,24 +421,24 @@
     margin-top: 80px;
 }
 
-#about-div{
+#savvy-content #main-content{
     color: #34495E;
-}
-#about-div > .title{
-    color: #079493;
     font-family: 'Futura PT Light';
+}
+.account-div > .title{
+    color: #079493;
     font-size: 48px;
     margin-bottom: 50px;
 }
 
-#about-div .nav-pills > li > a{
+#savvy-content #main-content .account-div .nav-pills > li > a{
     color: #34495E;
     font-size: 18px;
     font-family: 'Futura PT Bold';
 }
 
-#about-div .nav-pills > li > a:hover, #about-div .nav-pills > li > a:focus,
-#about-div .nav-pills > li.active > a, #about-div .nav-pills > li.active > a:focus, #about-div .nav-pills > li.active > a:hover{
+.account-div .nav-pills > li > a:hover, .account-div .nav-pills > li > a:focus,
+.account-div .nav-pills > li.active > a, .account-div .nav-pills > li.active > a:focus, .account-div .nav-pills > li.active > a:hover{
     text-decoration: underline;
     color: #34495E;
     background: white;
@@ -446,7 +446,7 @@
 
 .tab-content{
     background-color: white;
-    padding: 50px 30px 40px 30px;
+    padding: 50px 30px 20px 30px;
 }
 
 #about-div .tab-content .tab-pane > .header > .thumbnail{
@@ -493,10 +493,30 @@
     padding: 20px 0;
 }
 #about-div .tab-content .tab-pane > .content .value {
-    font-family: 'Futura PT Light';
     font-size: 18px;
     padding: 20px 0;
 }
 #about-div .tab-content .tab-pane > .content tr{
     border-bottom: 1px solid #ccc;
+}
+
+#profile-div .form-group label.control-label{
+    font-size: 16px;
+}
+#profile-div .form-group label.description{
+    font-size: 15px;
+}
+#profile-div .form-group input.form-control,
+#profile-div .form-group select.form-control{
+    height: 36px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+#access_log .description{
+    font-size: 18px;
+}
+#access_log .content table .field{
+    font-family: 'Futura PT Bold';
 }
