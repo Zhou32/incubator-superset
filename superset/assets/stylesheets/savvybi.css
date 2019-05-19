@@ -68,6 +68,7 @@
     padding-top: 23px;
     background-color: #edeef1;
 }
+
 .savvybi-alert{
     height: 69px;
     padding: 20px 0;
@@ -75,12 +76,14 @@
     font-family: 'Futura PT Bold';
     text-align: center;
 }
+
 .savvybi-alert a i{
     float: right;
     margin-right: 150px;
     color: RGBA(45, 74, 80, 0.27);
     font-size: 28px;
 }
+
 .reg-footer .savvybi-alert{
     height: 69px;
     width: 800px;
@@ -122,9 +125,11 @@
 .reg-footer .note-message, .reg-footer .ready-message{
     z-index: 1;
 }
+
 .reg-footer .flush-message, .reg-footer .error-message{
     z-index: 2;
 }
+
 .reg-footer .btn-disabled{
     background-color: #d3d3d5;
     color: #b1b1b2;
@@ -143,12 +148,14 @@
 #stay_login, #remember_me{
     display:none;
 }
+
 #stay_login + label{
     color: #707070;
     font-size: 20px;
     font-family: 'Futura PT Light';
     float: right;
 }
+
 #stay_login + label:before, #remember_me + label:before{
     background-color: white;
     font-family: FontAwesome;
@@ -182,32 +189,39 @@
     font-size: 20px;
     border-radius: 5px;
 }
+
 .savvy-submit-btn{
     background: #079493;
     color: white;
 }
+
 .savvy-submit-btn:hover, .savvy-submit-btn:active{
     background: #06807F;
 }
+
 .savvy-submit-btn:disabled{
     background: RGB(211,212,214);
     color: RGB(177,178,179);
 }
+
 .savvy-default-btn{
     background: transparent;
     color: #66B6AB;
     border-color: #079493;
 }
+
 .savvy-default-btn:active{
     background: #F4F5F8;
     color: #079493;
     border-color: #079493;
 }
+
 .savvy-default-btn:hover{
     background: white;
     color: #203539;
     border-color: #203539;
 }
+
 .savvy-default-btn:disabled{
     background: white;
     color: #CCCCCC;
@@ -218,21 +232,26 @@
     background-color: #2D4A50;
     margin-bottom: 0px !important;
 }
+
 .savvy-navbar .navbar-brand{
     height: 75px;
     padding: 0;
 }
+
 .savvy-navbar .navbar-brand img{
     background-color: #203539;
 }
+
 .savvy-navbar .navbar-right{
     margin-top: 8px;
     margin-right: 20px;
 }
+
 .savvy-navbar .navbar-right li a{
     font-size: 21px;
     color: #CCCCCC;
 }
+
 #savvy-onboard-img{
     width: 100%;
     height: 100%;
@@ -240,6 +259,7 @@
     position: absolute;
     top: 0;
 }
+
 #savvy-sidebar{
     position: fixed;
     left: 75px;
@@ -286,9 +306,11 @@
     transform-origin: left;
 
 }
+
 #savvy-sidebar .sidebar-nav li.active>ul{
     transform: scaleX(1);
 }
+
 #savvy-sidebar .sidebar-nav .sidebar-menu li>a{
     font-size: 24px;
     color: #566C70;
@@ -328,12 +350,12 @@
     text-align: center;
 }
 
-
 #welcome-div > .title{
     color: #079493;
     font-size: 40px;
     font-family: 'Futura PT Light';
 }
+
 #welcome-div .meter-description{
     color: #34495E;
     font-size: 20px;
@@ -345,12 +367,14 @@
 .meter-setup{
     margin-top: 80px;
 }
+
 .meter-setup .title{
     font-family: 'Futura PT Bold';
     color: #34495E;
     font-size: 22px;
     margin-bottom: 30px;
 }
+
 .meter-box{
     width: 100%;
     height: 200px;
@@ -361,13 +385,16 @@
     text-align: left;
     margin-bottom: 20px;
 }
+
 .meter-box:hover, .meter-box:active{
     background-color: white;
 }
+
 .meter-box .title{
     font-size: 20px;
     margin-bottom: 0;
 }
+
 .meter-box .content{
     font-size: 20px;
     width: 500px;
@@ -376,38 +403,47 @@
     margin-top: 20px;
     line-height: 0.8;
 }
+
 .meter-box .content .highlight{
     color: #149999;
     font-family: 'Futura PT Bold';
 }
+
 .meter-box .submit{
     float: right;
     position: relative;
     top: -15px;
 }
+
 .meter-setup .go-to-main{
     float: right;
 }
+
 .meter-setup .go-to-main a{
     font-family: 'Futura PT Light';
     color: #2D4A50;
     font-size: 18px;
 }
+
 .meter-setup .go-to-main a:hover, .meter-setup .go-to-main a:focus{
     text-decoration: none;
 }
+
 .modal-backdrop.in{
     background-color: #F4F5F8;
 }
+
 .meter-setup .modal-header{
     padding: 60px ;
     border-bottom: none;
 }
+
 .meter-setup .modal-title{
     font-size: 36px;
     color: #079493;
     font-family: 'Futura PT Light';
 }
+
 .meter-setup .modal-body{
     font-size: 20px;
     font-family: 'Futura PT Light';
@@ -415,6 +451,7 @@
     line-height: 1;
     padding: 0;
 }
+
 .meter-setup .modal-footer{
     border-top: none;
     padding: 20px 50px;
@@ -425,6 +462,7 @@
     color: #34495E;
     font-family: 'Futura PT Light';
 }
+
 .account-div > .title{
     color: #079493;
     font-size: 48px;
@@ -471,31 +509,38 @@
     padding-left: 15px;
     padding-right: 40px;
 }
+
 #about-div #admin_owner > .header .form-control-feedback{
     line-height: 5;
     color: #CCCCCC;
 }
+
 #workspace-name{
     font-size: 24px;
     font-family: 'Futura PT Bold';
     line-height: 2.5;
     float: left;
 }
+
 #about-div #overview > .header{
     margin-bottom: 30px;
 }
+
 #about-div .tab-content .tab-pane > .content table{
     width: 100%;
 }
+
 #about-div .tab-content .tab-pane > .content .field {
     font-family: 'Futura PT Bold';
     font-size: 18px;
     padding: 20px 0;
 }
+
 #about-div .tab-content .tab-pane > .content .value {
     font-size: 18px;
     padding: 20px 0;
 }
+
 #about-div .tab-content .tab-pane > .content tr{
     border-bottom: 1px solid #ccc;
 }
@@ -503,9 +548,11 @@
 #profile-div .form-group label.control-label{
     font-size: 16px;
 }
+
 #profile-div .form-group label.description{
     font-size: 15px;
 }
+
 #profile-div .form-group input.form-control,
 #profile-div .form-group select.form-control{
     height: 36px;
@@ -517,6 +564,7 @@
 #access_log .description{
     font-size: 18px;
 }
+
 #access_log .content table .field{
     font-family: 'Futura PT Bold';
 }
@@ -524,9 +572,11 @@
 #billing-div .form-group label.control-label{
     font-size: 16px;
 }
+
 #billing-div .form-group label.description{
     font-size: 15px;
 }
+
 #billing-div .form-group input.form-control,
 #billing-div .form-group select.form-control{
     height: 36px;
@@ -534,17 +584,63 @@
     -moz-border-radius: 5px;
     border-radius: 5px;
 }
+
 #billing-div .tab-content #detail>.header{
     text-align: left;
 }
+
 #billing-div .tab-content #detail>.header>.title{
     font-family: 'Futura PT Bold';
     font-size: 22px;
 }
+
 #billing-div .tab-content #detail>.header>.description{
     font-size: 18px;
 }
-#billing-div .tab-content #detail > .header > .description > .highlight{
-    font-family: 'Futura PT Bold';
-    color: #079493;
+
+#history > .header button{
+    width: 140px;
+    height: 36px;
+    font-size: 15px;
 }
+
+#history > .header .title{
+    font-size: 22px;
+    font-family: 'Futura PT Bold';
+    text-align: center;
+    line-height: 1;
+}
+
+#history > .content > table{
+    font-size: 18px;
+}
+
+#history > .content > table > thead{
+    font-family: 'Futura PT Bold';
+}
+
+#history > .content > table > thead{
+    border-bottom: 2px solid #ccc;
+}
+
+#history > .content > table > tbody > tr{
+    border-bottom: 1px solid #ccc;
+}
+
+#history > .content > table  td{
+    padding: 10px 0px 10px 0px;
+}
+
+.futura-bold{
+    font-family: 'Futura PT Bold';
+}
+
+.futura-light{
+    font-family: 'Futura PT Light';
+}
+
+#savvy-content .highlight{
+    color: #079493;
+    font-family: 'Futura PT Bold';
+}
+
