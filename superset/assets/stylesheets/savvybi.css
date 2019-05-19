@@ -520,3 +520,31 @@
 #access_log .content table .field{
     font-family: 'Futura PT Bold';
 }
+
+#billing-div .form-group label.control-label{
+    font-size: 16px;
+}
+#billing-div .form-group label.description{
+    font-size: 15px;
+}
+#billing-div .form-group input.form-control,
+#billing-div .form-group select.form-control{
+    height: 36px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+#billing-div .tab-content #detail>.header{
+    text-align: left;
+}
+#billing-div .tab-content #detail>.header>.title{
+    font-family: 'Futura PT Bold';
+    font-size: 22px;
+}
+#billing-div .tab-content #detail>.header>.description{
+    font-size: 18px;
+}
+#billing-div .tab-content #detail > .header > .description > .highlight{
+    font-family: 'Futura PT Bold';
+    color: #079493;
+}
