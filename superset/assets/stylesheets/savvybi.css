@@ -631,6 +631,13 @@
     padding: 10px 0px 10px 0px;
 }
 
+#plan-div .content{
+    font-size: 18px;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    padding: 10px 0px 10px 0px;
+}
+
 .futura-bold{
     font-family: 'Futura PT Bold';
 }
