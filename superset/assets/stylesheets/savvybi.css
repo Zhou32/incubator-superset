@@ -142,7 +142,7 @@
     right: 10px;
     float: right;
     font-size: 20px;
-    background: white;
+    background: transparent;
 }
 
 #stay_login, #remember_me{

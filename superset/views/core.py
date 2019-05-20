@@ -2831,7 +2831,6 @@ class Superset(BaseSupersetView):
 
     @expose('/connect-meter')
     def meter_connect(self):
-        """Personalized welcome page"""
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
 
