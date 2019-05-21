@@ -396,11 +396,11 @@ class SavvyBIAuthDBView(AuthDBView):
 
 
 class SavvyRegisterUserDBView(RegisterUserDBView):
-    redirect_url = '/'
     form = SavvyRegisterUserDBForm
     edit_widget = SavvyRegisterFormWidget
     form_template = 'appbuilder/general/security/form_template.html'
     email_subject = email_subject
+    redirect_url = "/"
 
     @expose('/activation/<string:activation_hash>')
     def activation(self, activation_hash):
@@ -420,14 +420,16 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
         self.appbuilder.get_session.commit()
 
         org_reg = self.appbuilder.sm.add_org(reg, user)
-        self.handle_aws_info(org_reg, user)
+        # self.handle_aws_info(org_reg, user)
         self.appbuilder.sm.del_register_user(reg)
         if request.args.get('login') == 'True':
             if user.last_login is None:
                 is_first_login = True
             else:
                 is_first_login = False
-            login_user(user, remember=False)
+
+            self.appbuilder.sm.update_user_auth_stat(user, True)
+            login_user(user)
 
             if is_first_login is True:
                 flash('Your account is successfully confirmed. Please connect meters to your organization.', 'success')
@@ -512,9 +514,9 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
             if self.send_email(register_user, stay_login=kwargs['stay_login']):
                 flash(as_unicode(self.message), 'info')
                 if kwargs['stay_login'] == True:
-                    login_user(user, remember=False)
-                    if user.email_confirm == False:
-                        flash("You haven't verified your email account yet.", "info")
+                    self.appbuilder.sm.update_user_auth_stat(user, True)
+                    login_user(user)
+                    flash("You haven't verified your email account yet.", "info")
                     return redirect(url_for('Superset.meter_connect'))
                 else:
                     return redirect(self.appbuilder.get_url_for_login)

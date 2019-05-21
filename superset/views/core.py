@@ -2829,10 +2829,11 @@ class Superset(BaseSupersetView):
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
         )
 
-    @has_access
     @expose('/connect-meter')
     def meter_connect(self):
-        """Personalized welcome page"""
+        if not g.user or not g.user.get_id():
+            return redirect(appbuilder.get_url_for_login)
+
         is_orgowner = False
         for role in g.user.roles:
             if role.name == 'org_owner':
@@ -2856,7 +2857,7 @@ class Superset(BaseSupersetView):
             later_link = appbuilder.get_url_for_index
         username = '{} {}'.format(user.first_name, user.last_name)
         return self.render_template(
-            'savvy/account/about.html',
+            'savvy/account/plan.html',
             title='Superset',
             organization=org_name.capitalize(),
             username=username,
