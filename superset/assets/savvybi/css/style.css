@@ -381,6 +381,11 @@ a:hover, a:focus {
     min-height: 70px;
     float: left;
 }
+.page-topbar .logo-area img{
+    position: relative;
+    left: 25px;
+    top: 10px;
+}
 .page-topbar .quick-area .info-menu {
     height: 70px;
     margin: 0;
@@ -6826,10 +6831,6 @@ border-left: 3px solid transparent;
     Logo
 ----------------------------------------------------------*/
 
-.page-topbar .logo-area {
-    background-image: url('../images/logo.png');
-    background-repeat: no-repeat;
-}
 .page-topbar.sidebar_shift .logo-area {
     background-image: url('../images/logo-folded.png');
     background-repeat: no-repeat;

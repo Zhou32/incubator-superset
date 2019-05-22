@@ -1,12 +1,6 @@
 <!DOCTYPE html>
-<html>
+<html class=" ">
     <head>
-        <!-- 
-         * @Package: Ultra Admin - Responsive Theme
-         * @Subpackage: Bootstrap
-         * @Version: 4.4
-         * This file is part of Ultra Admin Theme.
-        -->
         <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
         <meta charset="utf-8" />
         <title>Ultra Admin : Default Layout</title>
@@ -14,7 +8,6 @@
         <meta content="" name="description" />
         <meta content="" name="author" />
 
-        {% block head_css %}
         <link rel="shortcut icon" href="{{ url_for('static', filename='assets/savvybiimages/favicon.png') }}" type="image/x-icon" />    <!-- Favicon -->
         <link rel="apple-touch-icon-precomposed" href="{{ url_for('static', filename='assets/savvybi/images/apple-touch-icon-57-precomposed.png') }}">	<!-- For iPhone -->
         <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{{ url_for('static', filename='assets/savvybi/images/apple-touch-icon-114-precomposed.png') }}">    <!-- For iPhone 4 Retina display -->
@@ -34,7 +27,6 @@
         <link href="{{ url_for('static', filename='assets/savvybi/css/style.css') }}" rel="stylesheet" type="text/css"/>
         <link href="{{ url_for('static', filename='assets/savvybi/css/responsive.css') }}" rel="stylesheet" type="text/css"/>
         <!-- CORE CSS TEMPLATE - END -->
-        {% endblock %}
 
     </head>
     <!-- END HEAD -->
@@ -43,7 +35,7 @@
     <body class=" "><!-- START TOPBAR -->
         <div class='page-topbar '>
             <div class='logo-area'>
-
+                <img src="{{ url_for('static', filename='assets/savvybi/images/logo.png') }}" width="200px" height="50px">
             </div>
             <div class='quick-area'>
 {#                <div class='pull-left'>#}
@@ -207,8 +199,8 @@
                                 </li>
                             </ul>
                         </li>
-                    </ul>			
-                </div>		
+                    </ul>
+                </div>
             </div>
 
         </div>
