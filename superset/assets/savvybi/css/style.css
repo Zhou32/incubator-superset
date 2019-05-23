@@ -738,7 +738,7 @@ a:hover, a:focus {
     width: 270px;
     position: fixed;
     padding: 0px;
-    background-color: #079493;
+    background-color: white;
     margin-top: 60px;
     overflow: hidden;
 }
@@ -765,7 +765,6 @@ a:hover, a:focus {
     padding-left: 20px;
 }
 #main-menu-wrapper li ul.sub-menu {
-    display: none;
     list-style-type: none;
     font-size: 14px;
     padding-left: 40px;
@@ -776,10 +775,10 @@ a:hover, a:focus {
     line-height: 45px;
     min-height: 45px;
     height: auto;
-    color: #f1f1f1;
-    color: rgba(214, 218, 223, 1.0);
+    color: #34495E;
     text-decoration: none;
     padding-left: 50px;
+    padding-top: 20px;
     clear: both;
     text-transform: uppercase;
     font-size: 15px;
@@ -787,33 +786,33 @@ a:hover, a:focus {
 #main-menu-wrapper li .sub-menu a {
     line-height: 36px;
     min-height: 36px;
-    text-transform: uppercase;
 }
 #main-menu-wrapper li .sub-menu a {
-    color: rgba(174, 178, 183, 1.0);
+    color: #34495E;
     margin-bottom: 2px;
     padding-left: 15px;
+    padding-top: 10px;
     border-left: 3px solid transparent;
+    text-transform: none;
 }
-#main-menu-wrapper li.open .sub-menu a.active, #main-menu-wrapper li.open .sub-menu a:hover, #main-menu-wrapper li .sub-menu a:hover {
+#main-menu-wrapper li .sub-menu a.active, #main-menu-wrapper .sub-menu a:hover, #main-menu-wrapper li .sub-menu a:hover {
     background-color: transparent;
-    color: white;
     border-left: 3px solid rgba(31, 181, 172, 1);
 }
-#main-menu-wrapper li a:hover, #main-menu-wrapper li.open a {
-    background-color: rgba(31, 181, 172, 1);
-    color: #ffffff;
-}
-#main-menu-wrapper li a:hover .arrow:before, #main-menu-wrapper li.open a .arrow:before {
-    color: rgba(234, 238, 243, 0.9);
-}
-#main-menu-wrapper li .sub-menu a:hover .arrow:before, #main-menu-wrapper li.open .sub-menu a .arrow:before {
-    color: rgba(194, 198, 203, 0.65);
-}
-#main-menu-wrapper li.open .sub-menu a {
-    background-color: transparent;
-    color: rgba(174, 178, 183, 1.0);
-}
+/*#main-menu-wrapper li a:hover, #main-menu-wrapper li.open a {*/
+    /*background-color: rgba(31, 181, 172, 1);*/
+    /*color: #ffffff;*/
+/*}*/
+/*#main-menu-wrapper li a:hover .arrow:before, #main-menu-wrapper li.open a .arrow:before {*/
+    /*color: rgba(234, 238, 243, 0.9);*/
+/*}*/
+/*#main-menu-wrapper li .sub-menu a:hover .arrow:before, #main-menu-wrapper li.open .sub-menu a .arrow:before {*/
+    /*color: rgba(194, 198, 203, 0.65);*/
+/*}*/
+/*#main-menu-wrapper li.open .sub-menu a {*/
+    /*background-color: transparent;*/
+    /*color: rgba(174, 178, 183, 1.0);*/
+/*}*/
 #main-menu-wrapper li a i {
     display: inline-block;
     width: auto;
@@ -823,25 +822,25 @@ a:hover, a:focus {
     top: -2px;
     position: relative;
 }
-#main-menu-wrapper li a .arrow:before {
-    float: right;
-    margin-top: 1px;
-    margin-right: 20px;
-    display: inline;
-    font-size: 16px;
-    font-family: FontAwesome;
-    height: auto;
-    content: "\f104";
-    font-weight: 300;
-    text-shadow: none;
-    color: rgba(194, 198, 203, 0.65);
-}
-#main-menu-wrapper li.open a .arrow.open:before {
-    content: "\f107";
-}
-#main-menu-wrapper li a .arrow {
-    float: right;
-}
+/*#main-menu-wrapper li a .arrow:before {*/
+    /*float: right;*/
+    /*margin-top: 1px;*/
+    /*margin-right: 20px;*/
+    /*display: inline;*/
+    /*font-size: 16px;*/
+    /*font-family: FontAwesome;*/
+    /*height: auto;*/
+    /*content: "\f104";*/
+    /*font-weight: 300;*/
+    /*text-shadow: none;*/
+    /*color: rgba(194, 198, 203, 0.65);*/
+/*}*/
+/*#main-menu-wrapper li.open a .arrow.open:before {*/
+    /*content: "\f107";*/
+/*}*/
+/*#main-menu-wrapper li a .arrow {*/
+    /*float: right;*/
+/*}*/
 #main-menu-wrapper .fa {
     font-size: 14px;
 }
@@ -896,9 +895,8 @@ a:hover, a:focus {
     margin: 10px 0 5px 0;
 }
 .profile-info .profile-details .profile-name a {
-    font-family: 'Oswald', Arial, Helvetica, sans-serif;
     font-weight: 300;
-    color: rgba(234, 238, 243, 1.0);
+    color: #707070;
     font-size: 18px;
     line-height: 23px;
     text-decoration: none;

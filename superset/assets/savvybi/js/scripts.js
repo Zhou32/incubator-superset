@@ -412,43 +412,17 @@ jQuery(function($) {
          Main Menu
      --------------------------------*/
     ULTRA_SETTINGS.mainMenu = function() {
-        $('#main-menu-wrapper li a').click(function(e) {
+        $('#main-menu-wrapper .sub-menu li a').click(function(e) {
             e.preventDefault();
-            // if ($(this).next().hasClass('sub-menu') === false) {
-            //     return;
-            // }
+            var parent = $(this).parent();
+            parent.siblings('li').children('a').removeClass("active");
 
-            var parent = $(this).parent().parent();
-            var sub = $(this).next();
+            var ancestor = parent.parent('.sub-menu').parent();
+            ancestor.siblings('li').children('.sub-menu').children('li').children('a').removeClass("active");
 
-            if(parent.hasClass('sub-menu') === true){
-                var parent = $(this).parent();
-                parent.siblings('li').children('a').removeClass("active");
-                $(this).toggleClass('active');
-                return;
-            }
-
-            parent.children('li.open').children('.sub-menu').slideUp(200);
-            parent.children('li.open').children('a').children('.arrow').removeClass('open');
-            parent.children('li').removeClass('open');
-
-            if (sub.is(":visible")) {
-                $(this).find(".arrow").removeClass("open");
-                sub.slideUp(200);
-            } else {
-                $(this).parent().addClass("open");
-                $(this).find(".arrow").addClass("open");
-                sub.slideDown(200);
-            }
-
-        });
-
-        $('#main-menu-wrapper .submenu li a').click(function(e) {
-            e.preventDefault();
-            alert('asdf');
-            var parent = $(this).parent().parent();
-            parent.children("li").children("a").removeClass("active");
             $(this).toggleClass('active');
+            return;
+
         });
 
         $("body").click(function(e) {
