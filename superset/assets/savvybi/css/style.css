@@ -107,9 +107,7 @@ html.boxed{
 }
 
 body {
-    background-color: #f1f2f7;
-    color: rgba(118, 118, 118, 1.0);
-    font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+    background-color: #F4F5F8;
     font-size: 14px;
     padding: 0px !important;
     margin: 0px !important;
@@ -739,7 +737,7 @@ a:hover, a:focus {
     position: fixed;
     padding: 0px;
     background-color: white;
-    margin-top: 60px;
+    margin-left: -270px;
     overflow: hidden;
 }
 
@@ -4791,6 +4789,10 @@ code {
     padding:15px 0 0 15px;
 }
 
+.page-container{
+    padding-left: 270px;
+    margin-top: 70px;
+}
 
 .page-sidebar.collapseit {
     width: 60px;
@@ -4801,10 +4803,6 @@ code {
     width: 60px;
     margin-left: 0px !important;
     z-index: 99;
-}
-#main-content {
-    margin-left: 300px;
-    display: block;
 }
 #main-content.hor_menu {
     margin-left: 0px;
