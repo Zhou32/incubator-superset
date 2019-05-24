@@ -1,11 +1,11 @@
 @font-face {
     font-family: 'Futura PT Light';
-    src: url('../savvy_fonts/FuturaPTLight.otf') format("opentype");
+    src: url('../fonts/futura_fonts/FuturaPTLight.otf') format("opentype");
 }
 
 @font-face {
     font-family: 'Futura PT Bold';
-    src: url('../savvy_fonts/FuturaPTBold.otf') format("opentype");
+    src: url('../fonts/futura_fonts/FuturaPTBold.otf') format("opentype");
 }
 
 .reg-navbar .navbar-brand{
@@ -548,6 +548,7 @@
 
 #profile-div .form-group label.description{
     font-size: 15px;
+    color: #707070;
 }
 
 #profile-div .form-group input.form-control,

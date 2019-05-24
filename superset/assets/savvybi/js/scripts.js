@@ -32,6 +32,7 @@ jQuery(function($) {
             $(".page-topbar").addClass("sidebar_shift").removeClass("chat_shift");
             $(".page-sidebar").addClass("collapseit").removeClass("expandit");
             $("#main-content").addClass("sidebar_shift").removeClass("chat_shift");
+            $("#savvy-content").addClass("sidebar_shift");
             $(".page-chatapi").removeClass("showit").addClass("hideit");
             $(".chatapi-windows").removeClass("showit").addClass("hideit");
             ULTRA_SETTINGS.mainmenuCollapsed();
@@ -42,6 +43,7 @@ jQuery(function($) {
             $(".page-topbar").removeClass("sidebar_shift chat_shift");
             $(".page-sidebar").removeClass("collapseit chat_shift");
             $("#main-content").removeClass("sidebar_shift chat_shift");
+            $("#savvy-content").removeClass("sidebar_shift");
             ULTRA_SETTINGS.mainmenuScroll();
         }
 
@@ -102,6 +104,7 @@ jQuery(function($) {
             if (menuarea.hasClass("collapseit") || menuarea.hasClass("chat_shift")) {
                 menuarea.addClass("expandit").removeClass("collapseit").removeClass("chat_shift");
                 topbar.removeClass("sidebar_shift").removeClass("chat_shift");
+                $("#savvy-content").removeClass("sidebar_shift");
                 mainarea.removeClass("sidebar_shift").removeClass("chat_shift");
                 chatarea.addClass("hideit").removeClass("showit");
                 chatwindow.addClass("hideit").removeClass("showit");
@@ -110,6 +113,7 @@ jQuery(function($) {
                 menuarea.addClass("collapseit").removeClass("expandit").removeClass("chat_shift");
                 topbar.addClass("sidebar_shift").removeClass("chat_shift");
                 mainarea.addClass("sidebar_shift").removeClass("chat_shift");
+                $("#savvy-content").addClass("sidebar_shift");
                 ULTRA_SETTINGS.mainmenuCollapsed();
             }
         });
