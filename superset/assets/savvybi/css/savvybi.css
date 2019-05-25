@@ -480,7 +480,16 @@
     background-color: white;
     padding: 50px 30px 20px 30px;
 }
-
+#savvy-content .form-group input.form-control,
+#savvy-content .form-group select.form-control,
+#savvy-content .form-group textarea.form-control {
+    height: 36px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border: 1px solid #707070;
+    font-family: "Futura PT Light";
+}
 #about-div .tab-content .tab-pane > .header > .thumbnail{
     border: 1px solid black;
     -webkit-border-radius: unset;
@@ -523,11 +532,14 @@
     margin-bottom: 30px;
 }
 
-#about-div .tab-content .tab-pane > .content table{
+#about-div .tab-content .tab-pane > .content table,
+#billing-div #contact > .content table
+{
     width: 100%;
 }
 
-#about-div .tab-content .tab-pane > .content .field {
+#about-div .tab-content .tab-pane > .content .field
+{
     font-family: 'Futura PT Bold';
     font-size: 18px;
     padding: 20px 0;
@@ -538,7 +550,9 @@
     padding: 20px 0;
 }
 
-#about-div .tab-content .tab-pane > .content tr{
+#about-div .tab-content .tab-pane > .content tr,
+#billing-div #contact > .content tr
+{
     border-bottom: 1px solid #ccc;
 }
 
@@ -550,15 +564,6 @@
     font-size: 15px;
     color: #707070;
 }
-
-#profile-div .form-group input.form-control,
-#profile-div .form-group select.form-control{
-    height: 36px;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-}
-
 #access_log .description{
     font-size: 18px;
 }
@@ -575,14 +580,6 @@
     font-size: 15px;
 }
 
-#billing-div .form-group input.form-control,
-#billing-div .form-group select.form-control{
-    height: 36px;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-}
-
 #billing-div .tab-content #detail>.header{
     text-align: left;
 }
@@ -595,9 +592,13 @@
 #billing-div .tab-content #detail>.header>.description{
     font-size: 18px;
 }
-
+#billing-div #contact > .content .field{
+    font-family: 'Futura PT Bold';
+    font-size: 18px;
+    padding: 0;
+}
 #history > .header button{
-    width: 140px;
+    width: 150px;
     height: 36px;
     font-size: 15px;
 }
@@ -635,6 +636,35 @@
     border-bottom: 1px solid #ccc;
     padding: 10px 0px 10px 0px;
 }
+#billing-div #contact > .header{
+    border-bottom: 2px solid #CCCCCC;
+}
+#billing-div #contact .content #new-contact-div{
+    margin-top: 150px;
+}
+#billing-div #contact .content #new-contact-div .add-contact-btn{
+    width: 140px;
+    height: 36px;
+    border-color: #34495E;
+    color: #34495E;
+    font-size: 15px;
+}
+#billing-div #contact .content #new-contact-div .submit-contact-btn{
+    width: 140px;
+    height: 36px;
+    float: right;
+    font-size: 15px;
+    position: relative;
+    top: 27px;
+}
+#billing-div #contact .content #new-contact-div #submit-contact-div .form-group{
+    float: left;
+    margin-right: 80px;
+}
+#billing-div #contact .content #new-contact-div #submit-contact-div .form-group input{
+    width: 240px;
+    height: 36px;
+}
 
 .futura-bold{
     font-family: 'Futura PT Bold';
@@ -649,3 +679,6 @@
     font-family: 'Futura PT Bold';
 }
 
+.fade{
+    transition: opacity 1s linear !important;
+}
