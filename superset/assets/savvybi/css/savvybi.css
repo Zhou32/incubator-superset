@@ -665,6 +665,11 @@
     width: 240px;
     height: 36px;
 }
+#billing-div #payment .form-label{
+    font-size: 18px;
+    font-family: "Futura PT Bold";
+    color: #34495E;
+}
 
 .futura-bold{
     font-family: 'Futura PT Bold';
