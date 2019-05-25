@@ -23,3 +23,4 @@ from . import annotations # noqa
 from . import datasource # noqa
 from . import schedules # noqa
 from . import meterdata
+from . import savvy_admin

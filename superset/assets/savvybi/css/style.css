@@ -4786,10 +4786,10 @@ code {
 -----------------------------------------------------------*/
 
 #main-content, .page-chatapi, .page-topbar, .page-sidebar, .page-topbar .logo-area, .page-topbar .quick-area .pull-right, .collapse-wraplist, .profile-info, .wraplist, .chatapi-windows {
-    -webkit-transition: 600ms;
-    -moz-transition: 600ms;
-    -o-transition: 600ms;
-    transition: 600ms;
+    /*-webkit-transition: 600ms;*/
+    /*-moz-transition: 600ms;*/
+    /*-o-transition: 600ms;*/
+    /*transition: 600ms;*/
 }
 
 .main-wrapper{

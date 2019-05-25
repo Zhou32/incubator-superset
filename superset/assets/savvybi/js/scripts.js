@@ -417,7 +417,7 @@ jQuery(function($) {
      --------------------------------*/
     ULTRA_SETTINGS.mainMenu = function() {
         $('#main-menu-wrapper .sub-menu li a').click(function(e) {
-            e.preventDefault();
+            // e.preventDefault();
             var parent = $(this).parent();
             parent.siblings('li').children('a').removeClass("active");
 

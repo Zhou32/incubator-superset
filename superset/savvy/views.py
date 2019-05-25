@@ -386,7 +386,7 @@ class SavvyBIAuthDBView(AuthDBView):
             if user.email_confirm is False:
                 flash("You haven't verified your email account yet.", "info")
             if is_first_login is True:
-                return redirect(url_for('Superset.meter_connect'))
+                return redirect(url_for('MeterDataView.meter_connect'))
             if user.first_name == '' or user.last_name == '':
                 return redirect(self.appbuilder.get_url_for_userinfo)
             return redirect(self.appbuilder.get_url_for_index)
@@ -433,7 +433,7 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
 
             if is_first_login is True:
                 flash('Your account is successfully confirmed. Please connect meters to your organization.', 'success')
-                return redirect(url_for('Superset.meter_connect'))
+                return redirect(url_for('MeterDataView.meter_connect'))
 
             if user.first_name == '' or user.last_name == '':
                 flash('Your account is successfully confirmed. Please update your profile.', 'success')
@@ -517,7 +517,7 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
                     self.appbuilder.sm.update_user_auth_stat(user, True)
                     login_user(user)
                     flash("You haven't verified your email account yet.", "info")
-                    return redirect(url_for('Superset.meter_connect'))
+                    return redirect(url_for('MeterDataView.meter_connect'))
                 else:
                     return redirect(self.appbuilder.get_url_for_login)
             else:
