@@ -373,7 +373,7 @@ class SavvyBIAuthDBView(AuthDBView):
                     break
             # If org owner's first login
             is_first_login = False
-            if is_org_owner == True and user.last_login is None:
+            if is_org_owner == True and (user.login_count is None or user.login_count==0):
                     is_first_login = True
 
             user = self.appbuilder.sm.auth_user_db(form.email.data, form.password.data)
@@ -400,7 +400,6 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
     edit_widget = SavvyRegisterFormWidget
     form_template = 'appbuilder/general/security/form_template.html'
     email_subject = email_subject
-    redirect_url = "/"
 
     @expose('/activation/<string:activation_hash>')
     def activation(self, activation_hash):
@@ -423,7 +422,7 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
         self.handle_aws_info(org_reg, user)
         self.appbuilder.sm.del_register_user(reg)
         if request.args.get('login') == 'True':
-            if user.last_login is None:
+            if user.login_count is None or user.login_count==0:
                 is_first_login = True
             else:
                 is_first_login = False
@@ -514,12 +513,8 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
             if self.send_email(register_user, stay_login=kwargs['stay_login']):
                 flash(as_unicode(self.message), 'info')
                 if kwargs['stay_login'] == True:
-                    self.appbuilder.sm.update_user_auth_stat(user, True)
                     login_user(user)
-                    flash("You haven't verified your email account yet.", "info")
-                    return redirect(url_for('MeterDataView.meter_connect'))
-                else:
-                    return redirect(self.appbuilder.get_url_for_login)
+                return register_user
             else:
                 flash(as_unicode(self.error_message), 'danger')
                 self.appbuilder.sm.del_register_user(register_user)

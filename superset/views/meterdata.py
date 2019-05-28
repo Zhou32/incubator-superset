@@ -14,7 +14,7 @@ class MeterDataView(BaseView):
     route_base = "/superset"
 
     @expose('/meterdata/<string:table_id>', methods=['GET', 'POST'])
-    def method1(self, table_id):
+    def meter_data(self, table_id):
         page = int(request.args.get('page_meter', 0))
         page_size = int(request.args.get('page_size', 50))
         sites = db.session.query(Site).filter(

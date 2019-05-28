@@ -66,7 +66,7 @@ from .base import (
     SupersetFilter, SupersetModelView, YamlExportMixin,
 )
 from .utils import bootstrap_user_data
-from superset.savvy.models import Organization
+from superset.savvy.models import Organization, SavvyUser
 from superset.savvy.filters import get_db_name_list_form_org
 from flask_appbuilder.models.sqla.filters import FilterInFunction
 
@@ -2807,6 +2807,21 @@ class Superset(BaseSupersetView):
         """Personalized welcome page"""
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
+
+        is_org_owner = False
+        for role in g.user.roles:
+            if role.name == 'org_owner':
+                is_org_owner = True
+                break
+
+        user = db.session.query(SavvyUser).filter_by(id=g.user.get_id()).first()
+        is_first_login = False
+        if user.login_count is None or user.login_count==0:
+            is_first_login = True
+
+        if is_org_owner is True and is_first_login is True:
+            appbuilder.sm.update_user_auth_stat(g.user, True)
+            return redirect(url_for('MeterDataView.meter_connect'))
 
         welcome_dashboard_id = (
             db.session
