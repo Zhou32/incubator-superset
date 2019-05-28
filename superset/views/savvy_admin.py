@@ -1,19 +1,22 @@
-from pyathenajdbc import connect
-from flask import render_template, request, g, flash, redirect
+from flask import g, flash, redirect, url_for
 from flask_appbuilder import BaseView
 from flask_appbuilder.views import expose
 
 from superset import appbuilder, db
-from superset.connectors.sqla.models import SqlaTable, TableColumn
-from superset.models.core import Database
-from superset.views.utils import parse_sqalchemy_uri
 from superset.savvy.models import Group, Site, SavvyUser, OrgRegisterUser, Organization
-
 
 class SavvybiAdmin(BaseView):
     route_base = "/admin"
 
-    @expose('/account/about')
+    @expose('/')
+    def index(self):
+        return redirect(url_for('AccountView.about'))
+
+
+class AccountView(SavvybiAdmin):
+    route_base = "/admin/account"
+
+    @expose('/about')
     def about(self):
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
@@ -63,6 +66,5 @@ class SavvybiAdmin(BaseView):
             'savvy/account/billing.html'
         )
 
-
-
 appbuilder.add_view_no_menu(SavvybiAdmin)
+appbuilder.add_view_no_menu(AccountView)
