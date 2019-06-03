@@ -4,8 +4,8 @@
 }
 
 @font-face {
-    font-family: 'Futura PT Bold';
-    src: url('../fonts/futura_fonts/FuturaPTBold.otf') format("opentype");
+    font-family: 'Futura PT Medium';
+    src: url('../fonts/futura_fonts/FuturaPTMedium.otf') format("opentype");
 }
 
 .reg-navbar .navbar-brand{
@@ -17,7 +17,7 @@
 .auth-link{
     color: #34495E;
     font-size: 20px;
-    font-family: 'Futura PT Bold';
+    font-family: 'Futura PT Medium';
     margin-top: 76px;
     margin-right: 180px;
 }
@@ -30,7 +30,7 @@
     color: #079493;
     font-size: 36px;
     font-weight: bold;
-    font-family: 'Futura PT Bold';
+    font-family: 'Futura PT Medium';
 }
 
 #Home .form-subheader{
@@ -44,7 +44,7 @@
     height: 69px;
     font-size: 22px;
     margin-right: 140px;
-    font-family: 'Futura PT Bold';
+    font-family: 'Futura PT Medium';
 }
 
 #Home .register-form input{
@@ -73,7 +73,7 @@
     height: 69px;
     padding: 20px 0;
     font-size: 24px;
-    font-family: 'Futura PT Bold';
+    font-family: 'Futura PT Medium';
     text-align: center;
 }
 
@@ -185,7 +185,7 @@
 .savvy-btn{
     width: 220px;
     height: 60px;
-    font-family: 'Futura PT Bold';
+    font-family: 'Futura PT Medium';
     font-size: 20px;
     border-radius: 5px;
 }
@@ -332,7 +332,7 @@
 #savvy-sidebar .sidebar-nav .sidebar-menu li.active>a,
 #savvy-sidebar .sidebar-nav .sidebar-menu li.active>a:hover,
 #savvy-sidebar .sidebar-nav .sidebar-menu li.active>a:focus{
-    font-family: 'Futura PT Bold';
+    font-family: 'Futura PT Medium';
     text-decoration: underline;
 }
 
@@ -362,7 +362,7 @@
 }
 
 .meter-setup .title{
-    font-family: 'Futura PT Bold';
+    font-family: 'Futura PT Medium';
     color: #34495E;
     font-size: 22px;
     margin-bottom: 30px;
@@ -399,7 +399,7 @@
 
 .meter-box .content .highlight{
     color: #149999;
-    font-family: 'Futura PT Bold';
+    font-family: 'Futura PT Medium';
 }
 
 .meter-box .submit{
@@ -466,12 +466,12 @@
 #savvy-content #main-content .account-div .nav-pills > li > a{
     color: #34495E;
     font-size: 18px;
-    font-family: 'Futura PT Bold';
+    font-family: 'Futura PT Medium';
 }
 
 .account-div .nav-pills > li > a:hover, .account-div .nav-pills > li > a:focus,
 .account-div .nav-pills > li.active > a, .account-div .nav-pills > li.active > a:focus, .account-div .nav-pills > li.active > a:hover{
-    text-decoration: underline;
+    /*text-decoration: underline;*/
     color: #34495E;
     background: white;
 }
@@ -523,7 +523,7 @@
 
 #workspace-name{
     font-size: 24px;
-    font-family: 'Futura PT Bold';
+    font-family: 'Futura PT Medium';
     line-height: 2.5;
     float: left;
 }
@@ -540,7 +540,7 @@
 
 #about-div .tab-content .tab-pane > .content .field
 {
-    font-family: 'Futura PT Bold';
+    font-family: 'Futura PT Medium';
     font-size: 18px;
     padding: 20px 0;
 }
@@ -569,7 +569,7 @@
 }
 
 #access_log .content table .field{
-    font-family: 'Futura PT Bold';
+    font-family: 'Futura PT Medium';
 }
 
 #billing-div .form-group label.control-label{
@@ -585,7 +585,7 @@
 }
 
 #billing-div .tab-content #detail>.header>.title{
-    font-family: 'Futura PT Bold';
+    font-family: 'Futura PT Medium';
     font-size: 22px;
 }
 
@@ -593,7 +593,7 @@
     font-size: 18px;
 }
 #billing-div #contact > .content .field{
-    font-family: 'Futura PT Bold';
+    font-family: 'Futura PT Medium';
     font-size: 18px;
     padding: 0;
 }
@@ -605,7 +605,7 @@
 
 #history > .header .title{
     font-size: 22px;
-    font-family: 'Futura PT Bold';
+    font-family: 'Futura PT Medium';
     text-align: center;
     line-height: 1;
 }
@@ -615,7 +615,7 @@
 }
 
 #history > .content > table > thead{
-    font-family: 'Futura PT Bold';
+    font-family: 'Futura PT Medium';
 }
 
 #history > .content > table > thead{
@@ -667,12 +667,12 @@
 }
 #billing-div #payment .form-label{
     font-size: 18px;
-    font-family: "Futura PT Bold";
+    font-family: "Futura PT Medium";
     color: #34495E;
 }
 
-.futura-bold{
-    font-family: 'Futura PT Bold';
+.futura-medium{
+    font-family: 'Futura PT Medium';
 }
 
 .futura-light{
@@ -681,7 +681,7 @@
 
 #savvy-content .highlight{
     color: #079493;
-    font-family: 'Futura PT Bold';
+    font-family: 'Futura PT Medium';
 }
 
 .fade{
