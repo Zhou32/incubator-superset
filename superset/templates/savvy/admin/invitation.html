@@ -78,8 +78,15 @@
                                   <span class="owner">Bruce Wayne</span>
                               </div>
                               <div class="col-sm-3">
-                                  <a href="#"><i class="fas fa-caret-right"></i></a>
+                                  <a href="#" onclick="toggleButtons(event);">
+                                      <i class="fas fa-caret-right"></i>
+                                      <i class="fas fa-caret-down hide"></i>
+                                  </a>
                               </div>
+                          </div>
+                          <div class="col-sm-12 button-div hide">
+                              <button class="savvy-btn savvy-default-btn">Revoke</button>
+                              <button class="savvy-btn savvy-default-btn">Re-send</button>
                           </div>
                       </div>
                       <div class="user row">
@@ -96,8 +103,15 @@
                                   <span class="owner">Bruce Wayne</span>
                               </div>
                               <div class="col-sm-3">
-                                  <a href="#"><i class="fas fa-caret-right"></i></a>
+                                  <a href="#" onclick="toggleButtons(event);">
+                                      <i class="fas fa-caret-right"></i>
+                                      <i class="fas fa-caret-down hide"></i>
+                                  </a>
                               </div>
+                          </div>
+                          <div class="col-sm-12 button-div hide">
+                              <button class="savvy-btn savvy-default-btn">Revoke</button>
+                              <button class="savvy-btn savvy-default-btn">Re-send</button>
                           </div>
                       </div>
                   </div>
@@ -391,6 +405,12 @@
 {#                    jQuery('#ultraModal-8 .modal-body').html(response);#}
 {#                }#}
 {#            });#}
+        }
+
+        function toggleButtons(e){
+            var _this = $(e.target).parent('a');
+            _this.children('i').toggleClass('hide');
+            _this.parent('div').parent('div').siblings('.button-div').toggleClass('hide');
         }
     </script>
 {% endblock %}
