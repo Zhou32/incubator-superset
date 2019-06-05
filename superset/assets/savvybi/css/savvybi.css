@@ -699,10 +699,11 @@
 .admin-div .tab-content > .tab-pane > .header{
     margin-bottom: 30px;
 }
-.admin-div .tab-content > .tab-pane > .header #invite-btn{
+.admin-div .tab-content > .tab-pane > .header .savvy-btn{
     width: 139px;
     height: 36px;
     font-size: 15px;
+    margin-left: 20px;
 }
 .admin-div .tab-content > .tab-pane > .header > .description{
     font-family: "Futura PT Light";
@@ -757,6 +758,7 @@
 }
 .admin-div .tab-content > .tab-pane > .content ul.dropdown-menu .divider{
     background-color: #707070;
+    margin: 0px;
 }
 .admin-div .tab-content > .tab-pane > .content .search-bar ul.dropdown-menu{
     width: 296px;
@@ -767,8 +769,8 @@
 {
     background-color: #66B6AB !important;
 }
-
-.admin-div #member_list .modal .modal-dialog .modal-content{
+.admin-div #member_list .modal .modal-dialog .modal-content,
+.admin-div #security_groups .modal .modal-dialog .modal-content{
     width: 470px;
     margin: 300px auto;
     border-radius: 5px;
@@ -777,18 +779,34 @@
     -moz-box-shadow: 0px 2px 3px 5px rgba(100, 100,100, 0.5);
     box-shadow: 0px 2px 3px 5px rgba(100, 100,100, 0.5);
 }
-.admin-div #member_list .modal .modal-dialog .modal-content .modal-footer{
+.admin-div #member_list .modal .modal-dialog,
+.admin-div #security_groups .modal .modal-dialog{
+    font-size: 16px;
+    color: #707070;
+}
+.admin-div #member_list .modal .modal-dialog .modal-content .modal-footer,
+.admin-div #security_groups .modal .modal-dialog .modal-content .modal-footer{
     border-top: none;
     padding: 30px;
 }
-.admin-div #member_list .modal .modal-dialog .modal-content .modal-header{
+.admin-div #member_list .modal .modal-dialog .modal-content .modal-header,
+.admin-div #security_groups .modal .modal-dialog .modal-content .modal-header{
     border-bottom: none;
     padding: 30px 30px 15px 30px;
 }
-.admin-div #member_list .modal .modal-dialog .modal-content .control-label{
+.admin-div #member_list .modal .modal-dialog .modal-content .modal-header > .title,
+.admin-div #security_groups .modal .modal-dialog .modal-content .modal-header > .title{
+    font-size: 18px;
     font-family: "Futura PT Medium";
+    color: #34495E;
 }
-.admin-div #member_list .modal .modal-dialog .modal-content .modal-footer .savvy-btn{
+.admin-div #member_list .modal .modal-dialog .modal-content .control-label,
+.admin-div #security_groups .modal .modal-dialog .modal-content .control-label{
+    font-family: "Futura PT Medium";
+    color: #34495E;
+}
+.admin-div #member_list .modal .modal-dialog .modal-content .modal-footer .savvy-btn,
+.admin-div #security_groups .modal .modal-dialog .modal-content .modal-footer .savvy-btn{
     width: 90px;
     height: 36px;
     font-size: 15px;
@@ -830,4 +848,16 @@
     border-color: #34495E;
     font-size: 15px;
     margin-right: 20px;
+}
+#data-div #security_groups .content table .savvy-default-btn{
+    width: 100px;
+    height: 36px;
+    font-size: 15px;
+}
+#data-div #security_groups .content table .savvy-btn.deactivate-btn{
+    border-color: #34495E;
+}
+#data-div #security_groups .content table .savvy-btn.delete-btn{
+    border-color: #FF1B51;
+    color: #FF1B51;
 }
