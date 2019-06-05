@@ -691,19 +691,23 @@
     transition: opacity 1s linear !important;
 }
 
-.admin-div #member_list > .header{
+.admin-div #member_list > .header,
+.admin-div #access_log > .header{
     margin-bottom: 30px;
 }
-.admin-div #member_list > .header #invite-btn{
+.admin-div #member_list > .header #invite-btn,
+.admin-div #access_log > .header #invite-btn{
     width: 139px;
     height: 36px;
     font-size: 15px;
 }
-.admin-div #member_list > .header > .description{
+.admin-div #member_list > .header > .description,
+.admin-div #access_log > .header > .description{
     font-family: "Futura PT Light";
     font-size: 18px;
 }
-.admin-div #member_list .content .search-bar > div.input-group{
+.admin-div #member_list .content .search-bar > div.input-group,
+.admin-div #access_log .content .search-bar > div.input-group{
     width: 670px;
     height: 30px;
     border-radius: 5px;
@@ -712,30 +716,45 @@
     padding-right: 2px;
     padding-left: 2px;
 }
-.admin-div #member_list .content .search-bar > div.input-group input[type=text]{
+.admin-div #member_list .content .search-bar > div.input-group input[type=text],
+.admin-div #access_log .content .search-bar > div.input-group input[type=text]{
     height: 30px;
     color: #34495E;
 }
-.admin-div #member_list .content .search-bar > div.input-group .input-group-addon{
+.admin-div #member_list .content .search-bar > div.input-group .input-group-addon,
+.admin-div #access_log .content .search-bar > div.input-group .input-group-addon{
     height: 30px;
     color: #34495E;
 }
-.admin-div #member_list .content .search-bar .savvy-default-btn{
+.admin-div #member_list .content .search-bar .savvy-default-btn,
+.admin-div #access_log .content .search-bar .savvy-default-btn{
     width: 120px;
     height: 30px;
     color: #34495E;
     border-color: #34495E;
     font-size: 16px;
 }
-.admin-div #member_list .content .search-bar .savvy-default-btn i{
+.admin-div #member_list .content .search-bar .savvy-default-btn i,
+.admin-div #access_log .content .search-bar .savvy-default-btn i{
     position: relative;
     left: -20px;
 }
-.admin-div #member_list .content .search-bar .savvy-default-btn .caret{
+.admin-div #member_list .content .search-bar .savvy-default-btn .caret,
+.admin-div #access_log .content .search-bar .savvy-default-btn .caret{
     position: relative;
     right: -20px;
 }
-.admin-div #member_list .content #members-data .edit-member-menu > ul.dropdown-menu{
+.admin-div #member_list .content #members-data tr,
+.admin-div #access_log .content #access-data tr{
+    font-size: 18px;
+    font-family: "Futura PT Light";
+}
+.admin-div #member_list .content #members-data thead tr,
+.admin-div #access_log .content #access-data thead tr{
+    font-family: "Futura PT Medium";
+}
+.admin-div #member_list .content #members-data .edit-member-menu > ul.dropdown-menu,
+.admin-div #access_log .content #access-data .edit-member-menu > ul.dropdown-menu{
     text-align: center;
 }
 .admin-div #member_list .content ul.dropdown-menu .divider{
