@@ -343,33 +343,25 @@
                       </div>
                       <div class="modal fade" id="editgroup-modal">
                           <div class="modal-dialog">
-                              <div class="modal-content">
-                                    <div class="modal-header">
-                                        <span>About Arthur</span>
-                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                        <br/>
-                                        <span>Join on October 30th, 2018</span>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form>
-                                            <div class="form-group">
-                                                <label class="form-label" for="full-name-input"></label>
-                                                <input class="form-control" id="full-name-input">
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="form-label" for="full-name-input"></label>
-                                                <input class="form-control" id="full-name-input">
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="form-label" for="full-name-input"></label>
-                                                <input class="form-control" id="full-name-input">
-                                            </div>
-                                        </form>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="savvy-btn savvy-default-btn" data-dismiss="modal">Cancel</button>
-                                        <button type="button" class="savvy-btn savvy-submit-btn">Save</button>
-                                    </div>
+                              <div class="modal-content" style="font-size: 16px;">
+                                  <div class="modal-header">
+                                      <span class="futura-medium" style="font-size: 18px;">Security Groups</span>
+                                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                      <br/>
+                                      <span>Here you find groups of meter, if you want to see what’s inside each group find out here</span>
+                                  </div>
+                                  <div class="modal-body">
+                                      <form>
+                                          <div class="form-group">
+                                              <label class="control-label" for="full-name-input">Arthur belongs to</label>
+                                              <input class="form-control" id="full-name-input">
+                                          </div>
+                                      </form>
+                                  </div>
+                                  <div class="modal-footer">
+                                      <button type="button" class="savvy-btn savvy-default-btn" data-dismiss="modal">Cancel</button>
+                                      <button type="button" class="savvy-btn savvy-submit-btn">Save</button>
+                                  </div>
                               </div>
                           </div>
                       </div>
@@ -440,6 +432,18 @@
         function EditProfileModal()
         {
             jQuery('#editmember-modal').modal('show', {backdrop: 'static'});
+{#            jQuery.ajax({#}
+{#                url: "",#}
+{#                success: function(response)#}
+{#                {#}
+{#                    jQuery('#ultraModal-8 .modal-body').html(response);#}
+{#                }#}
+{#            });#}
+        }
+
+        function EditGroupModal()
+        {
+            jQuery('#editgroup-modal').modal('show', {backdrop: 'static'});
 {#            jQuery.ajax({#}
 {#                url: "",#}
 {#                success: function(response)#}
