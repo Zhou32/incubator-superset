@@ -750,3 +750,24 @@
 {
     background-color: #66B6AB !important;
 }
+
+.admin-div #member_list .modal .modal-dialog .modal-content{
+    width: 470px;
+    margin: 300px auto;
+}
+.admin-div #member_list .modal .modal-dialog .modal-content .modal-footer{
+    border-top: none;
+    padding: 30px;
+}
+.admin-div #member_list .modal .modal-dialog .modal-content .modal-header{
+    border-bottom: none;
+    padding: 30px 15px 15px 30px;
+}
+.admin-div #member_list .modal .modal-dialog .modal-content .control-label{
+    font-family: "Futura PT Medium";
+}
+.admin-div #member_list .modal .modal-dialog .modal-content .modal-footer .savvy-btn{
+    width: 90px;
+    height: 36px;
+    font-size: 15px;
+}
