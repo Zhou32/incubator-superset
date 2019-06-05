@@ -493,7 +493,7 @@
     border: 1px solid #707070;
     font-family: "Futura PT Light";
 }
-#about-div .tab-content .tab-pane > .header > .thumbnail{
+#savvy-content .tab-content .tab-pane > .header > .thumbnail{
     border: 1px solid black;
     -webkit-border-radius: unset;
     -moz-border-radius: unset;
@@ -531,30 +531,35 @@
     float: left;
 }
 
-#about-div #overview > .header{
+#about-div #overview > .header,
+#members-div #overview > .header{
     margin-bottom: 30px;
 }
 
 #about-div .tab-content .tab-pane > .content table,
-#billing-div #contact > .content table
+#billing-div #contact > .content table,
+#members-div .tab-content .tab-pane > .content table
 {
     width: 100%;
 }
 
-#about-div .tab-content .tab-pane > .content .field
+#about-div .tab-content .tab-pane > .content .field,
+#members-div .tab-content .tab-pane > .content .field
 {
     font-family: 'Futura PT Medium';
     font-size: 18px;
     padding: 20px 0;
 }
 
-#about-div .tab-content .tab-pane > .content .value {
+#about-div .tab-content .tab-pane > .content .value,
+#members-div .tab-content .tab-pane > .content .value{
     font-size: 18px;
     padding: 20px 0;
 }
 
 #about-div .tab-content .tab-pane > .content tr,
-#billing-div #contact > .content tr
+#billing-div #contact > .content tr,
+#members-div .tab-content .tab-pane > .content tr
 {
     border-bottom: 1px solid #ccc;
 }
@@ -691,23 +696,22 @@
     transition: opacity 1s linear !important;
 }
 
-.admin-div #member_list > .header,
-.admin-div #access_log > .header{
+.admin-div .tab-content > .tab-pane > .header{
     margin-bottom: 30px;
 }
-.admin-div #member_list > .header #invite-btn,
-.admin-div #access_log > .header #invite-btn{
+.admin-div .tab-content > .tab-pane > .header #invite-btn{
     width: 139px;
     height: 36px;
     font-size: 15px;
 }
-.admin-div #member_list > .header > .description,
-.admin-div #access_log > .header > .description{
+.admin-div .tab-content > .tab-pane > .header > .description{
     font-family: "Futura PT Light";
     font-size: 18px;
 }
-.admin-div #member_list .content .search-bar > div.input-group,
-.admin-div #access_log .content .search-bar > div.input-group{
+.admin-div .tab-content > .tab-pane > .content .search-bar{
+    margin-bottom: 30px;
+}
+.admin-div .tab-content > .tab-pane > .content .search-bar > div.input-group{
     width: 670px;
     height: 30px;
     border-radius: 5px;
@@ -716,51 +720,45 @@
     padding-right: 2px;
     padding-left: 2px;
 }
-.admin-div #member_list .content .search-bar > div.input-group input[type=text],
-.admin-div #access_log .content .search-bar > div.input-group input[type=text]{
+.admin-div .tab-content > .tab-pane > .content .search-bar > div.input-group input[type=text]{
     height: 30px;
     color: #34495E;
 }
-.admin-div #member_list .content .search-bar > div.input-group .input-group-addon,
-.admin-div #access_log .content .search-bar > div.input-group .input-group-addon{
+.admin-div .tab-content > .tab-pane > .content .search-bar > div.input-group .input-group-addon{
     height: 30px;
     color: #34495E;
 }
-.admin-div #member_list .content .search-bar .savvy-default-btn,
-.admin-div #access_log .content .search-bar .savvy-default-btn{
+.admin-div .tab-content > .tab-pane > .content .search-bar .savvy-default-btn{
     width: 120px;
     height: 30px;
     color: #34495E;
     border-color: #34495E;
     font-size: 16px;
 }
-.admin-div #member_list .content .search-bar .savvy-default-btn i,
-.admin-div #access_log .content .search-bar .savvy-default-btn i{
+.admin-div .tab-content > .tab-pane > .content .search-bar .savvy-default-btn i{
     position: relative;
     left: -20px;
 }
-.admin-div #member_list .content .search-bar .savvy-default-btn .caret,
-.admin-div #access_log .content .search-bar .savvy-default-btn .caret{
+.admin-div .tab-content > .tab-pane > .content .search-bar .savvy-default-btn .caret{
     position: relative;
     right: -20px;
 }
-.admin-div #member_list .content #members-data tr,
-.admin-div #access_log .content #access-data tr{
+.admin-div .tab-content > .tab-pane > .content table tr{
     font-size: 18px;
     font-family: "Futura PT Light";
 }
-.admin-div #member_list .content #members-data thead tr,
-.admin-div #access_log .content #access-data thead tr{
+.admin-div .tab-content > .tab-pane > .content table  thead tr{
     font-family: "Futura PT Medium";
 }
-.admin-div #member_list .content #members-data .edit-member-menu > ul.dropdown-menu,
-.admin-div #access_log .content #access-data .edit-member-menu > ul.dropdown-menu{
+.admin-div #member_list .content #members-data .edit-member-menu > ul.dropdown-menu{
     text-align: center;
+    width: 200px;
+    padding: 10px 20px;
 }
-.admin-div #member_list .content ul.dropdown-menu .divider{
+.admin-div .tab-content > .tab-pane > .content ul.dropdown-menu .divider{
     background-color: #707070;
 }
-.admin-div #member_list .search-bar ul.dropdown-menu{
+.admin-div .tab-content > .tab-pane > .content .search-bar ul.dropdown-menu{
     width: 296px;
     padding: 40px;
 }
@@ -794,4 +792,34 @@
     width: 90px;
     height: 36px;
     font-size: 15px;
+}
+
+#invite-div .content .invited-users{
+    border-top: 1px solid #8c8c8c;
+}
+#invite-div .content .invited-users .user{
+    border-bottom: 1px solid #8c8c8c;
+    font-size: 18px;
+    color: #34495E;
+}
+#invite-div .content .invited-users .user .username{
+    font-family: "Futura PT Medium";
+}
+#invite-div .content .invited-users .user .email{
+    font-size: 16px;
+    color: #707070;
+}
+#invite-div .content .invited-users .user .invite-date{
+    color: #079493;
+    font-family: "Futura PT Medium";
+    line-height: 3;
+}
+#invite-div .content .invited-users .user .owner{
+    font-size: 16px;
+    font-family: "Futura PT Medium";
+}
+#invite-div .content .invited-users .user a i{
+    color: #34495E;
+    font-size: 16px;
+    line-height: 3;
 }

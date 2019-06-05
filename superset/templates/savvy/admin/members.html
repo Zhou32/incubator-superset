@@ -1,7 +1,7 @@
 {% extends 'savvy/index.html' %}
 
 {% block main_content %}
-<div id="about-div" class="admin-div">
+<div id="members-div" class="admin-div">
   <p class="title">Members</p>
   <div>
       <ul class="nav nav-pills primary">
@@ -121,7 +121,7 @@
                                       <span id="edit-member-btn" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                                           <i class="fas fa-ellipsis-h"></i>
                                       </span>
-                                      <ul class="dropdown-menu animated fadeIn" role="menu" aria-labelledby="edit-member-btn">
+                                      <ul class="dropdown-menu dropdown-menu-right animated fadeIn" role="menu" aria-labelledby="edit-member-btn">
                                           <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditProfileModal();">Edit Member</a></li>
                                           <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditGroupModal();">Edit Groups</a></li>
                                           <li class="divider"></li>

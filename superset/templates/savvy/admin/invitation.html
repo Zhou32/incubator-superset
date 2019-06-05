@@ -1,10 +1,396 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-</head>
-<body>
+{% extends 'savvy/index.html' %}
 
-</body>
-</html>
+{% block main_content %}
+<div id="invite-div" class="admin-div">
+  <p class="title">Invitation</p>
+  <div>
+      <ul class="nav nav-pills primary">
+          <li class="active">
+              <a href="#pending" data-toggle="tab">Pending</a>
+          </li>
+          <li>
+              <a href="#accepted" data-toggle="tab">Accepted</a>
+          </li>
+      </ul>
+
+      <div class="tab-content clearfix">
+          <div class="tab-pane fade in active" id="pending">
+              <div class="header">
+                  <div>
+                      <span class="futura-medium" style="font-size: 22px;">Pending Invitation(1)</span>
+                      <button class="savvy-btn savvy-submit-btn pull-right" id="invite-btn">Invite Member</button>
+                  </div>
+                  <div style="clear:both;"></div><p/>
+                  <p class="description">
+                      Groups are how you define what users can and cannot see. User group can have access to single or multiple saved filters
+                  </p>
+              </div>
+              <div class="content">
+                  <div class="search-bar">
+                      <div class="input-group transparent pull-left">
+                          <span class="input-group-addon">
+                              <i class="fas fa-search"></i>
+                          </span>
+                          <input class="form-control transparent" type="text" placeholder="Search NMI's">
+                      </div>
+                      <div class="btn-group pull-right">
+                          <div class="dropdown">
+                              <button id="group-filter" class="savvy-btn savvy-default-btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                  <i class="	fa fa-sliders"></i>
+                                  <span>Filter</span>
+                                  <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu dropdown-menu-right animated fadeIn" role="menu" aria-labelledby="group-filter">
+                                  <li style="font-size: 15px;">
+                                      <span class="futura-medium">Filter by</span>
+                                      <span class="pull-right"><a href="#" style="color: #34495E;">Reset Filters</a></span>
+                                  </li>
+                                  <li class="divider"></li>
+                                  <li><p>Meter Status</p></li>
+                                  <li role="presentation">
+                                      <div class="checkbox">
+                                          <label><input type="checkbox" value="">Active</label>
+                                      </div>
+                                  </li>
+                                  <li role="presentation">
+                                      <div class="checkbox">
+                                          <label><input type="checkbox" value="">Inactive</label>
+                                      </div>
+                                  </li>
+                                  <li class="divider"></li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="clearfix"></div>
+                  </div>
+                  <div class="invited-users">
+                      <div class="user row">
+                          <div class="col-sm-5">
+                              <span class="username">James</span><br/>
+                              <span class="email">James@wayne.com</span>
+                          </div>
+                          <div class="col-sm-4 invite-date">
+                              1/21/19
+                          </div>
+                          <div class="col-sm-3">
+                              <div class="col-sm-9">
+                                  <div>Invited by</div>
+                                  <span class="owner">Bruce Wayne</span>
+                              </div>
+                              <div class="col-sm-3">
+                                  <a href="#"><i class="fas fa-caret-right"></i></a>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="user row">
+                          <div class="col-sm-5">
+                              <span class="username">James</span><br/>
+                              <span class="email">James@wayne.com</span>
+                          </div>
+                          <div class="col-sm-4 invite-date">
+                              1/21/19
+                          </div>
+                          <div class="col-sm-3">
+                              <div class="col-sm-9">
+                                  <div>Invited by</div>
+                                  <span class="owner">Bruce Wayne</span>
+                              </div>
+                              <div class="col-sm-3">
+                                  <a href="#"><i class="fas fa-caret-right"></i></a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div>
+                      <div class="modal fade" id="editmember-modal">
+                          <div class="modal-dialog">
+                              <div class="modal-content" style="font-size: 16px;">
+                                  <div class="modal-header">
+                                      <span class="futura-medium" style="font-size: 18px;">About Arthur</span>
+                                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                      <br/>
+                                      <span>Join on October 30th, 2018</span>
+                                  </div>
+                                  <div class="modal-body">
+                                      <form>
+                                          <div class="form-group">
+                                              <label class="control-label" for="full-name-input">Full Name</label>
+                                              <input class="form-control" id="full-name-input">
+                                          </div>
+                                          <div class="form-group">
+                                              <label class="control-label" for="full-name-input">Display Name (Optional)</label>
+                                              <input class="form-control" id="full-name-input">
+                                          </div>
+                                          <div class="form-group">
+                                              <label class="control-label" for="full-name-input">Email</label>
+                                              <input type="email" class="form-control" id="full-name-input">
+                                          </div>
+                                      </form>
+                                  </div>
+                                  <div class="modal-footer">
+                                      <button type="button" class="savvy-btn savvy-default-btn" data-dismiss="modal">Cancel</button>
+                                      <button type="button" class="savvy-btn savvy-submit-btn">Save</button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="modal fade" id="editgroup-modal">
+                          <div class="modal-dialog">
+                              <div class="modal-content" style="font-size: 16px;">
+                                  <div class="modal-header">
+                                      <span class="futura-medium" style="font-size: 18px;">Security Groups</span>
+                                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                      <br/>
+                                      <span>Here you find groups of meter, if you want to see what’s inside each group find out here</span>
+                                  </div>
+                                  <div class="modal-body">
+                                      <form>
+                                          <div class="form-group">
+                                              <label class="control-label" for="full-name-input">Arthur belongs to</label>
+                                              <input class="form-control" id="full-name-input">
+                                          </div>
+                                      </form>
+                                  </div>
+                                  <div class="modal-footer">
+                                      <button type="button" class="savvy-btn savvy-default-btn" data-dismiss="modal">Cancel</button>
+                                      <button type="button" class="savvy-btn savvy-submit-btn">Save</button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="modal fade" id="deactivate-modal">
+                          <div class="modal-dialog">
+                              <div class="modal-content" style="font-size: 16px;">
+                                  <div class="modal-header">
+                                      <span class="futura-medium" style="font-size: 18px;">Deactivate Arthur Fleck ?</span>
+                                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                  </div>
+                                  <div class="modal-body">
+                                      <p>What happens when an account is deactivated?</p>
+                                      <ul>
+                                          <li><p>The member will no longer be able to sign in to the workspace.</p></li>
+                                          <li><p>The member’s groups and BAV will still be online and accessible</p></li>
+                                      </ul>
+                                  </div>
+                                  <div class="modal-footer">
+                                      <button type="button" class="savvy-btn savvy-default-btn" data-dismiss="modal">Cancel</button>
+                                      <button type="button" class="savvy-btn btn-danger">Save</button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="tab-pane fade" id="accepted">
+              <div class="header">
+                  <div>
+                      <span class="futura-medium" style="font-size: 22px;">Access Logs</span>
+                      <button class="savvy-btn savvy-submit-btn pull-right" id="invite-btn">Invite Member</button>
+                  </div>
+                  <div style="clear:both;"></div><p/>
+                  <p class="description">
+                      Groups are how you define what users can and cannot see. User group can have access to single or multiple saved filters
+                  </p>
+              </div>
+              <div class="content">
+                  <div class="search-bar">
+                      <div class="input-group transparent pull-left">
+                          <span class="input-group-addon">
+                              <i class="fas fa-search"></i>
+                          </span>
+                          <input class="form-control transparent" type="text" placeholder="Search NMI's">
+                      </div>
+                      <div class="btn-group pull-right">
+                          <div class="dropdown">
+                              <button id="group-filter" class="savvy-btn savvy-default-btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                  <i class="	fa fa-sliders"></i>
+                                  <span>Filter</span>
+                                  <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu dropdown-menu-right animated fadeIn" role="menu" aria-labelledby="group-filter">
+                                  <li style="font-size: 15px;">
+                                      <span class="futura-medium">Filter by</span>
+                                      <span class="pull-right"><a href="#" style="color: #34495E;">Reset Filters</a></span>
+                                  </li>
+                                  <li class="divider"></li>
+                                  <li><p>Meter Status</p></li>
+                                  <li role="presentation">
+                                      <div class="checkbox">
+                                          <label><input type="checkbox" value="">Owner</label>
+                                      </div>
+                                  </li>
+                                  <li role="presentation">
+                                      <div class="checkbox">
+                                          <label><input type="checkbox" value="">Super User</label>
+                                      </div>
+                                  </li>
+                                  <li role="presentation">
+                                      <div class="checkbox">
+                                          <label><input type="checkbox" value="">Standard</label>
+                                      </div>
+                                  </li>
+                                  <li role="presentation">
+                                      <div class="checkbox">
+                                          <label><input type="checkbox" value="">Viewer</label>
+                                      </div>
+                                  </li>
+                                  <li class="divider"></li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <table id="access-data" class="table table-striped dt-responsive display dataTable no-footer" cellspacing="0" width="100%">
+                      <thead>
+                          <tr>
+                              <th>Date & Time</th>
+                              <th>User</th>
+                              <th>Action</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr>
+                              <td>1/6/19 20:00</td>
+                              <td>Arthur Fleck</td>
+                              <td>Log in</td>
+                          </tr>
+                          <tr>
+                              <td>1/6/19 20:00</td>
+                              <td>Arthur Fleck</td>
+                              <td>Log in</td>
+                          </tr>
+                          <tr>
+                              <td>1/6/19 20:00</td>
+                              <td>Arthur Fleck</td>
+                              <td>Log in</td>
+                          </tr>
+                          <tr>
+                              <td>1/6/19 20:00</td>
+                              <td>Arthur Fleck</td>
+                              <td>Log in</td>
+                          </tr>
+                      </tbody>
+                  </table>
+                  <div>
+                      <div class="modal fade" id="editmember-modal">
+                          <div class="modal-dialog">
+                              <div class="modal-content" style="font-size: 16px;">
+                                  <div class="modal-header">
+                                      <span class="futura-medium" style="font-size: 18px;">About Arthur</span>
+                                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                      <br/>
+                                      <span>Join on October 30th, 2018</span>
+                                  </div>
+                                  <div class="modal-body">
+                                      <form>
+                                          <div class="form-group">
+                                              <label class="control-label" for="full-name-input">Full Name</label>
+                                              <input class="form-control" id="full-name-input">
+                                          </div>
+                                          <div class="form-group">
+                                              <label class="control-label" for="full-name-input">Display Name (Optional)</label>
+                                              <input class="form-control" id="full-name-input">
+                                          </div>
+                                          <div class="form-group">
+                                              <label class="control-label" for="full-name-input">Email</label>
+                                              <input type="email" class="form-control" id="full-name-input">
+                                          </div>
+                                      </form>
+                                  </div>
+                                  <div class="modal-footer">
+                                      <button type="button" class="savvy-btn savvy-default-btn" data-dismiss="modal">Cancel</button>
+                                      <button type="button" class="savvy-btn savvy-submit-btn">Save</button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="modal fade" id="editgroup-modal">
+                          <div class="modal-dialog">
+                              <div class="modal-content" style="font-size: 16px;">
+                                  <div class="modal-header">
+                                      <span class="futura-medium" style="font-size: 18px;">Security Groups</span>
+                                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                      <br/>
+                                      <span>Here you find groups of meter, if you want to see what’s inside each group find out here</span>
+                                  </div>
+                                  <div class="modal-body">
+                                      <form>
+                                          <div class="form-group">
+                                              <label class="control-label" for="full-name-input">Arthur belongs to</label>
+                                              <input class="form-control" id="full-name-input">
+                                          </div>
+                                      </form>
+                                  </div>
+                                  <div class="modal-footer">
+                                      <button type="button" class="savvy-btn savvy-default-btn" data-dismiss="modal">Cancel</button>
+                                      <button type="button" class="savvy-btn savvy-submit-btn">Save</button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="modal fade" id="deactivate-modal">
+                          <div class="modal-dialog">
+                              <div class="modal-content" style="font-size: 16px;">
+                                  <div class="modal-header">
+                                      <span class="futura-medium" style="font-size: 18px;">Deactivate Arthur Fleck ?</span>
+                                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                  </div>
+                                  <div class="modal-body">
+                                      <p>What happens when an account is deactivated?</p>
+                                      <ul>
+                                          <li><p>The member will no longer be able to sign in to the workspace.</p></li>
+                                          <li><p>The member’s groups and BAV will still be online and accessible</p></li>
+                                      </ul>
+                                  </div>
+                                  <div class="modal-footer">
+                                      <button type="button" class="savvy-btn savvy-default-btn" data-dismiss="modal">Cancel</button>
+                                      <button type="button" class="savvy-btn btn-danger">Save</button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+        </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block css_import %}
+    {{ super() }}
+    <link href="{{ url_for('static', filename='assets/savvybi/plugins/datatables/css/jquery.dataTables.css') }}" rel="stylesheet" type="text/css" media="screen"/>
+{% endblock %}
+
+{% block js_import %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='assets/savvybi/plugins/datatables/js/jquery.dataTables.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='assets/savvybi/plugins/datatables/extensions/TableTools/js/dataTables.tableTools.min.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='assets/savvybi/plugins/datatables/extensions/Responsive/js/dataTables.responsive.min.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='assets/savvybi/plugins/datatables/extensions/Responsive/bootstrap/3/dataTables.bootstrap.js') }}" type="text/javascript"></script>
+    <script>
+        function EditProfileModal()
+        {
+            jQuery('#editmember-modal').modal('show', {backdrop: 'static'});
+{#            jQuery.ajax({#}
+{#                url: "",#}
+{#                success: function(response)#}
+{#                {#}
+{#                    jQuery('#ultraModal-8 .modal-body').html(response);#}
+{#                }#}
+{#            });#}
+        }
+
+        function EditGroupModal()
+        {
+            jQuery('#editgroup-modal').modal('show', {backdrop: 'static'});
+{#            jQuery.ajax({#}
+{#                url: "",#}
+{#                success: function(response)#}
+{#                {#}
+{#                    jQuery('#ultraModal-8 .modal-body').html(response);#}
+{#                }#}
+{#            });#}
+        }
+    </script>
+{% endblock %}
