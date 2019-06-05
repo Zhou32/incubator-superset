@@ -45,26 +45,82 @@ class AccountView(SavvybiAdmin):
             username=username
         )
 
-    @expose('/account/profile')
+    @expose('/profile')
     def profile(self):
 
         return self.render_template(
             'savvy/account/profile.html'
         )
 
-    @expose('/account/plan')
+    @expose('/plan')
     def plan(self):
 
         return self.render_template(
             'savvy/account/plan.html'
         )
 
-    @expose('/account/billing')
+    @expose('/billing')
     def billing(self):
 
         return self.render_template(
             'savvy/account/billing.html'
         )
 
+
+class AdminView(SavvybiAdmin):
+    route_base = "/admin/administration"
+
+    @expose('/members')
+    def members(self):
+        if not g.user or not g.user.get_id():
+            return redirect(appbuilder.get_url_for_login)
+
+        is_orgowner = False
+        for role in g.user.roles:
+            if role.name == 'org_owner':
+                is_orgowner = True
+                break
+        if is_orgowner is False:
+            flash('Access is denied. Only organization owner can access it.', 'info')
+            return redirect(appbuilder.get_url_for_index)
+
+        user = db.session.query(SavvyUser).filter_by(id=g.user.get_id()).first()
+
+        if user.email_confirm is True:
+            organization = db.session.query(Organization).filter(Organization.users.any(id=user.id)).scalar()
+            org_name = organization.organization_name
+        else:
+            org_register = db.session.query(OrgRegisterUser).filter_by(email=user.email).first()
+            org_name = org_register.organization
+        username = '{} {}'.format(user.first_name, user.last_name)
+        return self.render_template(
+            'savvy/admin/members.html',
+            organization=org_name.capitalize(),
+            username=username
+        )
+
+    @expose('/invitation')
+    def invitation(self):
+
+        return self.render_template(
+            'savvy/admin/invitation.html'
+        )
+
+    @expose('/data')
+    def data(self):
+
+        return self.render_template(
+            'savvy/admin/data.html'
+        )
+
+    @expose('/integration')
+    def integration(self):
+
+        return self.render_template(
+            'savvy/admin/integration.html'
+        )
+
+
 appbuilder.add_view_no_menu(SavvybiAdmin)
 appbuilder.add_view_no_menu(AccountView)
+appbuilder.add_view_no_menu(AdminView)
