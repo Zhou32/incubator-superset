@@ -25,6 +25,9 @@
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
         <!-- CORE CSS FRAMEWORK - END -->
 
+        <link href="{{ url_for('static', filename='assets/savvybi/plugins/jquery-ui/smoothness/jquery-ui.min.css') }}" rel="stylesheet" type="text/css"/>
+        <link href="{{ url_for('static', filename='assets/savvybi/plugins/select2/select2.css') }}" rel="stylesheet" type="text/css"/>
+
         <!-- CORE CSS TEMPLATE - START -->
         <link href="{{ url_for('static', filename='assets/savvybi/css/savvybi.css') }}" rel="stylesheet" type="text/css"/>
         <link href="{{ url_for('static', filename='assets/savvybi/css/style.css') }}" rel="stylesheet" type="text/css"/>
@@ -78,7 +81,7 @@
                                             </p>
                                         </div>
                                         <div class="col-sm-2">
-                                          <a class="arrow-btn fade"><i class="fas fa-arrow-right"></i></a>
+                                          <a class="arrow-btn fade" href="#invite-users-modal" data-toggle="modal"><i class="fas fa-arrow-right"></i></a>
                                         </div>
                                     </div>
                                 </div>
@@ -112,6 +115,143 @@
                         </div>
                     </div>
                 </div>
+                <div class="modal fade" id="invite-users-modal">
+                    <div class="modal-dialog animated fadeInLeft">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <p class="modal-icon"><i class="far fa-envelope"></i></p>
+                                <p class="title">Invite People to <span class="futura-medium">Workspace</span></p>
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;<p>ESC</p></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="col-sm-12">
+                                    <div class="col-sm-5 col-sm-offset-1 header-text">Email Address</div>
+                                    <div class="col-sm-5 header-text">Full Name (Optional)</div>
+                                </div>
+                                <div id="input-user-field">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 sort_panel">
+                                        <section class="box">
+                                            <div class="panel_header">
+                                                <div class="col-sm-5 col-sm-offset-1">
+                                                    <input type="text">
+                                                </div>
+                                                <div class="col-sm-5">
+                                                    <input type="text">
+                                                </div>
+                                                <div class="actions panel_actions pull-right col-sm-1">
+                                                    <i class="box_close fa fa-times"></i>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 sort_panel">
+                                        <section class="box">
+                                            <div class="panel_header">
+                                                <div class="col-sm-5 col-sm-offset-1">
+                                                    <input type="text">
+                                                </div>
+                                                <div class="col-sm-5">
+                                                    <input type="text">
+                                                </div>
+                                                <div class="actions panel_actions pull-right col-sm-1">
+                                                    <i class="box_close fa fa-times"></i>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 sort_panel">
+                                        <section class="box">
+                                            <div class="panel_header">
+                                                <div class="col-sm-5 col-sm-offset-1">
+                                                    <input type="text">
+                                                </div>
+                                                <div class="col-sm-5">
+                                                    <input type="text">
+                                                </div>
+                                                <div class="actions panel_actions pull-right col-sm-1">
+                                                    <i class="box_close fa fa-times"></i>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12"  id="add-input-field">
+                                    <div class="col-sm-10 col-sm-offset-1">
+                                        <span class="futura-medium" style="font-size: 16px">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+                                        <a href="#">Add another</a>
+                                        or
+                                        <a href="#">add many at once</a>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12" id="security-group-field">
+                                    <div class="col-sm-10 col-sm-offset-1" style="font-size: 18px;">
+                                        <p class="futura-medium">Security Groups</p>
+                                        <div class="form-group">
+                                            <label class="form-label futura-medium" style="font-size: 15px;">New members will have access to the meter data in the selected groups</label>
+                                            <select class="" id="s2example-2" multiple>
+                                                <option></option>
+                                                <optgroup label="United States">
+                                                    <option>Alabama</option>
+                                                    <option>Alaska</option>
+                                                    <option>Arizona</option>
+                                                    <option>Arkansas</option>
+                                                    <option selected>California</option>
+                                                    <option>Colorado</option>
+                                                    <option>Connecticut</option>
+                                                    <option>Delaware</option>
+                                                    <option selected>Florida</option>
+                                                    <option>Georgia</option>
+                                                    <option>Hawaii</option>
+                                                    <option>Idaho</option>
+                                                    <option>Illinois</option>
+                                                    <option>Indiana</option>
+                                                    <option>Iowa</option>
+                                                    <option>Kansas</option>
+                                                    <option>Kentucky[C]</option>
+                                                    <option>Louisiana</option>
+                                                    <option>Maine</option>
+                                                    <option>Maryland</option>
+                                                    <option>Massachusetts[D]</option>
+                                                    <option>Michigan</option>
+                                                    <option>Minnesota</option>
+                                                    <option>Mississippi</option>
+                                                    <option>Missouri</option>
+                                                    <option>Montana</option>
+                                                    <option>Nebraska</option>
+                                                    <option>Nevada</option>
+                                                    <option>New Hampshire</option>
+                                                    <option>New Jersey</option>
+                                                    <option>New Mexico</option>
+                                                    <option>New York</option>
+                                                    <option>North Carolina</option>
+                                                    <option>North Dakota</option>
+                                                    <option>Ohio</option>
+                                                    <option>Oklahoma</option>
+                                                    <option>Oregon</option>
+                                                    <option>Pennsylvania[E]</option>
+                                                    <option>Rhode Island[F]</option>
+                                                    <option>South Carolina</option>
+                                                    <option>South Dakota</option>
+                                                    <option>Tennessee</option>
+                                                    <option>Texas</option>
+                                                    <option>Utah</option>
+                                                    <option>Vermont</option>
+                                                    <option>Virginia[G]</option>
+                                                    <option selected>Washington</option>
+                                                    <option>West Virginia</option>
+                                                    <option>Wisconsin</option>
+                                                    <option>Wyoming</option>
+                                                </optgroup>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             {% endblock %}
             </div>
             <!-- END CONTENT -->
@@ -128,6 +268,9 @@
             <script src="{{ url_for('static', filename='assets/savvybi/plugins/perfect-scrollbar/perfect-scrollbar.min.js') }}" type="text/javascript"></script>
             <script src="{{ url_for('static', filename='assets/savvybi/plugins/viewport/viewportchecker.js') }}" type="text/javascript"></script>
             <!-- CORE JS FRAMEWORK - END -->
+
+            <script src="{{ url_for('static', filename='assets/savvybi/plugins/jquery-ui/smoothness/jquery-ui.js') }}" type="text/javascript"></script>
+            <script src="{{ url_for('static', filename='assets/savvybi/plugins/select2/select2.js') }}" type="text/javascript"></script>
 
             <!-- CORE TEMPLATE JS - START -->
             <script src="{{ url_for('static', filename='assets/savvybi/js/scripts.js') }}" type="text/javascript"></script>

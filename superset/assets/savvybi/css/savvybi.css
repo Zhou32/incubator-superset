@@ -880,7 +880,7 @@
 .invite-content .modal-dialog .modal-content .modal-header{
     text-align: center;
     border-bottom: 2px solid #34495E;
-    padding: 15px 15px 100px 15px;
+    padding: 15px 15px 70px 15px;
 }
 .invite-content .modal-dialog .modal-content .modal-header .modal-icon{
     font-size: 50px;
@@ -923,4 +923,51 @@
     line-height: 1.8;
     padding-left: 20px;
     cursor: pointer;
+}
+
+.invite-content #invite-users-modal .modal-body .header-text{
+    font-family: "Futura PT Medium";
+    font-size: 16px;
+}
+.invite-content #invite-users-modal .sort_panel input[type=text]{
+    width: 100%;
+    border: 1px solid #707070;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+.invite-content #invite-users-modal .sort_panel section.box .actions{
+    line-height: normal;
+    margin: 0;
+    position: relative;
+    top: 0;
+    right: 0;
+}
+.invite-content #invite-users-modal .sort_panel section.box .actions i{
+    font-size: 16px;
+    color:  #203539;
+}
+.invite-content #invite-users-modal .modal-dialog .modal-content .modal-header{
+    border-bottom: none;
+}
+.invite-content #invite-users-modal .modal-dialog .modal-content #add-input-field{
+    padding-top: 30px;
+    margin-bottom: 30px;
+    font-size: 20px;
+}
+.invite-content #invite-users-modal .modal-dialog .modal-content #add-input-field a:hover{
+    color: #079394;
+}
+.invite-content #invite-users-modal .modal-dialog .modal-content #security-group-field .select2-choices{
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border: 1px solid #707070;
+}
+.invite-content #invite-users-modal .modal-dialog .modal-content #security-group-field .select2-search-choice{
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border: 1px solid #707070;
+    background: transparent;
 }
