@@ -861,3 +861,59 @@
     border-color: #FF1B51;
     color: #FF1B51;
 }
+
+.invite-content .modal-dialog{
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    margin: 0;
+}
+.invite-content .modal-dialog .modal-content{
+    width: 700px;
+    height: 100%;
+    margin: auto;
+    padding-top: 200px;
+    border: none;
+    color: #34495E;
+    font-family: "Futura PT Light";
+}
+.invite-content .modal-dialog .modal-content .modal-header{
+    text-align: center;
+    border-bottom: 2px solid #34495E;
+    padding: 15px 15px 100px 15px;
+}
+.invite-content .modal-dialog .modal-content .modal-header .modal-icon{
+    font-size: 50px;
+    color: #079394;
+    font-family: "Futura PT Medium";
+}
+.invite-content .modal-dialog .modal-content .modal-header .title{
+    font-size: 32px;
+}
+.invite-content .modal-dialog .modal-content .modal-header button.close{
+    position: relative;
+    top: -150px;
+    left: 200px;
+    font-size: 70px;
+    font-weight: 100;
+    opacity: 1;
+}
+.invite-content .modal-dialog .modal-content .modal-header button.close > p{
+    font-size: 20px;
+    font-family: "Futura PT Light";
+    line-height: 0;
+}
+.invite-content .modal-dialog .modal-content .modal-body{
+    padding: 0;
+}
+.invite-content .modal-dialog .modal-content .modal-body .panel{
+    padding: 20px 140px 20px 25px;
+    border-bottom: 1px solid #34495E;
+}
+.invite-content .modal-dialog .modal-content .modal-body .panel .user-type{
+    font-size: 24px;
+    font-family: "Futura PT Medium";
+}
+.invite-content .modal-dialog .modal-content .modal-body .panel .description{
+    font-size: 20px;
+}

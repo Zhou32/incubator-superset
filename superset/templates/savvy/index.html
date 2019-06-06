@@ -57,6 +57,42 @@
                 {% endblock %}
                 </section>
             </section>
+
+            <div class="invite-content">
+            {% block invite_dialog %}
+                <div class="modal fade" id="invite-index-modal">
+                    <div class="modal-dialog animated fadeInLeft">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <p class="modal-icon"><i class="far fa-envelope"></i></p>
+                                <p class="title">Invite People to <span class="futura-medium">Workspace</span></p>
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;<p>ESC</p></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="panel">
+                                    <p class="user-type">Viewer</p>
+                                    <p class="description">
+                                        Viewer can access overviews, highlights and summaries of selected meter data
+                                    </p>
+                                </div>
+                                <div class="panel">
+                                    <p class="user-type">Standard</p>
+                                    <p class="description">
+                                        Standard users can access all SavvyBI features for selected meter data, and limited access to administration pages
+                                    </p>
+                                </div>
+                                <div class="panel">
+                                    <p class="user-type">Super Admin</p>
+                                    <p class="description">
+                                        Super Admin can access all SavvyBI features for selected meters and advance access to Administrative pages
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endblock %}
+            </div>
             <!-- END CONTENT -->
         </div>
         <!-- END CONTAINER -->
