@@ -70,22 +70,43 @@
                             </div>
                             <div class="modal-body">
                                 <div class="panel">
-                                    <p class="user-type">Viewer</p>
-                                    <p class="description">
-                                        Viewer can access overviews, highlights and summaries of selected meter data
-                                    </p>
+                                    <div class="row">
+                                        <div class="col-sm-10">
+                                            <p class="user-type">Viewer</p>
+                                            <p class="description">
+                                                Viewer can access overviews, highlights and summaries of selected meter data
+                                            </p>
+                                        </div>
+                                        <div class="col-sm-2">
+                                          <a class="arrow-btn fade"><i class="fas fa-arrow-right"></i></a>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="panel">
-                                    <p class="user-type">Standard</p>
-                                    <p class="description">
-                                        Standard users can access all SavvyBI features for selected meter data, and limited access to administration pages
-                                    </p>
+                                    <div class="row">
+                                        <div class="col-sm-10">
+                                            <p class="user-type">Super Admin</p>
+                                            <p class="description">
+                                                Super Admin can access all SavvyBI features for selected meters and advance access to Administrative pages
+                                            </p>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <a class="arrow-btn fade"><i class="fas fa-arrow-right"></i></a>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="panel">
-                                    <p class="user-type">Super Admin</p>
-                                    <p class="description">
-                                        Super Admin can access all SavvyBI features for selected meters and advance access to Administrative pages
-                                    </p>
+                                    <div class="row">
+                                        <div class="col-sm-10">
+                                            <p class="user-type">Viewer</p>
+                                            <p class="description">
+                                                Viewer can access overviews, highlights and summaries of selected meter data
+                                            </p>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <a class="arrow-btn fade"><i class="fas fa-arrow-right"></i></a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -116,6 +137,17 @@
             <script src="{{ url_for('static', filename='assets/savvybi/plugins/sparkline-chart/jquery.sparkline.min.js') }}" type="text/javascript"></script>
             <script src="{{ url_for('static', filename='assets/savvybi/js/chart-sparkline.js') }}" type="text/javascript"></script>
             <!-- Sidebar Graph - END -->
+
+            <script>
+                $(".invite-content .modal-body .panel").hover(function(){
+
+                    $(this).find(".arrow-btn").addClass('in');
+                });
+                $(".invite-content .modal-body .panel").mouseleave(function(){
+
+                    $(this).find(".arrow-btn").removeClass('in');
+                });
+            </script>
         {% endblock %}
 
         <!-- General section box modal start -->

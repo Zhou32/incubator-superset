@@ -907,7 +907,7 @@
     padding: 0;
 }
 .invite-content .modal-dialog .modal-content .modal-body .panel{
-    padding: 20px 140px 20px 25px;
+    padding: 20px 20px 20px 25px;
     border-bottom: 1px solid #34495E;
 }
 .invite-content .modal-dialog .modal-content .modal-body .panel .user-type{
@@ -916,4 +916,11 @@
 }
 .invite-content .modal-dialog .modal-content .modal-body .panel .description{
     font-size: 20px;
+}
+.invite-content .modal-dialog .modal-content .modal-body .panel .arrow-btn{
+    font-size: 50px;
+    color: #079394;
+    line-height: 1.8;
+    padding-left: 20px;
+    cursor: pointer;
 }
