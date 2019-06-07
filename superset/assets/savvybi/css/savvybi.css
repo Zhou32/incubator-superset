@@ -509,8 +509,8 @@
     float: right;
     width: 280px;
     height: 30px;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
+    -webkit-border-radius: 13px;
+    -moz-border-radius: 13px;
     border-radius: 13px;
     border: 1px solid #CCCCCC;
     margin-top: 20px;
@@ -1129,4 +1129,20 @@
 .modal-section #nmi-setup-modal .modal-body a.arrow-btn i{
     font-size: 50px;
     float: right;
+}
+
+.modal-section #create-group-modal .modal-header{
+    border-bottom: none;
+}
+.modal-section #create-group-modal .modal-body .form-group{
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+.modal-section #create-group-modal .modal-body .form-group p{
+    font-family: "Futura PT Medium";
+}
+.modal-section #create-group-modal .modal-body .savvy-submit-btn{
+    width: 140px;
+    height: 40px;
+    font-size: 15px;
 }
