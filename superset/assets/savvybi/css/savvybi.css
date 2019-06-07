@@ -880,8 +880,6 @@
 .invite-content .modal-dialog .modal-content .modal-header{
     text-align: center;
     padding: 15px 15px 70px 15px;
-}
-.invite-content #invite-index-modal .modal-dialog .modal-content .modal-header{
     border-bottom: 2px solid #34495E;
 }
 .invite-content .modal-dialog .modal-content .modal-header .modal-icon{
@@ -927,6 +925,9 @@
     cursor: pointer;
 }
 
+.invite-content #invite-users-modal .modal-dialog .modal-header{
+    border-bottom: none;
+}
 .invite-content #invite-users-modal .modal-body .header-text{
     font-family: "Futura PT Medium";
     font-size: 16px;
@@ -985,6 +986,9 @@
     border: 1px solid #707070;
     background: transparent;
 }
+.invite-content #invite-bulk-modal .modal-dialog .modal-header{
+    border-bottom: none;
+}
 .invite-content #invite-bulk-modal .control-label{
     font-size: 16px;
     font-family: "Futura PT Medium";
@@ -1005,4 +1009,34 @@
 }
 .invite-content #invite-bulk-modal .modal-body .savvy-default-btn{
     width: 90px;
+}
+.invite-content #invite-done-modal .modal-header > .title{
+    font-size: 32px;
+    font-family: "Futura PT Medium";
+}
+.invite-content #invite-done-modal .modal-header{
+    border-bottom: none;
+}
+.invite-content #invite-done-modal .modal-header p{
+    font-size: 18px;
+}
+.invite-content #invite-done-modal .modal-body table{
+    margin-bottom: 50px;
+}
+.invite-content #invite-done-modal .modal-body table thead tr{
+    border-bottom: 4px solid #079493;
+}
+.invite-content #invite-done-modal .modal-body table tr{
+    border: none;
+}
+.invite-content #invite-done-modal .modal-body .savvy-btn{
+    font-size: 15px;
+    height: 40px;
+}
+.invite-content #invite-done-modal .modal-body .savvy-default-btn{
+    width: 180px;
+    margin-right: 20px;
+}
+.invite-content #invite-done-modal .modal-body .savvy-submit-btn{
+    width: 75px;
 }
