@@ -18,7 +18,7 @@
               <div class="header">
                   <div>
                       <span class="futura-medium" style="font-size: 22px;">Pending Invitation(1)</span>
-                    <a data-toggle="modal" href="#invite-index-modal"><button class="savvy-btn savvy-submit-btn pull-right" id="invite-btn">Invite Member</button></a>
+                      <a data-toggle="modal" href="#invite-index-modal"><button class="savvy-btn savvy-submit-btn pull-right" id="invite-btn">Invite Member</button></a>
                   </div>
                   <div style="clear:both;"></div><p/>
                   <p class="description">
@@ -121,7 +121,7 @@
               <div class="header">
                   <div>
                       <span class="futura-medium" style="font-size: 22px;">Accepted Invitation(4)</span>
-                      <button class="savvy-btn savvy-submit-btn pull-right">Invite Member</button>
+                    <a data-toggle="modal" href="#invite-index-modal"><button class="savvy-btn savvy-submit-btn pull-right">Invite Member</button></a>
                   </div>
                   <div style="clear:both;"></div><p/>
                   <p class="description">
@@ -233,6 +233,13 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block invite_dialog %}
+    {% include 'savvy/modals/invite/index_modal.html' %}
+    {% include 'savvy/modals/invite/invite_user.html' %}
+    {% include 'savvy/modals/invite/invite_done.html' %}
+    {% include 'savvy/modals/invite/bulk_invite.html' %}
 {% endblock %}
 
 {% block css_import %}
