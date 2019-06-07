@@ -19,7 +19,7 @@
                   <div>
                       <span class="futura-medium" style="font-size: 22px;">Meter List</span>
                       <button class="savvy-btn savvy-submit-btn pull-right">Add a new NMI</button>
-                      <button class="savvy-btn savvy-default-btn pull-right">Create a Group</button>
+                      <a data-toggle="modal" href="#group-index-modal"><button class="savvy-btn savvy-default-btn pull-right">Create a Group</button></a>
                   </div>
                   <div style="clear:both;"></div><p/>
                   <p class="description">
@@ -124,7 +124,7 @@
                   <div>
                       <span class="futura-medium" style="font-size: 22px;">Security Groups</span>
                       <button class="savvy-btn savvy-submit-btn pull-right" id="invite-btn">Add a new NMI</button>
-                      <button class="savvy-btn savvy-default-btn pull-right" id="invite-btn">Create a Group</button>
+                      <a data-toggle="modal" href="#group-index-modal"><button class="savvy-btn savvy-default-btn pull-right" id="invite-btn">Create a Group</button></a>
                   </div>
                   <div style="clear:both;"></div><p/>
                   <p class="description">
@@ -257,6 +257,10 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block group_dialog %}
+    {% include 'savvy/modals/group/index.html' %}
 {% endblock %}
 
 {% block css_import %}

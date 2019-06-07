@@ -862,13 +862,13 @@
     color: #FF1B51;
 }
 
-.invite-content .modal-dialog{
+.modal-section .modal-dialog{
     width: 100%;
     height: 100%;
     background-color: white;
     margin: 0;
 }
-.invite-content .modal-dialog .modal-content{
+.modal-section .modal-dialog .modal-content{
     width: 700px;
     height: 100%;
     margin: auto;
@@ -877,20 +877,20 @@
     color: #34495E;
     font-family: "Futura PT Light";
 }
-.invite-content .modal-dialog .modal-content .modal-header{
+.modal-section .modal-dialog .modal-content .modal-header{
     text-align: center;
     padding: 15px 15px 70px 15px;
     border-bottom: 2px solid #34495E;
 }
-.invite-content .modal-dialog .modal-content .modal-header .modal-icon{
+.modal-section .modal-dialog .modal-content .modal-header .modal-icon{
     font-size: 50px;
     color: #079394;
     font-family: "Futura PT Medium";
 }
-.invite-content .modal-dialog .modal-content .modal-header .title{
+.modal-section .modal-dialog .modal-content .modal-header .title{
     font-size: 32px;
 }
-.invite-content .modal-dialog .modal-content .modal-header button.close{
+.modal-section .modal-dialog .modal-content .modal-header button.close{
     position: relative;
     top: -150px;
     left: 200px;
@@ -898,26 +898,26 @@
     font-weight: 100;
     opacity: 1;
 }
-.invite-content .modal-dialog .modal-content .modal-header button.close > p{
+.modal-section .modal-dialog .modal-content .modal-header button.close > p{
     font-size: 20px;
     font-family: "Futura PT Light";
     line-height: 0;
 }
-.invite-content .modal-dialog .modal-content .modal-body{
+.modal-section .modal-dialog .modal-content .modal-body{
     padding: 0;
 }
-.invite-content .modal-dialog .modal-content .modal-body .panel{
+.modal-section .modal-dialog .modal-content .modal-body .panel{
     padding: 20px 20px 20px 25px;
     border-bottom: 1px solid #34495E;
 }
-.invite-content .modal-dialog .modal-content .modal-body .panel .user-type{
+.modal-section .modal-dialog .modal-content .modal-body .panel .user-type{
     font-size: 24px;
     font-family: "Futura PT Medium";
 }
-.invite-content .modal-dialog .modal-content .modal-body .panel .description{
+.modal-section .modal-dialog .modal-content .modal-body .panel .description{
     font-size: 20px;
 }
-.invite-content .modal-dialog .modal-content .modal-body .panel .arrow-btn{
+.modal-section .modal-dialog .modal-content .modal-body .panel .arrow-btn{
     font-size: 50px;
     color: #079394;
     line-height: 1.8;
@@ -925,37 +925,37 @@
     cursor: pointer;
 }
 
-.invite-content #invite-users-modal .modal-dialog .modal-header{
+.modal-section #invite-users-modal .modal-dialog .modal-header{
     border-bottom: none;
 }
-.invite-content #invite-users-modal .modal-body .header-text{
+.modal-section #invite-users-modal .modal-body .header-text{
     font-family: "Futura PT Medium";
     font-size: 16px;
 }
-.invite-content #invite-users-modal .sort_panel input[type=text]{
+.modal-section #invite-users-modal .sort_panel input[type=text]{
     width: 100%;
     border: 1px solid #707070;
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
 }
-.invite-content #invite-users-modal .sort_panel section.box .actions{
+.modal-section #invite-users-modal .sort_panel section.box .actions{
     line-height: normal;
     margin: 0;
     position: relative;
     top: 0;
     right: 0;
 }
-.invite-content #invite-users-modal .sort_panel section.box .actions i{
+.modal-section #invite-users-modal .sort_panel section.box .actions i{
     font-size: 16px;
     color:  #203539;
 }
-.invite-content #invite-users-modal .modal-dialog .modal-body blockquote i{
+.modal-section #invite-users-modal .modal-dialog .modal-body blockquote i{
     font-size: 20px;
     color: #079394;
     line-height: 1.3;
 }
-.invite-content #invite-users-modal .modal-dialog .modal-body blockquote{
+.modal-section #invite-users-modal .modal-dialog .modal-body blockquote{
     color: #34495E;
     font-size: 16px;
     border-top: 1px solid #CCCCCC;
@@ -965,78 +965,100 @@
     -moz-border-radius: 5px;
     border-radius: 5px;
 }
-.invite-content #invite-users-modal .modal-dialog .modal-content #add-input-field{
+.modal-section #invite-users-modal .modal-dialog .modal-content #add-input-field{
     padding-top: 30px;
     margin-bottom: 30px;
     font-size: 20px;
 }
-.invite-content #invite-users-modal .modal-dialog .modal-content #add-input-field a:hover{
+.modal-section #invite-users-modal .modal-dialog .modal-content #add-input-field a:hover{
     color: #079394;
 }
-.invite-content #invite-users-modal .modal-dialog .modal-content #security-group-field .select2-choices{
+.modal-section #invite-users-modal .modal-dialog .modal-content #security-group-field .select2-choices{
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     border-radius: 5px;
     border: 1px solid #707070;
 }
-.invite-content #invite-users-modal .modal-dialog .modal-content #security-group-field .select2-search-choice{
+.modal-section #invite-users-modal .modal-dialog .modal-content #security-group-field .select2-search-choice{
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     border-radius: 5px;
     border: 1px solid #707070;
     background: transparent;
 }
-.invite-content #invite-bulk-modal .modal-dialog .modal-header{
+.modal-section #invite-bulk-modal .modal-dialog .modal-header{
     border-bottom: none;
 }
-.invite-content #invite-bulk-modal .control-label{
+.modal-section #invite-bulk-modal .control-label{
     font-size: 16px;
     font-family: "Futura PT Medium";
 }
-.invite-content #invite-bulk-modal .tip{
+.modal-section #invite-bulk-modal .tip{
     font-size: 14px;
     font-family: "Futura PT Light";
     color: #34495E;
     margin-bottom: 30px;
 }
-.invite-content #invite-bulk-modal .modal-body .savvy-btn{
+.modal-section #invite-bulk-modal .modal-body .savvy-btn{
     height: 40px;
     margin-right: 20px;
     font-size: 15px;
 }
-.invite-content #invite-bulk-modal .modal-body .savvy-submit-btn{
+.modal-section #invite-bulk-modal .modal-body .savvy-submit-btn{
     width: 140px;
 }
-.invite-content #invite-bulk-modal .modal-body .savvy-default-btn{
+.modal-section #invite-bulk-modal .modal-body .savvy-default-btn{
     width: 90px;
 }
-.invite-content #invite-done-modal .modal-header > .title{
+.modal-section #invite-done-modal .modal-header > .title{
     font-size: 32px;
     font-family: "Futura PT Medium";
 }
-.invite-content #invite-done-modal .modal-header{
+.modal-section #invite-done-modal .modal-header{
     border-bottom: none;
 }
-.invite-content #invite-done-modal .modal-header p{
+.modal-section #invite-done-modal .modal-header p{
     font-size: 18px;
 }
-.invite-content #invite-done-modal .modal-body table{
+.modal-section #invite-done-modal .modal-body table{
     margin-bottom: 50px;
 }
-.invite-content #invite-done-modal .modal-body table thead tr{
+.modal-section #invite-done-modal .modal-body table thead tr{
     border-bottom: 4px solid #079493;
 }
-.invite-content #invite-done-modal .modal-body table tr{
+.modal-section #invite-done-modal .modal-body table tr{
     border: none;
 }
-.invite-content #invite-done-modal .modal-body .savvy-btn{
+.modal-section #invite-done-modal .modal-body .savvy-btn{
     font-size: 15px;
     height: 40px;
 }
-.invite-content #invite-done-modal .modal-body .savvy-default-btn{
+.modal-section #invite-done-modal .modal-body .savvy-default-btn{
     width: 180px;
     margin-right: 20px;
 }
-.invite-content #invite-done-modal .modal-body .savvy-submit-btn{
+.modal-section #invite-done-modal .modal-body .savvy-submit-btn{
     width: 75px;
+}
+
+.modal-section #group-index-modal .modal-body{
+    height: 350px;
+}
+.modal-section #group-index-modal .modal-body .title{
+    font-size: 24px;
+    font-family: "Futura PT Medium";
+}
+.modal-section #group-index-modal .modal-body .panel{
+    height: 100%;
+}
+.modal-section #group-index-modal .modal-body .description{
+    font-size: 20px;
+}
+.modal-section #group-index-modal .modal-body a {
+    position: absolute;
+    bottom: 0;
+    font-size: 14px;
+}
+.modal-section #group-index-modal .modal-body a i{
+    font-size: 50px;
 }
