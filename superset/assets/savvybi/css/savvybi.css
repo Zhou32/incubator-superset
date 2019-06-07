@@ -971,3 +971,27 @@
     border: 1px solid #707070;
     background: transparent;
 }
+.invite-content #invite-bulk-modal .control-label{
+    font-size: 16px;
+    font-family: "Futura PT Medium";
+}
+.invite-content #invite-bulk-modal .tip{
+    font-size: 14px;
+    font-family: "Futura PT Light";
+    color: #34495E;
+    margin-bottom: 30px;
+}
+.invite-content #invite-bulk-modal .modal-body .savvy-btn{
+    height: 40px;
+    margin-right: 20px;
+    font-size: 15px;
+}
+.invite-content #invite-bulk-modal .modal-body .savvy-submit-btn{
+    width: 140px;
+}
+.invite-content #invite-bulk-modal .modal-body .savvy-default-btn{
+    width: 90px;
+}
+.invite-content #invite-bulk-modal .modal-header{
+    border-bottom: none;
+}
