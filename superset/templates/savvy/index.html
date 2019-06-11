@@ -104,6 +104,10 @@
 
                     $(this).find(".arrow-btn").removeClass('in');
                 });
+                $('.modal').on('hidden.bs.modal', function () {
+                    $(this).find('input').val('');
+                    $(this).find('textarea').val('');
+                })
             </script>
         {% endblock %}
     </body>
