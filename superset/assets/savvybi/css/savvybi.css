@@ -986,6 +986,12 @@
     border: 1px solid #707070;
     background: transparent;
 }
+.modal-section #invite-users-modal .modal-dialog .modal-content #send-invite-btn{
+    width: 140px;
+    height: 40px;
+    font-size: 15px;
+    margin-top: 30px;
+}
 .modal-section #invite-bulk-modal .modal-dialog .modal-header{
     border-bottom: none;
 }
@@ -1063,7 +1069,7 @@
     font-size: 50px;
 }
 .modal-section #nmi-setup-modal .modal-dialog .modal-content{
-    padding-top: 50px;
+    padding-top: 100px;
 }
 .modal-section #nmi-setup-modal .modal-body .search-bar{
     margin-bottom: 30px;
