@@ -100,10 +100,37 @@
 
                     $(this).find(".arrow-btn").addClass('in');
                 });
+
                 $("#invite-index-modal .modal-body .panel").mouseleave(function(){
 
                     $(this).find(".arrow-btn").removeClass('in');
                 });
+
+                // When click arrow button of user type panel in first page of invitatio dialog
+                $("#invite-index-modal a[data-toggle='modal']").on('click', function(){
+                    $("#invite-users-modal #user_type").val($(this).attr('data-value'));
+                });
+
+                // When add new user field to invite one more user in invite-users-modal
+                $("#add-user-field-btn").on('click', function(){
+                    var new_field_content = "<div class='col-lg-12 col-md-12 col-sm-12 col-xs-12 sort_panel'>\n"+
+                            "<section class='box'>\n"+
+                                "<div class='panel_header'>\n"+
+                                    "<div class='col-sm-5 col-sm-offset-1'>\n"+
+                                        "<input type='text'>\n"+
+                                    "</div>\n"+
+                                    "<div class='col-sm-5'>\n"+
+                                        "<input type='text'>\n"+
+                                    "</div>\n"+
+                                    "<div class='actions panel_actions pull-right col-sm-1'>\n"+
+                                        "<i class='box_close fa fa-times'></i>\n"+
+                                    "</div>\n"+
+                                "</div>\n"+
+                            "</section>\n"+
+                        "</div>"
+                    $("#input-user-field").append(new_field_content);
+                })
+
                 $('.modal').on('hidden.bs.modal', function () {
                     $(this).find('input').val('');
                     $(this).find('textarea').val('');

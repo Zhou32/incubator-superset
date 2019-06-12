@@ -8,102 +8,105 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;<p>ESC</p></button>
             </div>
             <div class="modal-body">
-                <div class="col-sm-12">
-                    <div class="col-sm-10 col-sm-offset-1">
-                        <blockquote>
-                            <div class="col-sm-1">
-                                <span data-class="check-circle">
-                                    <i class="fa fa-check-circle"></i>
-                                </span>
-                            </div>
-                            <div class="col-sm-11">
-                                We found 1 email address to invite. We’ve done our best to guess a name. See if it looks right, then press Invite.
-                            </div>
-                            <div class="clearfix"></div>
-                        </blockquote>
+                <form>
+                    <input type="hidden" id="user_type" name="usertype">
+                    <div class="col-sm-12">
+                        <div class="col-sm-10 col-sm-offset-1">
+                            <blockquote>
+                                <div class="col-sm-1">
+                                    <span data-class="check-circle">
+                                        <i class="fa fa-check-circle"></i>
+                                    </span>
+                                </div>
+                                <div class="col-sm-11">
+                                    We found 1 email address to invite. We’ve done our best to guess a name. See if it looks right, then press Invite.
+                                </div>
+                                <div class="clearfix"></div>
+                            </blockquote>
+                        </div>
+                        <div class="col-sm-5 col-sm-offset-1 header-text">Email Address</div>
+                        <div class="col-sm-5 header-text">Full Name (Optional)</div>
                     </div>
-                    <div class="col-sm-5 col-sm-offset-1 header-text">Email Address</div>
-                    <div class="col-sm-5 header-text">Full Name (Optional)</div>
-                </div>
-                <div id="input-user-field">
-                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 sort_panel">
-                        <section class="box">
-                            <div class="panel_header">
-                                <div class="col-sm-5 col-sm-offset-1">
-                                    <input type="text">
+                    <div id="input-user-field">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 sort_panel">
+                            <section class="box">
+                                <div class="panel_header">
+                                    <div class="col-sm-5 col-sm-offset-1">
+                                        <input type="text">
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <input type="text">
+                                    </div>
+                                    <div class="actions panel_actions pull-right col-sm-1">
+                                        <i class="box_close fa fa-times"></i>
+                                    </div>
                                 </div>
-                                <div class="col-sm-5">
-                                    <input type="text">
+                            </section>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 sort_panel">
+                            <section class="box">
+                                <div class="panel_header">
+                                    <div class="col-sm-5 col-sm-offset-1">
+                                        <input type="text">
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <input type="text">
+                                    </div>
+                                    <div class="actions panel_actions pull-right col-sm-1">
+                                        <i class="box_close fa fa-times"></i>
+                                    </div>
                                 </div>
-                                <div class="actions panel_actions pull-right col-sm-1">
-                                    <i class="box_close fa fa-times"></i>
+                            </section>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 sort_panel">
+                            <section class="box">
+                                <div class="panel_header">
+                                    <div class="col-sm-5 col-sm-offset-1">
+                                        <input type="text">
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <input type="text">
+                                    </div>
+                                    <div class="actions panel_actions pull-right col-sm-1">
+                                        <i class="box_close fa fa-times"></i>
+                                    </div>
                                 </div>
-                            </div>
-                        </section>
-                    </div>
-                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 sort_panel">
-                        <section class="box">
-                            <div class="panel_header">
-                                <div class="col-sm-5 col-sm-offset-1">
-                                    <input type="text">
-                                </div>
-                                <div class="col-sm-5">
-                                    <input type="text">
-                                </div>
-                                <div class="actions panel_actions pull-right col-sm-1">
-                                    <i class="box_close fa fa-times"></i>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 sort_panel">
-                        <section class="box">
-                            <div class="panel_header">
-                                <div class="col-sm-5 col-sm-offset-1">
-                                    <input type="text">
-                                </div>
-                                <div class="col-sm-5">
-                                    <input type="text">
-                                </div>
-                                <div class="actions panel_actions pull-right col-sm-1">
-                                    <i class="box_close fa fa-times"></i>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-                </div>
-                <div class="col-sm-12"  id="add-input-field">
-                    <div class="col-sm-10 col-sm-offset-1">
-                        <span class="futura-medium" style="font-size: 16px">
-                            <i class="fas fa-plus"></i>
-                        </span>
-                        <a href="#">Add another</a>
-                        or
-                        <a href="#invite-bulk-modal" data-toggle="modal">add many at once</a>
-                    </div>
-                </div>
-                <div class="col-sm-12" id="security-group-field">
-                    <div class="col-sm-10 col-sm-offset-1" style="font-size: 18px;">
-                        <p class="futura-medium">Security Groups</p>
-                        <div class="form-group">
-                            <label class="form-label futura-medium" style="font-size: 15px;">New members will have access to the meter data in the selected groups</label>
-                            <select class="" id="s2example-2" multiple>
-                                <option></option>
-                                <optgroup label="United States">
-                                    <option selected>Southern Manager</option>
-                                    <option selected>Victoria</option>
-                                    <option>Washington</option>
-                                    <option>Wyoming</option>
-                                </optgroup>
-                            </select>
+                            </section>
                         </div>
                     </div>
-                </div>
-                <div class="col-sm-12">
-                    <div class="col-sm-10 col-sm-offset-1">
-                        <a data-toggle="modal" href="#invite-done-modal"><button class="savvy-btn savvy-submit-btn pull-right" id="send-invite-btn">Send Invitation</button></a>
+                    <div class="col-sm-12"  id="add-input-field">
+                        <div class="col-sm-10 col-sm-offset-1">
+                            <span class="futura-medium" style="font-size: 16px">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                            <a href="#" id="add-user-field-btn">Add another</a>
+                            or
+                            <a href="#invite-bulk-modal" id="bulk-user-field-btn" data-toggle="modal">add many at once</a>
+                        </div>
                     </div>
-                </div>
+                    <div class="col-sm-12" id="security-group-field">
+                        <div class="col-sm-10 col-sm-offset-1" style="font-size: 18px;">
+                            <p class="futura-medium">Security Groups</p>
+                            <div class="form-group">
+                                <label class="form-label futura-medium" style="font-size: 15px;">New members will have access to the meter data in the selected groups</label>
+                                <select class="" id="s2example-2" multiple>
+                                    <option></option>
+                                    <optgroup label="United States">
+                                        <option selected>Southern Manager</option>
+                                        <option selected>Victoria</option>
+                                        <option>Washington</option>
+                                        <option>Wyoming</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="col-sm-10 col-sm-offset-1">
+                            <a data-toggle="modal" href="#invite-done-modal"><button type="submit" class="savvy-btn savvy-submit-btn pull-right" id="send-invite-btn">Send Invitation</button></a>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
