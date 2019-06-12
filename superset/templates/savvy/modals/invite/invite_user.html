@@ -1,4 +1,4 @@
-<div class="modal fade" id="invite-users-modal">
+<div class="modal fade" tabindex="-1" id="invite-users-modal" role="dialog" style="overflow: hidden;">
     <div class="modal-dialog animated fadeInLeft">
         <div class="modal-content">
             <div class="modal-header">
@@ -89,14 +89,11 @@
                             <p class="futura-medium">Security Groups</p>
                             <div class="form-group">
                                 <label class="form-label futura-medium" style="font-size: 15px;">New members will have access to the meter data in the selected groups</label>
-                                <select class="" id="s2example-2" multiple>
-                                    <option></option>
-                                    <optgroup label="United States">
-                                        <option selected>Southern Manager</option>
-                                        <option selected>Victoria</option>
-                                        <option>Washington</option>
-                                        <option>Wyoming</option>
-                                    </optgroup>
+                                <select id="group-list" multiple>
+                                    <option>Southern Manager</option>
+                                    <option>Victoria</option>
+                                    <option>Washington</option>
+                                    <option>Wyoming</option>
                                 </select>
                             </div>
                         </div>

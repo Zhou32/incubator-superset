@@ -96,6 +96,11 @@
             <!-- Sidebar Graph - END -->
 
             <script>
+                $.fn.modal.Constructor.prototype.enforceFocus = function() {};
+                $("#group-list").select2({
+                    dropdownParent: $("#invite-users-modal")
+                });
+
                 $("#invite-index-modal .modal-body .panel").hover(function(){
 
                     $(this).find(".arrow-btn").addClass('in');

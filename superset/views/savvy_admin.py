@@ -1,22 +1,26 @@
 from flask import g, flash, redirect, url_for
 from flask_appbuilder import BaseView
 from flask_appbuilder.views import expose
+from flask_appbuilder.security.decorators import has_access
 
 from superset import appbuilder, db
 from superset.savvy.models import Group, Site, SavvyUser, OrgRegisterUser, Organization
+from superset.savvy.decorator import has_access_savvybi_admin
 
-class SavvybiAdmin(BaseView):
+class SavvybiAdminView(BaseView):
     route_base = "/admin"
 
     @expose('/')
+    @has_access_savvybi_admin
     def index(self):
         return redirect(url_for('AccountView.about'))
 
 
-class AccountView(SavvybiAdmin):
+class AccountView(SavvybiAdminView):
     route_base = "/admin/account"
 
     @expose('/about')
+    @has_access_savvybi_admin
     def about(self):
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
@@ -46,6 +50,7 @@ class AccountView(SavvybiAdmin):
         )
 
     @expose('/profile')
+    @has_access_savvybi_admin
     def profile(self):
 
         return self.render_template(
@@ -53,6 +58,7 @@ class AccountView(SavvybiAdmin):
         )
 
     @expose('/plan')
+    @has_access_savvybi_admin
     def plan(self):
 
         return self.render_template(
@@ -60,6 +66,7 @@ class AccountView(SavvybiAdmin):
         )
 
     @expose('/billing')
+    @has_access_savvybi_admin
     def billing(self):
 
         return self.render_template(
@@ -67,23 +74,12 @@ class AccountView(SavvybiAdmin):
         )
 
 
-class AdminView(SavvybiAdmin):
+class AdministrationView(SavvybiAdminView):
     route_base = "/admin/administration"
 
     @expose('/members')
+    @has_access_savvybi_admin
     def members(self):
-        if not g.user or not g.user.get_id():
-            return redirect(appbuilder.get_url_for_login)
-
-        is_orgowner = False
-        for role in g.user.roles:
-            if role.name == 'org_owner':
-                is_orgowner = True
-                break
-        if is_orgowner is False:
-            flash('Access is denied. Only organization owner can access it.', 'info')
-            return redirect(appbuilder.get_url_for_index)
-
         user = db.session.query(SavvyUser).filter_by(id=g.user.get_id()).first()
 
         if user.email_confirm is True:
@@ -100,6 +96,7 @@ class AdminView(SavvybiAdmin):
         )
 
     @expose('/invitation')
+    @has_access_savvybi_admin
     def invitation(self):
 
         return self.render_template(
@@ -107,6 +104,7 @@ class AdminView(SavvybiAdmin):
         )
 
     @expose('/data')
+    @has_access_savvybi_admin
     def data(self):
 
         return self.render_template(
@@ -114,6 +112,7 @@ class AdminView(SavvybiAdmin):
         )
 
     @expose('/integration')
+    @has_access_savvybi_admin
     def integration(self):
 
         return self.render_template(
@@ -121,6 +120,6 @@ class AdminView(SavvybiAdmin):
         )
 
 
-appbuilder.add_view_no_menu(SavvybiAdmin)
+appbuilder.add_view_no_menu(SavvybiAdminView)
 appbuilder.add_view_no_menu(AccountView)
-appbuilder.add_view_no_menu(AdminView)
+appbuilder.add_view_no_menu(AdministrationView)
