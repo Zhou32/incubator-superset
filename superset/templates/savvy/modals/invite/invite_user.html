@@ -90,10 +90,9 @@
                             <div class="form-group">
                                 <label class="form-label futura-medium" style="font-size: 15px;">New members will have access to the meter data in the selected groups</label>
                                 <select id="group-list" multiple>
-                                    <option>Southern Manager</option>
-                                    <option>Victoria</option>
-                                    <option>Washington</option>
-                                    <option>Wyoming</option>
+                                    {% for group in groups %}
+                                        <option value="group.id">{{ group.name }}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                         </div>

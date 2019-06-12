@@ -7,6 +7,18 @@ from superset import appbuilder, db
 from superset.savvy.models import Group, Site, SavvyUser, OrgRegisterUser, Organization
 from superset.savvy.decorator import has_access_savvybi_admin
 
+def get_organization_name():
+    user = db.session.query(SavvyUser).filter_by(id=g.user.get_id()).first()
+
+    if user.email_confirm is True:
+        organization = db.session.query(Organization).filter(Organization.users.any(id=user.id)).scalar()
+        org_name = organization.organization_name
+    else:
+        org_register = db.session.query(OrgRegisterUser).filter_by(email=user.email).first()
+        org_name = org_register.organization
+    return org_name
+
+
 class SavvybiAdminView(BaseView):
     route_base = "/admin"
 
@@ -81,26 +93,30 @@ class AdministrationView(SavvybiAdminView):
     @has_access_savvybi_admin
     def members(self):
         user = db.session.query(SavvyUser).filter_by(id=g.user.get_id()).first()
-
-        if user.email_confirm is True:
-            organization = db.session.query(Organization).filter(Organization.users.any(id=user.id)).scalar()
-            org_name = organization.organization_name
-        else:
-            org_register = db.session.query(OrgRegisterUser).filter_by(email=user.email).first()
-            org_name = org_register.organization
         username = '{} {}'.format(user.first_name, user.last_name)
         return self.render_template(
             'savvy/admin/members.html',
-            organization=org_name.capitalize(),
+            workspace=get_organization_name().capitalize(),
             username=username
         )
 
     @expose('/invitation')
     @has_access_savvybi_admin
     def invitation(self):
+        organization = db.session.query(Organization).filter(Organization.users.any(id=g.user.get_id())).first()
+        groups = db.session.query(Group).filter_by(organization_id=organization.id).all()
+
+        group_list = []
+        for group in groups:
+            elem = {}
+            elem['id'] = group.id
+            elem['name'] = group.group_name
+            group_list.append(elem)
 
         return self.render_template(
-            'savvy/admin/invitation.html'
+            'savvy/admin/invitation.html',
+            workspace = get_organization_name().capitalize(),
+            groups= group_list
         )
 
     @expose('/data')

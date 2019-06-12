@@ -686,8 +686,8 @@ class SavvySiteModelView(ModelView):
     add_form = CSVToSitesForm
     add_columns = ['org', 'csv_file']
 
-    base_filters = [['SiteID', FilterInFunction, get_site_id_list_from_org],
-                    ['SiteID', FilterInFunction, get_site_id_list_from_group]]
+    # base_filters = [['SiteID', FilterInFunction, get_site_id_list_from_org],
+    #                 ['SiteID', FilterInFunction, get_site_id_list_from_group]]
 
     def get_select_widget(self, filters,
                          actions=None,
