@@ -118,23 +118,49 @@
 
                 // When add new user field to invite one more user in invite-users-modal
                 $("#add-user-field-btn").on('click', function(){
-                    var new_field_content = "<div class='col-lg-12 col-md-12 col-sm-12 col-xs-12 sort_panel'>\n"+
-                            "<section class='box'>\n"+
-                                "<div class='panel_header'>\n"+
-                                    "<div class='col-sm-5 col-sm-offset-1'>\n"+
-                                        "<input type='text'>\n"+
-                                    "</div>\n"+
-                                    "<div class='col-sm-5'>\n"+
-                                        "<input type='text'>\n"+
-                                    "</div>\n"+
-                                    "<div class='actions panel_actions pull-right col-sm-1'>\n"+
-                                        "<i class='box_close fa fa-times'></i>\n"+
-                                    "</div>\n"+
-                                "</div>\n"+
-                            "</section>\n"+
-                        "</div>"
-                    $("#input-user-field").append(new_field_content);
+                    var new_field_content = `<div class='col-lg-12 col-md-12 col-sm-12 col-xs-12 sort_panel'>\n
+                            <section class='box'>
+                                <div class='panel_header'>
+                                    <div class='col-sm-5 col-sm-offset-1'>
+                                        <input type='text'>
+                                    </div>
+                                    <div class='col-sm-5'>
+                                        <input type='text'>
+                                    </div>
+                                    <div class='actions panel_actions pull-right col-sm-1'>
+                                        <i class='box_close fa fa-times'></i>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>`;
+                    $("#user-invite-list-field").append(new_field_content);
                 })
+
+                // Add bulk email addresses to invite users
+                $("#bulk-user-email-add-btn").on('click', function(){
+                    var emails = $("#bulk-email-input").val().split(',');
+                    $("#user-invite-list-field").html('');
+
+                    emails.forEach(function(email, index){
+                        var dummy_fullname = email.split('@')[0].replace('.', ' ');
+                        var new_field_content = `<div class='col-lg-12 col-md-12 col-sm-12 col-xs-12 sort_panel'>\n
+                            <section class='box'>
+                                <div class='panel_header'>
+                                    <div class='col-sm-5 col-sm-offset-1'>
+                                        <input type='text' value='${email}'>
+                                    </div>
+                                    <div class='col-sm-5'>
+                                        <input type='text' value='${dummy_fullname}'>
+                                    </div>
+                                    <div class='actions panel_actions pull-right col-sm-1'>
+                                        <i class='box_close fa fa-times'></i>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>`;
+                        $("#user-invite-list-field").append(new_field_content);
+                    });
+                });
 
                 $('.modal').on('hidden.bs.modal', function () {
                     $(this).find('input').val('');
