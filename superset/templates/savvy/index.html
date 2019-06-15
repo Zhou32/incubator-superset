@@ -34,7 +34,6 @@
         <link href="{{ url_for('static', filename='assets/savvybi/css/responsive.css') }}" rel="stylesheet" type="text/css"/>
         <!-- CORE CSS TEMPLATE - END -->
         {% endblock %}
-
     </head>
     <!-- END HEAD -->
 
@@ -136,7 +135,7 @@
                     $("#user-invite-list-field").append(new_field_content);
                 })
 
-                // Add bulk email addresses to invite users
+                // Add bulk email addresses to invite users list
                 $("#bulk-user-email-add-btn").on('click', function(){
                     var emails = $("#bulk-email-input").val().split(',');
                     $("#user-invite-list-field").html('');
@@ -160,6 +159,23 @@
                         </div>`;
                         $("#user-invite-list-field").append(new_field_content);
                     });
+
+                    var email_counts = emails.length;
+                    $("#invite-users-modal .modal-body blockquote .alert-content span").html(email_counts);
+                });
+
+                $("#invite-users-modal #send-invite-btn").click(function(){
+                    $.ajax({
+                        url: $('#invite-users-modal form').attr('action'),
+                        data: $('#invite-users-modal form').serialize(),
+                        type: 'POST',
+                        success: function(response){
+                            console.log(response)
+                        },
+                        error: function (error){
+
+                        }
+                    })
                 });
 
                 $('.modal').on('hidden.bs.modal', function () {

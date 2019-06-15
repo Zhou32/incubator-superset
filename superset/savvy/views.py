@@ -292,7 +292,7 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
         result = [('-1', 'None')]
         if org:
             groups = self.appbuilder.sm.search_group(org.id)
-        if len(groups) > 1:
+        if groups is not None:
             list = [(str(group.id), group.group_name) for group in groups
                     if not group.group_name.endswith('_default_group')]
             result = result + list
@@ -326,7 +326,6 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
         if form.validate_on_submit():
             user_id = g.user.id
 
-
             try:
                 organization = self.appbuilder.sm.find_org(user_id=user_id)
                 reg_user = self.appbuilder.sm.add_invite_register_user(email=form.email.data,
@@ -351,6 +350,14 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
                                         widgets=widgets,
                                         appbuilder=self.appbuilder
                                         )
+
+    @expose('/bulk-invite', methods=['POST'])
+    def bulk_invite(self):
+        email_list = request.form.getlist('user_email')
+        name_list = request.form.getlist('user_name')
+        user_type = request.form['user_type']
+        group_list = request.form['group_list']
+        return json.dumps({'status': 'OK', 'users': email_list, 'group': group_list})
 
 
 class SavvyBIAuthDBView(AuthDBView):
@@ -535,8 +542,7 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
             url = url + "?login=False"
         msg.html = self.render_template(self.email_template,
                                         url=url,
-                                        first_name=register_user.first_name,
-                                        last_name=register_user.last_name)
+                                        workspace=register_user.organization)
         msg.recipients = [register_user.email]
         try:
             mail.send(msg)

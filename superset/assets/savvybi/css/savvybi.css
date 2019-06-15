@@ -5,7 +5,7 @@
 
 @font-face {
     font-family: 'Futura PT Medium';
-    src: url('../fonts/futura_fonts/FuturaPTMedium.otf') format("opentype");
+    src: url('../fonts/futura_fonts/FuturaPTMedium.otf');
 }
 
 .reg-navbar .navbar-brand{
