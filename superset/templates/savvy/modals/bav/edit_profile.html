@@ -1,32 +1,17 @@
-<div class="modal fade" tabindex="-1" id="invite-users-modal" role="dialog" style="overflow: hidden;">
+<div class="modal fade" tabindex="-1" id="bav-profile-modal">
     <div class="modal-dialog animated fadeInLeft">
         <div class="modal-content">
             <div class="modal-header">
-                <p class="modal-icon"><i class="far fa-envelope"></i></p>
-                <p class="title">Invite People to <span class="futura-medium">Workspace</span></p>
+                <p class="modal-icon"><i class="fas fa-user-shield"></i></p>
+                <p class="title">Business Authority Verification</p>
                 <button type="button" class="back pull-left" data-dismiss="modal" aria-hidden="true">&#8592;<p>BACK</p></button>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;<p>ESC</p></button>
             </div>
             <div class="modal-body">
                 <form action="{{ url_for('SavvyRegisterInvitationUserDBView.bulk_invite') }}" method="post">
-                    <input type="hidden" id="user_type" name="user_type">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="col-sm-12">
-                        <div class="col-sm-10 col-sm-offset-1">
-                            <blockquote class="hide">
-                                <div class="col-sm-1">
-                                    <span data-class="check-circle">
-                                        <i class="fa fa-check-circle"></i>
-                                    </span>
-                                </div>
-                                <div class="col-sm-11 alert-content">
-                                    We found <span>1</span> email address to invite. We’ve done our best to guess a name. See if it looks right, then press Invite.
-                                </div>
-                                <div class="clearfix"></div>
-                            </blockquote>
-                        </div>
-                        <div class="col-sm-5 col-sm-offset-1 header-text">Email Address</div>
-                        <div class="col-sm-5 header-text">Full Name (Optional)</div>
+
                     </div>
                     <div id="user-invite-list-field">
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 sort_panel">

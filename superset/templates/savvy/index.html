@@ -61,9 +61,7 @@
             </section>
 
             <div class="modal-section">
-                {% block invite_dialog %}
-                {% endblock %}
-                {% block group_dialog %}
+                {% block dialogs %}
                 {% endblock %}
             </div>
 
@@ -121,10 +119,10 @@
                             <section class='box'>
                                 <div class='panel_header'>
                                     <div class='col-sm-5 col-sm-offset-1'>
-                                        <input type='text'>
+                                        <input type='email' name='user_email'>
                                     </div>
                                     <div class='col-sm-5'>
-                                        <input type='text'>
+                                        <input type='text' name='user_name'>
                                     </div>
                                     <div class='actions panel_actions pull-right col-sm-1'>
                                         <i class='box_close fa fa-times'></i>
@@ -146,10 +144,10 @@
                             <section class='box'>
                                 <div class='panel_header'>
                                     <div class='col-sm-5 col-sm-offset-1'>
-                                        <input type='text' value='${email}'>
+                                        <input type='email' value='${email}' name='user_email'>
                                     </div>
                                     <div class='col-sm-5'>
-                                        <input type='text' value='${dummy_fullname}'>
+                                        <input type='text' value='${dummy_fullname}' name='user_name'>
                                     </div>
                                     <div class='actions panel_actions pull-right col-sm-1'>
                                         <i class='box_close fa fa-times'></i>
@@ -161,6 +159,7 @@
                     });
 
                     var email_counts = emails.length;
+                    $("#invite-users-modal .modal-body blockquote").removeClass('hide')
                     $("#invite-users-modal .modal-body blockquote .alert-content span").html(email_counts);
                 });
 

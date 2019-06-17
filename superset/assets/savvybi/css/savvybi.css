@@ -1000,7 +1000,7 @@
     font-family: "Futura PT Medium";
     font-size: 16px;
 }
-.modal-section #invite-users-modal .sort_panel input[type=text]{
+.modal-section #invite-users-modal .sort_panel input{
     width: 100%;
     border: 1px solid #707070;
     -webkit-border-radius: 3px;
@@ -1256,6 +1256,28 @@
 }
 .modal-section #group-create-done-modal .modal-body .savvy-submit-btn{
     width: 75px;
+}
+
+.modal-section #bav-index-modal .modal-body{
+    height: 350px;
+}
+.modal-section #bav-index-modal .modal-body .title{
+    font-size: 24px;
+    font-family: "Futura PT Medium";
+}
+.modal-section #bav-index-modal .modal-body .panel{
+    height: 100%;
+}
+.modal-section #bav-index-modal .modal-body .description{
+    font-size: 20px;
+}
+.modal-section #bav-index-modal .modal-body a {
+    position: absolute;
+    bottom: 0;
+    font-size: 14px;
+}
+.modal-section #bav-index-modal .modal-body a i{
+    font-size: 50px;
 }
 
 .modal-section .modal-dialog .modal-content .modal-header button.back{

@@ -144,12 +144,16 @@
                           </li>
                       </ul>
                   </div>
-                  <button class="savvy-btn savvy-submit-btn pull-right" id="bav-submit-btn">Update</button>
+                  <a href="#bav-index-modal" data-toggle="modal"><button class="savvy-btn savvy-submit-btn pull-right" id="bav-submit-btn">Update</button></a>
               </div>
         </div>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block dialogs %}
+    {% include 'savvy/modals/bav/index.html' %}
 {% endblock %}
 
 {% block js_import %}
