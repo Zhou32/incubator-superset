@@ -564,6 +564,74 @@
     border-bottom: 1px solid #ccc;
 }
 
+#about-div #bav .bav-content{
+    width: 540px;
+    margin: auto;
+    margin-top: 30px;
+}
+#about-div #bav blockquote{
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    font-family: "Futura PT Medium";
+    font-size: 26px;
+    border: 1px solid #CCCCCC;
+    padding: 16px 20px;
+    border-left: 20px solid #CCCCCC;
+}
+#about-div #bav span > i{
+    font-size: 20px;
+    margin-right: 10px;
+}
+#about-div #bav blockquote.success{
+    color: #079493;
+    border-left-color: #079394;
+}
+#about-div #bav blockquote.info{
+    color: #DAD338;
+    border-left-color: #DAD338;
+}
+#about-div #bav blockquote.warning{
+    color: #B81038;
+    border-left-color: #B81038;
+}
+#about-div #bav .bav-content ul#bav-list{
+    list-style: none;
+    padding-left: 0;
+}
+#about-div #bav .bav-content ul#bav-list li{
+    color: #34495E;
+    font-size: 18px;
+    line-height: 2;
+}
+#about-div #bav .bav-content ul#bav-list li.success span{
+    color: #079394;
+}
+#about-div #bav .bav-content ul#bav-list li.warning span{
+    color: #B81038;
+}
+#about-div #bav .bav-content ul#bav-list li.info span{
+    color: #DAD338;
+}
+#about-div #bav .bav-content ul#bav-list li.info a{
+    color: #34495E;
+}
+#about-div #bav .bav-content ul#bav-list li .content-div .savvy-default-btn{
+    width: 90px;
+    height: 36px;
+    font-size: 15px;
+    border-color: #34495E;
+    margin-left: 100px;
+}
+#about-div #bav #bav-submit-btn{
+    width: 140px;
+    height: 36px;
+    font-size: 15px;
+}
+#about-div #bav #bav-submit-btn:disabled{
+    color: white;
+}
+
 #profile-div .form-group label.control-label{
     font-size: 16px;
 }

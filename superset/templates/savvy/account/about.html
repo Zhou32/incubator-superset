@@ -79,18 +79,86 @@
                   <div style="clear:both;"></div>
               </div>
               <div class="content">
-                  <table>
-                      <tr>
-                          <td class="field">
-                              Linking Authentication
-                              <p style="font-family: 'Futura PT Light';"> More info soon </p>
-                          </td>
-                          <td class="value" style="text-align: right; padding-right: 50px;">Super User</td>
-                      </tr>
-                  </table>
+                  <div class="bav-content">
+                      <blockquote class="success">
+                          <span data-class="check-circle">
+                              <i class="fa fa-check-circle"></i>
+                          </span>
+                          You are A OK
+                      </blockquote>
+    {#                  <blockquote class="info">#}
+    {#                      <span data-class="check-circle">#}
+    {#                          <i class="fa fa-check-circle"></i>#}
+    {#                      </span>#}
+    {#                      We are validating your details#}
+    {#                  </blockquote>#}
+    {#                  <blockquote class="info">#}
+    {#                      <span data-class="check-circle">#}
+    {#                          <i class="fas fa-hand-point-up"></i>#}
+    {#                      </span>#}
+    {#                      Oh no ! We need some more#}
+    {#                  </blockquote>#}
+    {#                  <blockquote class="warning">#}
+    {#                      <span data-class="check-circle">#}
+    {#                          <i class="fa fa-times-circle"></i>#}
+    {#                      </span>#}
+    {#                      BAV Not Started#}
+    {#                  </blockquote>#}
+    {#                  <blockquote class="warning">#}
+    {#                      <span data-class="check-circle">#}
+    {#                          <i class="fa fa-check-circle"></i>#}
+    {#                      </span>#}
+    {#                      BAV Incomplete#}
+    {#                  </blockquote>#}
+                      <ul id="bav-list">
+                          <li class="success">
+                              <span>
+                                  <i class="fa fa-check-circle"></i>
+                              </span>
+                              Personal Validation
+                          </li>
+                          <li class="info">
+                              <span>
+                                  <i class="fas fa-hand-point-right"></i>
+                              </span>
+                              Business Validation
+                              <a href="#" onclick="toggleButtons(event);">
+                                  <i class="fas fa-caret-right"></i>
+                                  <i class="fas fa-caret-down hide"></i>
+                              </a>
+                              <div class="content-div hide">
+                                  <button class="savvy-btn savvy-default-btn">Show Me</button>
+                              </div>
+                          </li>
+                          <li class="warning">
+                              <span>
+                                  <i class="fa fa-times-circle"></i>
+                              </span>
+                              Business Authority
+                          </li>
+                          <li class="success">
+                              <span>
+                                  <i class="fa fa-check-circle"></i>
+                              </span>
+                              Scanned and Approved
+                          </li>
+                      </ul>
+                  </div>
+                  <button class="savvy-btn savvy-submit-btn pull-right" id="bav-submit-btn">Update</button>
               </div>
         </div>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block js_import %}
+    {{ super() }}
+    <script>
+        function toggleButtons(e){
+            var _this = $(e.target).parent('a');
+            _this.children('i').toggleClass('hide');
+            _this.siblings('.content-div').toggleClass('hide');
+        }
+    </script>
 {% endblock %}

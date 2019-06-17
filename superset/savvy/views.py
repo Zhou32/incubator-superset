@@ -357,6 +357,7 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
         name_list = request.form.getlist('user_name')
         user_type = request.form['user_type']
         group_list = request.form['group_list']
+
         return json.dumps({'status': 'OK', 'users': email_list, 'group': group_list})
 
 
