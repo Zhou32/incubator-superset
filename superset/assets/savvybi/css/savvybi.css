@@ -1326,10 +1326,14 @@
 }
 .modal-section #bav-profile-modal #filepath-addon{
     position: relative;
-    left: -40px;
+    left: -50px;
     z-index: 1000;
     background: transparent;
     border: none;
+}
+.modal-section #bav-profile-modal #filepath-addon .fa{
+    font-size: 25px;
+    color: black;
 }
 .modal-section #bav-profile-modal #save-later-btn{
     width: 200px;
@@ -1339,6 +1343,53 @@
 .modal-section #bav-profile-modal a.next-dialog-btn{
     position: relative;
     bottom: 10px;
+}
+.modal-section #bav-profile-modal .control-label{
+    font-family: "Futura PT Medium";
+    font-size: 16px;
+}
+.modal-section #bav-profile-modal .control-label-child {
+    font-family: "Futura PT Light";
+}
+
+.modal-section #bav-business-modal .modal-header{
+    border-bottom: none;
+}
+.modal-section #bav-business-modal .modal-body > .title{
+    font-family: "Futura PT Medium";
+    font-size: 24px;
+    color: #34495E;
+    margin-bottom: 20px;
+}
+.modal-section #bav-business-modal #filepath{
+    width: 310px;
+}
+.modal-section #bav-business-modal #filepath-addon{
+    position: relative;
+    left: -50px;
+    z-index: 1000;
+    background: transparent;
+    border: none;
+}
+.modal-section #bav-business-modal #filepath-addon .fa{
+    color: black;
+    font-size: 25px;
+}
+.modal-section #bav-business-modal #save-later-btn{
+    width: 200px;
+    height: 40px;
+    font-size: 15px;
+}
+.modal-section #bav-business-modal a.next-dialog-btn{
+    position: relative;
+    bottom: 10px;
+}
+.modal-section #bav-business-modal .control-label{
+    font-family: "Futura PT Medium";
+    font-size: 16px;
+}
+.modal-section #bav-business-modal .control-label-child {
+    font-family: "Futura PT Light";
 }
 
 .select2-container-multi .select2-choices .select2-search-field input{
