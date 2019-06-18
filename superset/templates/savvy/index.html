@@ -163,13 +163,35 @@
                     $("#invite-users-modal .modal-body blockquote .alert-content span").html(email_counts);
                 });
 
-                $("#invite-users-modal #send-invite-btn").click(function(){
+                $("#invite-users-modal #send-invite-btn").click(function(event){
+                    event.preventDefault();
                     $.ajax({
                         url: $('#invite-users-modal form').attr('action'),
                         data: $('#invite-users-modal form').serialize(),
                         type: 'POST',
                         success: function(response){
-                            console.log(response)
+                            $('#invite-done-modal .loading-content').addClass('hide');
+                            $('#invite-done-modal .modal-content').removeClass('hide');
+                            response = JSON.parse(response);
+                            console.log(response);
+                            console.log(response.status);
+
+                            if(response.status == 'success'){
+                                var invited_users = response.users;
+                                $('#invite-done-modal .invited-user-count').text(invited_users.length+" Member");
+                                for(var i = 0; i < invited_users.length; i++)
+                                {
+                                    var invited_user_tr = `
+                                                        <tr>
+                                                            <td>${invited_users[i].email}</td>
+                                                            <td>${invited_users[i].name}</td>
+                                                        </tr>`;
+                                    $('#invite-done-modal .modal-content table tbody').append(invited_user_tr);
+                                }
+
+                            }else if(response.status == 'failed'){
+
+                            }
                         },
                         error: function (error){
 

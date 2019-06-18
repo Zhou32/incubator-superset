@@ -1084,6 +1084,19 @@
 .modal-section #invite-bulk-modal .modal-body .savvy-default-btn{
     width: 90px;
 }
+.modal-section #invite-done-modal .modal-dialog{
+    display: table;
+}
+.loading-content{
+    display: table-cell;
+    vertical-align: middle;
+}
+.modal-section #invite-done-modal .loading-content img{
+    width: 100px;
+    height: 100px;
+    margin: auto;
+    display: block;
+}
 .modal-section #invite-done-modal .modal-header > .title{
     font-size: 32px;
     font-family: "Futura PT Medium";
@@ -1294,6 +1307,35 @@
     font-size: 20px;
     font-family: "Futura PT Light";
     line-height: 2.5;
+}
+
+.modal-section #bav-profile-modal .modal-header{
+    border-bottom: none;
+}
+.modal-section #bav-profile-modal .modal-body > .title{
+    font-family: "Futura PT Medium";
+    font-size: 24px;
+    color: #34495E;
+    margin-bottom: 20px;
+}
+.modal-section #bav-profile-modal .modal-body .photo-thumb{
+    border: 1px solid #707070;
+    width: 130px;
+    height: 130px;
+    -webkit-border-radius: 65px;
+    -moz-border-radius: 65px;
+    border-radius: 65px;
+    margin: auto;
+}
+.modal-section #bav-profile-modal #filepath{
+    width: 260px;
+}
+.modal-section #bav-profile-modal #filepath-addon{
+    position: relative;
+    left: -40px;
+    z-index: 1000;
+    background: transparent;
+    border: none;
 }
 
 .select2-container-multi .select2-choices .select2-search-field input{

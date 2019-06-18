@@ -8,88 +8,55 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;<p>ESC</p></button>
             </div>
             <div class="modal-body">
-                <form action="{{ url_for('SavvyRegisterInvitationUserDBView.bulk_invite') }}" method="post">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <div class="col-sm-12">
+                <div class="col-sm-10 col-sm-offset-1 title">
+                    <p>
+                        <i class="far fa-user"></i>
+                        Personal Verification
+                    </p>
+                    <div class="photo-thumb">
 
                     </div>
-                    <div id="user-invite-list-field">
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 sort_panel">
-                            <section class="box">
-                                <div class="panel_header">
-                                    <div class="col-sm-5 col-sm-offset-1">
-                                        <input type="email" name="user_email">
-                                    </div>
-                                    <div class="col-sm-5">
-                                        <input type="text" name="user_name">
-                                    </div>
-                                    <div class="actions panel_actions pull-right col-sm-1">
-                                        <i class="box_close fa fa-times"></i>
-                                    </div>
-                                </div>
-                            </section>
-                        </div>
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 sort_panel">
-                            <section class="box">
-                                <div class="panel_header">
-                                    <div class="col-sm-5 col-sm-offset-1">
-                                        <input type="email" name="user_email">
-                                    </div>
-                                    <div class="col-sm-5">
-                                        <input type="text" name="user_name">
-                                    </div>
-                                    <div class="actions panel_actions pull-right col-sm-1">
-                                        <i class="box_close fa fa-times"></i>
-                                    </div>
-                                </div>
-                            </section>
-                        </div>
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 sort_panel">
-                            <section class="box">
-                                <div class="panel_header">
-                                    <div class="col-sm-5 col-sm-offset-1">
-                                        <input type="email" name="user_email">
-                                    </div>
-                                    <div class="col-sm-5">
-                                        <input type="text" name="user_name">
-                                    </div>
-                                    <div class="actions panel_actions pull-right col-sm-1">
-                                        <i class="box_close fa fa-times"></i>
-                                    </div>
-                                </div>
-                            </section>
-                        </div>
-                    </div>
-                    <div class="col-sm-12"  id="add-input-field">
-                        <div class="col-sm-10 col-sm-offset-1">
-                            <span class="futura-medium" style="font-size: 16px">
-                                <i class="fas fa-plus"></i>
-                            </span>
-                            <a href="#" id="add-user-field-btn">Add another</a>
-                            or
-                            <a href="#invite-bulk-modal" id="bulk-user-field-btn" data-toggle="modal">add many at once</a>
-                        </div>
-                    </div>
-                    <div class="col-sm-12" id="security-group-field">
-                        <div class="col-sm-10 col-sm-offset-1" style="font-size: 18px;">
-                            <p class="futura-medium">Security Groups</p>
-                            <div class="form-group">
-                                <label class="form-label futura-medium" style="font-size: 15px;">New members will have access to the meter data in the selected groups</label>
-                                <select id="group-list" multiple name="group_list">
-                                    {% for group in groups %}
-                                        <option value="{{ group.id }}">{{ group.name }}</option>
-                                    {% endfor %}
-                                </select>
+                </div>
+                <div class="col-sm-10 col-sm-offset-1">
+                    <form action="{{ url_for('SavvyRegisterInvitationUserDBView.bulk_invite') }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="row">
+                            <div class="form-group col-sm-12">
+                                <label class="control-label" for="fullname">Your Full Name</label>
+                                <input type="text" id="fullname"  class="form-control" name="fullname" placeholder="Full Name">
                             </div>
                         </div>
-                    </div>
-                    <div class="col-sm-12">
-                        <div class="col-sm-10 col-sm-offset-1">
-                            <a data-toggle="modal" href="#invite-done-modal"><button type="submit" class="savvy-btn savvy-submit-btn pull-right" id="send-invite-btn">Send Invitation</button></a>
+                        <div class="row">
+                            <div class="form-group col-sm-7">
+                                <label class="control-label" for="position">Your Full Name</label>
+                                <input type="text" id="position" class="form-control" name="position" placeholder="Your position for this Workspace">
+                            </div>
+                            <div class="form-group col-sm-5">
+                                <label class="control-label" for="linkedin">LinkedIn</label>
+                                <input type="text" id="linkedin" class="form-control" name="linkedin" placeholder="URL link">
+                            </div>
                         </div>
-                    </div>
-                </form>
+                        <div class="row">
+                            <div class="form-group col-sm-3">
+                                <label class="control-label" for="mobile-no">Mobile</label>
+                                <input type="text" id="mobile-no" class="form-control" name="mobile" placeholder="Phone">
+                            </div>
+                            <div class="form-group col-sm-3">
+                                <label class="control-label" for="email">Email</label>
+                                <input type="text" id="email" class="form-control" name="email" placeholder="Email">
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label class="control-label" for="filepath">Upload a scan of your drivers licence</label>
+                                <div class="input-group">
+                                   <input type="text" id="filepath" class="form-control" name="filepath" aria-describedby="filepath-addon" placeholder="This is just to confirm your identify" onclick="document.getElementById('file').click()">
+                                   <span class="input-group-addon" id="filepath-addon"><i class="fa fa-cloud-upload" style="font-family: 'FontAwesome';"></i></span>
+                                </div>
+                                <input type="file" id="file" class="hide" onchange="document.getElementById('filepath').value=this.value">
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-    </div>
+</div>

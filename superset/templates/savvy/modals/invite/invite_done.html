@@ -1,9 +1,12 @@
 <div class="modal fade" id="invite-done-modal">
     <div class="modal-dialog animated fadeInLeft">
-        <div class="modal-content">
+        <div class="loading-content">
+            <img src="{{ url_for('static', filename='assets/savvybi/images/loading.gif') }}">
+        </div>
+        <div class="modal-content hide">
             <div class="modal-header">
                 <p class="title">Your invitation has been sent</p>
-                <p>You've invited <span class="futura-medium">1 Member</span> to Workspace</p>
+                <p>You've invited <span class="futura-medium invited-user-count"></span> to Workspace</p>
             </div>
             <div class="modal-body">
                 <div class="col-sm-12">
@@ -14,10 +17,6 @@
                                 <th>Full Name</th>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>Mr.example@my.com</td>
-                                    <td>Mr example</td>
-                                </tr>
                             </tbody>
                         </table>
                     </div>

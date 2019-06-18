@@ -2,7 +2,7 @@ import json
 import logging
 import time
 
-from flask import flash, redirect, url_for, g, request
+from flask import flash, redirect, url_for, g, request, make_response
 from flask_babel import lazy_gettext
 from flask_mail import Mail, Message
 from flask_login import login_user
@@ -266,10 +266,14 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
         msg = Message()
         msg.subject = self.email_subject
         url = self.appbuilder.sm.get_url_for_invitation(register_user.registration_hash)
+        org_owner = self.appbuilder.session.query(SavvyUser).filter_by(id=g.user.id).first()
+        title = '{org_owner_firstname} {org_owner_lastname} inviting you to join him at {workspace}'.format(org_owner_firstname=org_owner.first_name.upper(),
+                                                                                                            org_owner_lastname=org_owner.last_name.upper(),
+                                                                                                            workspace=register_user.organization)
         msg.html = self.render_template(self.email_template,
                                         url=url,
-                                        first_name=register_user.first_name,
-                                        last_name=register_user.last_name)
+                                        title=title
+                                        )
         msg.recipients = [register_user.email]
         try:
             mail.send(msg)
@@ -355,10 +359,43 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
     def bulk_invite(self):
         email_list = request.form.getlist('user_email')
         name_list = request.form.getlist('user_name')
-        user_type = request.form['user_type']
-        group_list = request.form['group_list']
+        role = request.form['user_type']
+        group = request.form['group_list'][0]
 
-        return json.dumps({'status': 'OK', 'users': email_list, 'group': group_list})
+        user_id = g.user.id
+        failed_users = []
+        succeed_users = []
+        organization = self.appbuilder.sm.find_org(user_id=user_id)
+
+        for index, email in enumerate(email_list):
+            if email == "" or  email is None:
+                continue
+            fullname = name_list[index]
+            first_name = fullname.split(' ')[0]
+            last_name = fullname.split(' ')[1]
+
+            try:
+                reg_user = self.appbuilder.sm.add_invite_register_user(email=email,
+                                                                       organization=organization,
+                                                                       first_name=first_name,
+                                                                       last_name=last_name,
+                                                                       role=role,
+                                                                       group=group,
+                                                                       inviter=user_id)
+                if reg_user:
+                    if self.send_email(reg_user):
+                        succeed_users.append({'email': email, 'name': fullname})
+                    else:
+                        failed_users.append({'email': email, 'name': fullname})
+            except Exception as e:
+                logging.error(e)
+                failed_users.append({'email': email, 'name': fullname})
+
+        if len(failed_users) > 0:
+            return json.dumps({'status': 'failed',
+                               'failed_users': failed_users,
+                               'success_users': succeed_users})
+        return json.dumps({'status': 'success', 'users': succeed_users})
 
 
 class SavvyBIAuthDBView(AuthDBView):
@@ -541,9 +578,11 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
             url = url + "?login=True"
         else:
             url = url + "?login=False"
+
+        title = 'You\'ve created {workspace}'.format(workspace=register_user.organization)
         msg.html = self.render_template(self.email_template,
                                         url=url,
-                                        workspace=register_user.organization)
+                                        title=title)
         msg.recipients = [register_user.email]
         try:
             mail.send(msg)
@@ -568,7 +607,8 @@ class SavvyRegisterInviteView(BaseRegisterUser):
         msg.subject = self.email_subject
         url = url_for('.activate', _external=True, invitation_hash=register_user.registration_hash)
         msg.html = self.render_template(self.email_template,
-                                        url=url)
+                                        url=url,
+                                        title=register_user.organization)
         msg.recipients = [register_user.email]
         try:
             mail.send(msg)
