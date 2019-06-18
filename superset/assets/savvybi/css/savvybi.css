@@ -1141,14 +1141,7 @@
 .modal-section #group-index-modal .modal-body .description{
     font-size: 20px;
 }
-.modal-section #group-index-modal .modal-body a {
-    position: absolute;
-    bottom: 0;
-    font-size: 14px;
-}
-.modal-section #group-index-modal .modal-body a i{
-    font-size: 50px;
-}
+
 .modal-section #nmi-setup-modal .modal-dialog .modal-content{
     padding-top: 100px;
 }
@@ -1209,13 +1202,9 @@
     font-size: 18px;
     color: #34495E;
 }
-.modal-section #nmi-setup-modal .modal-body a.arrow-btn span{
-    float: right;
-    font-size: 14px;
-}
-.modal-section #nmi-setup-modal .modal-body a.arrow-btn i{
-    font-size: 50px;
-    float: right;
+
+.modal-section #nmi-setup-modal .modal-body a.next-dialog-btn{
+    position: relative;
 }
 
 .modal-section #create-group-modal .modal-header{
@@ -1284,15 +1273,20 @@
 .modal-section #bav-index-modal .modal-body .description{
     font-size: 20px;
 }
-.modal-section #bav-index-modal .modal-body a {
+
+.modal-section .modal-body a.next-dialog-btn{
     position: absolute;
     bottom: 0;
     font-size: 14px;
 }
-.modal-section #bav-index-modal .modal-body a i{
-    font-size: 50px;
+.modal-section .modal-body a.next-dialog-btn span{
+    float: right;
+    padding-right: 10px;
 }
-
+.modal-section .modal-body a.next-dialog-btn i{
+    font-size: 50px;
+    float: right;
+}
 .modal-section .modal-dialog .modal-content .modal-header button.back{
     background: 0 0;
     border: 0;
@@ -1336,6 +1330,15 @@
     z-index: 1000;
     background: transparent;
     border: none;
+}
+.modal-section #bav-profile-modal #save-later-btn{
+    width: 200px;
+    height: 40px;
+    font-size: 15px;
+}
+.modal-section #bav-profile-modal a.next-dialog-btn{
+    position: relative;
+    bottom: 10px;
 }
 
 .select2-container-multi .select2-choices .select2-search-field input{
