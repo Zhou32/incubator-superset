@@ -3,7 +3,7 @@ from flask_appbuilder import BaseView
 from flask_appbuilder.views import expose
 
 from superset import appbuilder, db
-from superset.savvy.models import Group, SavvyUser, OrgRegisterUser, Organization
+from superset.savvy.models import Group, SavvyUser, OrgRegisterUser, Organization, assoc_org_user
 from superset.savvy.decorator import has_access_savvybi_admin
 
 def get_organization_name():
@@ -36,7 +36,7 @@ class AccountView(SavvybiAdminView):
         overview_values = {} # required parameters for Overview tab page in Account/About
         admin_owner_list = []  # required parameters for Admins&Owners tab page in Account/About
         bav_values = {}  # required parameters for BAV tab page in Account/About
-        role_matches = {'org_owner': 'Owner', 'org_superuser': 'Super User', 'org_user': 'Standard User', 'org_viewer': 'Viewer', 'Admin': 'Admin'}
+        role_matches = {'org_owner': 'Owner', 'org_superuser': 'Super User', 'org_user': 'Standard', 'org_viewer': 'Viewer', 'Admin': 'Admin'}
 
         user = db.session.query(SavvyUser).filter_by(id=g.user.get_id()).first()
         if user.email_confirm is True:
@@ -45,18 +45,19 @@ class AccountView(SavvybiAdminView):
             overview_values['date_created'] = organization.date_created.date()
             overview_values['meter_count'] = len(organization.sites)
 
-            for user in organization.users:
-                individual = {}
-                individual['fullname'] = "{} {}".format(user.first_name.capitalize(), user.last_name.capitalize())
-                individual['email'] = user.email
-                individual['role'] = role_matches[user.roles[0].name]
-                admin_owner_list.append(individual)
+            for org_member in organization.users:
+                if org_member != user:
+                    individual = {}
+                    individual['fullname'] = "{} {}".format(org_member.first_name.capitalize(), org_member.last_name.capitalize())
+                    individual['email'] = org_member.email
+                    individual['role'] = role_matches[org_member.roles[0].name]
+                    admin_owner_list.append(individual)
         else:
             org_register = db.session.query(OrgRegisterUser).filter_by(email=user.email).first()
             overview_values['organization'] = org_register.organization
             overview_values['date_created'] = org_register.registration_date.date()
             overview_values['meter_count'] = 0
-            admin_owner_list['users'] = []
+            admin_owner_list = None
 
         username = '{} {}'.format(user.first_name, user.last_name)
         return self.render_template(
@@ -100,7 +101,7 @@ class AdministrationView(SavvybiAdminView):
         overview_values = {}  # required parameters for 'Overview' tab page in Administration/Members
         member_list = []  # required parameters for 'Members List' tab page in Administration/Members
         bav_values = {}  # required parameters for 'Access Logs' tab page in Administration/Members
-        role_matches = {'org_owner': 'Owner', 'org_superuser': 'Super User', 'org_user': 'Standard User',
+        role_matches = {'org_owner': 'Owner', 'org_superuser': 'Super User', 'org_user': 'Standard',
                         'org_viewer': 'Viewer', 'Admin': 'Admin'}
 
         user = db.session.query(SavvyUser).filter_by(id=g.user.get_id()).first()
@@ -111,28 +112,32 @@ class AdministrationView(SavvybiAdminView):
             overview_values['date_created'] = organization.date_created.date()
             overview_values['group_count'] = len(groups)
 
-            for user in organization.users:
-                individual = {}
-                individual['fullname'] = "{} {}".format(user.first_name.capitalize(), user.last_name.capitalize())
-                individual['email'] = user.email
-                individual['role'] = role_matches[user.roles[0].name]
-                member_list.append(individual)
+            for org_member in organization.users:
+                if org_member != user:
+                    individual = {}
+                    groups = org_member.groups
+                    individual['fullname'] = "{} {}".format(org_member.first_name.capitalize(), org_member.last_name.capitalize())
+                    individual['email'] = org_member.email
+                    individual['role'] = role_matches[org_member.roles[0].name]
+                    individual['groups'] = groups
+                    member_list.append(individual)
 
-            overview_values['member_count'] = len(member_list)-1 # Count members except owner himself
+            overview_values['member_count'] = len(member_list)
         else:
             org_register = db.session.query(OrgRegisterUser).filter_by(email=user.email).first()
             overview_values['organization'] = org_register.organization
             overview_values['date_created'] = org_register.registration_date.date()
             overview_values['group_count'] = 0
             overview_values['member_count'] = 0
-            member_list['users'] = []
+            member_list = None
 
         username = '{} {}'.format(user.first_name, user.last_name)
 
         return self.render_template(
             'savvy/admin/members.html',
             workspace=get_organization_name().capitalize(),
-            overview=overview_values
+            overview=overview_values,
+            members=member_list
         )
 
     @expose('/invitation')

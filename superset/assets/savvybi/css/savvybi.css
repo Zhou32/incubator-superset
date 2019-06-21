@@ -746,6 +746,12 @@
     font-family: "Futura PT Medium";
     color: #34495E;
 }
+#billing-div #payment #add-card-btn{
+    float: right;
+    width: 140px;
+    height: 36px;
+    font-size: 15px;
+}
 
 .futura-medium{
     font-family: 'Futura PT Medium';
