@@ -33,18 +33,6 @@ class AccountView(SavvybiAdminView):
     @expose('/about')
     @has_access_savvybi_admin
     def about(self):
-        if not g.user or not g.user.get_id():
-            return redirect(appbuilder.get_url_for_login)
-
-        is_orgowner = False
-        for role in g.user.roles:
-            if role.name == 'org_owner':
-                is_orgowner = True
-                break
-        if is_orgowner is False:
-            flash('Access is denied. Only organization owner can access it.', 'info')
-            return redirect(appbuilder.get_url_for_index)
-
         overview_values = {} # required parameters for Overview tab page in Account/About
         admin_owner_list = []  # required parameters for Admins&Owners tab page in Account/About
         bav_values = {}  # required parameters for BAV tab page in Account/About
@@ -109,12 +97,42 @@ class AdministrationView(SavvybiAdminView):
     @expose('/members')
     @has_access_savvybi_admin
     def members(self):
+        overview_values = {}  # required parameters for 'Overview' tab page in Administration/Members
+        member_list = []  # required parameters for 'Members List' tab page in Administration/Members
+        bav_values = {}  # required parameters for 'Access Logs' tab page in Administration/Members
+        role_matches = {'org_owner': 'Owner', 'org_superuser': 'Super User', 'org_user': 'Standard User',
+                        'org_viewer': 'Viewer', 'Admin': 'Admin'}
+
         user = db.session.query(SavvyUser).filter_by(id=g.user.get_id()).first()
+        if user.email_confirm is True:
+            organization = db.session.query(Organization).filter(Organization.users.any(id=user.id)).scalar()
+            groups = db.session.query(Group).filter_by(organization_id=organization.id).all()
+            overview_values['organization'] = organization.organization_name
+            overview_values['date_created'] = organization.date_created.date()
+            overview_values['group_count'] = len(groups)
+
+            for user in organization.users:
+                individual = {}
+                individual['fullname'] = "{} {}".format(user.first_name.capitalize(), user.last_name.capitalize())
+                individual['email'] = user.email
+                individual['role'] = role_matches[user.roles[0].name]
+                member_list.append(individual)
+
+            overview_values['member_count'] = len(member_list)-1 # Count members except owner himself
+        else:
+            org_register = db.session.query(OrgRegisterUser).filter_by(email=user.email).first()
+            overview_values['organization'] = org_register.organization
+            overview_values['date_created'] = org_register.registration_date.date()
+            overview_values['group_count'] = 0
+            overview_values['member_count'] = 0
+            member_list['users'] = []
+
         username = '{} {}'.format(user.first_name, user.last_name)
+
         return self.render_template(
             'savvy/admin/members.html',
             workspace=get_organization_name().capitalize(),
-            username=username
+            overview=overview_values
         )
 
     @expose('/invitation')
