@@ -759,7 +759,9 @@
     color: #079493;
     font-family: 'Futura PT Medium';
 }
-
+.animated{
+    animation-duration: 1s
+}
 .fade{
     transition: opacity 1s linear !important;
 }

@@ -199,6 +199,23 @@
                     })
                 });
 
+                $('.modal').on('shown.bs.modal', function () {
+                    $('body').addClass('modal-open');
+                    // BS adds some padding-right to acomodate the scrollbar at right
+                    $('body').removeAttr('style');
+                })
+                $(".modal [data-dismiss='modal']").click(function(event){
+                    event.preventDefault();
+                    if($(this).attr('data-toggle')!=null){
+                        var modal_id = $(this).attr('href');
+                        alert($(modal_id).attr('class'));
+                        $(modal_id).modal('hide');
+                        setTimeout(function(){
+                            $(this).closest(".modal").removeClass('in').modal('hide');
+                        }, 3000);
+                    }
+
+                });
                 $('.modal').on('hidden.bs.modal', function () {
                     $(this).find('input').val('');
                     $(this).find('textarea').val('');

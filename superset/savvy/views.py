@@ -267,8 +267,8 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
         msg.subject = self.email_subject
         url = self.appbuilder.sm.get_url_for_invitation(register_user.registration_hash)
         org_owner = self.appbuilder.session.query(SavvyUser).filter_by(id=g.user.id).first()
-        title = '{org_owner_firstname} {org_owner_lastname} inviting you to join him at {workspace}'.format(org_owner_firstname=org_owner.first_name.upper(),
-                                                                                                            org_owner_lastname=org_owner.last_name.upper(),
+        title = '{org_owner_firstname} {org_owner_lastname} inviting you to join him at {workspace}'.format(org_owner_firstname=org_owner.first_name.capitalize(),
+                                                                                                            org_owner_lastname=org_owner.last_name.capitalize(),
                                                                                                             workspace=register_user.organization)
         msg.html = self.render_template(self.email_template,
                                         url=url,
@@ -464,7 +464,7 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
         self.appbuilder.get_session.commit()
 
         org_reg = self.appbuilder.sm.add_org(reg, user)
-        self.handle_aws_info(org_reg, user)
+        # self.handle_aws_info(org_reg, user)
         self.appbuilder.sm.del_register_user(reg)
         if request.args.get('login') == 'True':
             if user.login_count is None or user.login_count==0:
@@ -733,8 +733,8 @@ class SavvySiteModelView(ModelView):
     add_form = CSVToSitesForm
     add_columns = ['org', 'csv_file']
 
-    # base_filters = [['SiteID', FilterInFunction, get_site_id_list_from_org],
-    #                 ['SiteID', FilterInFunction, get_site_id_list_from_group]]
+    base_filters = [['SiteID', FilterInFunction, get_site_id_list_from_org]]
+                    # ['SiteID', FilterInFunction, get_site_id_list_from_group]]
 
     def get_select_widget(self, filters,
                          actions=None,

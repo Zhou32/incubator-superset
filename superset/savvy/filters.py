@@ -18,6 +18,8 @@ def get_site_id_list_from_org():
     org = db.session.query(Organization).filter(Organization.users.any(id=g.user.id)).first()
     for i in org.sites:
         all_site_id.append(i.SiteID)
+    print("All Sties")
+    print(all_site_id)
     return all_site_id
 
 
