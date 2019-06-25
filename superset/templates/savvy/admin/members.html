@@ -57,12 +57,12 @@
               </div>
               <div class="content">
                   <div class="search-bar">
-                      <div class="input-group transparent pull-left">
-                          <span class="input-group-addon">
-                              <i class="fas fa-search"></i>
-                          </span>
-                          <input class="form-control transparent" type="text" placeholder="Search NMI's">
-                      </div>
+{#                      <div class="input-group transparent pull-left">#}
+{#                          <span class="input-group-addon">#}
+{#                              <i class="fas fa-search"></i>#}
+{#                          </span>#}
+{#                          <input class="form-control transparent" type="text" placeholder="Search NMI's">#}
+{#                      </div>#}
                       <div class="btn-group pull-right">
                           <div class="dropdown">
                               <button id="group-filter" class="savvy-btn savvy-default-btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -121,6 +121,7 @@
                                           {{ group.group_name }}&nbsp;
                                       {% endfor %}
                                   </td>
+
                                   <td>{{ member.role }}</td>
                                   <td>
                                       <div class="dropdown edit-member-menu">

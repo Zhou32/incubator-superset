@@ -120,7 +120,8 @@ class AdministrationView(SavvybiAdminView):
                     individual['email'] = org_member.email
                     individual['role'] = role_matches[org_member.roles[0].name]
                     individual['groups'] = groups
-                    member_list.append(individual)
+                    for i in range(0,70):
+                        member_list.append(individual)
 
             overview_values['member_count'] = len(member_list)
         else:

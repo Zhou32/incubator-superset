@@ -2839,18 +2839,23 @@
 		var language = settings.oLanguage;
 		var previousSearch = settings.oPreviousSearch;
 		var features = settings.aanFeatures;
-		var input = '<input type="search" class="'+classes.sFilterInput+'"/>';
+		var searchIcon = `<span class="input-group-addon">
+                              <i class="fas fa-search"></i>
+                          </span>`;
+		var input = '<input type="search" class="transparent '+classes.sFilterInput+'"/>';
 	
-		var str = language.sSearch;
-		str = str.match(/_INPUT_/) ?
-			str.replace('_INPUT_', input) :
-			str+input;
+		// var str = language.sSearch;
+		// str = str.match(/_INPUT_/) ?
+		// 	str.replace('_INPUT_', input) :
+		// 	str+input;
+		var str = searchIcon+input;
+
 	
 		var filter = $('<div/>', {
 				'id': ! features.f ? tableId+'_filter' : null,
-				'class': classes.sFilter
+				'class': classes.sFilter + ' input-group transparent'
 			} )
-			.append( $('<label/>' ).append( str ) );
+			.append( str );
 	
 		var searchFn = function() {
 			/* Update all other filter input elements for the new display */
@@ -11585,7 +11590,7 @@
 			 *  @dtopt Language
 			 *  @name DataTable.defaults.language.searchPlaceholder
 			 */
-			"sSearchPlaceholder": "",
+			"sSearchPlaceholder": "Search NMI's",
 	
 	
 			/**

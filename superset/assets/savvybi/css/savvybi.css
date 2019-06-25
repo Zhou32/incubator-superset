@@ -1404,3 +1404,18 @@
     font-family: "Futura PT Light";
     color: black;
 }
+
+#savvy-content .dataTables_wrapper .dataTables_filter{
+    width: 670px;
+    height: 30px;
+    border-radius: 5px;
+    border-color: #34495E;
+    color: #34495E;
+    padding-right: 2px;
+    padding-left: 2px;
+    position: relative;
+    top: -30px;
+}
+#savvy-content .dataTables_wrapper .dataTables_filter input{
+    margin-left: 0;
+}
