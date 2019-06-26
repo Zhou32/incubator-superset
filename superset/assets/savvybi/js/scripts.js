@@ -1551,7 +1551,7 @@ jQuery(function($) {
 
             /*--- start ---*/
 
-            $("#members-data").dataTable({
+            $("#savvy-content .dataTable").dataTable({
                 responsive: true,
                 aLengthMenu: [
                     [10, 25, 50, 100, -1],
@@ -1560,14 +1560,6 @@ jQuery(function($) {
             });
 
             /*--- end ---*/
-
-            /*--- start ---*/
-
-            $('#example-4').dataTable();
-
-            /*--- end ---*/
-
-
 
             /* Set the defaults for DataTables initialisation */
             $.extend(true, $.fn.dataTable.defaults, {

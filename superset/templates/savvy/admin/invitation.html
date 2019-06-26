@@ -27,12 +27,12 @@
               </div>
               <div class="content">
                   <div class="search-bar">
-                      <div class="input-group transparent pull-left">
-                          <span class="input-group-addon">
-                              <i class="fas fa-search"></i>
-                          </span>
-                          <input class="form-control transparent" type="text" placeholder="Search NMI's">
-                      </div>
+{#                      <div class="input-group transparent pull-left">#}
+{#                          <span class="input-group-addon">#}
+{#                              <i class="fas fa-search"></i>#}
+{#                          </span>#}
+{#                          <input class="form-control transparent" type="text" placeholder="Search NMI's">#}
+{#                      </div>#}
                       <div class="btn-group pull-right">
                           <div class="dropdown">
                               <button id="group-filter" class="savvy-btn savvy-default-btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -64,56 +64,42 @@
                       <div class="clearfix"></div>
                   </div>
                   <div class="invited-users">
-                      <div class="user row">
-                          <div class="col-sm-5">
-                              <span class="username">James</span><br/>
-                              <span class="email">James@wayne.com</span>
-                          </div>
-                          <div class="col-sm-4 invite-date">
-                              1/21/19
-                          </div>
-                          <div class="col-sm-3">
-                              <div class="col-sm-9">
-                                  <div>Invited by</div>
-                                  <span class="owner">Bruce Wayne</span>
-                              </div>
-                              <div class="col-sm-3">
-                                  <a href="#" onclick="toggleButtons(event);">
-                                      <i class="fas fa-caret-right"></i>
-                                      <i class="fas fa-caret-down hide"></i>
-                                  </a>
-                              </div>
-                          </div>
-                          <div class="col-sm-12 button-div hide">
-                              <button class="savvy-btn savvy-default-btn">Revoke</button>
-                              <button class="savvy-btn savvy-default-btn">Re-send</button>
-                          </div>
-                      </div>
-                      <div class="user row">
-                          <div class="col-sm-5">
-                              <span class="username">James</span><br/>
-                              <span class="email">James@wayne.com</span>
-                          </div>
-                          <div class="col-sm-4 invite-date">
-                              1/21/19
-                          </div>
-                          <div class="col-sm-3">
-                              <div class="col-sm-9">
-                                  <div>Invited by</div>
-                                  <span class="owner">Bruce Wayne</span>
-                              </div>
-                              <div class="col-sm-3">
-                                  <a href="#" onclick="toggleButtons(event);">
-                                      <i class="fas fa-caret-right"></i>
-                                      <i class="fas fa-caret-down hide"></i>
-                                  </a>
-                              </div>
-                          </div>
-                          <div class="col-sm-12 button-div hide">
-                              <button class="savvy-btn savvy-default-btn">Revoke</button>
-                              <button class="savvy-btn savvy-default-btn">Re-send</button>
-                          </div>
-                      </div>
+                      <table class="table table-striped dataTable user" id="pending-invite-table" width="100%">
+                          <thead>
+                              <tr>
+                              <th></th>
+                              <th></th>
+                              <th></th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <tr>
+                                  <td class="col-sm-5">
+                                      <span class="username">James</span><br/>
+                                      <span class="email">James@wayne.com</span><p/>
+                                      <div class="button-div hide">
+                                          <button class="savvy-btn savvy-default-btn">Revoke</button>
+                                          <button class="savvy-btn savvy-default-btn">Re-send</button>
+                                      </div>
+                                  </td>
+                                  <td class="invite-date col-sm-4">
+                                      1/21/19
+                                  </td>
+                                  <td>
+                                      <div class="col-sm-10">
+                                          <div>Invited by</div>
+                                          <span class="owner">Bruce Wayne</span>
+                                      </div>
+                                      <div class="pull-right">
+                                          <a href="#" onclick="toggleButtons(event);">
+                                              <i class="fas fa-caret-right"></i>
+                                              <i class="fas fa-caret-down hide"></i>
+                                          </a>
+                                      </div>
+                                  </td>
+                              </tr>
+                          </tbody>
+                      </table>
                   </div>
               </div>
           </div>
@@ -130,12 +116,12 @@
               </div>
               <div class="content">
                   <div class="search-bar">
-                      <div class="input-group transparent pull-left">
-                          <span class="input-group-addon">
-                              <i class="fas fa-search"></i>
-                          </span>
-                          <input class="form-control transparent" type="text" placeholder="Search NMI's">
-                      </div>
+{#                      <div class="input-group transparent pull-left">#}
+{#                          <span class="input-group-addon">#}
+{#                              <i class="fas fa-search"></i>#}
+{#                          </span>#}
+{#                          <input class="form-control transparent" type="text" placeholder="Search NMI's">#}
+{#                      </div>#}
                       <div class="btn-group pull-right">
                           <div class="dropdown">
                               <button id="group-filter" class="savvy-btn savvy-default-btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -177,56 +163,42 @@
                       <div class="clearfix"></div>
                   </div>
                   <div class="invited-users">
-                      <div class="user row">
-                          <div class="col-sm-5">
-                              <span class="username">James</span><br/>
-                              <span class="email">James@wayne.com</span>
-                          </div>
-                          <div class="col-sm-4 invite-date">
-                              1/21/19
-                          </div>
-                          <div class="col-sm-3">
-                              <div class="col-sm-9">
-                                  <div>Invited by</div>
-                                  <span class="owner">Bruce Wayne</span>
-                              </div>
-                              <div class="col-sm-3">
-                                  <a href="#" onclick="toggleButtons(event);">
-                                      <i class="fas fa-caret-right"></i>
-                                      <i class="fas fa-caret-down hide"></i>
-                                  </a>
-                              </div>
-                          </div>
-                          <div class="col-sm-12 button-div hide">
-                              <button class="savvy-btn savvy-default-btn">Revoke</button>
-                              <button class="savvy-btn savvy-default-btn">Re-send</button>
-                          </div>
-                      </div>
-                      <div class="user row">
-                          <div class="col-sm-5">
-                              <span class="username">James</span><br/>
-                              <span class="email">James@wayne.com</span>
-                          </div>
-                          <div class="col-sm-4 invite-date">
-                              1/21/19
-                          </div>
-                          <div class="col-sm-3">
-                              <div class="col-sm-9">
-                                  <div>Invited by</div>
-                                  <span class="owner">Bruce Wayne</span>
-                              </div>
-                              <div class="col-sm-3">
-                                  <a href="#" onclick="toggleButtons(event);">
-                                      <i class="fas fa-caret-right"></i>
-                                      <i class="fas fa-caret-down hide"></i>
-                                  </a>
-                              </div>
-                          </div>
-                          <div class="col-sm-12 button-div hide">
-                              <button class="savvy-btn savvy-default-btn">Revoke</button>
-                              <button class="savvy-btn savvy-default-btn">Re-send</button>
-                          </div>
-                      </div>
+                      <table class="table table-striped dataTable user" id="accepted-invite-table" width="100%">
+                          <thead>
+                              <tr>
+                              <th></th>
+                              <th></th>
+                              <th></th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <tr>
+                                  <td class="col-sm-5">
+                                      <span class="username">James</span><br/>
+                                      <span class="email">James@wayne.com</span><p/>
+                                      <div class="button-div hide">
+                                          <button class="savvy-btn savvy-default-btn">Revoke</button>
+                                          <button class="savvy-btn savvy-default-btn">Re-send</button>
+                                      </div>
+                                  </td>
+                                  <td class="invite-date col-sm-4">
+                                      1/21/19
+                                  </td>
+                                  <td>
+                                      <div class="col-sm-10">
+                                          <div>Invited by</div>
+                                          <span class="owner">Bruce Wayne</span>
+                                      </div>
+                                      <div class="pull-right">
+                                          <a href="#" onclick="toggleButtons(event);">
+                                              <i class="fas fa-caret-right"></i>
+                                              <i class="fas fa-caret-down hide"></i>
+                                          </a>
+                                      </div>
+                                  </td>
+                              </tr>
+                          </tbody>
+                      </table>
                   </div>
               </div>
         </div>
@@ -257,7 +229,7 @@
         function toggleButtons(e){
             var _this = $(e.target).parent('a');
             _this.children('i').toggleClass('hide');
-            _this.parent('div').parent('div').siblings('.button-div').toggleClass('hide');
+            _this.parent('div').parent('td').siblings('td').children('.button-div').toggleClass('hide');
         }
     </script>
 {% endblock %}
