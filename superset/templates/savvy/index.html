@@ -12,7 +12,7 @@
         <meta content="" name="description" />
         <meta content="" name="author" />
 
-        <link rel="shortcut icon" href="{{ url_for('static', filename='assets/savvybi/images/favicon.png') }}" type="image/x-icon" />    <!-- Favicon -->
+        <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.png') }}" type="image/x-icon" />    <!-- Favicon -->
 
         {% block css_import %}
         <!-- CORE CSS FRAMEWORK - START -->
@@ -41,7 +41,9 @@
     <body>
         <!-- START TOPBAR -->
         {% block topbar %}
-            {% include 'savvy/navbar.html' %}
+            <div class="admin-header">
+                {% include 'savvy/navbar.html' %}
+            </div>
         {% endblock %}
         <!-- END TOPBAR -->
         <!-- START CONTAINER -->

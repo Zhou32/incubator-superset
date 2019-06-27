@@ -154,10 +154,23 @@ class AdministrationView(SavvybiAdminView):
             elem['name'] = group.group_name
             group_list.append(elem)
 
+        registers = db.session.query(OrgRegisterUser).filter_by(organization=organization.organization_name).all()
+        pending_invites = []
+        for register in registers:
+            row = {}
+            row['fullname'] = "{} {}".format(register.first_name, register.last_name)
+            row['email'] = register.email
+            row['invite_date'] = register.registration_date
+            row['id'] = register.id
+            inviter = db.session.query(SavvyUser).filter_by(id=register.inviter_id).first()
+            row['inviter'] = "{} {}".format(inviter.first_name, inviter.last_name)
+            pending_invites.append(row)
+
         return self.render_template(
             'savvy/admin/invitation.html',
-            workspace = get_organization_name().capitalize(),
-            groups= group_list
+            workspace=get_organization_name().capitalize(),
+            groups=group_list,
+            pending_invites=pending_invites
         )
 
     @expose('/data')

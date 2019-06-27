@@ -132,6 +132,7 @@ class MeterDataView(BaseView):
             organization=org_name.capitalize(),
             username=username,
             link=later_link,
+            page='connect_meter'
         )
 
 

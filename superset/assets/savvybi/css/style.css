@@ -378,13 +378,19 @@ a:hover, a:focus {
     max-height: 70px;
 }
 .page-topbar .logo-area {
-    width: 270px;
-    background-color: white;
     display: block;
     min-height: 70px;
     float: left;
 }
-.page-topbar .logo-area img{
+.admin-header .page-topbar .logo-area {
+    width: 270px;
+    background-color: white;
+}
+.welcome-header .page-topbar .logo-area {
+    width: 70px;
+    background-color: #203539;
+}
+.admin-header .page-topbar .logo-area img{
     position: relative;
     left: 25px;
     top: 10px;
@@ -4796,7 +4802,6 @@ code {
 
 .page-container{
     padding-left: 270px;
-    margin-top: 70px;
 }
 .page-container.sidebar_shift{
     padding-left: 60px;

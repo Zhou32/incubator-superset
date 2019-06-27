@@ -1,6 +1,13 @@
-<div class='page-topbar '>
+<div class='page-topbar'>
     <div class='logo-area'>
-        <img src="{{ url_for('static', filename='assets/savvybi/images/logo.png') }}" width="200px" height="50px">
+        {% if page %}
+            {% if page == 'connect_meter' %}
+                <img src="{{ url_for('static', filename='assets/savvybi/images/SavvyBI-Logo-Revise.png') }}" width="70px" height="70px">
+{#              {% elif page == 'homepage' %}#}
+            {% endif %}
+        {% else %}
+            <img src="{{ url_for('static', filename='assets/savvybi/images/logo.png') }}" width="200px" height="50px">
+        {% endif %}
     </div>
     <div class='quick-area'>
 {#                <div class='pull-left'>#}
@@ -15,7 +22,7 @@
 {#                </div>#}
         <div class='pull-right'>
             <ul class="info-menu right-links list-inline list-unstyled">
-                <li class="notify-toggle-wrapper">
+                <li class="notify-toggle-wrapper showopacity">
                     <a href="#" data-toggle="dropdown" class="toggle">
                         <i class="far fa-bell"></i>
                         <span class="badge badge-orange">3</span>
@@ -132,7 +139,7 @@
                         </li>
                     </ul>
                 </li>
-                <li class="profile">
+                <li class="profile showopacity">
                     <a href="#" data-toggle="dropdown" class="toggle">
                         <i class="fa fa-gear"></i>
                     </a>
@@ -166,5 +173,4 @@
             </ul>
         </div>
     </div>
-
 </div>
