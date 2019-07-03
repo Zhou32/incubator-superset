@@ -1,0 +1,36 @@
+{% extends 'savvy/base.html' %}
+
+{% block topbar %}
+    <div class="dashboard-header">
+        {% include 'savvy/navbar.html' %}
+    </div>
+{% endblock %}
+
+{% block container %}
+    <div class="page-container row-fluid sidebar_shift" id="savvy-content">
+        {% include 'savvy/sidebar.html' %}
+
+        <section id="main-content">
+            <section class="wrapper main-wrapper" style=''>
+            {% block main_content %}
+            {% endblock %}
+            </section>
+        </section>
+
+        <div class="modal-section">
+            {% block dialogs %}
+            {% endblock %}
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block js_import %}
+    {{ super() }}
+    <script>
+        $('.page-sidebar.collapseit .wraplist li a').click(function(){
+            $('.page-sidebar.collapseit .wraplist li a').removeClass('active')
+            $(this).addClass('active');
+        })
+    </script>
+{% endblock %}

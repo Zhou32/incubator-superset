@@ -24,11 +24,22 @@ def get_user_fullname():
 
 class SavvybiAdminView(BaseView):
     route_base = "/admin"
+    page_name = "admin"
 
     @expose('/')
     @has_access_savvybi_admin
     def index(self):
         return redirect(url_for('AccountView.about'))
+
+
+class SavvybiDashboardView(BaseView):
+    route_base = "/dashboard"
+    page_name = "dashboard"
+
+    @expose('/')
+    @has_access_savvybi_admin
+    def index(self):
+        return redirect(url_for('HomeView.index'))
 
 
 class AccountView(SavvybiAdminView):
@@ -68,7 +79,8 @@ class AccountView(SavvybiAdminView):
             'savvy/account/about.html',
             overview=overview_values,
             admin_owner=admin_owner_list,
-            username=get_user_fullname()
+            username=get_user_fullname(),
+            page_name=self.page_name
         )
 
     @expose('/profile')
@@ -77,7 +89,8 @@ class AccountView(SavvybiAdminView):
 
         return self.render_template(
             'savvy/account/profile.html',
-            username=get_user_fullname
+            username=get_user_fullname(),
+            page_name=self.page_name
         )
 
     @expose('/plan')
@@ -86,7 +99,8 @@ class AccountView(SavvybiAdminView):
 
         return self.render_template(
             'savvy/account/plan.html',
-            username=get_user_fullname()
+            username=get_user_fullname(),
+            page_name=self.page_name
         )
 
     @expose('/billing')
@@ -95,7 +109,8 @@ class AccountView(SavvybiAdminView):
 
         return self.render_template(
             'savvy/account/billing.html',
-            username=get_user_fullname()
+            username=get_user_fullname(),
+            page_name=self.page_name
         )
 
 
@@ -144,7 +159,8 @@ class AdministrationView(SavvybiAdminView):
             workspace=get_organization_name().capitalize(),
             overview=overview_values,
             members=member_list,
-            username=get_user_fullname()
+            username=get_user_fullname(),
+            page_name=self.page_name
         )
 
     @expose('/invitation')
@@ -177,7 +193,8 @@ class AdministrationView(SavvybiAdminView):
             workspace=get_organization_name().capitalize(),
             groups=group_list,
             pending_invites=pending_invites,
-            username=get_user_fullname()
+            username=get_user_fullname(),
+            page_name=self.page_name
         )
 
     @expose('/data')
@@ -186,7 +203,8 @@ class AdministrationView(SavvybiAdminView):
 
         return self.render_template(
             'savvy/admin/data.html',
-            username=get_user_fullname()
+            username=get_user_fullname(),
+            page_name=self.page_name
         )
 
     @expose('/integration')
@@ -195,10 +213,23 @@ class AdministrationView(SavvybiAdminView):
 
         return self.render_template(
             'savvy/admin/integration.html',
-            username=get_user_fullname()
+            username=get_user_fullname(),
+            page_name=self.page_name
         )
 
+
+class HomeView(SavvybiDashboardView):
+    @expose('/homepage')
+    @has_access_savvybi_admin
+    def index(self):
+        return self.render_template(
+            'savvy/dashboard/home.html',
+            username=get_user_fullname(),
+            page_name=self.page_name
+        )
 
 appbuilder.add_view_no_menu(SavvybiAdminView)
 appbuilder.add_view_no_menu(AccountView)
 appbuilder.add_view_no_menu(AdministrationView)
+appbuilder.add_view_no_menu(SavvybiDashboardView)
+appbuilder.add_view_no_menu(HomeView)

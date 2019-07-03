@@ -12,6 +12,7 @@ from superset.savvy.models import Group, Site, SavvyUser, OrgRegisterUser, Organ
 
 class MeterDataView(BaseView):
     route_base = "/superset"
+    page_name = "connect_meter"
 
     @expose('/meterdata/<string:table_id>', methods=['GET', 'POST'])
     def meter_data(self, table_id):
@@ -127,12 +128,12 @@ class MeterDataView(BaseView):
             later_link = appbuilder.get_url_for_index
         username = '{} {}'.format(user.first_name, user.last_name)
         return self.render_template(
-            'savvy/welcome.html',
+            'savvy/connect_meter.html',
             title='Superset',
             organization=org_name.capitalize(),
             username=username,
             link=later_link,
-            page='connect_meter'
+            page_name=self.page_name
         )
 
 

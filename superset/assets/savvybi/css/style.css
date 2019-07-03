@@ -385,7 +385,7 @@ a:hover, a:focus {
     width: 270px;
     background-color: white;
 }
-.welcome-header .page-topbar .logo-area {
+.meter-connect-header .page-topbar .logo-area{
     width: 70px;
     background-color: #203539;
 }
@@ -4803,12 +4803,14 @@ code {
     padding-left: 270px;
 }
 .page-container.sidebar_shift{
-    padding-left: 60px;
+    padding-left: 90px;
 }
 .page-sidebar.collapseit {
-    width: 60px;
-    margin-left: -60px;
+    width: 90px;
+    margin-left: -90px;
+    padding-top: 40px;
     z-index: 99;
+    background-color: #079493;
 }
 .page-sidebar.chat_shift {
     width: 60px;
@@ -4937,7 +4939,7 @@ code {
 */
 
 .page-sidebar.chat_shift .wraplist, .page-sidebar.collapseit .wraplist {
-    width: 60px;
+    width: 90px;
 }
 .page-sidebar.chat_shift .wraplist .sub-menu, .page-sidebar.collapseit .wraplist .sub-menu {
     display: none;
@@ -4949,7 +4951,8 @@ code {
     display: none;
 }
 .page-sidebar.chat_shift .wraplist li:hover, .page-sidebar.collapseit .wraplist li:hover {
-    background: #1fb5ac;
+    /*background: #1fb5ac;*/
+    /*color: white;*/
 }
 .page-sidebar.chat_shift .wraplist .sub-menu li:hover, .page-sidebar.collapseit .wraplist .sub-menu li:hover {
     background: transparent;
@@ -5063,10 +5066,17 @@ border-left: 3px solid transparent;
     top: 0px;
 }
 .page-sidebar.chat_shift #main-menu-wrapper .wraplist li:hover a, .page-sidebar.collapseit #main-menu-wrapper .wraplist li:hover a {
-    width: 300px;
+    /*width: 300px;*/
+    color: white;
+}
+.page-sidebar.collapseit #main-menu-wrapper .wraplist li a.active{
+    color: white;
 }
 .page-sidebar.chat_shift #main-menu-wrapper .wraplist li a, .page-sidebar.collapseit #main-menu-wrapper .wraplist li a {
     padding-left: 0px;
+    text-align: center;
+    font-size: 21px;
+    color: #CCCCCC;
 }
 .page-sidebar.chat_shift #main-menu-wrapper .wraplist li .sub-menu a, .page-sidebar.collapseit #main-menu-wrapper .wraplist li .sub-menu a {
     padding-left: 15px;

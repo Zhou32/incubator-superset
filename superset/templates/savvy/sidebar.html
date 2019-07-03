@@ -1,119 +1,143 @@
-<div class="page-sidebar collapseit">
+{% if page_name == 'admin' %}
+  <div class="page-sidebar">
+{% elif page_name == 'dashboard' %}
+  <div class="page-sidebar collapseit">
+{% endif %}
     <!-- MAIN MENU - START -->
-    <div class="page-sidebar-wrapper" id="main-menu-wrapper">
-
-        <!-- USER INFO - START -->
-        <div class="profile-info row">
-            <div class="profile-image col-md-4 col-sm-4 col-xs-4">
-                <a href="ui-profile.html">
-                    <img src="{{ url_for('static', filename='assets/savvybi/images/profile/avatar-4.png') }}" class="img-responsive img-circle">
-                </a>
-            </div>
-
-            <div class="profile-details col-md-8 col-sm-8 col-xs-8">
-                <span class="profile-title">SIGNED IN AS</span><br/>
-                <div class="profile-name futura-medium">
-                    <a href="ui-profile.html">{{ username }}</a>
-                    <!-- Available statuses: online, idle, busy, away and offline -->
-                    <span class="profile-status online"></span>
+    {% if page_name == 'admin' %}
+        <div class="page-sidebar-wrapper" id="main-menu-wrapper">
+            <!-- USER INFO - START -->
+            <div class="profile-info row">
+                <div class="profile-image col-md-4 col-sm-4 col-xs-4">
+                    <a href="ui-profile.html">
+                        <img src="{{ url_for('static', filename='assets/savvybi/images/profile/avatar-4.png') }}" class="img-responsive img-circle">
+                    </a>
                 </div>
+
+                <div class="profile-details col-md-8 col-sm-8 col-xs-8">
+                    <span class="profile-title">SIGNED IN AS</span><br/>
+                    <div class="profile-name futura-medium">
+                        <a href="ui-profile.html">{{ username }}</a>
+                        <!-- Available statuses: online, idle, busy, away and offline -->
+                        <span class="profile-status online"></span>
+                    </div>
+                </div>
+
             </div>
+            <!-- USER INFO - END -->
 
+            <ul class='wraplist'>
+                <li>
+                    <a href="javascript:;">
+                        <span class="title">Account</span>
+                    </a>
+                    <ul class="sub-menu" >
+                        <li>
+                            <a class="" href="#">
+                                <i class="fa fa-reply"></i>
+                                Back to SavvyBI
+                            </a>
+                        </li>
+                        <li>
+                            <a class="" href="{{ url_for('AccountView.about') }}">
+                                <i class="fa fa-info-circle"></i>
+                                About
+                            </a>
+                        </li>
+                        <li>
+                            <a class="" href="{{ url_for('AccountView.profile') }}">
+                                <i class="fa fa-user"></i>
+                                Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a class="" href="{{ url_for('AccountView.plan') }}">
+                                <i class="fas fa-compass"></i>
+                                Plan
+                            </a>
+                        </li>
+                        <li>
+                            <a class="" href="{{ url_for('AccountView.billing') }}">
+                                <i class="fa fa-credit-card"></i>
+                                Billing
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="javascript:;">
+                        <span class="title">Administration</span>
+                    </a>
+                    <ul class="sub-menu" >
+                        <li>
+                            <a class="" href="{{ url_for('AdministrationView.members') }}">
+                                <i class="fa fa-address-book"></i>
+                                Members
+                            </a>
+                        </li>
+                        <li>
+                            <a class="" href="{{ url_for('AdministrationView.invitation') }}">
+                                <i class="fa fa-user-plus"></i>
+                                Invitations
+                            </a>
+                        </li>
+                        <li>
+                            <a class="" href="{{ url_for('AdministrationView.data') }}">
+                                <i class="fas fa-tachometer-alt"></i>
+                                Data
+                            </a>
+                        </li>
+                        <li>
+                            <a class="" href="{{ url_for('AdministrationView.integration') }}">
+                                <i class="fas fa-hands-helping"></i>
+                                Integrations
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="">
+                    <a href="javascript:;">
+                        <span class="title">Others</span>
+                    </a>
+                    <ul class="sub-menu" >
+                        <li>
+                            <a class="" href="ui-typography.html">
+                                User Documentation
+                            </a>
+                        </li>
+                        <li>
+                            <a class="" href="ui-accordion.html" >Support</a>
+                        </li>
+                        <li>
+                            <a class="" href="ui-progress.html" >Our Blog</a>
+                        </li>
+                        <li>
+                            <a class="" href="ui-icons.html" >Sign out</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         </div>
-        <!-- USER INFO - END -->
-
-        <ul class='wraplist'>
-            <li>
-                <a href="javascript:;">
-                    <i class="fa fa-suitcase"></i>
-                    <span class="title">Account</span>
-                </a>
-                <ul class="sub-menu" >
-                    <li>
-                        <a class="" href="#">
-                            <i class="fa fa-reply"></i>
-                            Back to SavvyBI
-                        </a>
-                    </li>
-                    <li>
-                        <a class="" href="{{ url_for('AccountView.about') }}">
-                            <i class="fa fa-info-circle"></i>
-                            About
-                        </a>
-                    </li>
-                    <li>
-                        <a class="" href="{{ url_for('AccountView.profile') }}">
-                            <i class="fa fa-user"></i>
-                            Profile
-                        </a>
-                    </li>
-                    <li>
-                        <a class="" href="{{ url_for('AccountView.plan') }}">
-                            <i class="fas fa-compass"></i>
-                            Plan
-                        </a>
-                    </li>
-                    <li>
-                        <a class="" href="{{ url_for('AccountView.billing') }}">
-                            <i class="fa fa-credit-card"></i>
-                            Billing
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li>
-                <a href="javascript:;">
-                    <span class="title">Administration</span>
-                </a>
-                <ul class="sub-menu" >
-                    <li>
-                        <a class="" href="{{ url_for('AdministrationView.members') }}">
-                            <i class="fa fa-address-book"></i>
-                            Members
-                        </a>
-                    </li>
-                    <li>
-                        <a class="" href="{{ url_for('AdministrationView.invitation') }}">
-                            <i class="fa fa-user-plus"></i>
-                            Invitations
-                        </a>
-                    </li>
-                    <li>
-                        <a class="" href="{{ url_for('AdministrationView.data') }}">
-                            <i class="fas fa-tachometer-alt"></i>
-                            Data
-                        </a>
-                    </li>
-                    <li>
-                        <a class="" href="{{ url_for('AdministrationView.integration') }}">
-                            <i class="fas fa-hands-helping"></i>
-                            Integrations
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="">
-                <a href="javascript:;">
-                    <span class="title">Others</span>
-                </a>
-                <ul class="sub-menu" >
-                    <li>
-                        <a class="" href="ui-typography.html">
-                            User Documentation
-                        </a>
-                    </li>
-                    <li>
-                        <a class="" href="ui-accordion.html" >Support</a>
-                    </li>
-                    <li>
-                        <a class="" href="ui-progress.html" >Our Blog</a>
-                    </li>
-                    <li>
-                        <a class="" href="ui-icons.html" >Sign out</a>
-                    </li>
-                </ul>
-            </li>
-        </ul>
-    </div>
+    {% elif page_name == 'dashboard' %}
+        <div class="page-sidebar-wrapper collapseit" id="main-menu-wrapper">
+            <ul class='wraplist'>
+                <li>
+                    <a href="javascript:;">
+                        <i class="fas fa-home"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:;">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:;">
+                        <i class="fas fa-volleyball-ball"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    {% endif %}
     <!-- MAIN MENU - END -->
 </div>
