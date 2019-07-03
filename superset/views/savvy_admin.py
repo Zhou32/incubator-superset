@@ -17,6 +17,10 @@ def get_organization_name():
         org_name = org_register.organization
     return org_name
 
+def get_user_fullname():
+    user = db.session.query(SavvyUser).filter_by(id=g.user.get_id()).first()
+    username = '{} {}'.format(user.first_name.capitalize(), user.last_name.capitalize())
+    return username
 
 class SavvybiAdminView(BaseView):
     route_base = "/admin"
@@ -59,12 +63,12 @@ class AccountView(SavvybiAdminView):
             overview_values['meter_count'] = 0
             admin_owner_list = None
 
-        username = '{} {}'.format(user.first_name, user.last_name)
+
         return self.render_template(
             'savvy/account/about.html',
             overview=overview_values,
             admin_owner=admin_owner_list,
-            username=username
+            username=get_user_fullname()
         )
 
     @expose('/profile')
@@ -72,7 +76,8 @@ class AccountView(SavvybiAdminView):
     def profile(self):
 
         return self.render_template(
-            'savvy/account/profile.html'
+            'savvy/account/profile.html',
+            username=get_user_fullname
         )
 
     @expose('/plan')
@@ -80,7 +85,8 @@ class AccountView(SavvybiAdminView):
     def plan(self):
 
         return self.render_template(
-            'savvy/account/plan.html'
+            'savvy/account/plan.html',
+            username=get_user_fullname()
         )
 
     @expose('/billing')
@@ -88,7 +94,8 @@ class AccountView(SavvybiAdminView):
     def billing(self):
 
         return self.render_template(
-            'savvy/account/billing.html'
+            'savvy/account/billing.html',
+            username=get_user_fullname()
         )
 
 
@@ -132,13 +139,12 @@ class AdministrationView(SavvybiAdminView):
             overview_values['member_count'] = 0
             member_list = None
 
-        username = '{} {}'.format(user.first_name, user.last_name)
-
         return self.render_template(
             'savvy/admin/members.html',
             workspace=get_organization_name().capitalize(),
             overview=overview_values,
-            members=member_list
+            members=member_list,
+            username=get_user_fullname()
         )
 
     @expose('/invitation')
@@ -170,7 +176,8 @@ class AdministrationView(SavvybiAdminView):
             'savvy/admin/invitation.html',
             workspace=get_organization_name().capitalize(),
             groups=group_list,
-            pending_invites=pending_invites
+            pending_invites=pending_invites,
+            username=get_user_fullname()
         )
 
     @expose('/data')
@@ -178,7 +185,8 @@ class AdministrationView(SavvybiAdminView):
     def data(self):
 
         return self.render_template(
-            'savvy/admin/data.html'
+            'savvy/admin/data.html',
+            username=get_user_fullname()
         )
 
     @expose('/integration')
@@ -186,7 +194,8 @@ class AdministrationView(SavvybiAdminView):
     def integration(self):
 
         return self.render_template(
-            'savvy/admin/integration.html'
+            'savvy/admin/integration.html',
+            username=get_user_fullname()
         )
 
 

@@ -47,15 +47,14 @@
         {% endblock %}
         <!-- END TOPBAR -->
         <!-- START CONTAINER -->
-        <div class="page-container row-fluid" id="savvy-content">
-
+        <div class="page-container row-fluid sidebar_shift" id="savvy-content">
             <!-- SIDEBAR - START -->
             {% block sidebar %}
                 {% include 'savvy/sidebar.html' %}
             {% endblock %}
             <!--  SIDEBAR - END -->
             <!-- START CONTENT -->
-            <section id="main-content">
+            <section id="main-content" class="sidebar_shift">
                 <section class="wrapper main-wrapper" style=''>
                 {% block main_content %}
                 {% endblock %}

@@ -1,4 +1,4 @@
-<div class="page-sidebar ">
+<div class="page-sidebar collapseit">
     <!-- MAIN MENU - START -->
     <div class="page-sidebar-wrapper" id="main-menu-wrapper">
 
@@ -13,7 +13,7 @@
             <div class="profile-details col-md-8 col-sm-8 col-xs-8">
                 <span class="profile-title">SIGNED IN AS</span><br/>
                 <div class="profile-name futura-medium">
-                    <a href="ui-profile.html">Jason Bourne</a>
+                    <a href="ui-profile.html">{{ username }}</a>
                     <!-- Available statuses: online, idle, busy, away and offline -->
                     <span class="profile-status online"></span>
                 </div>
@@ -25,6 +25,7 @@
         <ul class='wraplist'>
             <li>
                 <a href="javascript:;">
+                    <i class="fa fa-suitcase"></i>
                     <span class="title">Account</span>
                 </a>
                 <ul class="sub-menu" >
