@@ -147,3 +147,43 @@
     font-size: 24px;
     font-family: "Futura PT Medium";
 }
+
+#home-div.dashboard-content{
+    text-align: center;
+}
+#home-div.dashboard-content > .title{
+    color: #079493;
+    font-size: 42px;
+    font-family: "Futura PT Medium";
+    margin: 60px 0 60px 0;
+    text-transform: uppercase;
+}
+.dashboard-content .chart-content .chart-info{
+    position: relative;
+    top: -180px;
+}
+.dashboard-content .chart-content .chart-info i{
+    font-size: 35px;
+    color: #CCCCCC;
+}
+.dashboard-content .chart-content .chart-info p.event-count{
+    font-size: 32px;
+    font-family: "Futura PT Medium";
+    margin-top: 10px;
+    /*font-style: italic;*/
+}
+.dashboard-content .chart-content .chart-info p.event-type-txt{
+    font-size: 20px;
+    font-family: "Futura PT Medium";
+    margin-top: 10px;
+    color: #566C70;
+}
+.dashboard-content .chart-content .chart-info.success p.event-count{
+    color: #66B6AB;
+}
+.dashboard-content .chart-content .chart-info.warning p.event-count{
+    color: #DAD338;
+}
+.dashboard-content .chart-content .chart-info.issue p.event-count{
+    color: #FF1B51;
+}
