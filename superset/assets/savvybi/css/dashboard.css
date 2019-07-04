@@ -1,0 +1,149 @@
+#dashboard-content{
+    padding: 70px;
+}
+
+#dashboard-content .nav-pills>li>a{
+    font-family: "Futura PT Medium";
+    font-size: 16px;
+    color: #566C70;
+}
+#dashboard-content .nav-pills>li.active>a,
+#dashboard-content .nav-pills>li.active>a:hover,
+#dashboard-content .nav-pills>li.active>a:focus{
+    background: transparent;
+    color: #566C70;
+}
+
+#dashboard-content .nav-pills>li.active,
+#dashboard-content .nav-pills>li.active:hover,
+#dashboard-content .nav-pills>li.active:focus{
+    border-bottom: 5px solid #566C70;
+}
+
+#dashboard-content .tab-content{
+    border: none;
+    border-top: 2px solid #CCCCCC;
+    background-color: transparent;
+}
+
+.event-info-chart{
+    float: left;
+    text-align: center;
+    padding: 0 60px 0 60px;
+}
+.event-info-chart i{
+    color: #CCCCCC;
+    font-size: 35px;
+    margin: auto;
+}
+.event-info-chart .event-count{
+    font-size: 22px;
+    color: #66B6AB;
+}
+.event-info-chart .event-type-text{
+    font-size: 18px;
+    color: #566C70;
+}
+.event-info-chart .vertical-line{
+    width: 1px;
+    height: 145px;
+    background-color: #707070;
+    margin: auto;
+}
+.event-info-chart.event .event-circle{
+    width: 200px;
+    height: 200px;
+    border-radius: 100px;
+    background-color: #66B6AB;
+    margin: auto;
+}
+.event-info-chart.warning .event-circle{
+    width: 60px;
+    height: 60px;
+    border-radius: 30px;
+    background-color: #DAD338;
+    margin: auto;
+}
+.event-info-chart.issue .event-circle{
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    background-color: #FF1B51;
+    margin: auto;
+}
+
+.dashboard-content .timeline:before{
+    top: 50px;
+    left: 0;
+    position: absolute;
+    width: 2px;
+    margin-left: 0;
+    background-color: #707070;
+    content: " ";
+}
+.dashboard-content .timeline > li > .timeline-badge{
+    left: 0;
+    top: 0;
+    width: 90px;
+    height: 90px;
+    border-radius: 45px;
+    margin-left: -40px;
+    line-height: 2.5;
+}
+.dashboard-content .timeline > li.timeline-inverted .timeline-alert-content{
+    float: left;
+    margin-left: 150px;
+    margin-top: 20px;
+}
+.dashboard-content .timeline > li.timeline-inverted .timeline-panel{
+    height: 60px;
+    color: #203539;
+    padding: 10px;
+    margin-bottom: 60px;
+}
+
+.dashboard-content .timeline > li.timeline-inverted .timeline-panel:before,
+.dashboard-content .timeline > li > .timeline-panel:before{
+    display: none;
+}
+
+.dashboard-content .timeline > li.timeline-inverted .timeline-panel:after,
+.dashboard-content .timeline > li > .timeline-panel:after{
+    display: none;
+}
+
+.dashboard-content .timeline > li.timeline-inverted .timeline-panel > div{
+    font-size: 20px;
+    padding: 10px 40px 5px 40px;
+    font-family: "Futura PT Light";
+    float: left;
+}
+.dashboard-content .timeline > li.timeline-inverted .timeline-panel .timeline-event-type{
+    font-family: "Futura PT Medium";
+}
+.dashboard-content .timeline > li.timeline-inverted .timeline-panel.warning .timeline-time,
+.dashboard-content .timeline > li.timeline-inverted .timeline-panel.warning .timeline-event-type{
+    border-right: 2px solid #DAD338;
+}
+.dashboard-content .timeline > li.timeline-inverted .timeline-panel.success .timeline-time,
+.dashboard-content .timeline > li.timeline-inverted .timeline-panel.success .timeline-event-type{
+    border-right: 2px solid #66B6AB;
+}
+
+.dashboard-content .timeline > li .timeline-date{
+    position: relative;
+    top: 20px;
+    left: 80px;
+    color: #34495E;
+    float: left;
+    text-align: center;
+}
+.dashboard-content .timeline > li .timeline-date > .date{
+    font-size: 15px;
+    font-style: italic;
+    font-family: "Futura PT Light";
+}
+.dashboard-content .timeline > li .timeline-date > .day{
+    font-size: 24px;
+    font-family: "Futura PT Medium";
+}

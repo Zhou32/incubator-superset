@@ -1,36 +1,115 @@
-{% extends 'savvy/base.html' %}
+{% extends 'savvy/dashboard/index.html' %}
 
-{% block topbar %}
-    <div class="dashboard-header">
-        {% include 'savvy/navbar.html' %}
-    </div>
+{% block main_content %}
+<div id="about-div" class="dashboard-content">
+  <div>
+      <ul class="nav nav-pills primary">
+          <li class="active">
+              <a href="#overview" data-toggle="tab">Overview</a>
+          </li>
+          <li>
+              <a href="#admin_owner" data-toggle="tab">Events</a>
+          </li>
+          <li>
+              <a href="#bav" data-toggle="tab">Warnings</a>
+          </li>
+          <li>
+              <a href="#bav" data-toggle="tab">Warnings</a>
+          </li>
+      </ul>
+
+      <div class="tab-content clearfix">
+          <div class="tab-pane fade in active" id="overview">
+              <div class="row">
+                  <div class="col-sm-5">
+                      <h1>Overview</h1>
+                      <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.</p>
+                  </div>
+                  <div class="col-sm-7">
+                      <div class="event-info-chart event">
+                          <i class="fas fa-crosshairs"></i>
+                          <p class="event-count">14</p>
+                          <p class="event-type-text">Events</p>
+                          <div class="vertical-line"></div>
+                          <div class="event-circle"></div>
+                      </div>
+                      <div class="event-info-chart warning">
+                          <i class="fas fa-exclamation-triangle"></i>
+                          <p class="event-count">7</p>
+                          <p class="event-type-text">Warnings</p>
+                          <div class="vertical-line"></div>
+                          <div class="event-circle"></div>
+                      </div>
+                      <div class="event-info-chart issue">
+                          <i class="far fa-window-close"></i>
+                          <p class="event-count">1</p>
+                          <p class="event-type-text">Issues</p>
+                          <div class="vertical-line"></div>
+                          <div class="event-circle"></div>
+                      </div>
+                  </div>
+              </div>
+              <div style="padding-left: 150px;">
+                  <ul class="timeline">
+                      <li class="timeline-inverted ">
+                          <div class="timeline-badge animated flipInY"><i class="glyphicon glyphicon-check"></i></div>
+                          <div class="timeline-date">
+                              <p class="day">W E D N E S D A Y</p>
+                              <p class="date">24 / 03 / 2019</p>
+                          </div>
+                          <div class="timeline-alert-content">
+                              <div class="timeline-panel warning animated flipInY">
+                                  <div class="timeline-time"> 15:23 </div>
+                                  <div class="timeline-event-type"> Warning </div>
+                                  <div class="timeline-description"> Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed. </div>
+                              </div>
+                              <div class="timeline-panel success animated flipInY">
+                                  <div class="timeline-time"> 14:13 </div>
+                                  <div class="timeline-event-type"> EVENT </div>
+                                  <div class="timeline-description"> Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed. </div>
+                              </div>
+                          </div>
+                      </li>
+                      <li class="timeline-inverted ">
+                          <div class="timeline-badge animated flipInY"><i class="glyphicon glyphicon-check"></i></div>
+                          <div class="timeline-date">
+                              <p class="day">W E D N E S D A Y</p>
+                              <p class="date">24 / 03 / 2019</p>
+                          </div>
+                          <div class="timeline-alert-content">
+                              <div class="timeline-panel warning animated flipInY">
+                                  <div class="timeline-time"> 15:23 </div>
+                                  <div class="timeline-event-type"> Warning </div>
+                                  <div class="timeline-description"> Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed. </div>
+                              </div>
+                              <div class="timeline-panel success animated flipInY">
+                                  <div class="timeline-time"> 14:13 </div>
+                                  <div class="timeline-event-type"> EVENT </div>
+                                  <div class="timeline-description"> Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed. </div>
+                              </div>
+                          </div>
+                      </li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
 {% endblock %}
 
-{% block container %}
-    <div class="page-container row-fluid sidebar_shift" id="savvy-content">
-        {% include 'savvy/sidebar.html' %}
-
-        <section id="main-content">
-            <section class="wrapper main-wrapper" style=''>
-            {% block main_content %}
-            {% endblock %}
-            </section>
-        </section>
-
-        <div class="modal-section">
-            {% block dialogs %}
-            {% endblock %}
-        </div>
-
-    </div>
+{% block dialogs %}
+    {% include 'savvy/admin/modals/bav/index.html' %}
+    {% include 'savvy/admin/modals/bav/edit_profile.html' %}
+    {% include 'savvy/admin/modals/bav/edit_business.html' %}
 {% endblock %}
 
 {% block js_import %}
     {{ super() }}
     <script>
-        $('.page-sidebar.collapseit .wraplist li a').click(function(){
-            $('.page-sidebar.collapseit .wraplist li a').removeClass('active')
-            $(this).addClass('active');
-        })
+        function toggleButtons(e){
+            var _this = $(e.target).parent('a');
+            _this.children('i').toggleClass('hide');
+            _this.siblings('.content-div').toggleClass('hide');
+        }
     </script>
 {% endblock %}

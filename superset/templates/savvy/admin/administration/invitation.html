@@ -1,4 +1,4 @@
-{% extends 'savvy/index.html' %}
+{% extends 'savvy/admin/index.html' %}
 
 {% block main_content %}
 <div id="invite-div" class="admin-div">
@@ -210,10 +210,10 @@
 {% endblock %}
 
 {% block dialogs %}
-    {% include 'savvy/modals/invite/index_modal.html' %}
-    {% include 'savvy/modals/invite/invite_user.html' %}
-    {% include 'savvy/modals/invite/invite_done.html' %}
-    {% include 'savvy/modals/invite/bulk_invite.html' %}
+    {% include 'savvy/admin/modals/invite/index_modal.html' %}
+    {% include 'savvy/admin/modals/invite/invite_user.html' %}
+    {% include 'savvy/admin/modals/invite/invite_done.html' %}
+    {% include 'savvy/admin/modals/invite/bulk_invite.html' %}
 {% endblock %}
 
 {% block css_import %}

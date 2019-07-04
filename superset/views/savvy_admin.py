@@ -76,7 +76,7 @@ class AccountView(SavvybiAdminView):
 
 
         return self.render_template(
-            'savvy/account/about.html',
+            'savvy/admin/account/about.html',
             overview=overview_values,
             admin_owner=admin_owner_list,
             username=get_user_fullname(),
@@ -88,7 +88,7 @@ class AccountView(SavvybiAdminView):
     def profile(self):
 
         return self.render_template(
-            'savvy/account/profile.html',
+            'savvy/admin/account/profile.html',
             username=get_user_fullname(),
             page_name=self.page_name
         )
@@ -98,7 +98,7 @@ class AccountView(SavvybiAdminView):
     def plan(self):
 
         return self.render_template(
-            'savvy/account/plan.html',
+            'savvy/admin/account/plan.html',
             username=get_user_fullname(),
             page_name=self.page_name
         )
@@ -108,7 +108,7 @@ class AccountView(SavvybiAdminView):
     def billing(self):
 
         return self.render_template(
-            'savvy/account/billing.html',
+            'savvy/admin/account/billing.html',
             username=get_user_fullname(),
             page_name=self.page_name
         )
@@ -155,7 +155,7 @@ class AdministrationView(SavvybiAdminView):
             member_list = None
 
         return self.render_template(
-            'savvy/admin/members.html',
+            'savvy/admin/administration/members.html',
             workspace=get_organization_name().capitalize(),
             overview=overview_values,
             members=member_list,
@@ -189,7 +189,7 @@ class AdministrationView(SavvybiAdminView):
             pending_invites.append(row)
 
         return self.render_template(
-            'savvy/admin/invitation.html',
+            'savvy/admin/administration/invitation.html',
             workspace=get_organization_name().capitalize(),
             groups=group_list,
             pending_invites=pending_invites,
@@ -202,7 +202,7 @@ class AdministrationView(SavvybiAdminView):
     def data(self):
 
         return self.render_template(
-            'savvy/admin/data.html',
+            'savvy/admin/administration/data.html',
             username=get_user_fullname(),
             page_name=self.page_name
         )
@@ -212,7 +212,7 @@ class AdministrationView(SavvybiAdminView):
     def integration(self):
 
         return self.render_template(
-            'savvy/admin/integration.html',
+            'savvy/admin/administration/integration.html',
             username=get_user_fullname(),
             page_name=self.page_name
         )

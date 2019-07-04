@@ -1,4 +1,4 @@
-{% extends 'savvy/index.html' %}
+{% extends 'savvy/admin/index.html' %}
 
 {% block main_content %}
 <div id="members-div" class="admin-div">
@@ -23,7 +23,7 @@
 
                   </div>
                   <div id="workspace-name">
-                    {{ organization }}
+                    {{ workspace }}
                   </div>
                   <div style="clear:both;"></div>
               </div>
@@ -31,15 +31,15 @@
                   <table>
                       <tr>
                           <td class="field">Date Created</td>
-                          <td class="value">June 5th, 2019</td>
+                          <td class="value">{{ overview.date_created }}</td>
                       </tr>
                       <tr>
                           <td class="field">Number of Members</td>
-                          <td class="value">2</td>
+                          <td class="value">{{ overview.member_count }}</td>
                       </tr>
                       <tr>
                           <td class="field">Number of Groups</td>
-                          <td class="value">5</td>
+                          <td class="value">{{ overview.group_count }}</td>
                       </tr>
                   </table>
               </div>
@@ -57,12 +57,12 @@
               </div>
               <div class="content">
                   <div class="search-bar">
-                      <div class="input-group transparent pull-left">
-                          <span class="input-group-addon">
-                              <i class="fas fa-search"></i>
-                          </span>
-                          <input class="form-control transparent" type="text" placeholder="Search NMI's">
-                      </div>
+{#                      <div class="input-group transparent pull-left">#}
+{#                          <span class="input-group-addon">#}
+{#                              <i class="fas fa-search"></i>#}
+{#                          </span>#}
+{#                          <input class="form-control transparent" type="text" placeholder="Search NMI's">#}
+{#                      </div>#}
                       <div class="btn-group pull-right">
                           <div class="dropdown">
                               <button id="group-filter" class="savvy-btn savvy-default-btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -102,7 +102,7 @@
                           </div>
                       </div>
                   </div>
-                  <table id="members-data" class="table dt-responsive display dataTable no-footer" cellspacing="0" width="100%">
+                  <table id="members-table" class="table dt-responsive display dataTable no-footer" cellspacing="0" width="100%">
                       <thead>
                           <tr>
                               <th>Users</th>
@@ -112,248 +112,37 @@
                           </tr>
                       </thead>
                       <tbody>
-                          <tr>
-                              <td>Bruce Wayne</td>
-                              <td>Tasmania</td>
-                              <td>Standard</td>
-                              <td>
-                                  <div class="dropdown edit-member-menu">
-                                      <span id="edit-member-btn" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                          <i class="fas fa-ellipsis-h"></i>
-                                      </span>
-                                      <ul class="dropdown-menu dropdown-menu-right animated fadeIn" role="menu" aria-labelledby="edit-member-btn">
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditProfileModal();">Edit Member</a></li>
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditGroupModal();">Edit Groups</a></li>
-                                          <li class="divider"></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Super Admin</a></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Standard</a></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Viewer</a></li>
-                                          <li class="divider"></li>
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" href="#deactivate-modal" style="color: #FF1B51;">Deactivate</a></li>
-                                      </ul>
-                                  </div>
-                              </td>
-                          </tr>
-                          <tr>
-                              <td>Bruce Wayne</td>
-                              <td>Tasmania</td>
-                              <td>Standard</td>
-                              <td>
-                                  <div class="dropdown edit-member-menu">
-                                      <span id="edit-member-btn" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                          <i class="fas fa-ellipsis-h"></i>
-                                      </span>
-                                      <ul class="dropdown-menu animated fadeIn" role="menu" aria-labelledby="edit-member-btn">
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditProfileModal();">Edit Member</a></li>
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditGroupModal();">Edit Groups</a></li>
-                                          <li class="divider"></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Super Admin</a></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Standard</a></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Viewer</a></li>
-                                          <li class="divider"></li>
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" href="#deactivate-modal" style="color: #FF1B51;">Deactivate</a></li>
-                                      </ul>
-                                  </div>
-                              </td>
-                          </tr>
-                          <tr>
-                              <td>Bruce Wayne</td>
-                              <td>Tasmania</td>
-                              <td>Standard</td>
-                              <td>
-                                  <div class="dropdown edit-member-menu">
-                                      <span id="edit-member-btn" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                          <i class="fas fa-ellipsis-h"></i>
-                                      </span>
-                                      <ul class="dropdown-menu animated fadeIn" role="menu" aria-labelledby="edit-member-btn">
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditProfileModal();">Edit Member</a></li>
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditGroupModal();">Edit Groups</a></li>
-                                          <li class="divider"></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Super Admin</a></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Standard</a></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Viewer</a></li>
-                                          <li class="divider"></li>
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" href="#deactivate-modal" style="color: #FF1B51;">Deactivate</a></li>
-                                      </ul>
-                                  </div>
-                              </td>
-                          </tr>
-                          <tr>
-                              <td>Bruce Wayne</td>
-                              <td>Tasmania</td>
-                              <td>Standard</td>
-                              <td>
-                                  <div class="dropdown edit-member-menu">
-                                      <span id="edit-member-btn" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                          <i class="fas fa-ellipsis-h"></i>
-                                      </span>
-                                      <ul class="dropdown-menu animated fadeIn" role="menu" aria-labelledby="edit-member-btn">
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditProfileModal();">Edit Member</a></li>
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditGroupModal();">Edit Groups</a></li>
-                                          <li class="divider"></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Super Admin</a></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Standard</a></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Viewer</a></li>
-                                          <li class="divider"></li>
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" href="#deactivate-modal" style="color: #FF1B51;">Deactivate</a></li>
-                                      </ul>
-                                  </div>
-                              </td>
-                          </tr>
-                          <tr>
-                              <td>Bruce Wayne</td>
-                              <td>Tasmania</td>
-                              <td>Standard</td>
-                              <td>
-                                  <div class="dropdown edit-member-menu">
-                                      <span id="edit-member-btn" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                          <i class="fas fa-ellipsis-h"></i>
-                                      </span>
-                                      <ul class="dropdown-menu animated fadeIn" role="menu" aria-labelledby="edit-member-btn">
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditProfileModal();">Edit Member</a></li>
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditGroupModal();">Edit Groups</a></li>
-                                          <li class="divider"></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Super Admin</a></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Standard</a></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Viewer</a></li>
-                                          <li class="divider"></li>
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" href="#deactivate-modal" style="color: #FF1B51;">Deactivate</a></li>
-                                      </ul>
-                                  </div>
-                              </td>
-                          </tr>
-                          <tr>
-                              <td>Bruce Wayne</td>
-                              <td>Tasmania</td>
-                              <td>Standard</td>
-                              <td>
-                                  <div class="dropdown edit-member-menu">
-                                      <span id="edit-member-btn" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                          <i class="fas fa-ellipsis-h"></i>
-                                      </span>
-                                      <ul class="dropdown-menu animated fadeIn" role="menu" aria-labelledby="edit-member-btn">
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditProfileModal();">Edit Member</a></li>
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditGroupModal();">Edit Groups</a></li>
-                                          <li class="divider"></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Super Admin</a></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Standard</a></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Viewer</a></li>
-                                          <li class="divider"></li>
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" href="#deactivate-modal" style="color: #FF1B51;">Deactivate</a></li>
-                                      </ul>
-                                  </div>
-                              </td>
-                          </tr>
-                          <tr>
-                              <td>Bruce Wayne</td>
-                              <td>Tasmania</td>
-                              <td>Standard</td>
-                              <td>
-                                  <div class="dropdown edit-member-menu">
-                                      <span id="edit-member-btn" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                          <i class="fas fa-ellipsis-h"></i>
-                                      </span>
-                                      <ul class="dropdown-menu animated fadeIn" role="menu" aria-labelledby="edit-member-btn">
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditProfileModal();">Edit Member</a></li>
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditGroupModal();">Edit Groups</a></li>
-                                          <li class="divider"></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Super Admin</a></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Standard</a></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Viewer</a></li>
-                                          <li class="divider"></li>
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" href="#deactivate-modal" style="color: #FF1B51;">Deactivate</a></li>
-                                      </ul>
-                                  </div>
-                              </td>
-                          </tr>
-                          <tr>
-                              <td>Bruce Wayne</td>
-                              <td>Tasmania</td>
-                              <td>Standard</td>
-                              <td>
-                                  <div class="dropdown edit-member-menu">
-                                      <span id="edit-member-btn" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                          <i class="fas fa-ellipsis-h"></i>
-                                      </span>
-                                      <ul class="dropdown-menu animated fadeIn" role="menu" aria-labelledby="edit-member-btn">
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditProfileModal();">Edit Member</a></li>
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditGroupModal();">Edit Groups</a></li>
-                                          <li class="divider"></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Super Admin</a></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Standard</a></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Viewer</a></li>
-                                          <li class="divider"></li>
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" href="#deactivate-modal" style="color: #FF1B51;">Deactivate</a></li>
-                                      </ul>
-                                  </div>
-                              </td>
-                          </tr>
-                          <tr>
-                              <td>Bruce Wayne</td>
-                              <td>Tasmania</td>
-                              <td>Standard</td>
-                              <td>
-                                  <div class="dropdown edit-member-menu">
-                                      <span id="edit-member-btn" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                          <i class="fas fa-ellipsis-h"></i>
-                                      </span>
-                                      <ul class="dropdown-menu animated fadeIn" role="menu" aria-labelledby="edit-member-btn">
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditProfileModal();">Edit Member</a></li>
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditGroupModal();">Edit Groups</a></li>
-                                          <li class="divider"></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Super Admin</a></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Standard</a></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Viewer</a></li>
-                                          <li class="divider"></li>
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" href="#deactivate-modal" style="color: #FF1B51;">Deactivate</a></li>
-                                      </ul>
-                                  </div>
-                              </td>
-                          </tr>
-                          <tr>
-                              <td>Bruce Wayne</td>
-                              <td>Tasmania</td>
-                              <td>Standard</td>
-                              <td>
-                                  <div class="dropdown edit-member-menu">
-                                      <span id="edit-member-btn" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                          <i class="fas fa-ellipsis-h"></i>
-                                      </span>
-                                      <ul class="dropdown-menu animated fadeIn" role="menu" aria-labelledby="edit-member-btn">
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditProfileModal();">Edit Member</a></li>
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditGroupModal();">Edit Groups</a></li>
-                                          <li class="divider"></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Super Admin</a></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Standard</a></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Viewer</a></li>
-                                          <li class="divider"></li>
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" href="#deactivate-modal" style="color: #FF1B51;">Deactivate</a></li>
-                                      </ul>
-                                  </div>
-                              </td>
-                          </tr>
-                          <tr>
-                              <td>Bruce Wayne</td>
-                              <td>Tasmania</td>
-                              <td>Standard</td>
-                              <td>
-                                  <div class="dropdown edit-member-menu">
-                                      <span id="edit-member-btn" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                          <i class="fas fa-ellipsis-h"></i>
-                                      </span>
-                                      <ul class="dropdown-menu animated fadeIn" role="menu" aria-labelledby="edit-member-btn">
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditProfileModal();">Edit Member</a></li>
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditGroupModal();">Edit Groups</a></li>
-                                          <li class="divider"></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Super Admin</a></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Standard</a></li>
-                                          <li role="presentation"><a role="menuitem" href="#">Change to Viewer</a></li>
-                                          <li class="divider"></li>
-                                          <li role="presentation"><a role="menuitem" data-toggle="modal" href="#deactivate-modal" style="color: #FF1B51;">Deactivate</a></li>
-                                      </ul>
-                                  </div>
-                              </td>
-                          </tr>
+                          {% if members %}
+                              {% for member in members %}
+                              <tr>
+                                  <td>{{ member.fullname }}</td>
+                                  <td>
+                                      {% for group in member.groups %}
+                                          {{ group.group_name }}&nbsp;
+                                      {% endfor %}
+                                  </td>
+
+                                  <td>{{ member.role }}</td>
+                                  <td>
+                                      <div class="dropdown edit-member-menu">
+                                          <span id="edit-member-btn" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                              <i class="fas fa-ellipsis-h"></i>
+                                          </span>
+                                          <ul class="dropdown-menu dropdown-menu-right animated fadeIn" role="menu" aria-labelledby="edit-member-btn">
+                                              <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditProfileModal();">Edit Member</a></li>
+                                              <li role="presentation"><a role="menuitem" data-toggle="modal" onclick="EditGroupModal();">Edit Groups</a></li>
+                                              <li class="divider"></li>
+                                              <li role="presentation"><a role="menuitem" href="#">Change to Super Admin</a></li>
+                                              <li role="presentation"><a role="menuitem" href="#">Change to Standard</a></li>
+                                              <li role="presentation"><a role="menuitem" href="#">Change to Viewer</a></li>
+                                              <li class="divider"></li>
+                                              <li role="presentation"><a role="menuitem" data-toggle="modal" href="#deactivate-modal" style="color: #FF1B51;">Deactivate</a></li>
+                                          </ul>
+                                      </div>
+                                  </td>
+                              </tr>
+                              {% endfor %}
+                          {% endif %}
                       </tbody>
                   </table>
                   <div>
@@ -612,3 +401,47 @@
 </div>
 {% endblock %}
 
+{% block dialogs %}
+    {% include 'savvy/admin/modals/invite/index_modal.html' %}
+    {% include 'savvy/admin/modals/invite/invite_user.html' %}
+    {% include 'savvy/admin/modals/invite/invite_done.html' %}
+    {% include 'savvy/admin/modals/invite/bulk_invite.html' %}
+{% endblock %}
+
+{% block css_import %}
+    {{ super() }}
+    <link href="{{ url_for('static', filename='assets/savvybi/plugins/datatables/css/jquery.dataTables.css') }}" rel="stylesheet" type="text/css" media="screen"/>
+{% endblock %}
+
+{% block js_import %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='assets/savvybi/plugins/datatables/js/jquery.dataTables.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='assets/savvybi/plugins/datatables/extensions/TableTools/js/dataTables.tableTools.min.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='assets/savvybi/plugins/datatables/extensions/Responsive/js/dataTables.responsive.min.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='assets/savvybi/plugins/datatables/extensions/Responsive/bootstrap/3/dataTables.bootstrap.js') }}" type="text/javascript"></script>
+    <script>
+        function EditProfileModal()
+        {
+            jQuery('#editmember-modal').modal('show', {backdrop: 'static'});
+{#            jQuery.ajax({#}
+{#                url: "",#}
+{#                success: function(response)#}
+{#                {#}
+{#                    jQuery('#ultraModal-8 .modal-body').html(response);#}
+{#                }#}
+{#            });#}
+        }
+
+        function EditGroupModal()
+        {
+            jQuery('#editgroup-modal').modal('show', {backdrop: 'static'});
+{#            jQuery.ajax({#}
+{#                url: "",#}
+{#                success: function(response)#}
+{#                {#}
+{#                    jQuery('#ultraModal-8 .modal-body').html(response);#}
+{#                }#}
+{#            });#}
+        }
+    </script>
+{% endblock %}

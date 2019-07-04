@@ -1,4 +1,4 @@
-{% extends 'savvy/index.html' %}
+{% extends 'savvy/admin/index.html' %}
 
 {% block main_content %}
 <div id="about-div" class="account-div">
@@ -155,9 +155,9 @@
 {% endblock %}
 
 {% block dialogs %}
-    {% include 'savvy/modals/bav/index.html' %}
-    {% include 'savvy/modals/bav/edit_profile.html' %}
-    {% include 'savvy/modals/bav/edit_business.html' %}
+    {% include 'savvy/admin/modals/bav/index.html' %}
+    {% include 'savvy/admin/modals/bav/edit_profile.html' %}
+    {% include 'savvy/admin/modals/bav/edit_business.html' %}
 {% endblock %}
 
 {% block js_import %}

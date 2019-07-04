@@ -2907,9 +2907,9 @@ ul.states li {
 .timeline > li:after {
     clear: both;
 }
-.timeline > li > .timeline-panel {
-    width: 45%;
-    float: left;
+.timeline > li .timeline-panel {
+    /*width: 45%;*/
+    /*float: left;*/
     border: 1px solid #eaeaea;
     -webkit-border-radius: 0px;
     -moz-border-radius: 0px;
@@ -2922,7 +2922,7 @@ ul.states li {
     margin-left: -15px;
     z-index: 11;
 }
-.timeline > li > .timeline-panel:before {
+.timeline > li .timeline-panel:before {
     position: absolute;
     top: 36px;
     right: -15px;
@@ -2933,7 +2933,7 @@ ul.states li {
     border-bottom: 15px solid transparent;
     content: " ";
 }
-.timeline > li > .timeline-panel:after {
+.timeline > li .timeline-panel:after {
     position: absolute;
     top: 37px;
     right: -14px;
@@ -3019,7 +3019,7 @@ ul.states li {
     ul.timeline:before {
         left: 40px;
     }
-    ul.timeline > li > .timeline-panel {
+    ul.timeline > li .timeline-panel {
         width: calc(100% - 90px);
         width: -moz-calc(100% - 90px);
         width: -webkit-calc(100% - 90px);
@@ -3029,16 +3029,16 @@ ul.states li {
         margin-left: 0;
         top: 16px;
     }
-    ul.timeline > li > .timeline-panel {
+    ul.timeline > li .timeline-panel {
         float: right;
     }
-    ul.timeline > li > .timeline-panel:before {
+    ul.timeline > li .timeline-panel:before {
         border-left-width: 0;
         border-right-width: 15px;
         left: -15px;
         right: auto;
     }
-    ul.timeline > li > .timeline-panel:after {
+    ul.timeline > li .timeline-panel:after {
         border-left-width: 0;
         border-right-width: 14px;
         left: -14px;

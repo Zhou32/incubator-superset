@@ -1,4 +1,4 @@
-{% extends 'savvy/index.html' %}
+{% extends 'savvy/admin/index.html' %}
 
 {% block main_content %}
 <div id="data-div" class="admin-div">
@@ -260,10 +260,10 @@
 {% endblock %}
 
 {% block dialogs %}
-    {% include 'savvy/modals/group/index.html' %}
-    {% include 'savvy/modals/group/nmi_setup.html' %}
-    {% include 'savvy/modals/group/create_group.html' %}
-    {% include 'savvy/modals/group/confirm.html' %}
+    {% include 'savvy/admin/modals/group/index.html' %}
+    {% include 'savvy/admin/modals/group/nmi_setup.html' %}
+    {% include 'savvy/admin/modals/group/create_group.html' %}
+    {% include 'savvy/admin/modals/group/confirm.html' %}
 {% endblock %}
 
 {% block css_import %}
