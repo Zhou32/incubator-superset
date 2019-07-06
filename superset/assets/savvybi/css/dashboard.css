@@ -217,3 +217,33 @@
     color: #566C70;
     font-family: "Futura PT Light";
 }
+
+#back-btn-div{
+    position: relative;
+    left: -70px;
+    top: -70px;
+    height: 75px;
+    width: 75px;
+    overflow: hidden;
+    background-color: #CCCCCC;
+}
+#back-btn-div:after {
+  content: '';
+  position: absolute;
+  left: 20%;
+  width: 100%;
+  height: 200%;
+  background-color: #F4F5F8;
+  top: 0;
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+#back-btn-div > a{
+    color: #2D4A50;
+    font-size: 22px;
+    position: relative;
+    left: 10px;
+    top: 15px;
+}

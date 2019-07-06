@@ -1,0 +1,15 @@
+{% extends 'savvy/dashboard/index.html' %}
+
+{% block main_content %}
+<div id="card-detail" class="dashboard-content">
+    <div id="back-btn-div">
+        <a><i class="fas fa-arrow-left"></i></a>
+    </div>
+</div>
+{% endblock %}
+
+{% block js_import %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='assets/savvybi/plugins/jquery-knob/jquery.knob.min.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='assets/savvybi/js/chart-knobs.js') }}" type="text/javascript"></script>
+{% endblock %}

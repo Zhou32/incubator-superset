@@ -32,16 +32,6 @@ class SavvybiAdminView(BaseView):
         return redirect(url_for('AccountView.about'))
 
 
-class SavvybiDashboardView(BaseView):
-    route_base = "/dashboard"
-    page_name = "dashboard"
-
-    @expose('/')
-    @has_access_savvybi_admin
-    def index(self):
-        return redirect(url_for('HomeView.index'))
-
-
 class AccountView(SavvybiAdminView):
     route_base = "/admin/account"
 
@@ -218,22 +208,36 @@ class AdministrationView(SavvybiAdminView):
         )
 
 
-class HomeView(SavvybiDashboardView):
-    @expose('/homepage')
+class SavvybiDashboardView(BaseView):
+    route_base = "/dashboard"
+    page_name = "dashboard"
+
+    @expose('/')
     @has_access_savvybi_admin
     def index(self):
+        return redirect(url_for('SavvybiDashboardView.homepage'))
+
+    @expose('/homepage')
+    @has_access_savvybi_admin
+    def homepage(self):
         return self.render_template(
             'savvy/dashboard/home.html',
             page_name=self.page_name
         )
 
-
-class ScanView(SavvybiDashboardView):
     @expose('/scan')
     @has_access_savvybi_admin
-    def index(self):
+    def scanpage(self):
         return self.render_template(
             'savvy/dashboard/scan.html',
+            page_name=self.page_name
+        )
+
+    @expose('/scan/<event_id>')
+    @has_access_savvybi_admin
+    def event_detail(self, event_id):
+        return self.render_template(
+            'savvy/dashboard/event_detail.html',
             page_name=self.page_name
         )
 
@@ -242,5 +246,3 @@ appbuilder.add_view_no_menu(SavvybiAdminView)
 appbuilder.add_view_no_menu(AccountView)
 appbuilder.add_view_no_menu(AdministrationView)
 appbuilder.add_view_no_menu(SavvybiDashboardView)
-appbuilder.add_view_no_menu(HomeView)
-appbuilder.add_view_no_menu(ScanView)
