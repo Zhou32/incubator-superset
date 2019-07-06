@@ -101,18 +101,18 @@
                     </a>
                     <ul class="sub-menu" >
                         <li>
-                            <a class="" href="ui-typography.html">
+                            <a class="" href="#">
                                 User Documentation
                             </a>
                         </li>
                         <li>
-                            <a class="" href="ui-accordion.html" >Support</a>
+                            <a class="" href="#" >Support</a>
                         </li>
                         <li>
-                            <a class="" href="ui-progress.html" >Our Blog</a>
+                            <a class="" href="#" >Our Blog</a>
                         </li>
                         <li>
-                            <a class="" href="ui-icons.html" >Sign out</a>
+                            <a class="" href="#" >Sign out</a>
                         </li>
                     </ul>
                 </li>
@@ -122,12 +122,12 @@
         <div class="page-sidebar-wrapper collapseit" id="main-menu-wrapper">
             <ul class='wraplist'>
                 <li>
-                    <a href="javascript:;" class="active">
+                    <a href="{{ url_for('HomeView.index') }}" class="active">
                         <i class="fas fa-home"></i>
                     </a>
                 </li>
                 <li>
-                    <a href="javascript:;">
+                    <a href="{{ url_for('ScanView.index') }}">
                         <i class="fas fa-tachometer-alt"></i>
                     </a>
                 </li>

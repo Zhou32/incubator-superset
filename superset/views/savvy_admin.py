@@ -224,12 +224,23 @@ class HomeView(SavvybiDashboardView):
     def index(self):
         return self.render_template(
             'savvy/dashboard/home.html',
-            username=get_user_fullname(),
             page_name=self.page_name
         )
+
+
+class ScanView(SavvybiDashboardView):
+    @expose('/scan')
+    @has_access_savvybi_admin
+    def index(self):
+        return self.render_template(
+            'savvy/dashboard/scan.html',
+            page_name=self.page_name
+        )
+
 
 appbuilder.add_view_no_menu(SavvybiAdminView)
 appbuilder.add_view_no_menu(AccountView)
 appbuilder.add_view_no_menu(AdministrationView)
 appbuilder.add_view_no_menu(SavvybiDashboardView)
 appbuilder.add_view_no_menu(HomeView)
+appbuilder.add_view_no_menu(ScanView)

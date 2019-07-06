@@ -7,18 +7,28 @@
     font-size: 16px;
     color: #566C70;
 }
-#dashboard-content .nav-pills>li.active>a,
-#dashboard-content .nav-pills>li.active>a:hover,
-#dashboard-content .nav-pills>li.active>a:focus{
+#dashboard-content .nav-pills>li.active>a{
     background: transparent;
+}
+#dashboard-content .nav-pills>li#overview-tab.active>a{
+    border-bottom: 5px solid #566C70;
     color: #566C70;
 }
 
-#dashboard-content .nav-pills>li.active,
-#dashboard-content .nav-pills>li.active:hover,
-#dashboard-content .nav-pills>li.active:focus{
-    border-bottom: 5px solid #566C70;
+#dashboard-content .nav-pills>li#event-tab.active>a{
+    border-bottom: 5px solid #66B6AB;
+    color: #66B6AB;
 }
+
+#dashboard-content .nav-pills>li#warning-tab.active>a{
+    border-bottom: 5px solid #DAD338;
+    color: #DAD338;
+}
+#dashboard-content .nav-pills>li#issue-tab.active>a{
+    border-bottom: 5px solid #FF1B51;
+    color: #FF1B51;
+}
+
 
 #dashboard-content .tab-content{
     border: none;
@@ -186,4 +196,24 @@
 }
 .dashboard-content .chart-content .chart-info.issue p.event-count{
     color: #FF1B51;
+}
+
+#scan-div .filter-btn{
+    font-size: 15px;
+    color: #566C70;
+    /*background: darkgrey;*/
+}
+#scan-div .dropdown{
+    color: #34495E;
+    font-size: 16px;
+    font-family: "Futura PT Light";
+}
+#scan-div .dropdown a[data-toggle='dropdown']{
+    color: #34495E;
+    font-size: 16px;
+    font-family: "Futura PT Light";
+}
+#scan-div .tab-content{
+    color: #566C70;
+    font-family: "Futura PT Light";
 }
