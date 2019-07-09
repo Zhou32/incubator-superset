@@ -40,6 +40,7 @@ class Organization(Model):
     organization_name = Column(String(250))
     users = relationship('SavvyUser', secondary=assoc_org_user, backref='organization')
     sites = relationship('Site', secondary=assoc_org_site, backref='organization')
+    date_created = Column(DateTime, default=datetime.datetime.now)
     superuser_number = Column('superuser_number', Integer, default=0)
 
     def __repr__(self):

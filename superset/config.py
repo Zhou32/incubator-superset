@@ -112,10 +112,10 @@ ENABLE_PROXY_FIX = False
 # GLOBALS FOR APP Builder
 # ------------------------------
 # Uncomment to setup Your App name
-APP_NAME = 'Superset'
+APP_NAME = 'SavvyBI'
 
 # Uncomment to setup an App icon
-APP_ICON = '/static/assets/images/SavyBI-Logo-White.png'
+APP_ICON = '/static/assets/savvybi/images/SavyBI-Logo-White.png'
 APP_ICON_WIDTH = 125
 
 # Druid query timezone

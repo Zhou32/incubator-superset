@@ -389,6 +389,7 @@ class CustomSecurityManager(SupersetSecurityManager):
     def add_org(self, reg, user):
         new_org = self.organization_model()
         new_org.organization_name = reg.organization
+        new_org.date_created = reg.registration_date
         new_org.users.append(user)
         try:
             self.get_session.add(new_org)

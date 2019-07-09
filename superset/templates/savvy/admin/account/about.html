@@ -1,0 +1,172 @@
+{% extends 'savvy/admin/index.html' %}
+
+{% block main_content %}
+<div id="about-div" class="account-div">
+  <p class="title">About This Workspace</p>
+  <div>
+      <ul class="nav nav-pills primary">
+          <li class="active">
+              <a href="#overview" data-toggle="tab">Overview</a>
+          </li>
+          <li>
+              <a href="#admin_owner" data-toggle="tab">Admins & Owners</a>
+          </li>
+          <li>
+              <a href="#bav" data-toggle="tab">BAV</a>
+          </li>
+      </ul>
+
+      <div class="tab-content clearfix">
+          <div class="tab-pane fade in active" id="overview">
+              <div class="header">
+                  <div class="thumbnail">
+
+                  </div>
+                  <div id="workspace-name">
+                    {{ overview.organization }}
+                  </div>
+                  <div style="clear:both;"></div>
+              </div>
+              <div class="content">
+                  <table>
+                      <tr>
+                          <td class="field">Date Created</td>
+                          <td class="value">{{ overview.date_created }}</td>
+                      </tr>
+                      <tr>
+                          <td class="field">Number of Meters</td>
+                          <td class="value">{{ overview.meter_count }}</td>
+                      </tr>
+                      <tr>
+                          <td class="field">Terms of Service</td>
+                          <td class="value"><a>review</a></td>
+                      </tr>
+                  </table>
+              </div>
+          </div>
+          <div class="tab-pane fade" id="admin_owner">
+              <div class="header">
+                  <div class="thumbnail">
+                  </div>
+                  <div class="form-group">
+                      <div class="form-group has-feedback">
+                          <input type="text" class="search-bar form-control" id="inputValidation" placeholder="Search Admins and Owner"/>
+                          <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                      </div>
+                  </div>
+                  <div style="clear:both;"></div>
+              </div>
+              <div class="content">
+                  <table>
+                      {% for user in admin_owner %}
+                      <tr>
+                          <td class="field">
+                              {{ user.fullname }}
+                              <p class="futura-light"> {{ user.email }} </p>
+                          </td>
+                          <td class="value" style="text-align: right; padding-right: 50px;">{{ user.role }}</td>
+                      </tr>
+                      {% endfor %}
+                  </table>
+              </div>
+          </div>
+          <div class="tab-pane fade" id="bav">
+              <div class="header">
+                  <p style="font-size: 22px; font-family: 'Futura PT Medium';">
+                      Business Authority Verification (BAV)
+                  </p>
+                  <p style="font-size: 18px; font-family: 'Futura PT Light';">
+                      The BAV ensures the member who registered this workspace have the authority to request energy data from meter data providers, retailers and network distribution businesses. Your privacy and security are paramount to Us.
+                  </p>
+                  <div style="clear:both;"></div>
+              </div>
+              <div class="content">
+                  <div class="bav-content">
+                      <blockquote class="success">
+                          <span data-class="check-circle">
+                              <i class="fa fa-check-circle"></i>
+                          </span>
+                          You are A OK
+                      </blockquote>
+    {#                  <blockquote class="info">#}
+    {#                      <span data-class="check-circle">#}
+    {#                          <i class="fa fa-check-circle"></i>#}
+    {#                      </span>#}
+    {#                      We are validating your details#}
+    {#                  </blockquote>#}
+    {#                  <blockquote class="info">#}
+    {#                      <span data-class="check-circle">#}
+    {#                          <i class="fas fa-hand-point-up"></i>#}
+    {#                      </span>#}
+    {#                      Oh no ! We need some more#}
+    {#                  </blockquote>#}
+    {#                  <blockquote class="warning">#}
+    {#                      <span data-class="check-circle">#}
+    {#                          <i class="fa fa-times-circle"></i>#}
+    {#                      </span>#}
+    {#                      BAV Not Started#}
+    {#                  </blockquote>#}
+    {#                  <blockquote class="warning">#}
+    {#                      <span data-class="check-circle">#}
+    {#                          <i class="fa fa-check-circle"></i>#}
+    {#                      </span>#}
+    {#                      BAV Incomplete#}
+    {#                  </blockquote>#}
+                      <ul id="bav-list">
+                          <li class="success">
+                              <span>
+                                  <i class="fa fa-check-circle"></i>
+                              </span>
+                              Personal Validation
+                          </li>
+                          <li class="info">
+                              <span>
+                                  <i class="fas fa-hand-point-right"></i>
+                              </span>
+                              Business Validation
+                              <a href="#" onclick="toggleButtons(event);">
+                                  <i class="fas fa-caret-right"></i>
+                                  <i class="fas fa-caret-down hide"></i>
+                              </a>
+                              <div class="content-div hide">
+                                  <button class="savvy-btn savvy-default-btn">Show Me</button>
+                              </div>
+                          </li>
+                          <li class="warning">
+                              <span>
+                                  <i class="fa fa-times-circle"></i>
+                              </span>
+                              Business Authority
+                          </li>
+                          <li class="success">
+                              <span>
+                                  <i class="fa fa-check-circle"></i>
+                              </span>
+                              Scanned and Approved
+                          </li>
+                      </ul>
+                  </div>
+                  <a href="#bav-index-modal" data-toggle="modal"><button class="savvy-btn savvy-submit-btn pull-right" id="bav-submit-btn">Update</button></a>
+              </div>
+        </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block dialogs %}
+    {% include 'savvy/admin/modals/bav/index.html' %}
+    {% include 'savvy/admin/modals/bav/edit_profile.html' %}
+    {% include 'savvy/admin/modals/bav/edit_business.html' %}
+{% endblock %}
+
+{% block js_import %}
+    {{ super() }}
+    <script>
+        function toggleButtons(e){
+            var _this = $(e.target).parent('a');
+            _this.children('i').toggleClass('hide');
+            _this.siblings('.content-div').toggleClass('hide');
+        }
+    </script>
+{% endblock %}

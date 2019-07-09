@@ -1,0 +1,29 @@
+{% extends 'savvy/admin/index.html' %}
+
+{% block main_content %}
+<div id="plan-div" class="account-div">
+    <p class="title">Your Plan</p>
+    <div class="content">
+        <div class="row">
+            <div class="col-sm-10 text-left">
+                <p class="futura-medium">Basic Plan</p>
+                <p>Your workspace is on Basic Plan, paying monthly. Your plan will renew {RenewDate} for {Meter X Fee}</p>
+            </div>
+            <div class="col-sm-2" style="line-height: 5"><a class="highlight">Change Plan</a></div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6 pull-right">
+                <select class="col-sm-12">
+                    <option selected></option>
+                </select>
+            </div>
+        </div>
+        <p/>
+        <div class="row">
+            <div class="col-sm-2 pull-right">
+                <button class="savvy-btn savvy-submit-btn col-sm-12" style="width: -webkit-fill-available; height: 36px; font-size: 15px;">Preview</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

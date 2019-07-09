@@ -1,0 +1,1432 @@
+@font-face {
+    font-family: 'Futura PT Light';
+    src: url('../fonts/futura_fonts/FuturaPTLight.otf') format("opentype");
+}
+
+@font-face {
+    font-family: 'Futura PT Medium';
+    src: url('../fonts/futura_fonts/FuturaPTMedium.otf');
+}
+
+.reg-navbar .navbar-brand{
+    width: 250px;
+    height: 250px;
+    margin-left: 150px !important;
+}
+
+.auth-link{
+    color: #34495E;
+    font-size: 20px;
+    font-family: 'Futura PT Medium';
+    margin-top: 76px;
+    margin-right: 180px;
+}
+
+#Home{
+    text-align: center;
+}
+
+#Home .form-header{
+    color: #079493;
+    font-size: 36px;
+    font-weight: bold;
+    font-family: 'Futura PT Medium';
+}
+
+#Home .form-subheader{
+    color: #2D4A50;
+    font-size: 25px;
+    font-family: 'Futura PT Light';
+}
+
+#Home .form-submit{
+    width: 240px;
+    height: 69px;
+    font-size: 22px;
+    margin-right: 140px;
+    font-family: 'Futura PT Medium';
+}
+
+#Home .register-form input{
+    border: none;
+    font-family: 'Futura PT Light';
+    font-size: 20px;
+    color: #079493;
+
+}
+
+#Home .register-form input:hover,  #Home .register-form input:focus{
+    box-shadow: 1px 1px 5px 1px RGBA(7, 148, 147, 0.5);
+}
+
+.reg-footer{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 130px;
+    padding-top: 23px;
+    background-color: #edeef1;
+}
+
+.savvybi-alert{
+    height: 69px;
+    padding: 20px 0;
+    font-size: 24px;
+    font-family: 'Futura PT Medium';
+    text-align: center;
+}
+
+.savvybi-alert a i{
+    float: right;
+    margin-right: 150px;
+    color: RGBA(45, 74, 80, 0.27);
+    font-size: 28px;
+}
+
+.reg-footer .savvybi-alert{
+    height: 69px;
+    width: 800px;
+    padding: 20px 0 20px 104px;
+    font-size: 20px;
+    font-family: 'Futura PT Light';
+    text-align: left;
+    color: #707070;
+    position: fixed;
+}
+
+.savvybi-alert.alert-danger{
+    background-color: #e7d1d8;
+    color: #F4F5F8;
+}
+
+.savvybi-alert.alert-success{
+    background-color: #b9d5d7;
+    color: #F4F5F8;
+}
+
+.savvybi-alert.alert-info{
+    background-color: #e9e9c8;
+    color: #F4F5F8;
+}
+
+.reg-footer .savvybi-alert.alert-danger{
+    color: #707070;
+}
+
+.reg-footer .savvybi-alert.alert-success{
+    color: #707070;
+}
+
+.reg-footer .savvybi-alert.alert-info{
+    color: #707070;
+}
+
+.reg-footer .note-message, .reg-footer .ready-message{
+    z-index: 1;
+}
+
+.reg-footer .flush-message, .reg-footer .error-message{
+    z-index: 2;
+}
+
+.reg-footer .btn-disabled{
+    background-color: #d3d3d5;
+    color: #b1b1b2;
+
+}
+
+.register-form .fa{
+    position: absolute;
+    top: 13px;
+    right: 10px;
+    float: right;
+    font-size: 20px;
+    background: transparent;
+}
+
+#stay_login, #remember_me{
+    display:none;
+}
+
+#stay_login + label{
+    color: #707070;
+    font-size: 20px;
+    font-family: 'Futura PT Light';
+    float: right;
+}
+
+#stay_login + label:before, #remember_me + label:before{
+    background-color: white;
+    font-family: FontAwesome;
+    content: "\f096";
+    font-size: 20px;
+    display: inline-block;
+    color: white;
+    width: 20px;
+    height: 22px;
+    margin-right: 5px;
+    position: relative;
+    top: 4px;
+}
+
+#stay_login:checked + label:before, #remember_me:checked + label:before{
+    content: "\f00c";
+    letter-spacing: 5px;
+    color: rgb(7, 148, 147)
+}
+
+#remember_me + label{
+    color: #707070;
+    font-size: 20px;
+    font-family: 'Futura PT Light';
+}
+
+.savvy-btn{
+    width: 220px;
+    height: 60px;
+    font-family: 'Futura PT Medium';
+    font-size: 20px;
+    border-radius: 5px;
+}
+
+.savvy-submit-btn{
+    background: #079493;
+    color: white;
+}
+
+.savvy-submit-btn:hover, .savvy-submit-btn:active{
+    background: #06807F;
+}
+
+.savvy-submit-btn:disabled{
+    background: RGB(211,212,214);
+    color: RGB(177,178,179);
+}
+
+.savvy-default-btn{
+    background: transparent;
+    color: #66B6AB;
+    border-color: #079493;
+}
+
+.savvy-default-btn:active{
+    background: #F4F5F8;
+    color: #079493;
+    border-color: #079493;
+}
+
+.savvy-default-btn:hover{
+    background: white;
+    color: #203539;
+    border-color: #203539;
+}
+
+.savvy-default-btn:disabled{
+    background: white;
+    color: #CCCCCC;
+    border-color: #CCCCCC;
+}
+
+.savvy-navbar{
+    background-color: #2D4A50;
+    margin-bottom: 0px !important;
+}
+
+.savvy-navbar .navbar-brand{
+    height: 75px;
+    padding: 0;
+}
+
+.savvy-navbar .navbar-brand img{
+    background-color: #203539;
+}
+
+.savvy-navbar .navbar-right{
+    margin-top: 8px;
+    margin-right: 20px;
+}
+
+.savvy-navbar .navbar-right li a{
+    font-size: 21px;
+    color: #CCCCCC;
+}
+
+#savvy-onboard-img{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+}
+
+#savvy-sidebar{
+    position: fixed;
+    left: 75px;
+    width: 75px;
+    height: 100%;
+    margin-left: -75px;
+    overflow-y: visible;
+    z-index: 3;
+    background-color: #079493;
+}
+
+#savvy-sidebar .sidebar-nav{
+    width: 75px;
+    padding: 20px 0;
+    list-style: none;
+}
+
+#savvy-sidebar .sidebar-nav>li{
+    line-height: 70px;
+    font-size: 24px;
+    text-align: center;
+    color: #A3BECA;
+}
+
+#savvy-sidebar .sidebar-nav>li.active{
+    color: white;
+}
+
+#savvy-sidebar .sidebar-nav ul{
+    position: absolute;
+    left: 100%;
+    top: 0;
+    bottom: 0;
+    width: 240px;
+    list-style: none;
+    background-color: #F4F5F8;
+    text-align: left;
+    padding-left: 40px;
+    padding-top: 20px;
+    box-shadow: 2px 0px 6px 0px #66B6AB;
+
+    transition: transform 0.5s ease-out;
+    transform: scaleX(0);
+    transform-origin: left;
+
+}
+
+#savvy-sidebar .sidebar-nav li.active>ul{
+    transform: scaleX(1);
+}
+
+#savvy-sidebar .sidebar-nav .sidebar-menu li>a{
+    font-size: 24px;
+    color: #566C70;
+    font-family: 'Futura PT Light';
+}
+
+#savvy-sidebar .sidebar-nav .sidebar-menu .sub-menu{
+    background-color: white;
+}
+
+#savvy-sidebar .sidebar-nav .sidebar-menu li>a{
+    text-decoration: none;
+}
+
+#savvy-sidebar .sidebar-nav .sidebar-menu li>a:hover{
+    text-decoration: underline;
+}
+
+#savvy-sidebar .sidebar-nav .sidebar-menu li.active>a,
+#savvy-sidebar .sidebar-nav .sidebar-menu li.active>a:hover,
+#savvy-sidebar .sidebar-nav .sidebar-menu li.active>a:focus{
+    font-family: 'Futura PT Medium';
+    text-decoration: underline;
+}
+
+#main-content{
+    width: 900px;
+    margin: auto;
+    padding-top: 20px;
+    text-align: left;
+}
+#welcome-div{
+    text-align: center;
+    margin-top: 80px;
+}
+#welcome-div > .title{
+    color: #079493;
+    font-size: 40px;
+    font-family: 'Futura PT Light';
+}
+
+#welcome-div .meter-description{
+    color: #34495E;
+    font-size: 20px;
+    font-family: 'Futura PT Light';
+    margin-top: 50px;
+    line-height: 0.8;
+}
+
+.meter-setup{
+    margin-top: 80px;
+}
+
+.meter-setup .title{
+    font-family: 'Futura PT Medium';
+    color: #34495E;
+    font-size: 22px;
+    margin-bottom: 30px;
+}
+
+.meter-box{
+    width: 100%;
+    height: 200px;
+    box-shadow: 1px 4px 5px RGBA(0, 0, 0, 0.16);
+    background-color: #F4F5F8;
+    border-radius: 5px;
+    padding: 30px 10px 15px 100px;
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.meter-box:hover, .meter-box:active{
+    background-color: white;
+}
+
+.meter-box .title{
+    font-size: 20px;
+    margin-bottom: 0;
+}
+
+.meter-box .content{
+    font-size: 20px;
+    width: 500px;
+    font-family: 'Futura PT Light';
+    float: left;
+    margin-top: 20px;
+    line-height: 0.8;
+}
+
+.meter-box .content .highlight{
+    color: #149999;
+    font-family: 'Futura PT Medium';
+}
+
+.meter-box .submit{
+    float: right;
+    position: relative;
+    top: -15px;
+}
+
+.meter-setup .go-to-main{
+    float: right;
+}
+
+.meter-setup .go-to-main a{
+    font-family: 'Futura PT Light';
+    color: #2D4A50;
+    font-size: 18px;
+}
+
+.meter-setup .go-to-main a:hover, .meter-setup .go-to-main a:focus{
+    text-decoration: none;
+}
+
+.modal-backdrop.in{
+    background-color: #F4F5F8;
+}
+
+.meter-setup .modal-header{
+    padding: 60px ;
+    border-bottom: none;
+}
+
+.meter-setup .modal-title{
+    font-size: 36px;
+    color: #079493;
+    font-family: 'Futura PT Light';
+}
+
+.meter-setup .modal-body{
+    font-size: 20px;
+    font-family: 'Futura PT Light';
+    color: #34495E;
+    line-height: 1;
+    padding: 0;
+}
+
+.meter-setup .modal-footer{
+    border-top: none;
+    padding: 20px 50px;
+    margin-top: 80px;
+}
+#savvy-content{
+    margin-top: 70px;
+}
+#savvy-content #main-content{
+    color: #34495E;
+    font-family: 'Futura PT Light';
+}
+
+.account-div > .title, .admin-div > .title{
+    color: #079493;
+    font-size: 48px;
+    margin-bottom: 50px;
+    text-align: center;
+}
+
+#savvy-content #main-content .nav-pills > li > a{
+    color: #34495E;
+    font-size: 18px;
+    font-family: 'Futura PT Medium';
+}
+
+#savvy-content #main-content .nav-pills > li > a:hover,
+#savvy-content #main-content .nav-pills > li > a:focus,
+#savvy-content #main-content .nav-pills > li.active > a,
+#savvy-content #main-content .nav-pills > li.active > a:focus,
+#savvy-content #main-content .nav-pills > li.active > a:hover{
+    /*text-decoration: underline;*/
+    color: #34495E;
+    background: white;
+}
+
+#savvy-content .tab-content{
+    background-color: white;
+    padding: 50px 30px 20px 30px;
+}
+#savvy-content .form-group input.form-control,
+#savvy-content .form-group select.form-control,
+#savvy-content .form-group textarea.form-control {
+    height: 36px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border: 1px solid #707070;
+    font-family: "Futura PT Light";
+}
+#savvy-content .tab-content .tab-pane > .header > .thumbnail{
+    border: 1px solid black;
+    -webkit-border-radius: unset;
+    -moz-border-radius: unset;
+    border-radius: unset;
+    width: 73px;
+    height: 66px;
+    float: left;
+    margin-right: 20px;
+    background-color: white;
+}
+
+#about-div #admin_owner > .header .search-bar{
+    float: right;
+    width: 280px;
+    height: 30px;
+    -webkit-border-radius: 13px;
+    -moz-border-radius: 13px;
+    border-radius: 13px;
+    border: 1px solid #CCCCCC;
+    margin-top: 20px;
+    color: dimgrey;
+    padding-left: 15px;
+    padding-right: 40px;
+}
+
+#about-div #admin_owner > .header .form-control-feedback{
+    line-height: 5;
+    color: #CCCCCC;
+}
+
+#workspace-name{
+    font-size: 24px;
+    font-family: 'Futura PT Medium';
+    line-height: 2.5;
+    float: left;
+}
+
+#about-div #overview > .header,
+#members-div #overview > .header{
+    margin-bottom: 30px;
+}
+
+#about-div .tab-content .tab-pane > .content table,
+#billing-div #contact > .content table,
+#members-div .tab-content .tab-pane > .content table
+{
+    width: 100%;
+}
+
+#about-div .tab-content .tab-pane > .content .field,
+#members-div .tab-content .tab-pane > .content .field
+{
+    font-family: 'Futura PT Medium';
+    font-size: 18px;
+    padding: 20px 0;
+}
+
+#about-div .tab-content .tab-pane > .content .value,
+#members-div .tab-content .tab-pane > .content .value{
+    font-size: 18px;
+    padding: 20px 0;
+}
+
+#about-div .tab-content .tab-pane > .content tr,
+#billing-div #contact > .content tr,
+#members-div .tab-content .tab-pane > .content tr
+{
+    border-bottom: 1px solid #ccc;
+}
+
+#about-div #bav .bav-content{
+    width: 540px;
+    margin: auto;
+    margin-top: 30px;
+}
+#about-div #bav blockquote{
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    font-family: "Futura PT Medium";
+    font-size: 26px;
+    border: 1px solid #CCCCCC;
+    padding: 16px 20px;
+    border-left: 20px solid #CCCCCC;
+}
+#about-div #bav span > i{
+    font-size: 20px;
+    margin-right: 10px;
+}
+#about-div #bav blockquote.success{
+    color: #079493;
+    border-left-color: #079394;
+}
+#about-div #bav blockquote.info{
+    color: #DAD338;
+    border-left-color: #DAD338;
+}
+#about-div #bav blockquote.warning{
+    color: #B81038;
+    border-left-color: #B81038;
+}
+#about-div #bav .bav-content ul#bav-list{
+    list-style: none;
+    padding-left: 0;
+}
+#about-div #bav .bav-content ul#bav-list li{
+    color: #34495E;
+    font-size: 18px;
+    line-height: 2;
+}
+#about-div #bav .bav-content ul#bav-list li.success span{
+    color: #079394;
+}
+#about-div #bav .bav-content ul#bav-list li.warning span{
+    color: #B81038;
+}
+#about-div #bav .bav-content ul#bav-list li.info span{
+    color: #DAD338;
+}
+#about-div #bav .bav-content ul#bav-list li.info a{
+    color: #34495E;
+}
+#about-div #bav .bav-content ul#bav-list li .content-div .savvy-default-btn{
+    width: 90px;
+    height: 36px;
+    font-size: 15px;
+    border-color: #34495E;
+    margin-left: 100px;
+}
+#about-div #bav #bav-submit-btn{
+    width: 140px;
+    height: 36px;
+    font-size: 15px;
+}
+#about-div #bav #bav-submit-btn:disabled{
+    color: white;
+}
+
+#profile-div .form-group label.control-label{
+    font-size: 16px;
+}
+
+#profile-div .form-group label.description{
+    font-size: 15px;
+    color: #707070;
+}
+#access_log .description{
+    font-size: 18px;
+}
+
+#access_log .content table .field{
+    font-family: 'Futura PT Medium';
+}
+
+#billing-div .form-group label.control-label{
+    font-size: 16px;
+}
+
+#billing-div .form-group label.description{
+    font-size: 15px;
+}
+
+#billing-div .tab-content #detail>.header{
+    text-align: left;
+}
+
+#billing-div .tab-content #detail>.header>.title{
+    font-family: 'Futura PT Medium';
+    font-size: 22px;
+}
+
+#billing-div .tab-content #detail>.header>.description{
+    font-size: 18px;
+}
+#billing-div #contact > .content .field{
+    font-family: 'Futura PT Medium';
+    font-size: 18px;
+    padding: 0;
+}
+#history > .header button{
+    width: 150px;
+    height: 36px;
+    font-size: 15px;
+}
+
+#history > .header .title{
+    font-size: 22px;
+    font-family: 'Futura PT Medium';
+    text-align: center;
+    line-height: 1;
+}
+
+#history > .content > table{
+    font-size: 18px;
+}
+
+#history > .content > table > thead{
+    font-family: 'Futura PT Medium';
+}
+
+#history > .content > table > thead{
+    border-bottom: 2px solid #ccc;
+}
+
+#history > .content > table > tbody > tr{
+    border-bottom: 1px solid #ccc;
+}
+
+#history > .content > table  td{
+    padding: 10px 0px 10px 0px;
+}
+
+#plan-div .content{
+    font-size: 18px;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    padding: 10px 0px 10px 0px;
+}
+#billing-div #contact > .header{
+    border-bottom: 2px solid #CCCCCC;
+}
+#billing-div #contact .content #new-contact-div{
+    margin-top: 150px;
+}
+#billing-div #contact .content #new-contact-div .add-contact-btn{
+    width: 140px;
+    height: 36px;
+    border-color: #34495E;
+    color: #34495E;
+    font-size: 15px;
+}
+#billing-div #contact .content #new-contact-div .submit-contact-btn{
+    width: 140px;
+    height: 36px;
+    float: right;
+    font-size: 15px;
+    position: relative;
+    top: 27px;
+}
+#billing-div #contact .content #new-contact-div #submit-contact-div .form-group{
+    float: left;
+    margin-right: 80px;
+}
+#billing-div #contact .content #new-contact-div #submit-contact-div .form-group input{
+    width: 240px;
+    height: 36px;
+}
+#billing-div #payment .form-label{
+    font-size: 18px;
+    font-family: "Futura PT Medium";
+    color: #34495E;
+}
+#billing-div #payment #add-card-btn{
+    float: right;
+    width: 140px;
+    height: 36px;
+    font-size: 15px;
+}
+
+.futura-medium{
+    font-family: 'Futura PT Medium';
+}
+
+.futura-light{
+    font-family: 'Futura PT Light';
+}
+
+#savvy-content .highlight{
+    color: #079493;
+    font-family: 'Futura PT Medium';
+}
+.animated{
+    animation-duration: 1s
+}
+.fade{
+    transition: opacity 1s linear !important;
+}
+
+.admin-div .tab-content > .tab-pane > .header{
+    margin-bottom: 30px;
+}
+.admin-div .tab-content > .tab-pane > .header .savvy-btn{
+    width: 139px;
+    height: 36px;
+    font-size: 15px;
+    margin-left: 20px;
+}
+.admin-div .tab-content > .tab-pane > .header > .description{
+    font-family: "Futura PT Light";
+    font-size: 18px;
+}
+.admin-div .tab-content > .tab-pane > .content .search-bar{
+    /*margin-bottom: 30px;*/
+}
+.admin-div .tab-content > .tab-pane > .content .search-bar > div.input-group{
+    width: 670px;
+    height: 30px;
+    border-radius: 5px;
+    border-color: #34495E;
+    color: #34495E;
+    padding-right: 2px;
+    padding-left: 2px;
+}
+.admin-div .tab-content > .tab-pane > .content .search-bar > div.input-group input[type=text]{
+    height: 30px;
+    color: #34495E;
+}
+.admin-div .tab-content > .tab-pane > .content .search-bar > div.input-group .input-group-addon{
+    height: 30px;
+    color: #34495E;
+}
+.admin-div .tab-content > .tab-pane > .content .search-bar .savvy-default-btn{
+    width: 120px;
+    height: 30px;
+    color: #34495E;
+    border-color: #34495E;
+    font-size: 16px;
+}
+.admin-div .tab-content > .tab-pane > .content .search-bar .savvy-default-btn i{
+    position: relative;
+    left: -20px;
+}
+.admin-div .tab-content > .tab-pane > .content .search-bar .savvy-default-btn .caret{
+    position: relative;
+    right: -20px;
+}
+.admin-div .tab-content > .tab-pane > .content table tr{
+    font-size: 18px;
+    font-family: "Futura PT Light";
+}
+.admin-div .tab-content > .tab-pane > .content table  thead tr{
+    font-family: "Futura PT Medium";
+}
+.admin-div #member_list .content #members-data .edit-member-menu > ul.dropdown-menu{
+    text-align: center;
+    width: 200px;
+    padding: 10px 20px;
+}
+.admin-div .tab-content > .tab-pane > .content ul.dropdown-menu .divider{
+    background-color: #707070;
+    margin: 0px;
+}
+.admin-div .tab-content > .tab-pane > .content .search-bar ul.dropdown-menu{
+    width: 296px;
+    padding: 40px;
+}
+.admin-div #member_list .content #members-data .edit-member-menu > ul.dropdown-menu li:hover,
+.admin-div #member_list .content #members-data .edit-member-menu > ul.dropdown-menu li a:hover
+{
+    background-color: #66B6AB !important;
+}
+.admin-div #member_list .modal .modal-dialog .modal-content,
+.admin-div #security_groups .modal .modal-dialog .modal-content{
+    width: 470px;
+    margin: 300px auto;
+    border-radius: 5px;
+    border: none;
+    -webkit-box-shadow: 0px 2px 3px 5px rgba(100, 100,100, 0.5);
+    -moz-box-shadow: 0px 2px 3px 5px rgba(100, 100,100, 0.5);
+    box-shadow: 0px 2px 3px 5px rgba(100, 100,100, 0.5);
+}
+.admin-div #member_list .modal .modal-dialog,
+.admin-div #security_groups .modal .modal-dialog{
+    font-size: 16px;
+    color: #707070;
+}
+.admin-div #member_list .modal .modal-dialog .modal-content .modal-footer,
+.admin-div #security_groups .modal .modal-dialog .modal-content .modal-footer{
+    border-top: none;
+    padding: 30px;
+}
+.admin-div #member_list .modal .modal-dialog .modal-content .modal-header,
+.admin-div #security_groups .modal .modal-dialog .modal-content .modal-header{
+    border-bottom: none;
+    padding: 30px 30px 15px 30px;
+}
+.admin-div #member_list .modal .modal-dialog .modal-content .modal-header > .title,
+.admin-div #security_groups .modal .modal-dialog .modal-content .modal-header > .title{
+    font-size: 18px;
+    font-family: "Futura PT Medium";
+    color: #34495E;
+}
+.admin-div #member_list .modal .modal-dialog .modal-content .control-label,
+.admin-div #security_groups .modal .modal-dialog .modal-content .control-label{
+    font-family: "Futura PT Medium";
+    color: #34495E;
+}
+.admin-div #member_list .modal .modal-dialog .modal-content .modal-footer .savvy-btn,
+.admin-div #security_groups .modal .modal-dialog .modal-content .modal-footer .savvy-btn{
+    width: 90px;
+    height: 36px;
+    font-size: 15px;
+}
+
+#invite-div .content .invited-users .user{
+    border-bottom: 1px solid #8c8c8c;
+    font-size: 18px;
+    color: #34495E;
+}
+#invite-div .content .invited-users .user .button-div{
+    margin-top: 10px;
+}
+#invite-div .content .invited-users .user .username{
+    font-family: "Futura PT Medium";
+}
+#invite-div .content .invited-users .user .email{
+    font-size: 16px;
+    color: #707070;
+}
+#invite-div .content .invited-users .user .invite-date{
+    color: #079493;
+    font-family: "Futura PT Medium";
+    line-height: 3;
+}
+#invite-div .content .invited-users .user .owner{
+    font-size: 16px;
+    font-family: "Futura PT Medium";
+}
+#invite-div .content .invited-users .user a i{
+    color: #34495E;
+    font-size: 16px;
+    line-height: 3;
+}
+#invite-div .content .invited-users .user .savvy-default-btn{
+    width: 90px;
+    height: 36px;
+    border-color: #34495E;
+    font-size: 15px;
+    margin-right: 20px;
+}
+#data-div #security_groups .content table .savvy-default-btn{
+    width: 100px;
+    height: 36px;
+    font-size: 15px;
+}
+#data-div #security_groups .content table .savvy-btn.deactivate-btn{
+    border-color: #34495E;
+}
+#data-div #security_groups .content table .savvy-btn.delete-btn{
+    border-color: #FF1B51;
+    color: #FF1B51;
+}
+
+#integration-div .content{
+    border-top: 2px solid #CCCCCC;
+    border-bottom: 1px solid #CCCCCC;
+    padding: 20px 0 20px 0;
+    font-family: "Futura PT Light";
+    font-size: 18px;
+}
+
+.modal-section .modal-dialog{
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    margin: 0;
+}
+.modal-section .modal-dialog .modal-content{
+    width: 700px;
+    height: 100%;
+    margin: auto;
+    padding-top: 200px;
+    border: none;
+    color: #34495E;
+    font-family: "Futura PT Light";
+}
+.modal-section .modal-dialog .modal-content .modal-header{
+    text-align: center;
+    padding: 15px 15px 70px 15px;
+    border-bottom: 2px solid #34495E;
+}
+.modal-section .modal-dialog .modal-content .modal-header .modal-icon{
+    font-size: 50px;
+    color: #079394;
+    font-family: "Futura PT Medium";
+}
+.modal-section .modal-dialog .modal-content .modal-header .title{
+    font-size: 32px;
+}
+.modal-section .modal-dialog .modal-content .modal-header button.close{
+    position: relative;
+    top: -150px;
+    left: 200px;
+    font-size: 70px;
+    font-weight: 100;
+    opacity: 1;
+}
+.modal-section .modal-dialog .modal-content .modal-header button.close > p{
+    font-size: 20px;
+    font-family: "Futura PT Light";
+    line-height: 0;
+}
+.modal-section .modal-dialog .modal-content .modal-body{
+    padding: 0;
+}
+.modal-section .modal-dialog .modal-content .modal-body .panel{
+    padding: 20px 20px 20px 25px;
+    border-bottom: 1px solid #34495E;
+}
+.modal-section .modal-dialog .modal-content .modal-body .panel .user-type{
+    font-size: 24px;
+    font-family: "Futura PT Medium";
+}
+.modal-section .modal-dialog .modal-content .modal-body .panel .description{
+    font-size: 20px;
+}
+.modal-section .modal-dialog .modal-content .modal-body .panel .arrow-btn{
+    font-size: 50px;
+    color: #079394;
+    line-height: 1.8;
+    padding-left: 20px;
+    cursor: pointer;
+}
+
+.modal-section #invite-users-modal .modal-dialog .modal-header{
+    border-bottom: none;
+}
+.modal-section #invite-users-modal .modal-body .header-text{
+    font-family: "Futura PT Medium";
+    font-size: 16px;
+}
+.modal-section #invite-users-modal .sort_panel input{
+    width: 100%;
+    border: 1px solid #707070;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+.modal-section #invite-users-modal .sort_panel section.box .actions{
+    line-height: normal;
+    margin: 0;
+    position: relative;
+    top: 0;
+    right: 0;
+}
+.modal-section #invite-users-modal .sort_panel section.box .actions i{
+    font-size: 16px;
+    color:  #203539;
+}
+.modal-section #invite-users-modal .modal-dialog .modal-body blockquote i{
+    font-size: 20px;
+    color: #079394;
+    line-height: 1.3;
+}
+.modal-section #invite-users-modal .modal-dialog .modal-body blockquote{
+    color: #34495E;
+    font-size: 16px;
+    border-top: 1px solid #CCCCCC;
+    border-right: 1px solid #CCCCCC;
+    border-bottom: 1px solid #CCCCCC;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+.modal-section #invite-users-modal .modal-dialog .modal-content #add-input-field{
+    padding-top: 30px;
+    margin-bottom: 30px;
+    font-size: 20px;
+}
+.modal-section #invite-users-modal .modal-dialog .modal-content #add-input-field a:hover{
+    color: #079394;
+}
+.modal-section #invite-users-modal .modal-dialog .modal-content #security-group-field .select2-choices{
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border: 1px solid #707070;
+}
+.modal-section #invite-users-modal .modal-dialog .modal-content #security-group-field .select2-search-choice{
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border: 1px solid #707070;
+    background: transparent;
+}
+.modal-section #invite-users-modal .modal-dialog .modal-content #send-invite-btn{
+    width: 140px;
+    height: 40px;
+    font-size: 15px;
+    margin-top: 30px;
+}
+.modal-section #invite-bulk-modal .modal-dialog .modal-header{
+    border-bottom: none;
+}
+.modal-section #invite-bulk-modal .control-label{
+    font-size: 16px;
+    font-family: "Futura PT Medium";
+}
+.modal-section #invite-bulk-modal .tip{
+    font-size: 14px;
+    font-family: "Futura PT Light";
+    color: #34495E;
+    margin-bottom: 30px;
+}
+.modal-section #invite-bulk-modal .modal-body .savvy-btn{
+    height: 40px;
+    margin-right: 20px;
+    font-size: 15px;
+}
+.modal-section #invite-bulk-modal .modal-body .savvy-submit-btn{
+    width: 140px;
+}
+.modal-section #invite-bulk-modal .modal-body .savvy-default-btn{
+    width: 90px;
+}
+.modal-section #invite-done-modal .modal-dialog{
+    display: table;
+}
+.loading-content{
+    display: table-cell;
+    vertical-align: middle;
+}
+.modal-section #invite-done-modal .loading-content img{
+    width: 100px;
+    height: 100px;
+    margin: auto;
+    display: block;
+}
+.modal-section #invite-done-modal .modal-header > .title{
+    font-size: 32px;
+    font-family: "Futura PT Medium";
+}
+.modal-section #invite-done-modal .modal-header{
+    border-bottom: none;
+}
+.modal-section #invite-done-modal .modal-header p{
+    font-size: 18px;
+}
+.modal-section #invite-done-modal .modal-body table{
+    margin-bottom: 50px;
+}
+.modal-section #invite-done-modal .modal-body table thead tr{
+    border-bottom: 4px solid #079493;
+}
+.modal-section #invite-done-modal .modal-body table tr{
+    border: none;
+}
+.modal-section #invite-done-modal .modal-body .savvy-btn{
+    font-size: 15px;
+    height: 40px;
+}
+.modal-section #invite-done-modal .modal-body .savvy-default-btn{
+    width: 180px;
+    margin-right: 20px;
+}
+.modal-section #invite-done-modal .modal-body .savvy-submit-btn{
+    width: 75px;
+}
+
+.modal-section #group-index-modal .modal-body{
+    height: 350px;
+}
+.modal-section #group-index-modal .modal-body .title{
+    font-size: 24px;
+    font-family: "Futura PT Medium";
+}
+.modal-section #group-index-modal .modal-body .panel{
+    height: 100%;
+}
+.modal-section #group-index-modal .modal-body .description{
+    font-size: 20px;
+}
+
+.modal-section #nmi-setup-modal .modal-dialog .modal-content{
+    padding-top: 100px;
+}
+.modal-section #nmi-setup-modal .modal-body .search-bar{
+    margin-bottom: 30px;
+}
+.modal-section #nmi-setup-modal .modal-body .search-bar > div.input-group{
+    width: 550px;
+    height: 30px;
+    border-radius: 5px;
+    margin-top: 5px;
+    border-color: #34495E;
+    color: #34495E;
+    padding-right: 2px;
+    padding-left: 2px;
+}
+.modal-section #nmi-setup-modal .modal-body > .description{
+    font-size: 20px;
+    margin: 20px 0;
+}
+.modal-section #nmi-setup-modal .modal-body .search-bar > div.input-group input[type=text]{
+    height: 30px;
+    color: #34495E;
+}
+.modal-section #nmi-setup-modal .modal-body .search-bar > div.input-group .input-group-addon{
+    height: 30px;
+    color: #34495E;
+}
+.modal-section #nmi-setup-modal .modal-body .search-bar .savvy-default-btn{
+    width: 120px;
+    height: 30px;
+    color: #34495E;
+    border-color: #34495E;
+    font-size: 16px;
+}
+.modal-section #nmi-setup-modal .modal-body .search-bar .savvy-default-btn i{
+    position: relative;
+    left: -20px;
+}
+.modal-section #nmi-setup-modal .modal-body .search-bar .savvy-default-btn i.fa-angle-down{
+    left: 15px;
+    top: 2px;
+}
+.modal-section #nmi-setup-modal .modal-body{
+    padding-bottom: 20px;
+    border-bottom: 1px solid black;
+}
+.modal-section #nmi-setup-modal .modal-body table{
+    margin-bottom: 40px;
+}
+.modal-section #nmi-setup-modal .modal-body table tr{
+    font-size: 14px;
+    font-family: "Futura PT Light";
+    color: #707070;
+}
+.modal-section #nmi-setup-modal .modal-body table  thead tr{
+    font-family: "Futura PT Medium";
+    font-size: 18px;
+    color: #34495E;
+}
+
+.modal-section #nmi-setup-modal .modal-body a.next-dialog-btn{
+    position: relative;
+}
+
+.modal-section #create-group-modal .modal-header{
+    border-bottom: none;
+}
+.modal-section #create-group-modal .modal-body .form-group{
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+.modal-section #create-group-modal .modal-body .form-group p{
+    font-family: "Futura PT Medium";
+}
+.modal-section #create-group-modal .modal-body .savvy-submit-btn{
+    width: 140px;
+    height: 40px;
+    font-size: 15px;
+}
+
+.modal-section #group-create-done-modal .modal-dialog .modal-body blockquote i{
+    font-size: 20px;
+    color: #079394;
+    line-height: 1.3;
+}
+.modal-section #group-create-done-modal .modal-dialog .modal-body blockquote{
+    color: #34495E;
+    font-size: 16px;
+    border-top: 1px solid #CCCCCC;
+    border-right: 1px solid #CCCCCC;
+    border-bottom: 1px solid #CCCCCC;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+.modal-section #group-create-done-modal .modal-header{
+    border-bottom: none;
+}
+.modal-section #group-create-done-modal .modal-body table{
+    margin-bottom: 30px;
+}
+.modal-section #group-create-done-modal .modal-body table thead tr{
+    border-bottom: 4px solid #079493;
+    font-family: "Futura PT Medium";
+}
+.modal-section #group-create-done-modal .modal-body .savvy-btn{
+    font-size: 15px;
+    height: 40px;
+}
+.modal-section #group-create-done-modal .modal-body .savvy-default-btn{
+    width: 180px;
+    margin-right: 20px;
+}
+.modal-section #group-create-done-modal .modal-body .savvy-submit-btn{
+    width: 75px;
+}
+
+.modal-section #bav-index-modal .modal-body{
+    height: 350px;
+}
+.modal-section #bav-index-modal .modal-body .title{
+    font-size: 24px;
+    font-family: "Futura PT Medium";
+}
+.modal-section #bav-index-modal .modal-body .panel{
+    height: 100%;
+}
+.modal-section #bav-index-modal .modal-body .description{
+    font-size: 20px;
+}
+
+.modal-section .modal-body a.next-dialog-btn{
+    position: absolute;
+    bottom: 0;
+    font-size: 14px;
+}
+.modal-section .modal-body a.next-dialog-btn span{
+    float: right;
+    padding-right: 10px;
+}
+.modal-section .modal-body a.next-dialog-btn i{
+    font-size: 50px;
+    float: right;
+}
+.modal-section .modal-dialog .modal-content .modal-header button.back{
+    background: 0 0;
+    border: 0;
+    position: relative;
+    top: -130px;
+    left: -200px;
+    color: black;
+    font-size: 40px;
+
+}
+.modal-section .modal-dialog .modal-content .modal-header button.back > p{
+    font-size: 20px;
+    font-family: "Futura PT Light";
+    line-height: 2.5;
+}
+
+.modal-section #bav-profile-modal .modal-header{
+    border-bottom: none;
+}
+.modal-section #bav-profile-modal .modal-body > .title{
+    font-family: "Futura PT Medium";
+    font-size: 24px;
+    color: #34495E;
+    margin-bottom: 20px;
+}
+.modal-section #bav-profile-modal .modal-body .photo-thumb{
+    border: 1px solid #707070;
+    width: 130px;
+    height: 130px;
+    -webkit-border-radius: 65px;
+    -moz-border-radius: 65px;
+    border-radius: 65px;
+    margin: auto;
+}
+.modal-section #bav-profile-modal #filepath{
+    width: 260px;
+}
+.modal-section #bav-profile-modal #filepath-addon{
+    position: relative;
+    left: -50px;
+    z-index: 1000;
+    background: transparent;
+    border: none;
+}
+.modal-section #bav-profile-modal #filepath-addon .fa{
+    font-size: 25px;
+    color: black;
+}
+.modal-section #bav-profile-modal #save-later-btn{
+    width: 200px;
+    height: 40px;
+    font-size: 15px;
+}
+.modal-section #bav-profile-modal a.next-dialog-btn{
+    position: relative;
+    bottom: 10px;
+}
+.modal-section #bav-profile-modal .control-label{
+    font-family: "Futura PT Medium";
+    font-size: 16px;
+}
+.modal-section #bav-profile-modal .control-label-child {
+    font-family: "Futura PT Light";
+}
+
+.modal-section #bav-business-modal .modal-header{
+    border-bottom: none;
+}
+.modal-section #bav-business-modal .modal-body > .title{
+    font-family: "Futura PT Medium";
+    font-size: 24px;
+    color: #34495E;
+    margin-bottom: 20px;
+}
+.modal-section #bav-business-modal #filepath{
+    width: 310px;
+}
+.modal-section #bav-business-modal #filepath-addon{
+    position: relative;
+    left: -50px;
+    z-index: 1000;
+    background: transparent;
+    border: none;
+}
+.modal-section #bav-business-modal #filepath-addon .fa{
+    color: black;
+    font-size: 25px;
+}
+.modal-section #bav-business-modal #save-later-btn{
+    width: 200px;
+    height: 40px;
+    font-size: 15px;
+}
+.modal-section #bav-business-modal a.next-dialog-btn{
+    position: relative;
+    bottom: 10px;
+}
+.modal-section #bav-business-modal .control-label{
+    font-family: "Futura PT Medium";
+    font-size: 16px;
+}
+.modal-section #bav-business-modal .control-label-child {
+    font-family: "Futura PT Light";
+}
+
+.select2-container-multi .select2-choices .select2-search-field input{
+    font-family: "Futura PT Light";
+    color: black;
+}
+
+#savvy-content .dataTables_wrapper .dataTables_filter{
+    width: 670px;
+    height: 30px;
+    border-radius: 5px;
+    border-color: #34495E;
+    color: #34495E;
+    padding-right: 2px;
+    padding-left: 2px;
+    position: relative;
+    top: -30px;
+}
+#savvy-content .dataTables_wrapper .dataTables_filter input{
+    margin-left: 0;
+}

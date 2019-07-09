@@ -1,11 +1,50 @@
-<p>Hi,</p>
 
-<p>Welcome to SavvyBI Alpha release!</p>
-
-<p>We only need you to confirm your email <a href="{{url}}">here</a>. And you can find out the Solar information for your next project.</p>
-
-<p>This is our alpha release, we are going to be adding more features and make it prettier before our full release in 3 months, and we want you to be part of the journey.</p>
-
-<p>Thanks !!! You rock</p>
-
-<p>Oscar<br>@savvybi.com.au</p>
+<div
+    style="text-align: center;
+           font-size: 16px;
+           color: #34495E;
+           font-family: Futura;
+           line-height: 1.2;
+           width: 660px;
+           background-color: white;
+           padding: 60px 100px 40px 100px;
+           -webkit-box-shadow: 1px 1px 6px 2px darkgray;
+           -moz-box-shadow: 1px 1px 6px 2px darkgray;
+           box-shadow: 1px 1px 6px 2px darkgray;
+           -webkit-border-radius: 6px;
+           -moz-border-radius: 6px;
+           border-radius: 6px;
+           margin: auto;
+    "
+>
+    <p style="font-size: 36px; color: #079493;">You got a Savvy mail!</p>
+    <p/>
+    <p style="font-size: 18px;">{{ title }}</p>
+    <p>
+      Using SavvyBI is like having a friendly energy expert on your team. It quietly monitors your consumption and demand activity in the background and only requires your attention when something looks suspicious. SavvyBI allows you to focus on growing your business, while comprehensively covering your energy needs.
+    </p>
+    <p style="margin-top: 70px; font-size: 21px;">
+        To activate your account click the button bellow
+    </p>
+    <a href="{{ url }}">
+        <button
+            style="width:450px;
+                   height: 69px;
+                   border-radius: 5px;
+                   font-size: 22px;
+                   font-weight: bold;
+                   color: white;
+                   background-color: #079493;
+                   text-align: center;
+                  "
+        >
+            Activate
+        </button>
+    </a>
+    <div style="font-size: 24px;">
+        <p>Or</p>
+        <p style="font-size: 21px;">Copy and paste this url</p>
+        <p>{{ url }}</p>
+        <p/>
+    </div>
+</div>

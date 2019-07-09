@@ -1,0 +1,110 @@
+<div class="modal fade" tabindex="-1" id="invite-users-modal" role="dialog" style="overflow: hidden;">
+    <div class="modal-dialog animated fadeInLeft">
+        <div class="modal-content">
+            <div class="modal-header">
+                <p class="modal-icon"><i class="far fa-envelope"></i></p>
+                <p class="title">Invite People to <span class="futura-medium">Workspace</span></p>
+                <a href="#invite-index-modal" data-dismiss="modal" data-toggle="modal"><button type="button" class="back pull-left" aria-hidden="true">&#8592;<p>BACK</p></button></a>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;<p>ESC</p></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('SavvyRegisterInvitationUserDBView.bulk_invite') }}" method="post">
+                    <input type="hidden" id="user_type" name="user_type">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="col-sm-12">
+                        <div class="col-sm-10 col-sm-offset-1">
+                            <blockquote class="hide">
+                                <div class="col-sm-1">
+                                    <span data-class="check-circle">
+                                        <i class="fa fa-check-circle"></i>
+                                    </span>
+                                </div>
+                                <div class="col-sm-11 alert-content">
+                                    We found <span>1</span> email address to invite. We’ve done our best to guess a name. See if it looks right, then press Invite.
+                                </div>
+                                <div class="clearfix"></div>
+                            </blockquote>
+                        </div>
+                        <div class="col-sm-5 col-sm-offset-1 header-text">Email Address</div>
+                        <div class="col-sm-5 header-text">Full Name (Optional)</div>
+                    </div>
+                    <div id="user-invite-list-field">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 sort_panel">
+                            <section class="box">
+                                <div class="panel_header">
+                                    <div class="col-sm-5 col-sm-offset-1">
+                                        <input type="email" name="user_email">
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <input type="text" name="user_name">
+                                    </div>
+                                    <div class="actions panel_actions pull-right col-sm-1">
+                                        <i class="box_close fa fa-times"></i>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 sort_panel">
+                            <section class="box">
+                                <div class="panel_header">
+                                    <div class="col-sm-5 col-sm-offset-1">
+                                        <input type="email" name="user_email">
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <input type="text" name="user_name">
+                                    </div>
+                                    <div class="actions panel_actions pull-right col-sm-1">
+                                        <i class="box_close fa fa-times"></i>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 sort_panel">
+                            <section class="box">
+                                <div class="panel_header">
+                                    <div class="col-sm-5 col-sm-offset-1">
+                                        <input type="email" name="user_email">
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <input type="text" name="user_name">
+                                    </div>
+                                    <div class="actions panel_actions pull-right col-sm-1">
+                                        <i class="box_close fa fa-times"></i>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                    <div class="col-sm-12"  id="add-input-field">
+                        <div class="col-sm-10 col-sm-offset-1">
+                            <span class="futura-medium" style="font-size: 16px">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                            <a href="#" id="add-user-field-btn">Add another</a>
+                            or
+                            <a href="#invite-bulk-modal" id="bulk-user-field-btn" data-toggle="modal" data-dismiss="modal">add many at once</a>
+                        </div>
+                    </div>
+                    <div class="col-sm-12" id="security-group-field">
+                        <div class="col-sm-10 col-sm-offset-1" style="font-size: 18px;">
+                            <p class="futura-medium">Security Groups</p>
+                            <div class="form-group">
+                                <label class="form-label futura-medium" style="font-size: 15px;">New members will have access to the meter data in the selected groups</label>
+                                <select id="group-list" multiple name="group_list">
+                                    {% for group in groups %}
+                                        <option value="{{ group.id }}">{{ group.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="col-sm-10 col-sm-offset-1">
+                            <a href="#invite-done-modal" data-toggle="modal" data-dismiss="modal"><button type="submit" class="savvy-btn savvy-submit-btn pull-right" id="send-invite-btn">Send Invitation</button></a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

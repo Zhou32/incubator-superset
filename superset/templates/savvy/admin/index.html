@@ -1,0 +1,163 @@
+{% extends 'savvy/base.html' %}
+
+{% block topbar %}
+    <div class="admin-header">
+        {% include 'savvy/navbar.html' %}
+    </div>
+{% endblock %}
+
+{% block container %}
+    <div class="page-container row-fluid" id="savvy-content">
+        {% include 'savvy/sidebar.html' %}
+
+        <section id="main-content">
+            <section class="wrapper main-wrapper" style=''>
+            {% block main_content %}
+            {% endblock %}
+            </section>
+        </section>
+
+        <div class="modal-section">
+            {% block dialogs %}
+            {% endblock %}
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block js_import %}
+    {{ super() }}
+
+    <script>
+        $.fn.modal.Constructor.prototype.enforceFocus = function() {};
+        $("#group-list").select2({
+            dropdownParent: $("#invite-users-modal")
+        });
+
+        $("#invite-index-modal .modal-body .panel").hover(function(){
+
+            $(this).find(".arrow-btn").addClass('in');
+        });
+
+        $("#invite-index-modal .modal-body .panel").mouseleave(function(){
+
+            $(this).find(".arrow-btn").removeClass('in');
+        });
+
+        // When click arrow button of user type panel in first page of invitatio dialog
+        $("#invite-index-modal a[data-toggle='modal']").on('click', function(){
+            $("#invite-users-modal #user_type").val($(this).attr('data-value'));
+        });
+
+        // When add new user field to invite one more user in invite-users-modal
+        $("#add-user-field-btn").on('click', function(){
+            var new_field_content = `<div class='col-lg-12 col-md-12 col-sm-12 col-xs-12 sort_panel'>\n
+                    <section class='box'>
+                        <div class='panel_header'>
+                            <div class='col-sm-5 col-sm-offset-1'>
+                                <input type='email' name='user_email'>
+                            </div>
+                            <div class='col-sm-5'>
+                                <input type='text' name='user_name'>
+                            </div>
+                            <div class='actions panel_actions pull-right col-sm-1'>
+                                <i class='box_close fa fa-times'></i>
+                            </div>
+                        </div>
+                    </section>
+                </div>`;
+            $("#user-invite-list-field").append(new_field_content);
+        })
+
+        // Add bulk email addresses to invite users list
+        $("#bulk-user-email-add-btn").on('click', function(){
+            var emails = $("#bulk-email-input").val().split(',');
+            $("#user-invite-list-field").html('');
+
+            emails.forEach(function(email, index){
+                var dummy_fullname = email.split('@')[0].replace('.', ' ');
+                var new_field_content = `<div class='col-lg-12 col-md-12 col-sm-12 col-xs-12 sort_panel'>\n
+                    <section class='box'>
+                        <div class='panel_header'>
+                            <div class='col-sm-5 col-sm-offset-1'>
+                                <input type='email' value='${email}' name='user_email'>
+                            </div>
+                            <div class='col-sm-5'>
+                                <input type='text' value='${dummy_fullname}' name='user_name'>
+                            </div>
+                            <div class='actions panel_actions pull-right col-sm-1'>
+                                <i class='box_close fa fa-times'></i>
+                            </div>
+                        </div>
+                    </section>
+                </div>`;
+                $("#user-invite-list-field").append(new_field_content);
+            });
+
+            var email_counts = emails.length;
+            $("#invite-users-modal .modal-body blockquote").removeClass('hide')
+            $("#invite-users-modal .modal-body blockquote .alert-content span").html(email_counts);
+        });
+
+        $("#invite-users-modal #send-invite-btn").click(function(event){
+            event.preventDefault();
+            $.ajax({
+                url: $('#invite-users-modal form').attr('action'),
+                data: $('#invite-users-modal form').serialize(),
+                type: 'POST',
+                success: function(response){
+                    $('#invite-done-modal .loading-content').addClass('hide');
+                    $('#invite-done-modal .modal-content').removeClass('hide');
+                    response = JSON.parse(response);
+                    console.log(response);
+                    console.log(response.status);
+
+                    if(response.status == 'success'){
+                        var invited_users = response.users;
+                        $('#invite-done-modal .invited-user-count').text(invited_users.length+" Member");
+                        for(var i = 0; i < invited_users.length; i++)
+                        {
+                            var invited_user_tr = `
+                                                <tr>
+                                                    <td>${invited_users[i].email}</td>
+                                                    <td>${invited_users[i].name}</td>
+                                                </tr>`;
+                            $('#invite-done-modal .modal-content table tbody').append(invited_user_tr);
+                        }
+
+                    }else if(response.status == 'failed'){
+
+                    }
+                },
+                error: function (error){
+
+                }
+            })
+        });
+
+        $('.modal').on('shown.bs.modal', function () {
+            $('body').addClass('modal-open');
+            // BS adds some padding-right to acomodate the scrollbar at right
+            $('body').removeAttr('style');
+        })
+        $(".modal [data-dismiss='modal']").click(function(event){
+            event.preventDefault();
+            if($(this).attr('data-toggle')!=null){
+                var modal_id = $(this).attr('href');
+                alert($(modal_id).attr('class'));
+                $(modal_id).modal('hide');
+                setTimeout(function(){
+                    $(this).closest(".modal").removeClass('in').modal('hide');
+                }, 3000);
+            }
+
+        });
+        $('.modal').on('hidden.bs.modal', function () {
+            $(this).find('input').val('');
+            $(this).find('textarea').val('');
+        })
+    </script>
+{% endblock %}
+
+
+

@@ -21,7 +21,7 @@
 
 {% block head_css %}
   {{ super() }}
-   <link href="{{url_for('static',filename='assets/stylesheets/savvybi.css')}}" rel="stylesheet">
+   <link href="{{url_for('static',filename='assets/savvybi/css/savvybi.css')}}" rel="stylesheet">
 {% endblock %}
 {% block navbar %}
   <div class="navbar navbar-static-top reg-navbar" role="navigation">
@@ -31,7 +31,7 @@
         <a class="navbar-brand">
           <img
             width="250"
-            src="{{ url_for('static', filename='assets/images/SavvyBI-Logo-Large.png') }}"
+            src="{{ url_for('static', filename='assets/savvybi/images/SavvyBI-Logo-Large.png') }}"
             alt="{{ appbuilder.app_name }}"
           />
         </a>
@@ -117,6 +117,8 @@
                         <div class="savvybi-alert alert-success ready-message" hidden>
                             All good let's do it!
                         </div>
+                        <div class="savvybi-alert alert-info warning-message" hidden>
+                        </div>
                         {% endwith %}
                     </div>
                     <div style="float: right;">
@@ -128,6 +130,10 @@
     </div>
 </div>
 <script>
+    function emailValidation(emailAddress) {
+        var pattern = new RegExp(/^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i);
+        return pattern.test(emailAddress);
+    }
 
     $('#remember_me').on('click', function(){
         if($(this). prop("checked") == true){
@@ -139,11 +145,17 @@
 
     $('.login-form').on('change', function(){
         var is_ready = true;
+        var warning_msg = "";
         // Check if submit is ready
         $('.login-form').each(function(){
             if($(this).val() == '')
             {
                 is_ready = is_ready && false;
+                warning_msg = $(this).attr('id').charAt(0).toUpperCase()+ $(this).attr('id').slice(1) + ' is required!';
+            }
+            else if($(this).attr('id') == 'email' && !emailValidation($(this).val())){
+                is_ready = is_ready && false;
+                warning_msg = 'Please input valid email address!'
             }
         });
         if(is_ready){
@@ -154,7 +166,8 @@
         }else{
             $('input:submit').attr('disabled', 'disabled');
             $('input:submit').removeClass('btn-primary').addClass('btn-disabled');
-            $('.ready-message').attr('hidden', true);
+            $('.savvybi-alert').attr('hidden', true);
+            $('.warning-message').html(warning_msg).removeAttr('hidden');
         }
     })
 

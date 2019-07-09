@@ -2,7 +2,7 @@ import json
 import logging
 import time
 
-from flask import flash, redirect, url_for, g, request
+from flask import flash, redirect, url_for, g, request, make_response
 from flask_babel import lazy_gettext
 from flask_mail import Mail, Message
 from flask_login import login_user
@@ -266,10 +266,14 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
         msg = Message()
         msg.subject = self.email_subject
         url = self.appbuilder.sm.get_url_for_invitation(register_user.registration_hash)
+        org_owner = self.appbuilder.session.query(SavvyUser).filter_by(id=g.user.id).first()
+        title = '{org_owner_firstname} {org_owner_lastname} inviting you to join him at {workspace}'.format(org_owner_firstname=org_owner.first_name.capitalize(),
+                                                                                                            org_owner_lastname=org_owner.last_name.capitalize(),
+                                                                                                            workspace=register_user.organization)
         msg.html = self.render_template(self.email_template,
                                         url=url,
-                                        first_name=register_user.first_name,
-                                        last_name=register_user.last_name)
+                                        title=title
+                                        )
         msg.recipients = [register_user.email]
         try:
             mail.send(msg)
@@ -292,7 +296,7 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
         result = [('-1', 'None')]
         if org:
             groups = self.appbuilder.sm.search_group(org.id)
-        if len(groups) > 1:
+        if groups is not None:
             list = [(str(group.id), group.group_name) for group in groups
                     if not group.group_name.endswith('_default_group')]
             result = result + list
@@ -326,7 +330,6 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
         if form.validate_on_submit():
             user_id = g.user.id
 
-
             try:
                 organization = self.appbuilder.sm.find_org(user_id=user_id)
                 reg_user = self.appbuilder.sm.add_invite_register_user(email=form.email.data,
@@ -352,6 +355,48 @@ class SavvyRegisterInvitationUserDBView(RegisterUserDBView):
                                         appbuilder=self.appbuilder
                                         )
 
+    @expose('/bulk-invite', methods=['POST'])
+    def bulk_invite(self):
+        email_list = request.form.getlist('user_email')
+        name_list = request.form.getlist('user_name')
+        role = request.form['user_type']
+        group = request.form['group_list'][0]
+
+        user_id = g.user.id
+        failed_users = []
+        succeed_users = []
+        organization = self.appbuilder.sm.find_org(user_id=user_id)
+
+        for index, email in enumerate(email_list):
+            if email == "" or  email is None:
+                continue
+            fullname = name_list[index]
+            first_name = fullname.split(' ')[0]
+            last_name = fullname.split(' ')[1]
+
+            try:
+                reg_user = self.appbuilder.sm.add_invite_register_user(email=email,
+                                                                       organization=organization,
+                                                                       first_name=first_name,
+                                                                       last_name=last_name,
+                                                                       role=role,
+                                                                       group=group,
+                                                                       inviter=user_id)
+                if reg_user:
+                    if self.send_email(reg_user):
+                        succeed_users.append({'email': email, 'name': fullname})
+                    else:
+                        failed_users.append({'email': email, 'name': fullname})
+            except Exception as e:
+                logging.error(e)
+                failed_users.append({'email': email, 'name': fullname})
+
+        if len(failed_users) > 0:
+            return json.dumps({'status': 'failed',
+                               'failed_users': failed_users,
+                               'success_users': succeed_users})
+        return json.dumps({'status': 'success', 'users': succeed_users})
+
 
 class SavvyBIAuthDBView(AuthDBView):
 
@@ -373,7 +418,7 @@ class SavvyBIAuthDBView(AuthDBView):
                     break
             # If org owner's first login
             is_first_login = False
-            if is_org_owner == True and (user.login_count == 0 or user.login_count is None):
+            if is_org_owner == True and (user.login_count is None or user.login_count==0):
                     is_first_login = True
 
             user = self.appbuilder.sm.auth_user_db(form.email.data, form.password.data)
@@ -386,7 +431,7 @@ class SavvyBIAuthDBView(AuthDBView):
             if user.email_confirm is False:
                 flash("You haven't verified your email account yet.", "info")
             if is_first_login is True:
-                return redirect(url_for('Superset.meter_connect'))
+                return redirect(url_for('MeterDataView.meter_connect'))
             if user.first_name == '' or user.last_name == '':
                 return redirect(self.appbuilder.get_url_for_userinfo)
             return redirect(self.appbuilder.get_url_for_index)
@@ -396,7 +441,6 @@ class SavvyBIAuthDBView(AuthDBView):
 
 
 class SavvyRegisterUserDBView(RegisterUserDBView):
-    redirect_url = '/'
     form = SavvyRegisterUserDBForm
     edit_widget = SavvyRegisterFormWidget
     form_template = 'appbuilder/general/security/form_template.html'
@@ -423,12 +467,27 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
         # self.handle_aws_info(org_reg, user)
         self.appbuilder.sm.del_register_user(reg)
         if request.args.get('login') == 'True':
-            login_user(user, remember=False)
-            flash('Your account is successfully confirmed. Please update your profile.', 'success')
-            return redirect(self.appbuilder.get_url_for_userinfo)
+            if user.login_count is None or user.login_count==0:
+                is_first_login = True
+            else:
+                is_first_login = False
+
+            self.appbuilder.sm.update_user_auth_stat(user, True)
+            login_user(user)
+
+            if is_first_login is True:
+                flash('Your account is successfully confirmed. Please connect meters to your organization.', 'success')
+                return redirect(url_for('MeterDataView.meter_connect'))
+
+            if user.first_name == '' or user.last_name == '':
+                flash('Your account is successfully confirmed. Please update your profile.', 'success')
+                return redirect(self.appbuilder.get_url_for_userinfo)
+
+            flash('Your account is successfully confirmed.', 'success')
+            return redirect(self.appbuilder.get_url_for_index)
         else:
             flash('Your account is successfully confirmed. Please login with your email', 'success')
-            return redirect(self.appbuilder.get_url_for_index)
+            return redirect(self.appbuilder.get_url_for_login)
 
     def add_form_unique_validations(self, form):
         datamodel_user = self.appbuilder.sm.get_user_datamodel
@@ -499,12 +558,8 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
             if self.send_email(register_user, stay_login=kwargs['stay_login']):
                 flash(as_unicode(self.message), 'info')
                 if kwargs['stay_login'] == True:
-                    login_user(user, remember=False)
-                    if user.email_confirm == False:
-                        flash("You haven't verified your email account yet.", "info")
-                    return redirect(url_for('Superset.meter_connect'))
-                else:
-                    return redirect(self.appbuilder.get_url_for_login)
+                    login_user(user)
+                return register_user
             else:
                 flash(as_unicode(self.error_message), 'danger')
                 self.appbuilder.sm.del_register_user(register_user)
@@ -523,10 +578,11 @@ class SavvyRegisterUserDBView(RegisterUserDBView):
             url = url + "?login=True"
         else:
             url = url + "?login=False"
+
+        title = 'You\'ve created {workspace}'.format(workspace=register_user.organization)
         msg.html = self.render_template(self.email_template,
                                         url=url,
-                                        first_name=register_user.first_name,
-                                        last_name=register_user.last_name)
+                                        title=title)
         msg.recipients = [register_user.email]
         try:
             mail.send(msg)
@@ -551,7 +607,8 @@ class SavvyRegisterInviteView(BaseRegisterUser):
         msg.subject = self.email_subject
         url = url_for('.activate', _external=True, invitation_hash=register_user.registration_hash)
         msg.html = self.render_template(self.email_template,
-                                        url=url)
+                                        url=url,
+                                        title=register_user.organization)
         msg.recipients = [register_user.email]
         try:
             mail.send(msg)
@@ -676,8 +733,8 @@ class SavvySiteModelView(ModelView):
     add_form = CSVToSitesForm
     add_columns = ['org', 'csv_file']
 
-    base_filters = [['SiteID', FilterInFunction, get_site_id_list_from_org],
-                    ['SiteID', FilterInFunction, get_site_id_list_from_group]]
+    base_filters = [['SiteID', FilterInFunction, get_site_id_list_from_org]]
+                    # ['SiteID', FilterInFunction, get_site_id_list_from_group]]
 
     def get_select_widget(self, filters,
                          actions=None,

@@ -7,14 +7,15 @@ from superset import appbuilder, db
 from superset.connectors.sqla.models import SqlaTable, TableColumn
 from superset.models.core import Database
 from superset.views.utils import parse_sqalchemy_uri
-from superset.savvy.models import Group, Site, SavvyUser
+from superset.savvy.models import Group, Site, SavvyUser, OrgRegisterUser, Organization
 
 
 class MeterDataView(BaseView):
     route_base = "/superset"
+    page_name = "connect_meter"
 
     @expose('/meterdata/<string:table_id>', methods=['GET', 'POST'])
-    def method1(self, table_id):
+    def meter_data(self, table_id):
         page = int(request.args.get('page_meter', 0))
         page_size = int(request.args.get('page_size', 50))
         sites = db.session.query(Site).filter(
@@ -98,5 +99,42 @@ class MeterDataView(BaseView):
             flash(u'There is no available sites data for you. Please add yourself into a group, or '
                   u'ask your inviter to do so.', 'info')
             return redirect(self.get_redirect())
+
+    @expose('/connect-meter')
+    def meter_connect(self):
+        if not g.user or not g.user.get_id():
+            return redirect(appbuilder.get_url_for_login)
+
+        is_orgowner = False
+        for role in g.user.roles:
+            if role.name == 'org_owner':
+                is_orgowner = True
+                break
+        if is_orgowner is False:
+            flash('Access is denied. Only organization owner can access it.', 'info')
+            return redirect(appbuilder.get_url_for_index)
+
+        user = db.session.query(SavvyUser).filter_by(id=g.user.get_id()).first()
+
+        if user.email_confirm is True:
+            organization = db.session.query(Organization).filter(Organization.users.any(id=user.id)).scalar()
+            org_name = organization.organization_name
+        else:
+            org_register = db.session.query(OrgRegisterUser).filter_by(email=user.email).first()
+            org_name = org_register.organization
+        if user.first_name == '' or user.last_name == '':
+            later_link = appbuilder.get_url_for_userinfo
+        else:
+            later_link = appbuilder.get_url_for_index
+        username = '{} {}'.format(user.first_name, user.last_name)
+        return self.render_template(
+            'savvy/connect_meter.html',
+            title='Superset',
+            organization=org_name.capitalize(),
+            username=username,
+            link=later_link,
+            page_name=self.page_name
+        )
+
 
 appbuilder.add_view_no_menu(MeterDataView)

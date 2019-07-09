@@ -1,0 +1,80 @@
+<div class="modal fade" tabindex="-1" id="bav-profile-modal">
+    <div class="modal-dialog animated fadeInLeft">
+        <div class="modal-content">
+            <div class="modal-header">
+                <p class="modal-icon"><i class="fas fa-user-shield"></i></p>
+                <p class="title">Business Authority Verification</p>
+                <button type="button" class="back pull-left" data-dismiss="modal" aria-hidden="true">&#8592;<p>BACK</p></button>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;<p>ESC</p></button>
+            </div>
+            <div class="modal-body">
+                <div class="col-sm-10 col-sm-offset-1 title">
+                    <p>
+                        <i class="far fa-user"></i>
+                        Personal Verification
+                    </p>
+                    <div class="photo-thumb">
+
+                    </div>
+                </div>
+                <div class="col-sm-10 col-sm-offset-1">
+                    <form action="{{ url_for('SavvyRegisterInvitationUserDBView.bulk_invite') }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="row">
+                            <div class="form-group col-sm-12">
+                                <label class="control-label" for="fullname">
+                                    Your Full Name
+                                    <p class="control-label-child">Please share your name as it's shown on your drivers license</p>
+                                </label>
+                                <input type="text" id="fullname"  class="form-control" name="fullname" placeholder="Full Name">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-7">
+                                <label class="control-label" for="position">Position</label>
+                                <input type="text" id="position" class="form-control" name="position" placeholder="Your position for this Workspace">
+                            </div>
+                            <div class="form-group col-sm-5">
+                                <label class="control-label" for="linkedin">LinkedIn</label>
+                                <input type="text" id="linkedin" class="form-control" name="linkedin" placeholder="URL link">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-3" style="position: relative; top: 35px;">
+                                <label class="control-label" for="mobile-no">Mobile</label>
+                                <input type="text" id="mobile-no" class="form-control" name="mobile-no" placeholder="Phone">
+                            </div>
+                            <div class="form-group col-sm-3" style="position: relative; top: 35px;">
+                                <label class="control-label" for="email">Email</label>
+                                <input type="text" id="email" class="form-control" name="email" placeholder="Email">
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label class="control-label" for="filepath">
+                                    Upload a scan of your drivers licence
+                                    <p class="control-label-child">This is just to confirm your identity</p>
+                                </label>
+                                <div class="input-group">
+                                   <input type="text" id="filepath" class="form-control" name="filepath" aria-describedby="filepath-addon" placeholder="This is just to confirm your identify" onclick="document.getElementById('file').click()">
+                                   <span class="input-group-addon" id="filepath-addon"><i class="fa fa-cloud-upload" style="font-family: 'FontAwesome';"></i></span>
+                                </div>
+                                <input type="file" id="file" class="hide" onchange="document.getElementById('filepath').value=this.value">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-sm-12" style="margin-top: 100px;">
+                    <div class="col-sm-10">
+                        <button class="savvy-btn savvy-default-btn" id="save-later-btn">Save for Later</button>
+                    </div>
+                    <div class="col-sm-2">
+                        <a class="next-dialog-btn pull-right" href="#bav-business-modal" data-toggle="modal">
+                            <i class="fas fa-arrow-right"></i><br/>
+                            <span>Next!</span>
+                        </a>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
