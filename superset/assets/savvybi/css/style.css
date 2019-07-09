@@ -5032,7 +5032,7 @@ border-left: 3px solid transparent;
     display: none;
 }
 .page-sidebar.chat_shift, .page-sidebar.collapseit {
-    position: absolute !important;
+    /*position: absolute !important;*/
 }
 .page-sidebar.chat_shift #main-menu-wrapper, .page-sidebar.collapseit #main-menu-wrapper, .page-sidebar.chat_shift #main-menu-wrapper .wraplist, .page-sidebar.collapseit #main-menu-wrapper .wraplist {
     /*height: 3000px !important;*/
