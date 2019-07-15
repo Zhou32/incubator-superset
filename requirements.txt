@@ -10,8 +10,8 @@ asn1crypto==0.24.0        # via cryptography
 babel==2.6.0              # via flask-babel
 billiard==3.5.0.4         # via celery
 bleach==3.0.2
-boto3==1.9.58
-botocore==1.12.84
+boto3==1.4.7
+botocore==1.12.80
 cachetools==3.0.0         # via google-auth
 cchardet==1.0.0           # via tabulator
 celery==4.2.0
@@ -21,7 +21,7 @@ chardet==3.0.4            # via requests
 click==6.7
 colorama==0.3.9
 contextlib2==0.5.5
-croniter==0.3.26
+croniter==0.3.25
 cryptography==2.4.2
 decorator==4.3.0          # via retry
 defusedxml==0.5.0         # via python3-openid
@@ -31,9 +31,9 @@ flask-caching==1.4.0
 flask-compress==1.4.0
 flask-login==0.4.1        # via flask-appbuilder
 flask-migrate==2.1.1
+flask-mail==0.9.1
 flask-openid==1.2.5       # via flask-appbuilder
 flask-sqlalchemy==2.3.2   # via flask-appbuilder, flask-migrate
-flask-mail==0.9.1
 flask-wtf==0.14.2
 flask==1.0.2
 geopy==1.11.0
@@ -75,5 +75,3 @@ vine==1.1.4               # via amqp
 webencodings==0.5.1       # via bleach
 werkzeug==0.14.1          # via flask
 wtforms==2.2.1            # via flask-wtf
-xlrd==1.1.0               # via tabulator
-redis==3.0.1
