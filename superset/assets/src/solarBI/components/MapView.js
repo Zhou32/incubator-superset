@@ -29,7 +29,6 @@ import { Map, Marker, Circle, InfoWindow, GoogleApiWrapper } from '../../visuali
 import { fetchSolarData } from '../actions/solarActions';
 import SaveModal from './SaveModal';
 import ExportModal from './ExportModal';
-// import InfoWidgets from './InfoWidgets';
 import InfoTabs from './InfoTabs';
 import SolarCharts from './SolarCharts';
 import WelcomePage from './WelcomePage';
@@ -296,7 +295,7 @@ export class MapView extends React.Component {
           onClick={this.onMarkerClick}
           icon={{
             url:
-              'https://s3-ap-southeast-2.amazonaws.com/public-asset-test/red_marker.png',
+              'https://i.ibb.co/d58fhn1/red-marker.png',
           }}
         />
       );
@@ -369,7 +368,7 @@ export class MapView extends React.Component {
 
     const defaultIcon = {
       url:
-        'https://s3-ap-southeast-2.amazonaws.com/public-asset-test/icons8-marker-48.png',
+        'https://i.ibb.co/23Gypbr/green-marker.png',
       // scaledSize: new this.props.google.maps.Size(20, 30) // scaled size
     };
 

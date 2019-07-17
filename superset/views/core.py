@@ -22,6 +22,7 @@ import os
 import re
 import time
 import traceback
+import boto3
 from urllib import parse
 
 from flask import (
@@ -1407,6 +1408,58 @@ class Superset(BaseSupersetView):
         return self.generate_json(
             datasource_type=datasource_type,
             datasource_id=datasource_id,
+            form_data=form_data,
+            csv=csv,
+            query=query,
+            results=results,
+            force=force,
+            samples=samples,
+        )
+
+    @log_this
+    @api
+    @has_access_api
+    @handle_api_exception
+    @expose('/export_data/<lat>/<lng>/<start_date>/<end_date>/<type>/<resolution>/',
+            methods=['GET', 'POST'])
+    def export_data(self, lat=None, lng=None, start_date=None, end_date=None,
+                    type=None, resolution=None):
+        """Serves all request that GET or POST form_data
+
+        This endpoint evolved to be the entry point of many different
+        requests that GETs or POSTs a form_data.
+
+        `self.generate_json` receives this input and returns different
+        payloads based on the request args in the first block
+
+        TODO: break into one endpoint for each return shape"""
+        csv = request.args.get('csv') == 'true'
+        query = request.args.get('query') == 'true'
+        results = request.args.get('results') == 'true'
+        samples = request.args.get('samples') == 'true'
+        force = request.args.get('force') == 'true'
+
+        # form_data = self.get_form_data()[0]
+        # datasource_id, datasource_type = self.datasource_info(
+        #     datasource_id, datasource_type, form_data)
+        client = boto3.client('athena')
+        response = client.start_query_execution(
+            QueryString='string',
+            ClientRequestToken='string',
+            QueryExecutionContext={
+                'Database': 'string'
+            },
+            ResultConfiguration={
+                'OutputLocation': 'string',
+                'EncryptionConfiguration': {
+                    'EncryptionOption': 'SSE_S3',
+                    'KmsKey': 'string'
+                }
+            },
+            WorkGroup='string'
+        )
+
+        return self.generate_json(
             form_data=form_data,
             csv=csv,
             query=query,

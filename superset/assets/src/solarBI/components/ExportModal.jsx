@@ -18,14 +18,13 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { withStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import Slide from '@material-ui/core/Slide';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-// import DialogContentText from '@material-ui/core/DialogContentText';
-// import { DatePicker } from '@material-ui/pickers';
 import TextField from '@material-ui/core/TextField';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Radio from '@material-ui/core/Radio';
@@ -33,6 +32,7 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
+import { exportSolarData } from '../actions/solarActions';
 
 const propTypes = {
   classes: PropTypes.object.isRequired,
@@ -112,6 +112,7 @@ class ExportModal extends React.Component {
     this.handleStartDateChange = this.handleStartDateChange.bind(this);
     this.handleEndDateChange = this.handleEndDateChange.bind(this);
     this.handleResolutionChange = this.handleResolutionChange.bind(this);
+    this.handleExportData = this.handleExportData.bind(this);
   }
 
   handleTypeChange(event) {
@@ -128,6 +129,18 @@ class ExportModal extends React.Component {
 
   handleResolutionChange(event) {
     this.setState({ resolution: event.target.value });
+  }
+
+  handleExportData() {
+    const formData = {
+      lat: '-37.8',
+      lng: '144.9',
+      startDate: '2017-02-03',
+      endDate: '2017-05-04',
+      type: 'dni',
+      resolution: 'daily',
+    };
+    this.props.exportSolarData(formData);
   }
 
   render() {
@@ -211,8 +224,7 @@ class ExportModal extends React.Component {
             <DialogActions>
               <Button
                 className={classes.button}
-                onClick={onHide}
-                // onClick={this.props.onHide}
+                onClick={this.handleExportData}
                 color="primary"
               >
                 Export
@@ -236,4 +248,13 @@ class ExportModal extends React.Component {
 
 ExportModal.propTypes = propTypes;
 
-export default withStyles(styles)(ExportModal);
+const mapStateToProps = state => ({
+  solarBI: state.solarBI,
+});
+
+export default withStyles(styles)(
+  connect(
+    mapStateToProps,
+    { exportSolarData },
+  )(ExportModal),
+);

@@ -171,3 +171,25 @@ export function saveSolarData(formData, requestParams) {
       .catch(() => dispatch(saveSolarDataFailed()));
   };
 }
+
+export function exportSolarData(formData, timeout = 60) {
+  return (dispatch) => {
+    const url =
+      '/superset/export_data/' +
+      formData.lat + '/' + formData.lng + '/' +
+      formData.startDate + '/' + formData.endDate + '/' +
+      formData.type + '/' + formData.resolution + '/';
+    const logStart = Logger.getTimestamp();
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    return SupersetClient.post({
+      url,
+      postPayload: { form_data: formData },
+      signal,
+      timeout: timeout * 1000,
+    })
+      .then(({ json }) => console.log(json))
+      .catch(() => dispatch(saveSolarDataFailed()));
+  };
+}
