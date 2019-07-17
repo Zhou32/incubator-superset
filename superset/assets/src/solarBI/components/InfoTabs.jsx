@@ -148,7 +148,7 @@ class InfoTabs extends React.Component {
               <IconButton
                 id="exportIcon"
                 className={classes.icon}
-                href={this.getCSVURL()}
+                // href={this.getCSVURL()}
                 onClick={this.onExportClick}
               >
                 <CloudDownloadIcon />
