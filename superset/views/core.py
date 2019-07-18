@@ -1347,6 +1347,7 @@ class Superset(BaseSupersetView):
         payload = viz_obj.get_payload()
         return data_payload_response(*viz_obj.payload_json_and_has_error(payload))
 
+
     @log_this
     @api
     @has_access_api
@@ -1416,13 +1417,38 @@ class Superset(BaseSupersetView):
             samples=samples,
         )
 
+    def send_email(self, user):
+        """
+            Method for sending the Email to the user
+        """
+        log = logging.getLogger(__name__)
+        email_template = 'appbuilder/general/security/data_request_mail.html'
+
+        try:
+            from flask_mail import Mail, Message
+        except:
+            log.error("Install Flask-Mail to use Mail")
+            return False
+        mail = Mail(self.appbuilder.get_app)
+        msg = Message()
+        msg.subject = "SolarBI - You Data Request is Received!"
+        msg.html = self.render_template(email_template,
+                                        username=user.username,
+                                        first_name=user.first_name)
+        msg.recipients = [user.email]
+        try:
+            mail.send(msg)
+        except Exception as e:
+            log.error("Send email exception: {0}".format(str(e)))
+            return False
+        return True
+
     @log_this
     @api
-    @has_access_api
     @handle_api_exception
-    @expose('/export_data/<lat>/<lng>/<start_date>/<end_date>/<type>/<resolution>/',
+    @expose('/request_data/<lat>/<lng>/<start_date>/<end_date>/<type>/<resolution>/',
             methods=['GET', 'POST'])
-    def export_data(self, lat=None, lng=None, start_date=None, end_date=None,
+    def request_data(self, lat=None, lng=None, start_date=None, end_date=None,
                     type=None, resolution=None):
         """Serves all request that GET or POST form_data
 
@@ -1439,10 +1465,11 @@ class Superset(BaseSupersetView):
         samples = request.args.get('samples') == 'true'
         force = request.args.get('force') == 'true'
 
+        self.send_email(g.user)
         # form_data = self.get_form_data()[0]
-        # datasource_id, datasource_type = self.datasource_info(
-        #     datasource_id, datasource_type, form_data)
         client = boto3.client('athena')
+
+        athena_query = "SELECT "
         response = client.start_query_execution(
             QueryString='string',
             ClientRequestToken='string',
@@ -1460,7 +1487,6 @@ class Superset(BaseSupersetView):
         )
 
         return self.generate_json(
-            form_data=form_data,
             csv=csv,
             query=query,
             results=results,

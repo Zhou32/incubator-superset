@@ -32,12 +32,14 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
-import { exportSolarData } from '../actions/solarActions';
+import { requestSolarData } from '../actions/solarActions';
 
 const propTypes = {
   classes: PropTypes.object.isRequired,
+  solarBI: PropTypes.object,
   open: PropTypes.bool.isRequired,
   onHide: PropTypes.func.isRequired,
+  requestSolarData: PropTypes.func.isRequired,
 };
 
 const theme = createMuiTheme({
@@ -50,6 +52,7 @@ const theme = createMuiTheme({
     },
   },
 });
+
 
 const styles = tm => ({
   button: {
@@ -102,7 +105,7 @@ class ExportModal extends React.Component {
     super(props);
 
     this.state = {
-      type: 'DNI',
+      type: 'dni',
       startDate: '2017-01-01',
       endDate: '2018-01-01',
       resolution: 'Hourly',
@@ -112,7 +115,7 @@ class ExportModal extends React.Component {
     this.handleStartDateChange = this.handleStartDateChange.bind(this);
     this.handleEndDateChange = this.handleEndDateChange.bind(this);
     this.handleResolutionChange = this.handleResolutionChange.bind(this);
-    this.handleExportData = this.handleExportData.bind(this);
+    this.handleRequestData = this.handleRequestData.bind(this);
   }
 
   handleTypeChange(event) {
@@ -131,16 +134,17 @@ class ExportModal extends React.Component {
     this.setState({ resolution: event.target.value });
   }
 
-  handleExportData() {
-    const formData = {
-      lat: '-37.8',
-      lng: '144.9',
-      startDate: '2017-02-03',
-      endDate: '2017-05-04',
-      type: 'dni',
+  handleRequestData() {
+    const queryData = {
+      lat: this.props.solarBI.queryResponse.data.lat + '',
+      lng: this.props.solarBI.queryResponse.data.lng + '',
+      startDate: this.state.startDate,
+      endDate: this.state.endDate,
+      type: this.state.type,
       resolution: 'daily',
     };
-    this.props.exportSolarData(formData);
+    this.props.requestSolarData(queryData);
+    // this.props.onHide();
   }
 
   render() {
@@ -199,9 +203,9 @@ class ExportModal extends React.Component {
                   value={this.state.type}
                   onChange={this.handleTypeChange}
                 >
-                  <FormControlLabel classes={{ label: classes.formControlLabel }} value="DNI" control={<Radio />} label="DNI" />
-                  <FormControlLabel classes={{ label: classes.formControlLabel }} value="GHI" control={<Radio />} label="GHI" />
-                  <FormControlLabel classes={{ label: classes.formControlLabel }} value="Download Both" control={<Radio />} label="Download Both" />
+                  <FormControlLabel classes={{ label: classes.formControlLabel }} value="dni" control={<Radio />} label="DNI" />
+                  <FormControlLabel classes={{ label: classes.formControlLabel }} value="ghi" control={<Radio />} label="GHI" />
+                  {/* <FormControlLabel classes={{ label: classes.formControlLabel }} value="Download Both" control={<Radio />} label="Download Both" /> */}
                 </RadioGroup>
               </FormControl>
 
@@ -224,16 +228,15 @@ class ExportModal extends React.Component {
             <DialogActions>
               <Button
                 className={classes.button}
-                onClick={this.handleExportData}
+                onClick={this.handleRequestData}
                 color="primary"
               >
-                Export
+                Request
               </Button>
 
               <Button
                 className={classes.button}
                 onClick={onHide}
-                // onClick={this.props.onHide}
                 color="primary"
               >
                 Close
@@ -255,6 +258,6 @@ const mapStateToProps = state => ({
 export default withStyles(styles)(
   connect(
     mapStateToProps,
-    { exportSolarData },
+    { requestSolarData },
   )(ExportModal),
 );

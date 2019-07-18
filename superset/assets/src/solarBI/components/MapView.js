@@ -273,12 +273,7 @@ export class MapView extends React.Component {
 
 
   render() {
-    // const { width } = this.props;
     const { entry } = this.props.solarBI;
-    // const isSmallScreen = /xs|sm|md/.test(width);
-    // const buttonProps = {
-    //   size: isSmallScreen ? 'medium' : 'large',
-    // };
     let reactEcharts = null;
     let closestMarker = null;
     let infoWindow = null;

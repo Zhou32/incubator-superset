@@ -142,6 +142,16 @@ export function saveSolarDataFailed() {
   return { type: SAVE_SOLAR_DATA_FAILED };
 }
 
+export const REQEUST_SOLAR_DATA_SUCCEEDED = 'REQEUST_SOLAR_DATA_SUCCEEDED';
+export function requestSolarDataSucceeded(data) {
+  return { type: REQEUST_SOLAR_DATA_SUCCEEDED, data };
+}
+
+export const REQUEST_SOLAR_DATA_FAILED = 'REQUEST_SOLAR_DATA_FAILED';
+export function requestSolarDataFailed(data) {
+  return { type: REQUEST_SOLAR_DATA_FAILED, data };
+}
+
 export function saveSolarData(formData, requestParams) {
   return (dispatch) => {
     const directory = '/superset/solar/';
@@ -172,24 +182,24 @@ export function saveSolarData(formData, requestParams) {
   };
 }
 
-export function exportSolarData(formData, timeout = 60) {
+export function requestSolarData(queryData, timeout = 60) {
   return (dispatch) => {
     const url =
-      '/superset/export_data/' +
-      formData.lat + '/' + formData.lng + '/' +
-      formData.startDate + '/' + formData.endDate + '/' +
-      formData.type + '/' + formData.resolution + '/';
-    const logStart = Logger.getTimestamp();
+      '/superset/request_data/' +
+      queryData.lat + '/' + queryData.lng + '/' +
+      queryData.startDate + '/' + queryData.endDate + '/' +
+      queryData.type + '/' + queryData.resolution + '/';
+    // const logStart = Logger.getTimestamp();
     const controller = new AbortController();
     const { signal } = controller;
 
     return SupersetClient.post({
       url,
-      postPayload: { form_data: formData },
+      postPayload: { form_data: queryData },
       signal,
       timeout: timeout * 1000,
     })
       .then(({ json }) => console.log(json))
-      .catch(() => dispatch(saveSolarDataFailed()));
+      .catch(() => console.log('error'));
   };
 }
