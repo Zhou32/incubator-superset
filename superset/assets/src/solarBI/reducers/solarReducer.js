@@ -42,7 +42,7 @@ export default function (state = {}, action) {
         queryResponse: action.queryResponse,
         can_export: true,
         can_save: true,
-        chartUpdateEndTime: now(),
+        solarUpdateEndTime: now(),
       };
     },
     [actions.SOLAR_UPDATE_TIMEOUT]() {
@@ -87,16 +87,28 @@ export default function (state = {}, action) {
           : null,
       };
     },
-    [actions.SAVE_SOLAR_DATA_SUCCESS](data) {
+    [actions.SAVE_SOLAR_DATA_SUCCESS]() {
       return {
         ...state,
-        data,
+        data: action.data,
       };
     },
     [actions.SAVE_SOLAR_DATA_FAILED]() {
       return {
         ...state,
         saveModalAlert: 'Failed to save slice',
+      };
+    },
+    [actions.REQEUST_SOLAR_DATA_SUCCEEDED]() {
+      return {
+        ...state,
+        requestStatus: 'success',
+      };
+    },
+    [actions.REQUEST_SOLAR_DATA_FAILED]() {
+      return {
+        ...state,
+        requestStatus: 'failed',
       };
     },
   };

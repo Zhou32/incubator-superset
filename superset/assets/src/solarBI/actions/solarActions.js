@@ -30,6 +30,10 @@ import {
   addInfoToast as addInfoToastAction,
 } from '../../messageToasts/actions/index';
 
+export const addInfoToast = addInfoToastAction;
+export const addSuccessToast = addSuccessToastAction;
+export const addDangerToast = addDangerToastAction;
+
 export const SOLAR_UPDATE_STARTED = 'SOLAR_UPDATE_STARTED';
 export function solarUpdateStarted(queryController, latestQueryFormData, key) {
   return {
@@ -39,10 +43,6 @@ export function solarUpdateStarted(queryController, latestQueryFormData, key) {
     key,
   };
 }
-
-export const addInfoToast = addInfoToastAction;
-export const addSuccessToast = addSuccessToastAction;
-export const addDangerToast = addDangerToastAction;
 
 export const SOLAR_UPDATE_SUCCEEDED = 'SOLAR_UPDATE_SUCCEEDED';
 export function solarUpdateSucceeded(queryResponse, key) {
@@ -142,16 +142,6 @@ export function saveSolarDataFailed() {
   return { type: SAVE_SOLAR_DATA_FAILED };
 }
 
-export const REQEUST_SOLAR_DATA_SUCCEEDED = 'REQEUST_SOLAR_DATA_SUCCEEDED';
-export function requestSolarDataSucceeded(data) {
-  return { type: REQEUST_SOLAR_DATA_SUCCEEDED, data };
-}
-
-export const REQUEST_SOLAR_DATA_FAILED = 'REQUEST_SOLAR_DATA_FAILED';
-export function requestSolarDataFailed(data) {
-  return { type: REQUEST_SOLAR_DATA_FAILED, data };
-}
-
 export function saveSolarData(formData, requestParams) {
   return (dispatch) => {
     const directory = '/superset/solar/';
@@ -182,6 +172,16 @@ export function saveSolarData(formData, requestParams) {
   };
 }
 
+export const REQEUST_SOLAR_DATA_SUCCEEDED = 'REQEUST_SOLAR_DATA_SUCCEEDED';
+export function requestSolarDataSucceeded(data) {
+  return { type: REQEUST_SOLAR_DATA_SUCCEEDED, data };
+}
+
+export const REQUEST_SOLAR_DATA_FAILED = 'REQUEST_SOLAR_DATA_FAILED';
+export function requestSolarDataFailed() {
+  return { type: REQUEST_SOLAR_DATA_FAILED };
+}
+
 export function requestSolarData(queryData, timeout = 60) {
   return (dispatch) => {
     const url =
@@ -199,7 +199,13 @@ export function requestSolarData(queryData, timeout = 60) {
       signal,
       timeout: timeout * 1000,
     })
-      .then(({ json }) => console.log(json))
-      .catch(() => console.log('error'));
+      .then(({ json }) => {
+        console.log(json); // json: {'foo': 3}
+        dispatch(addSuccessToast(t('Request confirmed! An email has been sent to you.')));
+      })
+      .catch(() => {
+        console.log('error');
+        dispatch(addDangerToast(t('Request failed.')));
+      });
   };
 }

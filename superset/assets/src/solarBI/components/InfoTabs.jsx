@@ -24,6 +24,7 @@ import IconButton from '@material-ui/core/IconButton';
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
 import SaveIcon from '@material-ui/icons/Save';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
+import ExportModal from './ExportModal';
 
 const styles = theme => ({
   root: {
@@ -65,29 +66,17 @@ const styles = theme => ({
   },
 });
 
-// const tabHeadStyles = {
-//   fontSize: 20,
-//   textTransform: 'none',
-// };
-
-// function TabContainer(props) {
-//   return (
-//     <Typography component="div" style={{ padding: 8 * 3, fontSize: 20 }}>
-//       {props.children}
-//     </Typography>
-//   );
-// }
-
 class InfoTabs extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       tabValue: 0,
+      showExportModal: false,
     };
     this.handleTabChange = this.handleTabChange.bind(this);
     this.onBackClick = this.onBackClick.bind(this);
     this.onSaveClick = this.onSaveClick.bind(this);
-    this.onExportClick = this.onExportClick.bind(this);
+    this.toggleExportModal = this.toggleExportModal.bind(this);
   }
 
   onBackClick() {
@@ -102,12 +91,12 @@ class InfoTabs extends React.Component {
     this.props.onSaveClick();
   }
 
-  onExportClick() {
-    this.props.onExportClick();
-  }
-
   getCSVURL() {
     return this.props.getCSVURL();
+  }
+
+  toggleExportModal() {
+    this.setState({ showExportModal: !this.state.showExportModal });
   }
 
   handleTabChange(event, tabValue) {
@@ -149,13 +138,18 @@ class InfoTabs extends React.Component {
                 id="exportIcon"
                 className={classes.icon}
                 // href={this.getCSVURL()}
-                onClick={this.onExportClick}
+                onClick={this.toggleExportModal}
               >
                 <CloudDownloadIcon />
               </IconButton>
             </Tooltip>
           )}
         </div>
+
+        <ExportModal
+          open={this.state.showExportModal}
+          onHide={this.toggleExportModal}
+        />
       </div>
     );
   }
@@ -165,7 +159,6 @@ InfoTabs.propTypes = {
   classes: PropTypes.object.isRequired,
   onBackClick: PropTypes.func.isRequired,
   onSaveClick: PropTypes.func.isRequired,
-  onExportClick: PropTypes.func.isRequired,
   getCSVURL: PropTypes.func.isRequired,
   can_save: PropTypes.bool.isRequired,
   can_export: PropTypes.bool.isRequired,

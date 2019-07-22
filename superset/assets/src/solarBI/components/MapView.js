@@ -28,7 +28,7 @@ import LocationSearchBox from './LocationSearchBox';
 import { Map, Marker, Circle, InfoWindow, GoogleApiWrapper } from '../../visualizations/SolarBI/google_maps_react';
 import { fetchSolarData } from '../actions/solarActions';
 import SaveModal from './SaveModal';
-import ExportModal from './ExportModal';
+// import ExportModal from './ExportModal';
 import InfoTabs from './InfoTabs';
 import SolarCharts from './SolarCharts';
 import WelcomePage from './WelcomePage';
@@ -70,8 +70,8 @@ export class MapView extends React.Component {
       zoom: 14,
       address: '',
       options: {},
-      showModal: false,
-      showExportModal: false,
+      showSaveModal: false,
+      // showExportModal: false,
       searching: true,
       showingMap: false,
       activeMarker: {},
@@ -84,8 +84,8 @@ export class MapView extends React.Component {
     this.onPlaceChanged = this.onPlaceChanged.bind(this);
     this.onGoBackClick = this.onGoBackClick.bind(this);
     this.requestData = this.requestData.bind(this);
-    this.toggleModal = this.toggleModal.bind(this);
-    this.toggleExportModal = this.toggleExportModal.bind(this);
+    this.toggleSaveModal = this.toggleSaveModal.bind(this);
+    // this.toggleExportModal = this.toggleExportModal.bind(this);
     this.getFormData = this.getFormData.bind(this);
     this.getCSVURL = this.getCSVURL.bind(this);
     this.onMarkerClick = this.onMarkerClick.bind(this);
@@ -263,13 +263,13 @@ export class MapView extends React.Component {
     }, 3000);
   }
 
-  toggleModal() {
-    this.setState({ showModal: !this.state.showModal });
+  toggleSaveModal() {
+    this.setState({ showSaveModal: !this.state.showSaveModal });
   }
 
-  toggleExportModal() {
-    this.setState({ showExportModal: !this.state.showExportModal });
-  }
+  // toggleExportModal() {
+  //   this.setState({ showExportModal: !this.state.showExportModal });
+  // }
 
 
   render() {
@@ -340,8 +340,8 @@ export class MapView extends React.Component {
           <SolarCharts queryData={queryResponse.data.data} />
           <InfoTabs
             onBackClick={this.onGoBackClick}
-            onSaveClick={this.toggleModal}
-            onExportClick={this.toggleExportModal}
+            onSaveClick={this.toggleSaveModal}
+            // onExportClick={this.toggleExportModal}
             getCSVURL={this.getCSVURL}
             can_save={this.props.solarBI.can_save}
             can_export={this.props.solarBI.can_export}
@@ -459,8 +459,8 @@ export class MapView extends React.Component {
           </Grid>
 
           <SaveModal
-            open={this.state.showModal}
-            onHide={this.toggleModal}
+            open={this.state.showSaveModal}
+            onHide={this.toggleSaveModal}
             // actions={this.props.actions}
             form_data={{
               datasource_id: this.state.datasource_id,
@@ -478,10 +478,10 @@ export class MapView extends React.Component {
             }}
             userId={''}
           />
-          <ExportModal
+          {/* <ExportModal
             open={this.state.showExportModal}
             onHide={this.toggleExportModal}
-          />
+          /> */}
         </MuiThemeProvider>
       </div>
     );

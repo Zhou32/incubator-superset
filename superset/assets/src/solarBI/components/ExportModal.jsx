@@ -135,16 +135,22 @@ class ExportModal extends React.Component {
   }
 
   handleRequestData() {
-    const queryData = {
-      lat: this.props.solarBI.queryResponse.data.lat + '',
-      lng: this.props.solarBI.queryResponse.data.lng + '',
-      startDate: this.state.startDate,
-      endDate: this.state.endDate,
-      type: this.state.type,
-      resolution: 'daily',
-    };
-    this.props.requestSolarData(queryData);
-    // this.props.onHide();
+    const sDate = new Date(this.state.startDate);
+    const eDate = new Date(this.state.endDate);
+    if (sDate > eDate) {
+      alert('Start date cannot be later than end date!'); // eslint-disable-line no-alert
+    } else {
+      const queryData = {
+        lat: this.props.solarBI.queryResponse.data.lat + '',
+        lng: this.props.solarBI.queryResponse.data.lng + '',
+        startDate: this.state.startDate,
+        endDate: this.state.endDate,
+        type: this.state.type,
+        resolution: 'daily',
+      };
+      this.props.requestSolarData(queryData);
+      // this.props.onHide();
+    }
   }
 
   render() {
@@ -205,7 +211,7 @@ class ExportModal extends React.Component {
                 >
                   <FormControlLabel classes={{ label: classes.formControlLabel }} value="dni" control={<Radio />} label="DNI" />
                   <FormControlLabel classes={{ label: classes.formControlLabel }} value="ghi" control={<Radio />} label="GHI" />
-                  {/* <FormControlLabel classes={{ label: classes.formControlLabel }} value="Download Both" control={<Radio />} label="Download Both" /> */}
+                  <FormControlLabel classes={{ label: classes.formControlLabel }} value="Download Both" control={<Radio />} label="Download Both" />
                 </RadioGroup>
               </FormControl>
 

@@ -1431,7 +1431,7 @@ class Superset(BaseSupersetView):
             return False
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
-        msg.subject = "SolarBI - You Data Request is Received!"
+        msg.subject = "SolarBI - Your Data Request is Received!"
         msg.html = self.render_template(email_template,
                                         username=user.username,
                                         first_name=user.first_name)
@@ -1459,16 +1459,15 @@ class Superset(BaseSupersetView):
         payloads based on the request args in the first block
 
         TODO: break into one endpoint for each return shape"""
-        csv = request.args.get('csv') == 'true'
-        query = request.args.get('query') == 'true'
-        results = request.args.get('results') == 'true'
-        samples = request.args.get('samples') == 'true'
-        force = request.args.get('force') == 'true'
+        # csv = request.args.get('csv') == 'true'
+        # query = request.args.get('query') == 'true'
+        # results = request.args.get('results') == 'true'
+        # samples = request.args.get('samples') == 'true'
+        # force = request.args.get('force') == 'true'
 
         self.send_email(g.user)
-        # form_data = self.get_form_data()[0]
-        client = boto3.client('athena')
 
+        client = boto3.client('athena')
         athena_query = "SELECT "
         response = client.start_query_execution(
             QueryString='string',
@@ -1486,13 +1485,8 @@ class Superset(BaseSupersetView):
             WorkGroup='string'
         )
 
-        return self.generate_json(
-            csv=csv,
-            query=query,
-            results=results,
-            force=force,
-            samples=samples,
-        )
+        return json_success(json.dumps({'foo': 3}))
+
 
     @log_this
     @has_access
