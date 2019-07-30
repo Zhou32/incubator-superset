@@ -1465,28 +1465,77 @@ class Superset(BaseSupersetView):
         # samples = request.args.get('samples') == 'true'
         # force = request.args.get('force') == 'true'
 
-        self.send_email(g.user)
+        # self.send_email(g.user)
 
-        client = boto3.client('athena')
-        athena_query = "SELECT "
+        start_year, start_month, start_day = start_date.split('-')
+        end_year, end_month, end_day = end_date.split('-')
+        select_str = ""
+        group_str = ""
+        order_str = ""
+        if resolution == 'hourly':
+            select_str = "SELECT year, month, day, hour, radiationtype, radiation"
+            group_str = "GROUP BY year, month, day, hour, radiationtype, radiation"
+            order_str = "ORDER BY year ASC, month ASC, day ASC, hour ASC"
+        elif resolution == 'daily':
+            select_str = \
+                "SELECT year, month, day, radiationtype, avg(radiation) AS radiation"
+            group_str = "GROUP BY year, month, day, radiationtype"
+            order_str = "ORDER BY year ASC, month ASC, day ASC"
+        elif resolution == 'monthly':
+            select_str = "SELECT year, month, radiationtype, avg(radiation) AS radiation"
+            group_str = "GROUP BY year, month, radiationtype"
+            order_str = "ORDER BY year ASC, month ASC"
+
+        if type != 'both':
+            athena_query = select_str \
+                + " FROM \"solar_radiation_solarbi\".\"gzip_lat_temp\"" \
+                + " WHERE (CAST(year AS BIGINT)*10000" \
+                + " + CAST(month AS BIGINT)*100 + day)" \
+                + " BETWEEN " + start_year + start_month + start_day \
+                + " AND " + end_year + end_month + end_day \
+                + " AND latitude = '" + lat + "' AND longitude = '" + lng \
+                + "' AND radiationtype = '" + type + "' AND radiation != -999 " \
+                + group_str + " " + order_str
+        else:
+            athena_query = "(" + select_str \
+                + " FROM \"solar_radiation_solarbi\".\"gzip_lat_temp\"" \
+                + " WHERE (CAST(year AS BIGINT)*10000" \
+                + " + CAST(month AS BIGINT)*100 + day)" \
+                + " BETWEEN " + start_year + start_month + start_day \
+                + " AND " + end_year + end_month + end_day \
+                + " AND latitude = '" + lat + "' AND longitude = '" + lng \
+                + "' AND radiationtype = 'dni' AND radiation != -999 " \
+                + group_str + " " + order_str + ") UNION ALL (" \
+                + select_str + " FROM \"solar_radiation_solarbi\".\"gzip_lat_temp\"" \
+                + " WHERE (CAST(year AS BIGINT)*10000" \
+                + " + CAST(month AS BIGINT)*100 + day)" \
+                + " BETWEEN " + start_year + start_month + start_day \
+                + " AND " + end_year + end_month + end_day \
+                + " AND latitude = '" + lat + "' AND longitude = '" + lng \
+                + "' AND radiationtype = 'ghi' AND radiation != -999 " \
+                + group_str + " " + order_str + ")"
+
+        SECRET_ACCESS_KEY = 'nwL43NsbEhR4vBHjZIvQI07Q4UtPIC27MqW0gHY/'
+        session = boto3.session.Session(aws_access_key_id='AKIAQAIVQMVAZYHCVDG3',
+                                        aws_secret_access_key=SECRET_ACCESS_KEY)
+        client = session.client('athena')
         response = client.start_query_execution(
-            QueryString='string',
-            ClientRequestToken='string',
+            QueryString=athena_query,
+            ClientRequestToken=g.user.email+'_'+str(time.time()),
             QueryExecutionContext={
-                'Database': 'string'
+                'Database': 'solar_radiation_solarbi'
             },
             ResultConfiguration={
-                'OutputLocation': 'string',
-                'EncryptionConfiguration': {
-                    'EncryptionOption': 'SSE_S3',
-                    'KmsKey': 'string'
-                }
+                'OutputLocation': 's3://colin-query-test/' + g.user.email,
+                # 'EncryptionConfiguration': {
+                #     'EncryptionOption': 'SSE_S3',
+                #     'KmsKey': 'string'
+                # }
             },
-            WorkGroup='string'
         )
 
-        return json_success(json.dumps({'foo': 3}))
-
+        print(response)
+        return json_success(json.dumps({'query_id': response['QueryExecutionId']}))
 
     @log_this
     @has_access

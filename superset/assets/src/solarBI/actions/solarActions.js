@@ -200,11 +200,10 @@ export function requestSolarData(queryData, timeout = 60) {
       timeout: timeout * 1000,
     })
       .then(({ json }) => {
-        console.log(json); // json: {'foo': 3}
+        console.log(json); // eslint-disable-line no-console
         dispatch(addSuccessToast(t('Request confirmed! An email has been sent to you.')));
       })
       .catch(() => {
-        console.log('error');
         dispatch(addDangerToast(t('Request failed.')));
       });
   };

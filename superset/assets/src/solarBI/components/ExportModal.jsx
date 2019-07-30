@@ -108,7 +108,7 @@ class ExportModal extends React.Component {
       type: 'dni',
       startDate: '2017-01-01',
       endDate: '2018-01-01',
-      resolution: 'Hourly',
+      resolution: 'hourly',
     };
 
     this.handleTypeChange = this.handleTypeChange.bind(this);
@@ -146,10 +146,10 @@ class ExportModal extends React.Component {
         startDate: this.state.startDate,
         endDate: this.state.endDate,
         type: this.state.type,
-        resolution: 'daily',
+        resolution: this.state.resolution,
       };
       this.props.requestSolarData(queryData);
-      // this.props.onHide();
+      this.props.onHide();
     }
   }
 
@@ -211,7 +211,7 @@ class ExportModal extends React.Component {
                 >
                   <FormControlLabel classes={{ label: classes.formControlLabel }} value="dni" control={<Radio />} label="DNI" />
                   <FormControlLabel classes={{ label: classes.formControlLabel }} value="ghi" control={<Radio />} label="GHI" />
-                  <FormControlLabel classes={{ label: classes.formControlLabel }} value="Download Both" control={<Radio />} label="Download Both" />
+                  <FormControlLabel classes={{ label: classes.formControlLabel }} value="both" control={<Radio />} label="Download Both" />
                 </RadioGroup>
               </FormControl>
 
@@ -224,10 +224,10 @@ class ExportModal extends React.Component {
                   value={this.state.resolution}
                   onChange={this.handleResolutionChange}
                 >
-                  <FormControlLabel classes={{ label: classes.formControlLabel }} value="Hourly" control={<Radio />} label="Hourly" />
-                  <FormControlLabel classes={{ label: classes.formControlLabel }} value="Daily" control={<Radio />} label="Daily" />
-                  <FormControlLabel classes={{ label: classes.formControlLabel }} value="Weekly" control={<Radio />} label="Weekly" />
-                  <FormControlLabel classes={{ label: classes.formControlLabel }} value="Monthly" control={<Radio />} label="Monthly" />
+                  <FormControlLabel classes={{ label: classes.formControlLabel }} value="hourly" control={<Radio />} label="Hourly" />
+                  <FormControlLabel classes={{ label: classes.formControlLabel }} value="daily" control={<Radio />} label="Daily" />
+                  {/* <FormControlLabel classes={{ label: classes.formControlLabel }} value="weekly" control={<Radio />} label="Weekly" /> */}
+                  <FormControlLabel classes={{ label: classes.formControlLabel }} value="monthly" control={<Radio />} label="Monthly" />
                 </RadioGroup>
               </FormControl>
             </DialogContent>
