@@ -62,18 +62,20 @@ const styles = tm => ({
     width: '80%',
     padding: 10,
   },
-  title: {
-    fontSize: '1.6em',
+  endText: {
+    marginLeft: '25px',
   },
-  formLabel: {
-    fontSize: '1.4rem',
+  lengthLabel: {
+    fontSize: '1.6rem',
     width: '10%',
     float: 'left',
     borderBottom: 'none',
-    marginTop: '12px',
-    marginRight: '20px',
+    marginLeft: '15px',
+    marginRight: '30px',
+    marginTop: '25px',
   },
   formControl: {
+    marginBottom: '5px',
     width: '90%',
     display: 'inline-block',
     margin: theme.spacing.unit * 2,
@@ -81,10 +83,43 @@ const styles = tm => ({
   formControlLabel: {
     fontSize: '1.5rem',
   },
+  loading: {
+    width: 60,
+    margin: 0,
+    marginRight: '10px',
+  },
+  resolutionLabel: {
+    fontSize: '1.6rem',
+    width: '10%',
+    float: 'left',
+    borderBottom: 'none',
+    marginTop: '15px',
+    marginRight: '45px',
+  },
+  startText: {
+    marginLeft: '10px',
+  },
+  title: {
+    fontSize: '1.6em',
+  },
+  textLabel: {
+    fontSize: '16px',
+  },
+  textInput: {
+    fontSize: '16px',
+  },
   typeGroup: {
     flexDirection: 'row',
     width: '70%',
     float: 'left',
+  },
+  typeLabel: {
+    fontSize: '1.6rem',
+    width: '10%',
+    float: 'left',
+    borderBottom: 'none',
+    marginTop: '15px',
+    marginRight: '45px',
   },
   resolutionGroup: {
     flexDirection: 'row',
@@ -148,13 +183,13 @@ class ExportModal extends React.Component {
         type: this.state.type,
         resolution: this.state.resolution,
       };
-      this.props.requestSolarData(queryData);
       this.props.onHide();
+      this.props.requestSolarData(queryData);
     }
   }
 
   render() {
-    const { classes, open, onHide } = this.props;
+    const { classes, open, onHide, solarBI } = this.props;
     const { startDate, endDate } = this.state;
 
     return (
@@ -162,7 +197,7 @@ class ExportModal extends React.Component {
         <MuiThemeProvider theme={theme}>
           <Dialog
             classes={{ paper: classes.dialog }}
-            open={open}
+            open={open || solarBI.sending}
             onClose={onHide}
             TransitionComponent={Transition}
             keepMounted
@@ -175,33 +210,45 @@ class ExportModal extends React.Component {
               Options
             </DialogTitle>
             <DialogContent>
-              <FormLabel classes={{ root: classes.formLabel }} component="legend">Length</FormLabel>
+              <FormLabel classes={{ root: classes.lengthLabel }} component="legend">Length</FormLabel>
               <TextField
+                error={new Date(this.state.startDate) > new Date(this.state.endDate)}
                 id="date"
                 label="Start"
                 type="date"
                 value={startDate}
                 onChange={this.handleStartDateChange}
-                className={classes.textField}
+                className={classes.startText}
+                InputProps={{
+                  classes: { input: classes.textInput },
+                }}
                 InputLabelProps={{
-                  shrink: true,
+                  FormLabelClasses: {
+                    root: classes.textLabel,
+                  },
                 }}
               />
 
               <TextField
+                error={new Date(this.state.startDate) > new Date(this.state.endDate)}
                 id="date"
                 label="End"
                 type="date"
                 value={endDate}
                 onChange={this.handleEndDateChange}
-                className={classes.textField}
+                className={classes.endText}
+                InputProps={{
+                  classes: { input: classes.textInput },
+                }}
                 InputLabelProps={{
-                  shrink: true,
+                  FormLabelClasses: {
+                    root: classes.textLabel,
+                  },
                 }}
               />
 
               <FormControl component="fieldset" className={classes.formControl}>
-                <FormLabel classes={{ root: classes.formLabel }} component="legend">Type</FormLabel>
+                <FormLabel classes={{ root: classes.typeLabel }} component="legend">Type</FormLabel>
                 <RadioGroup
                   aria-label="type"
                   name="type"
@@ -216,7 +263,7 @@ class ExportModal extends React.Component {
               </FormControl>
 
               <FormControl component="fieldset" className={classes.formControl}>
-                <FormLabel classes={{ root: classes.formLabel }} component="legend">Resolution</FormLabel>
+                <FormLabel classes={{ root: classes.resolutionLabel }} component="legend">Resolution</FormLabel>
                 <RadioGroup
                   aria-label="resolution"
                   name="resolution"
@@ -226,22 +273,20 @@ class ExportModal extends React.Component {
                 >
                   <FormControlLabel classes={{ label: classes.formControlLabel }} value="hourly" control={<Radio />} label="Hourly" />
                   <FormControlLabel classes={{ label: classes.formControlLabel }} value="daily" control={<Radio />} label="Daily" />
-                  {/* <FormControlLabel classes={{ label: classes.formControlLabel }} value="weekly" control={<Radio />} label="Weekly" /> */}
+                  <FormControlLabel classes={{ label: classes.formControlLabel }} value="weekly" control={<Radio />} label="Weekly" />
                   <FormControlLabel classes={{ label: classes.formControlLabel }} value="monthly" control={<Radio />} label="Monthly" />
                 </RadioGroup>
               </FormControl>
             </DialogContent>
             <DialogActions>
-              <Button
-                className={classes.button}
-                onClick={this.handleRequestData}
-                color="primary"
-              >
-                Request
-              </Button>
+              {solarBI.sending ?
+                (<img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />) :
+                (<Button className={classes.button} onClick={this.handleRequestData} color="primary">Request</Button>)
+              }
 
               <Button
                 className={classes.button}
+                disabled={solarBI.sending}
                 onClick={onHide}
                 color="primary"
               >

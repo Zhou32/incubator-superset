@@ -463,6 +463,15 @@ MAIL_PORT = 465
 MAIL_PASSWORD = 'AhDOJ0gw1xam5CCNOuDkK0g0mxrlS6yJB0DNFX6GieRI'
 MAIL_DEFAULT_SENDER = 'noreply@solarbi.com.au'
 
+# MAIL_SERVER = 'smtp.gmail.com'
+# MAIL_PORT = 465
+# MAIL_USE_TLS = False
+# MAIL_USE_SSL = True
+# MAIL_USERNAME = 'chenyang.wang@zawee.work'
+# MAIL_PASSWORD = 'WANGcy888'
+# MAIL_DEFAULT_SENDER = 'chenyang.wang@zawee.work'
+
+
 if not CACHE_DEFAULT_TIMEOUT:
     CACHE_DEFAULT_TIMEOUT = CACHE_CONFIG.get('CACHE_DEFAULT_TIMEOUT')
 

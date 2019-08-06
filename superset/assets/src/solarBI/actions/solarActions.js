@@ -172,6 +172,11 @@ export function saveSolarData(formData, requestParams) {
   };
 }
 
+export const REQEUST_SOLAR_DATA_STARTED = 'REQEUST_SOLAR_DATA_STARTED';
+export function requestSolarDataStarted() {
+  return { type: REQEUST_SOLAR_DATA_STARTED };
+}
+
 export const REQEUST_SOLAR_DATA_SUCCEEDED = 'REQEUST_SOLAR_DATA_SUCCEEDED';
 export function requestSolarDataSucceeded(data) {
   return { type: REQEUST_SOLAR_DATA_SUCCEEDED, data };
@@ -192,6 +197,7 @@ export function requestSolarData(queryData, timeout = 60) {
     // const logStart = Logger.getTimestamp();
     const controller = new AbortController();
     const { signal } = controller;
+    dispatch(requestSolarDataStarted());
 
     return SupersetClient.post({
       url,
@@ -200,7 +206,7 @@ export function requestSolarData(queryData, timeout = 60) {
       timeout: timeout * 1000,
     })
       .then(({ json }) => {
-        console.log(json); // eslint-disable-line no-console
+        dispatch(requestSolarDataSucceeded(json));
         dispatch(addSuccessToast(t('Request confirmed! An email has been sent to you.')));
       })
       .catch(() => {

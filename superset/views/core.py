@@ -1431,7 +1431,8 @@ class Superset(BaseSupersetView):
             return False
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
-        msg.subject = "SolarBI - Your Data Request is Received!"
+        msg.sender = 'SavvyBI', 'chenyang.wang@zawee.work'
+        msg.subject = "SolarBI - Your data request is received"
         msg.html = self.render_template(email_template,
                                         username=user.username,
                                         first_name=user.first_name)
@@ -1481,6 +1482,15 @@ class Superset(BaseSupersetView):
                 "SELECT year, month, day, radiationtype, avg(radiation) AS radiation"
             group_str = "GROUP BY year, month, day, radiationtype"
             order_str = "ORDER BY year ASC, month ASC, day ASC"
+        elif resolution == 'weekly':
+            select_str = \
+                "SELECT CAST(date_trunc('week', r_date) AS date) AS Monday_of_week, " + \
+                "radiationtype, avg(radiation) AS week_avg_radiation FROM " + \
+                "(SELECT cast(date AS timestamp) AS r_date, year, month, day, " + \
+                "radiationtype, radiation"
+            group_str = "GROUP BY  date, year, month, day, radiationtype, radiation"
+            order_str = "ORDER BY  date) GROUP BY date_trunc('week', r_date), " + \
+                        "radiationtype ORDER BY 1"
         elif resolution == 'monthly':
             select_str = "SELECT year, month, radiationtype, avg(radiation) AS radiation"
             group_str = "GROUP BY year, month, radiationtype"

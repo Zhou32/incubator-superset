@@ -95,13 +95,14 @@ export class MapView extends React.Component {
     this.handleWrongErrorAlert = this.handleWrongErrorAlert.bind(this);
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const { solarBI } = this.props;
     const { form_data } = solarBI;
     if (
       solarBI.hasOwnProperty('form_data') &&
       form_data.hasOwnProperty('spatial_address')
     ) {
+      // eslint-disable-next-line react/no-did-mount-set-state
       this.setState(
         {
           center: {
@@ -123,6 +124,7 @@ export class MapView extends React.Component {
         },
       );
     } else {
+      // eslint-disable-next-line react/no-did-mount-set-state
       this.setState({
         // data_source: form_data["datasource"],
         datasource_id: solarBI.datasource_id,

@@ -59,8 +59,7 @@ export default function (state = {}, action) {
           t(
             'Perhaps your data has grown, your database is under unusual load, ' +
             'or you are simply querying a data source that is too large ' +
-            'to be processed within the timeout range. ' +
-            'If that is the case, we recommend that you summarize your data further.',
+            'to be processed within the timeout range. ',
           ),
         solarUpdateEndTime: now(),
       };
@@ -99,9 +98,16 @@ export default function (state = {}, action) {
         saveModalAlert: 'Failed to save slice',
       };
     },
+    [actions.REQEUST_SOLAR_DATA_STARTED]() {
+      return {
+        ...state,
+        sending: true,
+      };
+    },
     [actions.REQEUST_SOLAR_DATA_SUCCEEDED]() {
       return {
         ...state,
+        sending: false,
         requestStatus: 'success',
       };
     },
