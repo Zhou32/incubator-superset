@@ -24,6 +24,7 @@ import IconButton from '@material-ui/core/IconButton';
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
 import SaveIcon from '@material-ui/icons/Save';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
+import GoBackModal from './GoBackModal';
 import ExportModal from './ExportModal';
 
 const styles = theme => ({
@@ -72,10 +73,12 @@ class InfoTabs extends React.Component {
     this.state = {
       tabValue: 0,
       showExportModal: false,
+      showGoBackModal: false,
     };
     this.handleTabChange = this.handleTabChange.bind(this);
     this.onBackClick = this.onBackClick.bind(this);
     this.onSaveClick = this.onSaveClick.bind(this);
+    this.toggleGoBackModal = this.toggleGoBackModal.bind(this);
     this.toggleExportModal = this.toggleExportModal.bind(this);
   }
 
@@ -95,6 +98,10 @@ class InfoTabs extends React.Component {
     return this.props.getCSVURL();
   }
 
+  toggleGoBackModal() {
+    this.setState({ showGoBackModal: !this.state.showGoBackModal });
+  }
+
   toggleExportModal() {
     this.setState({ showExportModal: !this.state.showExportModal });
   }
@@ -104,15 +111,16 @@ class InfoTabs extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
-    // const tabValue = this.state.tabValue;
+    // eslint-disable-next-line camelcase
+    const { classes, solar_new } = this.props;
     return (
       <div className={classes.root}>
         <Tooltip title="Go Back" classes={{ tooltip: classes.tooltip }}>
           <IconButton
             id="backIcon"
             className={classes.icon}
-            onClick={this.onBackClick}
+            // eslint-disable-next-line camelcase
+            onClick={solar_new ? this.toggleGoBackModal : this.onBackClick}
           >
             <KeyboardBackspaceIcon />
           </IconButton>
@@ -149,6 +157,11 @@ class InfoTabs extends React.Component {
         <ExportModal
           open={this.state.showExportModal}
           onHide={this.toggleExportModal}
+        />
+        <GoBackModal
+          onBackClick={this.onBackClick}
+          open={this.state.showGoBackModal}
+          onClose={this.toggleGoBackModal}
         />
       </div>
     );

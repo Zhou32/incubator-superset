@@ -208,17 +208,17 @@ class SaveModal extends React.Component {
             <DialogActions>
               <Button
                 className={classes.button}
-                onClick={this.handleClose}
-                color="primary"
-              >
-                Cancel
-              </Button>
-              <Button
-                className={classes.button}
                 onClick={() => this.saveOrOverwrite(true)}
                 color="primary"
               >
                 Save
+              </Button>
+              <Button
+                className={classes.button}
+                onClick={this.handleClose}
+                color="primary"
+              >
+                Cancel
               </Button>
             </DialogActions>
           </Dialog>

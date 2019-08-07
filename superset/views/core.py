@@ -1466,7 +1466,7 @@ class Superset(BaseSupersetView):
         # samples = request.args.get('samples') == 'true'
         # force = request.args.get('force') == 'true'
 
-        # self.send_email(g.user)
+        self.send_email(g.user)
 
         start_year, start_month, start_day = start_date.split('-')
         end_year, end_month, end_day = end_date.split('-')

@@ -212,7 +212,7 @@ class ExportModal extends React.Component {
             <DialogContent>
               <FormLabel classes={{ root: classes.lengthLabel }} component="legend">Length</FormLabel>
               <TextField
-                error={new Date(this.state.startDate) > new Date(this.state.endDate)}
+                error={new Date(startDate) > new Date(endDate)}
                 id="date"
                 label="Start"
                 type="date"
@@ -230,7 +230,7 @@ class ExportModal extends React.Component {
               />
 
               <TextField
-                error={new Date(this.state.startDate) > new Date(this.state.endDate)}
+                error={new Date(startDate) > new Date(endDate)}
                 id="date"
                 label="End"
                 type="date"

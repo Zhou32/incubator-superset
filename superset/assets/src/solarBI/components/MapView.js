@@ -463,7 +463,6 @@ export class MapView extends React.Component {
           <SaveModal
             open={this.state.showSaveModal}
             onHide={this.toggleSaveModal}
-            // actions={this.props.actions}
             form_data={{
               datasource_id: this.state.datasource_id,
               datasource_type: this.state.datasource_type,
@@ -480,10 +479,6 @@ export class MapView extends React.Component {
             }}
             userId={''}
           />
-          {/* <ExportModal
-            open={this.state.showExportModal}
-            onHide={this.toggleExportModal}
-          /> */}
         </MuiThemeProvider>
       </div>
     );
