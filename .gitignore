@@ -63,6 +63,7 @@ venv
 @eaDir/
 
 # Docker
+contrib/docker/.env
 ./Dockerfile
 ./docker-build.sh
 ./docker-compose.yml
@@ -77,3 +78,4 @@ celerybeat.pid
 geckodriver.log
 ghostdriver.log
 testCSV.csv
+
