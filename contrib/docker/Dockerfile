@@ -33,7 +33,7 @@ RUN apt-get install -y build-essential libssl-dev \
     libffi-dev python3-dev libsasl2-dev libldap2-dev libxi-dev
 
 # Install extra useful tool for development
-RUN apt-get install -y vim less postgresql-client redis-tools
+RUN apt-get install -y vim less postgresql-client redis-tools default-jdk
 
 # Install nodejs for custom build
 # https://superset.incubator.apache.org/installation.html#making-your-own-build
@@ -69,4 +69,4 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 HEALTHCHECK CMD ["curl", "-f", "http://localhost:8088/health"]
 
-EXPOSE 8088
+EXPOSE 8088 9000

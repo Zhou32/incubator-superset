@@ -792,8 +792,12 @@
     "select_country": {
       "type": "SelectControl",
       "label": "Country Name",
-      "default": "France",
+      "default": "Australia",
       "choices": [
+        [
+          "Australia",
+          "Australia"
+        ],
         [
           "Belgium",
           "Belgium"
@@ -981,6 +985,14 @@
         null
       ],
       "description": "Point to your spatial columns"
+    },
+    "spatial_address": {
+      "type": "AddressSearchControl",
+      "label": "Location Search",
+      "validators": [
+        null
+      ],
+      "description": "Search Location based on address"
     },
     "start_spatial": {
       "type": "SpatialControl",
@@ -3337,6 +3349,17 @@
       "default": 250,
       "description": "Maxium radius size of the circle, in pixels. As the zoom level changes, this insures that the circle respects this maximum radius."
     },
+    "radius": {
+      "type": "TextControl",
+      "label": "Radius",
+      "isFloat": true,
+      "validators": [
+        null
+      ],
+      "renderTrigger": true,
+      "default": 2,
+      "description": "Radius size of the circle, in pixels. As the zoom level changes, this insures that the circle respects this radius."
+    },
     "partition_threshold": {
       "type": "TextControl",
       "label": "Partition Threshold",
@@ -3716,6 +3739,15 @@
       "renderTrigger": true,
       "description": "Whether to fill the objects",
       "default": true
+    },
+    "filter_configs": {
+      "type": "CollectionControl",
+      "label": "Filters",
+      "description": "Filter configuration for the filter box",
+      "validators": [
+        null
+      ],
+      "controlName": "FilterBoxItemControl"
     },
     "normalized": {
       "type": "CheckboxControl",
