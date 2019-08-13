@@ -14,13 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-version: '3'
+version: '2'
 services:
   redis:
     image: redis:3.2
     restart: unless-stopped
     ports:
-      - 6379:6379
+      - "127.0.0.1:6379:6379"
     volumes:
       - redis:/data
 
@@ -32,7 +32,7 @@ services:
       POSTGRES_PASSWORD: superset
       POSTGRES_USER: superset
     ports:
-      - 5432:5432
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres:/var/lib/postgresql/data
 
@@ -54,7 +54,7 @@ services:
       SUPERSET_ENV: development
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-
+    user: root:root
     ports:
       - 8088:8088
       - 9000:9000

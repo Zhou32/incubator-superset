@@ -22,6 +22,7 @@
  */
 import { isFeatureEnabled, FeatureFlag } from 'src/featureFlags';
 import * as sections from './sections';
+import extraOverrides from './extraOverrides';
 
 import Area from './Area';
 import Bar from './Bar';
@@ -73,7 +74,7 @@ import DeckScatter from './DeckScatter';
 import DeckScreengrid from './DeckScreengrid';
 import SolarBI from './SolarBI';
 
-export const controlPanelConfigs = {
+export const controlPanelConfigs = extraOverrides({
   area: Area,
   bar: Bar,
   big_number: BigNumber,
@@ -123,31 +124,32 @@ export const controlPanelConfigs = {
   deck_scatter: DeckScatter,
   deck_screengrid: DeckScreengrid,
   solarBI: SolarBI,
-};
+});
 
 export default controlPanelConfigs;
 
 export function sectionsToRender(vizType, datasourceType) {
-  const config = controlPanelConfigs[vizType];
+  const { sectionOverrides = {}, controlPanelSections = [] } = controlPanelConfigs[vizType] || {};
 
   const sectionsCopy = { ...sections };
-  if (config.sectionOverrides) {
-    Object.entries(config.sectionOverrides).forEach(([section, overrides]) => {
-      if (typeof overrides === 'object' && overrides.constructor === Object) {
-        sectionsCopy[section] = {
-          ...sectionsCopy[section],
-          ...overrides,
-        };
-      } else {
-        sectionsCopy[section] = overrides;
-      }
-    });
-  }
+
+  Object.entries(sectionOverrides).forEach(([section, overrides]) => {
+    if (typeof overrides === 'object' && overrides.constructor === Object) {
+      sectionsCopy[section] = {
+        ...sectionsCopy[section],
+        ...overrides,
+      };
+    } else {
+      sectionsCopy[section] = overrides;
+    }
+  });
+
+  const { datasourceAndVizType, sqlaTimeSeries, druidTimeSeries, filters } = sectionsCopy;
 
   return [].concat(
-    sectionsCopy.datasourceAndVizType,
-    datasourceType === 'table' ? sectionsCopy.sqlaTimeSeries : sectionsCopy.druidTimeSeries,
-    isFeatureEnabled(FeatureFlag.SCOPED_FILTER) ? sectionsCopy.filters : undefined,
-    config.controlPanelSections,
+    datasourceAndVizType,
+    datasourceType === 'table' ? sqlaTimeSeries : druidTimeSeries,
+    isFeatureEnabled(FeatureFlag.SCOPED_FILTER) ? filters : undefined,
+    controlPanelSections,
   ).filter(section => section);
 }
