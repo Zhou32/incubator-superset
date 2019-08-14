@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 # pylint: disable=C,R,W
+import os
 from contextlib import closing
 from datetime import datetime, timedelta
 import logging
@@ -482,8 +483,8 @@ class SolarBIModelAddView(SolarBIModelView):
         #     return self.dashboard(str(welcome_dashboard_id))
 
         payload = {
-            'user': bootstrap_user_data(),
-            'common': BaseSupersetView().common_bootsrap_payload(),
+            'user': bootstrap_user_data(g.user),
+            'common': BaseSupersetView().common_bootstrap_payload(),
             'datasource_id': datasource_id,
             'datasource_type': 'table',
             'entry': 'add',
@@ -526,8 +527,8 @@ class SolarBIModelAddView(SolarBIModelView):
         #     return self.dashboard(str(welcome_dashboard_id))
 
         payload = {
-            'user': bootstrap_user_data(),
-            'common': BaseSupersetView().common_bootsrap_payload(),
+            'user': bootstrap_user_data(g.user),
+            'common': BaseSupersetView().common_bootstrap_payload(),
             'datasource_id': datasource_id,
             'datasource_type': 'table',
             'entry': 'welcome',
@@ -1287,6 +1288,10 @@ class Superset(BaseSupersetView):
             force=force,
         )
 
+        return self.generate_json(
+            viz_obj, csv=csv, query=query, results=results, samples=samples
+        )
+
     def send_email(self, user):
         """
             Method for sending the Email to the user
@@ -1314,7 +1319,7 @@ class Superset(BaseSupersetView):
             return False
         return True
 
-    @log_this
+    @event_logger.log_this
     @api
     @handle_api_exception
     @expose('/request_data/<lat>/<lng>/<start_date>/<end_date>/<type>/<resolution>/',
@@ -1418,7 +1423,7 @@ class Superset(BaseSupersetView):
         print(response)
         return json_success(json.dumps({'query_id': response['QueryExecutionId']}))
 
-    @log_this
+    @event_logger.log_this
     @has_access
     @expose("/import_dashboards", methods=["GET", "POST"])
     def import_dashboards(self):
@@ -3139,8 +3144,8 @@ class Superset(BaseSupersetView):
             return self.dashboard(str(welcome_dashboard_id))
 
         payload = {
-            'user': bootstrap_user_data(),
-            'common': self.common_bootsrap_payload(),
+            'user': bootstrap_user_data(g.user),
+            'common': self.common_bootstrap_payload(),
             'datasource_id': datasource_id,
             'datasource_type': 'table',
         }
@@ -3160,7 +3165,7 @@ class Superset(BaseSupersetView):
         user_id = g.user.get_id() if g.user else None
         form_data, slc = self.get_form_data(use_slice_data=True)
 
-        datasource_id, datasource_type = self.datasource_info(
+        datasource_id, datasource_type = get_datasource_info(
             form_data['datasource_id']
             if 'datasource_id' in form_data.keys() else None,
             form_data['datasource_type']
@@ -3237,7 +3242,7 @@ class Superset(BaseSupersetView):
             'standalone': standalone,
             'user_id': user_id,
             'forced_height': request.args.get('height'),
-            'common': self.common_bootsrap_payload(),
+            'common': self.common_bootstrap_payload(),
         }
         table_name = datasource.table_name \
             if datasource_type == 'table' \

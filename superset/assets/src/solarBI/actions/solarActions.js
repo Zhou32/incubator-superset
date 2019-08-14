@@ -20,7 +20,8 @@
 import { SupersetClient } from '@superset-ui/connection';
 import { t } from '@superset-ui/translation';
 import URI from 'urijs';
-import { Logger, LOG_ACTIONS_LOAD_CHART } from '../../logger';
+import { logEvent } from '../../logger/actions';
+import { Logger, LOG_ACTIONS_LOAD_CHART } from '../../logger/LogUtils';
 import getClientErrorObject from '../../utils/getClientErrorObject';
 // import { getExploreUrlAndPayload, getURIDirectory } from '../../explore/exploreUtils';
 // import { saveSliceFailed, saveSliceSuccess } from '../../explore/actions/saveModalActions';
@@ -85,7 +86,7 @@ export function fetchSolarData(formData, force = false, timeout = 60, key) {
       timeout: timeout * 1000,
     })
       .then(({ json }) => {
-        Logger.append(LOG_ACTIONS_LOAD_CHART, {
+        dispatch(logEvent(LOG_ACTIONS_LOAD_CHART, {
           slice_id: key,
           is_cached: json.is_cached,
           force_refresh: force,
@@ -96,20 +97,20 @@ export function fetchSolarData(formData, force = false, timeout = 60, key) {
           has_extra_filters:
             formData.extra_filters && formData.extra_filters.length > 0,
           viz_type: formData.viz_type,
-        });
+        }));
         dispatch(addSuccessToastAction(t('Successfully fetch data')));
         return dispatch(solarUpdateSucceeded(json, key));
       })
       .catch((response) => {
         const appendErrorLog = (errorDetails) => {
-          Logger.append(LOG_ACTIONS_LOAD_CHART, {
+          dispatch(logEvent(LOG_ACTIONS_LOAD_CHART, {
             slice_id: key,
             has_err: true,
             error_details: errorDetails,
             datasource: formData.datasource,
             start_offset: logStart,
             duration: Logger.getTimestamp() - logStart,
-          });
+          }));
         };
 
         if (response.statusText === 'timeout') {
