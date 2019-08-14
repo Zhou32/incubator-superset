@@ -38,6 +38,7 @@ from superset import sql_parse
 from superset.connectors.connector_registry import ConnectorRegistry
 from superset.exceptions import SupersetSecurityException
 from superset.solar.register import SolarRegisterUserDBView
+from superset.solar.login import SolarBIAuthDBView
 
 if TYPE_CHECKING:
     from superset.models.core import Database, BaseDatasource
@@ -90,6 +91,7 @@ SOLAR_PERMISSIONS_MENU = ['SolarBI', 'Search your Location', 'Saved Solar Data',
 
 
 class SupersetSecurityManager(SecurityManager):
+    authdbview = SolarBIAuthDBView
     registeruserdbview = SolarRegisterUserDBView
 
     READ_ONLY_MODEL_VIEWS = {"DatabaseAsync", "DatabaseView", "DruidClusterModelView"}
