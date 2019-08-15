@@ -1,3 +1,16 @@
+@font-face {
+  font-family: 'Futura PT Light';
+  src: url('./fonts/FuturaPTLight.otf') format("opentype");
+}
+@font-face {
+  font-family: 'Futura PT Book';
+  src: url('./fonts/FuturaPTBook.otf') format("opentype");
+}
+@font-face {
+  font-family: 'Futura PT Bold';
+  src: url('./fonts/FuturaPTBold.otf') format("opentype");
+}
+
 .primary-body {
   height:  100vh; 
   width:  100vw;
@@ -5,159 +18,220 @@
   display:  flex; 
   align-items:  flex-start; 
   justify-content:  flex-start; 
-  background-color:  #f3f2f2; 
+  background-color:  white; 
+  font-family: 'Futura PT Book';
 }
 body {
   margin: 0
 }
-h4 {
-  font-size:  24px; 
-  font-weight:  600; 
-  color:  #000; 
-  opacity:  .85; 
-}
-label {
-  font-size:  12.5px; 
-  color:  #000;
-  opacity:  .8;
-  font-weight:  400; 
-}
-form {
-
-  h4 {
-    margin-bottom:  20px;
-    color:  rgba(#000, .5);
-    span {
-      color:  rgba(#000, 1);
-      font-weight:  700; 
-    }
-  }
-  p {
-    line-height:  155%; 
-    margin-bottom:  5px; 
-    font-size:  14px; 
-    color:  #000; 
-    opacity:  .65;
-    font-weight:  400; 
-    max-width:  200px; 
-    margin-bottom:  40px; 
-  }
-}
-a.discrete {
-    color:  rgba(#000, .4); 
-    font-size:  14px; 
-    border-bottom:  solid 1px rgba(#000, .0);
-    padding-bottom:  4px;  
-    margin-left:  auto; 
-    font-weight:  300; 
-    transition:  all .3s ease; 
-    margin-top:  40px; 
-    &:hover {
-      border-bottom:  solid 1px rgba(#000, .2);
-    }
-}
-button {
-  -webkit-appearance:  none; 
-  width:  auto;
-  min-width:  100px;
-  border-radius:  24px; 
-  text-align:  center; 
-  padding:  15px 40px;
-  margin-top:  5px; 
-  background-color:  saturate($primary, 30%); 
-  color:  #fff; 
-  font-size:  14px;
-  margin-left:  auto; 
-  font-weight:  500; 
-  box-shadow:  0px 2px 6px -1px rgba(0,0,0,.13); 
-  border:  none;
-  transition:  all .3s ease; 
-  outline: 0; 
-  &:hover {
-    transform:  translateY(-3px);
-    box-shadow:  0 2px 6px -1px rgba($primary, .65);
-    &:active {
-      transform:  scale(.99);
-    }
-  }
-}
 input {
-  font-size:  16px; 
-  padding:  20px 0px; 
-  height:  56px; 
-  border:  none; 
-  border-bottom:  solid 1px rgba(0,0,0,.1); 
-  background:  #fff; 
-  width:  280px; 
-  box-sizing:  border-box; 
-  transition:  all .3s linear; 
-  color:  #000; 
-  font-weight:  400;
-  -webkit-appearance:  none; 
-  &:focus {
-    border-bottom:  solid 1px $primary; 
-    outline: 0; 
-    box-shadow:  0 2px 6px -8px rgba($primary, .45);
-  }
+  border: none;
 }
-.form-div {
-  padding:  40px 30px; 
-  background:  #fefefe; 
-  display:  flex; 
-  flex-direction:  column;
-  align-items:  flex-start; 
-  padding-bottom:  20px; 
-  width: 50%;
-  height: 100%;
+::-webkit-input-placeholder {
+  color: #0667A3;
 }
-.field {
-  position: relative;
-  margin-bottom: 2em;
+::-webkit-input-placeholder .input-line:focus +::input-placeholder {
+  color: #0667A3;
 }
-.label {
-  position: absolute;
-  height: 2rem;
-  line-height: 2rem;
-  bottom: 0;
-  color: #999;
-  transition: all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-.input {
+.full-width {
   width: 100%;
-  font-size: 100%;
-  border: 0;
-  padding: 0;
-  background-color: transparent;
-  height: 2rem;
-  line-height: 2rem;
-  border-bottom: 1px solid #eee;
-  color: #777;
-  transition: all .2s ease-in;
 }
-.input:focus {
-  outline: 0;
-  border-color: #489795;
+.content {
+  margin-top: 40px;
+  align-items: center;
+  padding-left: 25px;
+  padding-right: 25px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-flow: column;
+  -ms-flex-flow: column;
+  flex-flow: column;
+  z-index: 5;
 }
-
-.input:focus + .label,
-input:valid + .label {
-  transform: translateY(-100%);
-  font-size: 0.75rem;
-  color: #ccc;
+.input-fields {
+  width: 50%;
 }
-
+.input-line {
+  margin-bottom: 40px;
+  line-height: 2.4em;
+  color: #0667A3;
+  font-weight: 300;
+  letter-spacing: 0.02rem;
+  font-size: 0.9rem;
+  border-bottom: 2px solid #E9E9F0;
+  -webkit-transition: all .2s ease;
+  transition: all .2s ease;
+}
+.input-line:focus {
+  outline: none;
+  border-color: purple;
+  -webkit-transition: all .2s ease;
+  transition: all .2s ease;
+}
 .left {
-  width:  50%; 
-  height:  auto; 
-  min-height:  100%; 
-  position:  relative; 
+  width: 50%; 
+  height: auto; 
+  min-height: 100%; 
+  position: relative; 
   background-image: url("../images/solarbi_auth_left.png");
-  background-size:  cover;
-  border-top-left-radius:  4px; 
-  border-bottom-left-radius:  4px; 
-  svg {
-    height:  40px; 
-    width:  auto; 
-    margin:  20px; 
-  }
+  background-size: cover;
+}
+.right {
+  width: 50%; 
+  height: auto; 
+  min-height: 100%; 
+  position: relative; 
+  text-align: center;
+  border-top-left-radius: 4px; 
+  border-bottom-left-radius: 4px; 
+}
+.solarbi-sun {
+  margin-top: 16%;
+  width: 100px;
+  height: 100px;
+}
+.solarbi-text {
+  font-size: 35px;
+  letter-spacing: 7px;
+  color: #0667A3;
+  margin: 10px;
+  font-family: 'Futura PT Bold'
+}
+.solarbi-welcome {
+  text-align: center;
+  color: #CCCCCC;
+  font-size: 18px;
+  opacity: 0.5;
+}
+.remember-me {
+  float: left;
+}
+.remember-me.label {
+	width:100%;
+	color:#fff;
+	display:block;
+}
+.remember-me label .icon{
+	width: 15px;
+	height: 15px;
+  border-radius: 4px;
+  border: 1px solid #808495;
+	position: relative;
+	display: inline-block;
+  background:white;
+  transform: translateY(2px);
+}
+.remember-me .check{
+	display:none;
+}
+.remember-me label .icon:before,
+.remember-me label .icon:after{
+	content:'';
+	width:10px;
+	height:2px;
+	background:#fff;
+	position:absolute;
+	transition:all .2s ease-in-out 0s;
+}
+.remember-me label .icon:before{
+	left: 2px;
+	width: 5px;
+	bottom: 6px;
+	transform: scale(0) rotate(0);
+}
+.remember-me label .icon:after{
+	top: 6px;
+	right: 1px;
+	transform: scale(0) rotate(0);
+}
+.remember-me .check:checked + label{
+	color:black;
+}
+.remember-me .check:checked + label .icon{
+	background:#0667A3;
+}
+.remember-me .check:checked + label .icon:before{
+	transform:scale(1) rotate(45deg);
+}
+.remember-me .check:checked + label .icon:after{
+	transform:scale(1) rotate(-45deg);
+}
+.rm {
+  color: #024067;
+  font-size: 15px;
+  font-weight: 300;
+  margin-left: 15px;
+}
+.login-options {
+  width: 50%;
+}
+.login-options a {
+  color: #024067;
+  text-decoration: none;
+  float: right;
+  font-size: 15px;
+}
+.form-buttons {
+  margin-top: 60px;
+  width: 50%;
+}
+.login-btn {
+  background: #0667A3 0% 0% no-repeat padding-box;
+  float: left;
+  font-family: 'Futura PT Book';
+  width: 40%;
+  border-radius: 30px;
+  border: 1px solid #0667A3;
+  box-shadow: 0px 1px 6px #000000;
+  // background-color: #0667A3;
+  color: #FFFFFF;
+  font-size: 18px;
+  padding: 12px 45px;
+  transition: transform 80ms ease-in;
+}
+.login-btn:hover {
+  // transition: all 0.5s ease;
+  // opacity: 0.8;
+  text-shadow: 0px 0px 3px rgba(255, 255, 255, 1);
+  box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+  -webkit-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+  -moz-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+  transition: all 0.4s ease 0s;
+  cursor: pointer;
+}
+.login-btn:active {
+	transform: scale(0.95);
+}
+.login-btn:focus {
+	outline: none;
+}
+.register-btn {
+  float: right;
+  text-decoration: none;
+  font-family: 'Futura PT Book';
+  width: 40%;
+  border-radius: 30px;
+  border: 1px solid #0667A3;
+  background-color: white;
+  color: #0667A3;
+  font-size: 18px;
+  padding: 12px 0;
+  letter-spacing: 1px;
+  transition: transform 80ms ease-in;
+}
+.register-btn:hover {
+  text-shadow: 0px 0px 1px #0667A3;
+  box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+  -webkit-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+  -moz-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+  transition: all 0.4s ease 0s;
+  cursor: pointer;
+}
+.register-btn:active {
+	transform: scale(0.95);
+}
+.register-btn:focus {
+	outline: none;
 }

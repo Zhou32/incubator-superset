@@ -1,33 +1,47 @@
 <!-- extend base layout -->
 {#{% extends "appbuilder/base.html" %}#}
 
-  {% block head_css %}
+{% block head_css %}
     <link rel="icon" type="image/png" href="/static/assets/images/favicon.png">
     <link rel="stylesheet" type="text/css" href="/static/assets/stylesheets/solarbi.less" />
-  {% endblock %}
+{% endblock %}
 
 {% block content %}
-{#        <div class="panel panel-primary" >#}
-            <div class="primary-body">
-                <div class="left"></div>
-                <div class="form-div">
-                <form class="form" action="" method="post" name="login">
-                    {{form.hidden_tag()}}
-
-                    <h4>S O L A R B I</h4>
-                    <p>Welcome back! Log in to your account to view today's clients:</p>
-                    <div class="field">
-                      <input type="text" id="fieldUser" class="input" required />
-                      <label for="fieldUser" class="label">Username</label>
+    <div class="primary-body">
+        <div class="left"></div>
+        <div class="right">
+            <img class="solarbi-sun" src="/static/assets/images/solarbi_auth_sun.jpg" alt="solar sun">
+            <form class="form" action="" method="post" name="login">
+                {{form.hidden_tag()}}
+                <h4 class="solarbi-text">SOLARBI</h4>
+                <p class="solarbi-welcome">Welcome back! Please login to your account.</p>
+                <div class='content'>
+                    <div class='input-fields'>
+                        {{ form.username(size = 80, class = "input-line full-width", placeholder = "Username") }}
+                        {{ form.password(size = 80, class = "input-line full-width", placeholder = "Password") }}
                     </div>
-                    <div class="field">
-                      <input type="password" id="fieldPassword" class="input" required />
-                      <label for="fieldPassword" class="label">Password</label>
+                    <div class="login-options">
+                        <div class="remember-me">
+                            <input id="check" type="checkbox" class="check">
+                            <label for="check"><span class="icon"></span><span class="rm">Remember me</span></label>
+                        </div>
+                        <a class="forgot" href="#">Forgot Password</a>
                     </div>
+                    <div class="form-buttons">
+                        <input class="login-btn" type="submit" value="{{_('Login')}}">
+                        {% if appbuilder.sm.auth_user_registration %}
+                            <a href="{{appbuilder.sm.get_url_for_registeruser}}" class="register-btn" data-toggle="tooltip" rel="tooltip"
+                            title="{{_('If you are not already a user, please sign up')}}">
+                                {{_('Sign up')}}
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
 
-                    <button type="submit" onClick="return false;">Log in</button>
-
-
+            </form>
+        </div>
+    </div>
+{% endblock %}
 {#                    <div class="help-block">{{_("SOLARBI")}}:</div>#}
 {#                    <div class="control-group{% if form.errors.openid is defined %} error{% endif %}">#}
 {#                        <label class="control-label" for="openid">{{_("Username")}}:</label>#}
@@ -66,8 +80,8 @@
 {#                            </div>#}
 {#                        </div>#}
 {#                    </div>#}
-                </form>
-                </div>
-            </div>
+{#                </form>#}
+{#                </div>#}
+{#            </div>#}
 {#        </div>#}
-{% endblock %}
+{#{% endblock %}#}
