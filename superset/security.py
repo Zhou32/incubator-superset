@@ -37,8 +37,8 @@ from sqlalchemy.orm.mapper import Mapper
 from superset import sql_parse
 from superset.connectors.connector_registry import ConnectorRegistry
 from superset.exceptions import SupersetSecurityException
-from superset.solar.register import SolarRegisterUserDBView
-from superset.solar.login import SolarBIAuthDBView
+from superset.solar.views import SolarBIAuthDBView
+from superset.solar.registerviews import SolarRegisterUserDBView
 
 if TYPE_CHECKING:
     from superset.models.core import Database, BaseDatasource
