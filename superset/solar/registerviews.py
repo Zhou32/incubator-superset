@@ -16,10 +16,11 @@
 # under the License.
 # pylint: disable=C,R,W
 from flask_appbuilder.security.registerviews import RegisterUserDBView
-from .forms import SavvyRegisterFormWidget
+from .forms import SolarBIRegisterFormWidget, SolarBIRegisterUserDBForm
 
 
-class SolarRegisterUserDBView(RegisterUserDBView):
-    edit_widget = SavvyRegisterFormWidget
+class SolarBIRegisterUserDBView(RegisterUserDBView):
+    form = SolarBIRegisterUserDBForm
+    edit_widget = SolarBIRegisterFormWidget
     form_template = 'appbuilder/general/security/form_template.html'
     email_subject = 'SolarBI - Email Confirmation '

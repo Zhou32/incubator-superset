@@ -34,7 +34,7 @@
                         <div class="remember-me">
                             {{ form.remember_me(size = 10, id = "check_id", class = "check") }}
                             <label for="check_id">
-                              <span class="icon"></span><span class="rm">Remember me</span>
+                                <span class="icon"></span><span class="rm">Remember me</span>
                             </label>
                         </div>
                         <a class="forgot" href="#">Forgot Password</a>
@@ -42,7 +42,7 @@
                     <div class="form-buttons">
                         <input class="login-btn" type="submit" value="{{_('Login')}}">
                         {% if appbuilder.sm.auth_user_registration %}
-                            <a href="{{appbuilder.sm.get_url_for_registeruser}}" class="register-btn" data-toggle="tooltip" rel="tooltip"
+                            <a href="{{appbuilder.sm.get_url_for_registeruser}}" class="signup-btn" data-toggle="tooltip" rel="tooltip"
                             title="{{_('If you are not already a user, please sign up')}}">
                                 {{_('Sign up')}}
                             </a>
