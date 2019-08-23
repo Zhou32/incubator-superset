@@ -10,7 +10,12 @@
                     <div class="alert-top">
                         <div class="alert alert-danger">
                             <button type="button" class="close" data-dismiss="alert">&times;</button>
-                            {{ error[1][0] }}
+                            {% if error[1][0] == 'Already exists.' %}
+                                {{ _('Username already exists.') }}
+                            {% else %}
+                                {{ error[1][0] }}
+                            {% endif %}
+
                         </div>
                     </div>
 {#                {% endif %}#}
@@ -27,7 +32,7 @@
                             {{ field(size = 80, class = 'input-line full-width', placeholder=field.label.text) }}
                         </div>
                     {% elif field.name == 'password' %}
-                        <div class="password-div">
+                        <div data-toggle="tooltip" data-placement="top" title="Password must be at least 8 characters and it must contain at least one number and one letter." class="password-div">
                             {{ field(size = 80, id=field.name, class = "input-line full-width", placeholder=field.label.text) }}
                             <span class="match-message" id="pass_message"></span>
                         </div>
@@ -49,16 +54,20 @@
                     </label>
                 </div>
             </div>
-            <input class="signup-page-btn" type="submit" value="{{_('Sign Up')}}">
         </div>
+        <input class="signup-page-btn" type="submit" value="{{_('Sign Up')}}">
     </form>
 
 {% endblock %}
 
 {% block tail_js %}
     <script>
-        var passwordReady = false;
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        });
+
         $('#password').bind('input', function() {
+            var passwordReady = false;
             var regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/igm;
             var result = regex.test($(this).val());
 
@@ -75,9 +84,7 @@
                 $('#pass_message').show();
                 $('#pass_message').html("&#10003;").css({"color": "green", "height": "20px"});
             }
-        });
 
-        $('#password').bind('input', function() {
             if ($('#password').val().length > 0 && passwordReady) {
                 $("#conf_message").show();
                 $('#password, #conf_password').on('keyup', function () {
@@ -91,23 +98,30 @@
             }
         });
 
-        $("form").submit(function (e) {
-           var validationFailed = false;
-           if (!$('#check_id').is(':checked')) {
-               alert("To proceed you must agree the terms");
-               validationFailed = true;
-           }
-           else if (passwordReady === false) {
-               alert("To proceed you must provide a valid password");
-               validationFailed = true;
-           }
 
-           if (validationFailed) {
-               e.preventDefault();
-               return false;
-           } else {
-               return true;
-           }
+        $("form").submit(function (e) {
+               var validationFailed = false;
+               if (!$('#check_id').is(':checked')) {
+                   alert("To proceed you must agree the terms");
+                   validationFailed = true;
+               }
+               if ($('#pass_message').text() !== "✓") {
+                   alert("To proceed you must provide a valid password");
+                   validationFailed = true;
+               }
+                if ($('#conf_message').text() !== "✓") {
+                   alert("To proceed passwords must match");
+                   validationFailed = true;
+               }
+
+
+               if (validationFailed) {
+                   e.preventDefault();
+                   return false;
+               } else {
+                   return true;
+               }
         });
+
     </script>
 {% endblock %}
