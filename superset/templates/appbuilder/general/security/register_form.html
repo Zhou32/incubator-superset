@@ -29,7 +29,7 @@
                 {% for field in form %}
                     {% if field.name == 'first_name' or field.name == 'last_name' %}
                         <div class="inline-names inline-{{ field.name[:-5] }}-name">
-                            {{ field(size = 80, class = 'input-line full-width', placeholder=field.label.text) }}
+                            {{ field(size = 80, class = 'input-line full-width extra-mb', placeholder=field.label.text) }}
                         </div>
                     {% elif field.name == 'password' %}
                         <div data-toggle="tooltip" data-placement="top" title="Password must be at least 8 characters and it must contain at least one number and one letter." class="password-div">
@@ -42,7 +42,7 @@
                              <span class="match-message" id="conf_message"></span>
                         </div>
                     {% else %}
-                        {{ field(size = 80, id=field.name, class = "input-line full-width", placeholder=field.label.text) }}
+                        {{ field(size = 80, id=field.name, class = "input-line full-width extra-mb", placeholder=field.label.text) }}
                     {% endif %}
                 {% endfor %}
                 <div class="agreed">
@@ -82,7 +82,7 @@
             } else {
                 passwordReady = true;
                 $('#pass_message').show();
-                $('#pass_message').html("&#10003;").css({"color": "green", "height": "20px"});
+                $('#pass_message').html("✓").css({"color": "green", "height": "20px"});
             }
 
             if ($('#password').val().length > 0 && passwordReady) {
@@ -98,30 +98,24 @@
             }
         });
 
+        $("form").submit(function () {
+            if (!$('#check_id').is(':checked')) {
+               alert("To proceed you must agree the terms");
+               return false;
+            }
+            if ($('#pass_message').text() !== "✓") {
+               alert("To proceed you must provide a valid password");
+               return false;
+            }
+            if ($('#conf_message').text() !== "✓") {
+               alert("To proceed passwords must match");
+               return false;
+            }
 
-        $("form").submit(function (e) {
-               var validationFailed = false;
-               if (!$('#check_id').is(':checked')) {
-                   alert("To proceed you must agree the terms");
-                   validationFailed = true;
-               }
-               if ($('#pass_message').text() !== "✓") {
-                   alert("To proceed you must provide a valid password");
-                   validationFailed = true;
-               }
-                if ($('#conf_message').text() !== "✓") {
-                   alert("To proceed passwords must match");
-                   validationFailed = true;
-               }
-
-
-               if (validationFailed) {
-                   e.preventDefault();
-                   return false;
-               } else {
-                   return true;
-               }
+            return true;
         });
+
+
 
     </script>
 {% endblock %}
