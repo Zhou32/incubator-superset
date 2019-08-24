@@ -5,9 +5,10 @@
         <form id="model_form" action="" method="post" enctype="multipart/form-data">
     {% endif %}
         {% if form.errors %}
+            <div class="alert-top">
             {% for error in form.errors.items() %}
 {#                {% if loop.first %}#}
-                    <div class="alert-top">
+
                         <div class="alert alert-danger">
                             <button type="button" class="close" data-dismiss="alert">&times;</button>
                             {% if error[1][0] == 'Already exists.' %}
@@ -17,9 +18,10 @@
                             {% endif %}
 
                         </div>
-                    </div>
+
 {#                {% endif %}#}
             {% endfor %}
+             </div>
         {% endif %}
         <img class="signup-solarbi-sun" src="/static/assets/images/solarbi_auth_sun.jpg" alt="solar sun">
         <h4 class="solarbi-text">SOLARBI</h4>
@@ -90,8 +92,12 @@
                 $('#password, #conf_password').on('keyup', function () {
                     if ($('#password').val() == $('#conf_password').val()) {
                         $('#conf_message').html("&#10003;").css({"color": "green", "height": "20px"});
-                    } else
-                        $('#conf_message').html("&#215;").css({"color": "red", "height": "20px"});
+                    } else {
+                        $('#conf_message').html("&#215;").css({
+                            "color": "red",
+                            "height": "20px"
+                        });
+                    }
                 });
             } else {
                 $("#conf_message").hide();

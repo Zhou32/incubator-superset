@@ -6,7 +6,7 @@
 {% set app_icon_width = appbuilder.app.config.get('APP_ICON_WIDTH', 126) %}
 {% block head_css %}
     <link href="{{url_for('appbuilder.static',filename='css/bootstrap.min.css')}}" rel="stylesheet">
-    <link href="{{url_for('static',filename='assets/stylesheets/solarbi.less')}}" rel="stylesheet">
+    <link href="{{url_for('static',filename='assets/stylesheets/solarbi.less')}}?v=1.0" rel="stylesheet">
 {% endblock %}
 {% block head_js %}
     <script src="{{url_for('appbuilder.static',filename='js/jquery-latest.js')}}"></script>
