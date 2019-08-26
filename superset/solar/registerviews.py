@@ -22,5 +22,5 @@ from .forms import SolarBIRegisterFormWidget, SolarBIRegisterUserDBForm
 class SolarBIRegisterUserDBView(RegisterUserDBView):
     form = SolarBIRegisterUserDBForm
     edit_widget = SolarBIRegisterFormWidget
-    form_template = 'appbuilder/general/security/form_template.html'
+    form_template = 'appbuilder/general/security/register_form_template.html'
     email_subject = 'SolarBI - Email Confirmation '

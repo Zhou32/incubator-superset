@@ -24,8 +24,9 @@ from flask_appbuilder import const, urltools
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from superset.solar.views import PasswordRecoverView, SolarBIAuthDBView
+from superset.solar.views import SolarBIPasswordRecoverView, SolarBIAuthDBView
 from superset.solar.registerviews import SolarBIRegisterUserDBView
+from superset.solar.models import ResetRequest
 from superset.security import SupersetSecurityManager
 
 PERMISSION_COMMON = {
@@ -91,10 +92,12 @@ DB_ROLE_PREFIX = 'org_db_'
 
 
 class CustomSecurityManager(SupersetSecurityManager):
-    passwordrecoverview = PasswordRecoverView()
+    passwordrecoverview = SolarBIPasswordRecoverView()
 
     registeruserdbview = SolarBIRegisterUserDBView
     authdbview = SolarBIAuthDBView
+
+    resetRequest_model = ResetRequest
 
     def __init__(self, appbuilder):
         super(CustomSecurityManager, self).__init__(appbuilder)
@@ -120,6 +123,59 @@ class CustomSecurityManager(SupersetSecurityManager):
         self.get_session.commit()
         self.clean_perms()
 
+    @property
     def get_url_for_recover(self):
         return url_for('%s.%s' % (self.passwordrecoverview.endpoint,
                                   self.passwordrecoverview.default_view))
+
+    def add_reset_request(self, email):
+        """try look for not used existed hash for user"""
+        reset_request = self.get_session.query(self.resetRequest_model) \
+            .filter_by(email=email, used=False).first()
+        if reset_request is not None:
+            self.set_token_used(reset_request.reset_hash)
+        reset_request = self.resetRequest_model()
+        reset_request.email = email
+        reset_request.used = False
+        user = self.find_user(email=email)
+
+        if user is not None:
+            reset_request.user_id = user.id
+            hash_token = generate_password_hash(email)
+            reset_request.reset_hash = hash_token
+            try:
+                self.get_session.add(reset_request)
+                self.get_session.commit()
+                return hash_token
+            except Exception as e:
+                self.appbuilder.get_session.rollback()
+        return None
+
+    def find_user_by_token(self, token):
+        reset_request = self.get_session.query(self.resetRequest_model) \
+            .filter_by(reset_hash=token, used=False).first()
+        if reset_request is not None:
+            time = reset_request.reset_date
+            current_time = datetime.datetime.now()
+            time_diff = (current_time - time).total_seconds()
+            if time_diff < 3600:
+                """Check time diff of reset hash time"""
+                email = reset_request.email
+                user = self.find_user(email=email)
+                return user
+        return None
+
+    def set_token_used(self, token):
+        reset_request = self.get_session.query(self.resetRequest_model) \
+            .filter_by(reset_hash=token).first()
+        reset_request.used = True
+        try:
+            self.get_session.merge(reset_request)
+            self.get_session.commit()
+        except Exception as e:
+            self.get_session.rollback()
+
+    def to_reset_view(self):
+        return url_for('%s.%s' % (self.passwordresetview.endpoint,
+                                  self.passwordresetview.default_view))
+

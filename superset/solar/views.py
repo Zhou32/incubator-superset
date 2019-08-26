@@ -24,7 +24,8 @@ from flask_login import login_user
 
 from flask_appbuilder.views import expose, PublicFormView, ModelView
 
-from .forms import SolarBILoginForm_db, SolarBIPasswordRecoverForm
+from .forms import SolarBILoginForm_db, SolarBIPasswordRecoverForm, \
+    SolarBIPasswordRecoverFormWidget
 from flask_appbuilder._compat import as_unicode
 
 from flask_appbuilder.security.views import AuthDBView
@@ -56,12 +57,12 @@ class SolarBIAuthDBView(AuthDBView):
         )
 
 
-class PasswordRecoverView(PublicFormView):
+class SolarBIPasswordRecoverView(PublicFormView):
     """
         This is the view for recovering password
     """
 
-    route_base = '/recover'
+    route_base = '/password-recover'
 
     email_template = 'appbuilder/general/security/recover_mail.html'
     """ The template used to generate the email sent to the user """
@@ -75,10 +76,9 @@ class PasswordRecoverView(PublicFormView):
     error_message = lazy_gettext('This email is not registered or confirmed yet.')
     """ The message shown on an unsuccessful registration """
 
-    form_title = lazy_gettext('Enter your registered email for recovery')
-    """ The form title """
-
     form = SolarBIPasswordRecoverForm
+    edit_widget = SolarBIPasswordRecoverFormWidget
+    form_template = 'appbuilder/general/security/recover_password_form_template.html'
 
     def send_email(self, email, hash_val):
         """

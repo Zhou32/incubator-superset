@@ -75,3 +75,7 @@ class SolarBIRegisterFormWidget(FormWidget):
 
 class SolarBIPasswordRecoverForm(DynamicForm):
     email = StringField(lazy_gettext('Email'), validators=[DataRequired(), Email()])
+
+
+class SolarBIPasswordRecoverFormWidget(FormWidget):
+    template = 'appbuilder/general/security/recover_password_form.html'
