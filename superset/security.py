@@ -37,8 +37,6 @@ from sqlalchemy.orm.mapper import Mapper
 from superset import sql_parse
 from superset.connectors.connector_registry import ConnectorRegistry
 from superset.exceptions import SupersetSecurityException
-from superset.solar.views import SolarBIAuthDBView
-from superset.solar.registerviews import SolarBIRegisterUserDBView
 
 if TYPE_CHECKING:
     from superset.models.core import Database, BaseDatasource
@@ -91,8 +89,6 @@ SOLAR_PERMISSIONS_MENU = ['SolarBI', 'Search your Location', 'Saved Solar Data',
 
 
 class SupersetSecurityManager(SecurityManager):
-    authdbview = SolarBIAuthDBView
-    registeruserdbview = SolarBIRegisterUserDBView
 
     READ_ONLY_MODEL_VIEWS = {"DatabaseAsync", "DatabaseView", "DruidClusterModelView"}
 
@@ -752,7 +748,7 @@ class SupersetSecurityManager(SecurityManager):
                 'can_sql_json', 'can_csv', 'can_search_queries', 'can_sqllab_viz',
                 'can_sqllab',
             } or
-            (pvm.view_menu.name in USER_MODEL_VIEWS and
+            (pvm.view_menu.name in self.USER_MODEL_VIEWS and
              pvm.permission.name == 'can_list'))
 
     def is_granter_pvm(self, pvm):

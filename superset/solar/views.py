@@ -15,15 +15,22 @@
 # specific language governing permissions and limitations
 # under the License.
 # pylint: disable=C,R,W
+import logging
+
 from flask import flash, redirect, url_for, g, request, make_response
+from flask_babel import lazy_gettext
+from flask_mail import Mail, Message
 from flask_login import login_user
 
-from flask_appbuilder.views import expose
+from flask_appbuilder.views import expose, PublicFormView, ModelView
 
-from .forms import SolarBILoginForm_db
+from .forms import SolarBILoginForm_db, SolarBIPasswordRecoverForm
 from flask_appbuilder._compat import as_unicode
 
 from flask_appbuilder.security.views import AuthDBView
+
+
+log = logging.getLogger(__name__)
 
 
 class SolarBIAuthDBView(AuthDBView):
@@ -47,3 +54,66 @@ class SolarBIAuthDBView(AuthDBView):
         return self.render_template(
             self.login_template, title=self.title, form=form, appbuilder=self.appbuilder
         )
+
+
+class PasswordRecoverView(PublicFormView):
+    """
+        This is the view for recovering password
+    """
+
+    route_base = '/recover'
+
+    email_template = 'appbuilder/general/security/recover_mail.html'
+    """ The template used to generate the email sent to the user """
+
+    email_subject = lazy_gettext('Change your password')
+    """ The email subject sent to the user """
+
+    message = lazy_gettext('Password reset link sent to your email')
+    """ The message shown on a successful registration """
+
+    error_message = lazy_gettext('This email is not registered or confirmed yet.')
+    """ The message shown on an unsuccessful registration """
+
+    form_title = lazy_gettext('Enter your registered email for recovery')
+    """ The form title """
+
+    form = SolarBIPasswordRecoverForm
+
+    def send_email(self, email, hash_val):
+        """
+            Method for sending the registration Email to the user
+        """
+        mail = Mail(self.appbuilder.get_app)
+        msg = Message()
+        msg.subject = self.email_subject
+        url = url_for('.reset', _external=True, reset_hash=hash_val)
+        msg.html = self.render_template(self.email_template,
+                                        url=url)
+        msg.recipients = [email]
+        try:
+            mail.send(msg)
+        except Exception as e:
+            log.error('Send email exception: {0}'.format(str(e)))
+            return False
+        return True
+
+    def add_password_reset(self, email):
+        reset_hash = self.appbuilder.sm.add_reset_request(email)
+        if reset_hash is not None:
+            flash(as_unicode(self.message), 'info')
+            self.send_email(email, reset_hash)
+            return redirect(self.appbuilder.get_url_for_index)
+        else:
+            flash(as_unicode(self.error_message), 'danger')
+            return None
+
+    @expose('/reset/<string:reset_hash>')
+    def reset(self, reset_hash):
+        """ This is end point to verify the reset password hash from user
+        """
+        if reset_hash is not None:
+            return redirect(self.appbuilder.sm.get_url_for_reset(token=reset_hash))
+
+    def form_post(self, form):
+        return self.add_password_reset(email=form.email.data)

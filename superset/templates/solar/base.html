@@ -1,0 +1,43 @@
+{% block head_css %}
+    <link href="{{url_for('appbuilder.static',filename='css/bootstrap.min.css')}}" rel="stylesheet">
+    <link href="{{url_for('static',filename='assets/stylesheets/solarbi.less')}}?v=1.0" rel="stylesheet">
+{% endblock %}
+{% block head_js %}
+    <script src="{{url_for('appbuilder.static',filename='js/jquery-latest.js')}}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="primary-body">
+        <div class="left"></div>
+        {% block right %}
+        {% endblock %}
+    </div>
+{% endblock %}
+
+{% block terms %}
+    <div class="term-modal-overlay">
+        <div class="term-modal">
+            <a class="term-close-modal">
+              <span>&times;</span>
+            </a>
+            <div class="term-modal-content">
+              <h3>Some content here</h3>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block add_tail_js %}
+    <script src="{{url_for('appbuilder.static',filename='js/bootstrap.min.js')}}"></script>
+    <script>
+        var elements = $('.term-modal-overlay, .term-modal');
+
+        $('.term-of-use').click(function(){
+            elements.addClass('active');
+        });
+
+        $('.term-close-modal').click(function(){
+            elements.removeClass('active');
+        });
+    </script>
+{% endblock %}

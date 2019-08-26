@@ -16,19 +16,12 @@
   specific language governing permissions and limitations
   under the License.
 #}
-{% extends "solar/base.html" %}
-{% import 'appbuilder/general/lib.html' as lib %}
+<p>Hi,</p>
 
-{% set languages = appbuilder.languages %}
-{% set WARNING_MSG = appbuilder.app.config.get('WARNING_MSG') %}
-{% set app_icon_width = appbuilder.app.config.get('APP_ICON_WIDTH', 126) %}
+<p>Seems like you forgot your password and would like it to be reset.</p>
 
-{% block right %}
-    <div class="right">
-        {{ widgets.get('edit')(form_action=form_action)|safe }}
-        <a href="{{appbuilder.get_url_for_login}}" class="to-login" data-toggle="tooltip" rel="tooltip">
-            {{_('Already have an account? Sign in.')}}
-        </a>
-        <p class="term-of-use">Term of use. Privacy policy</p>
-    </div>
-{% endblock %}
+<p>Please click <a href="{{url}}">here</a> to reset your password. Remember it will only last for one hour.</p>
+
+<p>If you didn't ask for reseting your password, please ignore this email</p>
+
+<p>Oscar<br>@solarbi.com.au</p>
