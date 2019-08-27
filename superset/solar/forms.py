@@ -79,3 +79,24 @@ class SolarBIPasswordRecoverForm(DynamicForm):
 
 class SolarBIPasswordRecoverFormWidget(FormWidget):
     template = 'appbuilder/general/security/recover_password_form.html'
+
+
+class SolarBIPasswordResetForm(DynamicForm):
+    password = PasswordField(
+        lazy_gettext("Password"),
+        description=lazy_gettext(
+            "Please use a good password policy,"
+            " this application does not check this for you"
+        ),
+        validators=[DataRequired()],
+    )
+    conf_password = PasswordField(
+        lazy_gettext("Confirm Password"),
+        description=lazy_gettext("Please rewrite the password to confirm"),
+        validators=[
+            EqualTo("password", message=lazy_gettext("Passwords must match"))],
+    )
+
+
+class SolarBIPasswordResetFormWidget(FormWidget):
+    template = 'appbuilder/general/security/reset_password_form.html'

@@ -23,9 +23,15 @@ from flask_mail import Mail, Message
 from flask_login import login_user
 
 from flask_appbuilder.views import expose, PublicFormView, ModelView
+from flask_appbuilder.security.forms import ResetPasswordForm
 
-from .forms import SolarBILoginForm_db, SolarBIPasswordRecoverForm, \
-    SolarBIPasswordRecoverFormWidget
+from .forms import (
+    SolarBILoginForm_db,
+    SolarBIPasswordRecoverForm,
+    SolarBIPasswordRecoverFormWidget,
+    SolarBIPasswordResetFormWidget,
+    SolarBIPasswordResetForm
+)
 from flask_appbuilder._compat import as_unicode
 
 from flask_appbuilder.security.views import AuthDBView
@@ -67,7 +73,7 @@ class SolarBIPasswordRecoverView(PublicFormView):
     email_template = 'appbuilder/general/security/recover_mail.html'
     """ The template used to generate the email sent to the user """
 
-    email_subject = lazy_gettext('Change your password')
+    email_subject = lazy_gettext('SolarBI - Reset Your Password')
     """ The email subject sent to the user """
 
     message = lazy_gettext('Password reset link sent to your email')
@@ -106,7 +112,7 @@ class SolarBIPasswordRecoverView(PublicFormView):
             return redirect(self.appbuilder.get_url_for_index)
         else:
             flash(as_unicode(self.error_message), 'danger')
-            return None
+            return redirect(self.appbuilder.get_url_for_index)
 
     @expose('/reset/<string:reset_hash>')
     def reset(self, reset_hash):
@@ -117,3 +123,62 @@ class SolarBIPasswordRecoverView(PublicFormView):
 
     def form_post(self, form):
         return self.add_password_reset(email=form.email.data)
+
+
+class SolarBIResetPasswordView(PublicFormView):
+    route_base = '/reset'
+    form = SolarBIPasswordResetForm
+    form_template = 'appbuilder/general/security/reset_password_form_template.html'
+    edit_widget = SolarBIPasswordResetFormWidget
+    redirect_url = '/'
+    message = lazy_gettext('Password has been reset.')
+    error_message = lazy_gettext('Sorry, the link has expired.')
+
+    @expose('/form', methods=['GET'])
+    def this_form_get(self):
+        self._init_vars()
+        form = self.form.refresh()
+        token = request.args.get('token')
+        user = self.appbuilder.sm.find_user_by_token(token)
+        if user is not None:
+            self.form_get(form)
+            widgets = self._get_edit_widget(form=form)
+            self.update_redirect()
+            return self.render_template(self.form_template,
+                                        title=self.form_title,
+                                        widgets=widgets,
+                                        appbuilder=self.appbuilder)
+        flash(as_unicode(self.error_message), 'danger')
+        return redirect(self.appbuilder.get_url_for_index)
+
+    @expose('/form', methods=['POST'])
+    def this_form_post(self):
+        self._init_vars()
+        form = self.form.refresh()
+        if form.validate_on_submit():
+            token = request.args.get('token')
+            response = self.form_post(form, token=token)
+            if not response:
+                return self.this_form_get()
+            return redirect(response)
+        else:
+            widgets = self._get_edit_widget(form=form)
+            return self.render_template(
+                self.form_template,
+                title=self.form_title,
+                widgets=widgets,
+                appbuilder=self.appbuilder,
+            )
+
+    def form_post(self, form, **kwargs):
+        token = kwargs['token']
+        user = self.appbuilder.sm.find_user_by_token(token)
+
+        if user is not None:
+            flash(as_unicode(self.message), 'info')
+            password = form.password.data
+            self.appbuilder.sm.reset_password(user.id, password)
+            self.appbuilder.sm.set_token_used(token)
+            return self.appbuilder.get_url_for_index
+
+        return None

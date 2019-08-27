@@ -24,7 +24,8 @@ from flask_appbuilder import const, urltools
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from superset.solar.views import SolarBIPasswordRecoverView, SolarBIAuthDBView
+from superset.solar.views import SolarBIPasswordRecoverView, SolarBIAuthDBView, \
+    SolarBIResetPasswordView
 from superset.solar.registerviews import SolarBIRegisterUserDBView
 from superset.solar.models import ResetRequest
 from superset.security import SupersetSecurityManager
@@ -93,6 +94,7 @@ DB_ROLE_PREFIX = 'org_db_'
 
 class CustomSecurityManager(SupersetSecurityManager):
     passwordrecoverview = SolarBIPasswordRecoverView()
+    passwordresetview = SolarBIResetPasswordView()
 
     registeruserdbview = SolarBIRegisterUserDBView
     authdbview = SolarBIAuthDBView
@@ -105,6 +107,7 @@ class CustomSecurityManager(SupersetSecurityManager):
     def register_views(self):
         super(CustomSecurityManager, self).register_views()
         self.appbuilder.add_view_no_menu(self.passwordrecoverview)
+        self.appbuilder.add_view_no_menu(self.passwordresetview)
 
     def sync_role_definitions(self):
         """Inits the Superset application with security roles and such"""
@@ -127,6 +130,10 @@ class CustomSecurityManager(SupersetSecurityManager):
     def get_url_for_recover(self):
         return url_for('%s.%s' % (self.passwordrecoverview.endpoint,
                                   self.passwordrecoverview.default_view))
+
+    def get_url_for_reset(self, token):
+        return url_for('%s.%s' % (self.passwordresetview.endpoint,
+                                  self.passwordresetview.default_view), token=token)
 
     def add_reset_request(self, email):
         """try look for not used existed hash for user"""
@@ -152,7 +159,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         return None
 
     def find_user_by_token(self, token):
-        reset_request = self.get_session.query(self.resetRequest_model) \
+        reset_request = self.get_session.query(self.resetRequest_model)\
             .filter_by(reset_hash=token, used=False).first()
         if reset_request is not None:
             time = reset_request.reset_date
@@ -174,8 +181,4 @@ class CustomSecurityManager(SupersetSecurityManager):
             self.get_session.commit()
         except Exception as e:
             self.get_session.rollback()
-
-    def to_reset_view(self):
-        return url_for('%s.%s' % (self.passwordresetview.endpoint,
-                                  self.passwordresetview.default_view))
 
