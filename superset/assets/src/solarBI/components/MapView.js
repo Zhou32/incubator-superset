@@ -497,7 +497,7 @@ export default withWidth()(
     { fetchSolarData },
   )(
     GoogleApiWrapper({
-      apiKey: 'AIzaSyBhxmH4h8k0ZaUN713RVCb9T1uGTfsIX9k',
+      apiKey: 'AIzaSyAc65tB0eu0jqft4ip7De7VcD56BpYlgio',
     })(MapView),
   ),
 );
