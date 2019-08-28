@@ -112,8 +112,8 @@ class WelcomePage extends React.Component {
 
     return (
       <div className={classes.root}>
-        <div className={classes.topLine1} />
-        <div className={classes.topLine2} />
+        {/* <div className={classes.topLine1} />
+        <div className={classes.topLine2} /> */}
         <div className={classes.title}>
           <p className={classes.head}>SolarBI</p>
           <p className={classes.subtitle}>

@@ -16,6 +16,7 @@
 #
 black==19.3b0
 coverage==4.5.3
+docutils==0.15.2
 flake8-import-order==0.18.1
 flake8-mypy==17.8.0
 flake8==3.7.7
@@ -35,3 +36,4 @@ requests==2.22.0
 statsd==3.3.0
 thrift==0.11.0
 tox==3.11.1
+PyAthenaJDBC==2.0.5
