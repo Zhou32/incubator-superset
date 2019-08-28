@@ -61,19 +61,27 @@
   </head>
 
   <body {% if standalone_mode %}class="standalone"{% endif %}>
-{#    {% block navbar %}#}
-{#      {% if not standalone_mode %}#}
-{#        <header class="top" role="header">#}
-{#          {% include 'appbuilder/navbar.html' %}#}
-{#        </header>#}
-{#      {% endif %}#}
-{#    {% endblock %}#}
+    {% if not is_solar %}
+        {% block navbar %}
+          {% if not standalone_mode %}
+            <header class="top" role="header">
+              {% include 'appbuilder/navbar.html' %}
+            </header>
+          {% endif %}
+        {% endblock %}
 
-    {% block body %}
-      <div id="app" data-bootstrap="{{ bootstrap_data }}">
-        <img src="/static/assets/images/loading.gif" style="width: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%)">
-      </div>
-    {% endblock %}
+        {% block body %}
+          <div id="app" data-bootstrap="{{ bootstrap_data }}">
+            <img src="/static/assets/images/loading.gif" style="width: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%)">
+          </div>
+        {% endblock %}
+    {% else %}
+        {% block side_layout %}
+            <div class="s-layout" style="display: flex; width: 100%; min-height: 100vh">
+                {% include 'solar/sidebar.html' %}
+            </div>
+        {% endblock %}
+    {% endif %}
 
     <!-- Modal for misc messages / alerts  -->
     <div class="misc-modal modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
