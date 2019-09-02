@@ -543,14 +543,18 @@ input {
 }
 .sidebar-solarbi-sun {
   margin-top: 10px;
-  width: 60px;
-  height: 60px;
+  width: 15px;
+  height: 15px;
+  position: relative;
+  top: 5px;
+  left: 45px;
 }
 .sidebar-solarbi-text {
-  font-size: 15px;
-  color: #024067;
+  font-size: 25px;
+  color: #D7DE1F;
   margin: 5px;
   font-family: 'Futura PT Bold';
+  text-transform: uppercase;
 }
 .s-sidebar__trigger > i {
   display: inline-block;
@@ -566,7 +570,7 @@ input {
   transition: all .3s ease-in;
   width: 15em;
   height: 100%;
-  background: white;
+  background: linear-gradient(to bottom, #177BB9, #118DB3, #129AAA);
   color: rgba(255, 255, 255, 0.7);
   z-index: 1000;
 }
@@ -589,24 +593,30 @@ input {
 
 .s-sidebar__nav ul li {
   width: 100%;
+  padding: 0 30px;
 }
-
+.s-sidebar__nav ul li hr{
+  position: relative;
+  bottom: 15px;
+}
 .s-sidebar__nav-link {
   position: relative;
   display: inline-block;
   width: 100%;
-  height: 4em;
+  height: 3em;
+  font-size: 16px;
+  color: white;
 }
 
-.s-sidebar__nav-link em {
+.s-sidebar__nav-link span {
   position: absolute;
   top: 50%;
-  left: 4em;
+  left: 3em;
   transform: translateY(-50%);
 }
 
 .s-sidebar__nav-link:hover {
-  background: #4d6276;
+  color: #BFD54F;
 }
 
 .s-sidebar__nav-link > i {
@@ -614,8 +624,8 @@ input {
   top: 0;
   left: 0;
   display: inline-block;
-  width: 4em;
-  height: 4em;
+  width: 2em;
+  height: 3em;
 }
 
 .s-sidebar__nav-link > i::before {
@@ -644,7 +654,18 @@ input {
   .s-sidebar__nav ul {
     position: absolute;
   }
-  
+
+  .s-sidebar__nav ul li{
+      padding: 0;
+  }
+
+  .s-sidebar__nav-link > i{
+    width: 4em;
+  }
+
+  .s-sidebar__nav-link span{
+    left: 4em;
+  }
   .s-sidebar__nav:hover, .s-sidebar__nav:focus, .s-sidebar__trigger:hover + .s-sidebar__nav, .s-sidebar__trigger:focus + .s-sidebar__nav {
      width: 15em;
   }
@@ -664,12 +685,26 @@ input {
     width: 15em;
   }
 
+  .s-sidebar__nav ul li {
+      padding: 0 30px;
+  }
+
+  .s-sidebar__nav-link > i {
+      width: 2em;
+  }
+
+  .s-sidebar__nav-link span{
+      left: 3em;
+  }
+
   .s-sidebar__nav ul {
     position: initial;
   }
 
   .sidebar-title {
     display: inherit;
+    margin-bottom: 80px;
+    margin-top: 50px;
   }
   
   .s-sidebar__nav ul {
