@@ -25,6 +25,7 @@ import URI from 'urijs';
 import withWidth from '@material-ui/core/withWidth';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import LocationSearchBox from './LocationSearchBox';
+import DemoBox from './DemoBox';
 import { Map, Marker, Circle, InfoWindow, GoogleApiWrapper } from '../../visualizations/SolarBI/google_maps_react';
 import { fetchSolarData } from '../actions/solarActions';
 import SaveModal from './SaveModal';
@@ -40,7 +41,7 @@ const theme = createMuiTheme({
   },
   palette: {
     primary: {
-      main: '#489795',
+      main: '#DAD800',
     },
     secondary: {
       main: '#8E44AD',
@@ -373,7 +374,7 @@ export class MapView extends React.Component {
       <div>
         <MuiThemeProvider theme={theme}>
           {this.state.showingEmptyAlert && (
-            <Grid>
+            <Grid style={{ position: 'absolute', top: 0 }}>
               <Row className="show-grid" xs={12}>
                 <Col>
                   <Alert bsStyle="danger" style={{ margin: 'auto' }}>
@@ -384,7 +385,7 @@ export class MapView extends React.Component {
             </Grid>
           )}
           {this.state.showingWrongAlert && (
-            <Grid>
+            <Grid style={{ position: 'absolute', top: 0 }}>
               <Row className="show-grid" xs={12}>
                 <Col>
                   <Alert bsStyle="danger" style={{ margin: 'auto' }}>
@@ -401,13 +402,14 @@ export class MapView extends React.Component {
             </div>
           )}
           {this.state.searching && entry !== 'welcome' && (
-            <Grid>
-              <Row className="show-grid" style={{ marginTop: '20vh' }}>
+            <Grid style={{ position: 'absolute', top: '200px' }}>
+              <Row className="show-grid">
                 <Col xs={10} xsOffset={1} md={10} mdOffset={1}>
                   <LocationSearchBox
                     address={this.state.address}
                     onPlaceChanged={place => this.onPlaceChanged(place)}
                   />
+                  <DemoBox />
                 </Col>
               </Row>
             </Grid>

@@ -18,34 +18,24 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
+import withWidth from '@material-ui/core/withWidth';
+// import { withStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import Fab from '@material-ui/core/Fab';
-import InputAdornment from '@material-ui/core/InputAdornment';
+// import InputAdornment from '@material-ui/core/InputAdornment';
 import Input from '@material-ui/core/Input';
 import Search from '@material-ui/icons/Search';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
+// import Button from 'src/components/Button';
 
 
 const propTypes = {
   classes: PropTypes.object.isRequired,
   address: PropTypes.string.isRequired,
+  width: PropTypes.string.isRequired,
   onPlaceChanged: PropTypes.func.isRequired,
 };
-
-const theme = createMuiTheme({
-  palette: {
-    primary: {
-      main: '#489795',
-    },
-    secondary: {
-      main: '#FFEBEE',
-    },
-  },
-  typography: {
-    useNextVariants: true,
-  },
-});
 
 const styles = tm => ({
   textField: {
@@ -58,26 +48,59 @@ const styles = tm => ({
     fontSize: '13px',
   },
   fab: {
-    margin: tm.spacing.unit,
+    width: 60,
+    height: 60,
+    marginLeft: 20,
   },
   icon: {
     margin: tm.spacing.unit,
   },
   input: {
-    margin: '70 40',
+    margin: '50 40',
     height: 60,
-    width: '90%',
+    width: '70%',
     backgroundColor: '#f6f6f6',
     borderRadius: '3em',
     border: '1px solid dimgray',
   },
   inputFocused: {
-    width: '90%',
+    width: '70%',
     borderColor: '#80bdff',
     boxShadow: '0 0 0 0.2rem rgba(0,123,255,.25)',
   },
   card: {
-    minHeight: 250,
+    minHeight: 200,
+    height: 200,
+  },
+  saved: {
+    display: 'block',
+    margin: 'auto',
+    marginTop: -10,
+    width: 180,
+    fontFamily: 'Montserrat, sans-serif',
+    fontSize: 16,
+    color: '#0063B0',
+  },
+  searchBtn: {
+    width: '18%',
+    height: 60,
+    padding: '0 16px',
+    minWidth: 30,
+    borderRadius: 60,
+    backgroundColor: '#DAD800',
+    border: 'none',
+    fontSize: 16,
+    fontFamily: 'Montserrat, sans-serif',
+    fontWeight: 'bold',
+    '&:hover': {
+      backgroundColor: '#bab702',
+    },
+    '&:focus': {
+      outline: 'none !important',
+    },
+    '&:active': {
+      color: '#FFB2B2',
+    },
   },
 });
 
@@ -138,7 +161,10 @@ class LocationSearchBox extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, width } = this.props;
+    console.log(width);
+    const isXSScreen = /xs|sm|md/.test(width);
+    console.log(isXSScreen);
 
     return (
       <Card className={classes.card}>
@@ -146,35 +172,59 @@ class LocationSearchBox extends React.Component {
           <Input
             autoFocus
             id="inputBox"
-            placeholder="Address"
             className={classes.input}
+            placeholder=""
             classes={{ focused: classes.inputFocused }}
             inputRef={ref => (this.locationSearch = ref)} // eslint-disable-line no-return-assign
             onChange={this.onChange.bind(this, 'address')}
             inputProps={{
               style: {
                 fontSize: 18,
+                fontFamily: 'Montserrat, sans-serif',
                 paddingLeft: 10,
               },
             }}
             disableUnderline
-            endAdornment={
-              <MuiThemeProvider theme={theme}>
-                <InputAdornment position="end">
-                  <Fab
-                    id="searchFab"
-                    size="medium"
-                    color="primary"
-                    aria-label="Search"
-                    className={classes.fab}
-                    onClick={this.onSearchClick}
-                  >
-                    <Search />
-                  </Fab>
-                </InputAdornment>
-              </MuiThemeProvider>
-            }
+          // endAdornment={
+          //   <MuiThemeProvider theme={theme}>
+          //     <InputAdornment position="end">
+          //       <Fab
+          //         id="searchFab"
+          //         size="medium"
+          //         color="primary"
+          //         aria-label="Search"
+          //         className={classes.fab}
+          //         onClick={this.onSearchClick}
+          //       >
+          //         <Search />
+          //       </Fab>
+          //     </InputAdornment>
+          //   </MuiThemeProvider>
+          // }
           />
+          {isXSScreen ?
+            <Fab
+              id="searchFab"
+              size="medium"
+              color="primary"
+              aria-label="Search"
+              className={classes.fab}
+              onClick={this.onSearchClick}
+            >
+              <Search />
+            </Fab>
+            :
+            <button
+              variant="contained"
+              aria-label="Search"
+              color="primary"
+              className={classes.searchBtn}
+              onClick={this.onSearchClick}
+            >
+              SEARCH
+            </button>
+          }
+          <a className={classes.saved} href="/solar/list">See saved searches</a>
         </CardContent>
       </Card>
     );
@@ -183,4 +233,4 @@ class LocationSearchBox extends React.Component {
 
 LocationSearchBox.propTypes = propTypes;
 
-export default withStyles(styles)(LocationSearchBox);
+export default withWidth()(withStyles(styles)(LocationSearchBox));
