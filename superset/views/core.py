@@ -423,6 +423,8 @@ class SolarBIModelAddView(SolarBIModelView):
 
     filters_not_for_admin = {}
 
+    list_template = 'solar/list.html',
+
     @expose('/list/')
     @has_access
     def list(self):
@@ -3253,7 +3255,7 @@ class Superset(BaseSupersetView):
                 is_solar = True
 
         return self.render_template(
-            'superset/basic.html',
+            'solar/basic.html',
             entry='solarBI',
             title=title,
             bootstrap_data=json.dumps(bootstrap_data),

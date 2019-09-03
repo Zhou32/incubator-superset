@@ -47,6 +47,11 @@ const styles = tm => ({
     margin: '4px',
     fontSize: '13px',
   },
+  card: {
+    minHeight: 200,
+    height: 200,
+    borderRadius: 12,
+  },
   fab: {
     width: 60,
     height: 60,
@@ -68,10 +73,6 @@ const styles = tm => ({
     borderColor: '#80bdff',
     boxShadow: '0 0 0 0.2rem rgba(0,123,255,.25)',
   },
-  card: {
-    minHeight: 200,
-    height: 200,
-  },
   saved: {
     display: 'block',
     margin: 'auto',
@@ -80,6 +81,7 @@ const styles = tm => ({
     fontFamily: 'Montserrat, sans-serif',
     fontSize: 16,
     color: '#0063B0',
+    cursor: 'pointer',
   },
   searchBtn: {
     width: '18%',
@@ -162,9 +164,7 @@ class LocationSearchBox extends React.Component {
 
   render() {
     const { classes, width } = this.props;
-    console.log(width);
     const isXSScreen = /xs|sm|md/.test(width);
-    console.log(isXSScreen);
 
     return (
       <Card className={classes.card}>

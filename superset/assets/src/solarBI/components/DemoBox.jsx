@@ -20,15 +20,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import withWidth from '@material-ui/core/withWidth';
-// import { withStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-import Fab from '@material-ui/core/Fab';
-// import InputAdornment from '@material-ui/core/InputAdornment';
-import Input from '@material-ui/core/Input';
-import Search from '@material-ui/icons/Search';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import Button from 'src/components/Button';
-
 
 const propTypes = {
   classes: PropTypes.object.isRequired,
@@ -64,6 +57,7 @@ const styles = tm => ({
     marginTop: 160,
     minHeight: 290,
     height: 290,
+    borderRadius: 12,
     fontFamily: 'Montserrat',
   },
   cardInitial: {
@@ -71,6 +65,7 @@ const styles = tm => ({
     marginBottom: 30,
     minHeight: 290,
     height: 530,
+    borderRadius: 12,
     fontFamily: 'Montserrat',
   },
   contentFlex: {
