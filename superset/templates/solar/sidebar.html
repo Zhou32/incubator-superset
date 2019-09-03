@@ -23,7 +23,6 @@
 {% set logo_target_path = appbuilder.app.config.get('LOGO_TARGET_PATH') or '/profile/{}/'.format(current_user.username) %}
 
 <link href="{{url_for('static',filename='assets/stylesheets/solarbi.less')}}?v=1.0" rel="stylesheet">
-<script src="https://kit.fontawesome.com/ace8403ae5.js"></script>
 
 <!-- Sidebar -->
 <div class="s-layout__sidebar">
@@ -33,7 +32,7 @@
 
   <nav class="s-sidebar__nav">
       <div class="sidebar-title">
-          <img class="sidebar-solarbi-sun" src="/static/assets/images/solarbi_auth_sun.jpg" alt="solar sun">
+          <img class="sidebar-solarbi-sun" src="/static/assets/images/solarbi_auth_sun.png" alt="solar sun">
           <h4 class="sidebar-solarbi-text">SolarBI</h4>
       </div>
      <ul>
@@ -86,9 +85,3 @@
      </ul>
   </nav>
 </div>
-
-{% block side_body %}
-  <div id="app" class="s-layout__content" data-bootstrap="{{ bootstrap_data }}">
-    <img src="/static/assets/images/loading.gif" style="width: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%)">
-  </div>
-{% endblock %}

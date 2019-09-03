@@ -12,13 +12,13 @@
 }
 
 .primary-body {
-  height:  100vh; 
+  height:  100vh;
   width:  100vw;
-  margin:  0 0; 
-  display:  flex; 
-  align-items:  flex-start; 
-  justify-content:  flex-start; 
-  background-color:  white; 
+  margin:  0 0;
+  display:  flex;
+  align-items:  flex-start;
+  justify-content:  flex-start;
+  background-color:  white;
   font-family: 'Futura PT Book';
 }
 body {
@@ -30,7 +30,7 @@ input {
 ::-webkit-input-placeholder {
   color: #0667A3;
 }
-::-webkit-input-placeholder .input-line:focus +::input-placeholder {
+::-webkit-input-placeholder .input-line:focus{
   color: #0667A3;
 }
 .full-width {
@@ -70,21 +70,21 @@ input {
   transition: all .2s ease;
 }
 .left {
-  width: 50%; 
-  height: 100%; 
-  min-height: 880px; 
-  position: relative; 
+  width: 50%;
+  height: 100%;
+  min-height: 880px;
+  position: relative;
   background-image: url("../images/solarbi_auth_left.png");
   background-size: cover;
 }
 .right {
-  width: 50%; 
-  height: auto; 
-  min-height: 100%; 
-  position: relative; 
+  width: 50%;
+  height: auto;
+  min-height: 100%;
+  position: relative;
   text-align: center;
-  border-top-left-radius: 4px; 
-  border-bottom-left-radius: 4px; 
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
 }
 .alert-top {
   position: absolute;
@@ -527,6 +527,112 @@ input {
   align-items: center;
   flex: 1;
 }
+
+.s-layout__content .billing-content {
+  width: 100%;
+  height: 100%;
+}
+
+.billing-content .nav-pills {
+  display: flex;
+  justify-content: center;
+  background: white;
+  border-bottom: 1px solid #707070;
+}
+
+.billing-content .nav > li {
+  margin-right: 100px;
+}
+
+.billing-content .nav > li > a {
+  font-size: 18px;
+  color: #024067;
+  padding: 10px 20px 10px 0;
+}
+
+.billing-content .nav > li > a i {
+  margin-right: 15px;
+}
+
+.billing-content .nav-pills > li.active > a, .billing-content .nav-pills > li.active > a:hover, .billing-content .nav-pills > li.active > a:focus {
+  color: #024067;
+  background: transparent;
+  border-bottom: 2px solid #024067;
+}
+
+.billing-content .panel {
+  width: 750px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+  color: #707070;
+}
+
+.billing-content .panel > .panel-body {
+  padding: 25px 35px;
+}
+
+.billing-content .panel > .panel-footer {
+  background: transparent;
+  align-content: center;
+  display: flex;
+  justify-content: center;
+}
+
+.billing-content .panel-primary > .panel-heading {
+  font-size:21px;
+  color: #707070;
+  text-align: center;
+  border-bottom: 1px solid #CCCCCC;
+}
+
+.billing-content .plan-option-pane {
+  width: 950px;
+  height: 130px;
+  background: white;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+  padding: 24px 45px;
+  color: #707070;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 1px 2px 3px 1px lightgrey;
+  margin-top: 40px;
+}
+
+.billing-content .plan-option-pane .option-name {
+  font-size: 26px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+.billing-content .plan-option-pane .option-name > i {
+  color: #024067;
+  font-size: 42px;
+  margin-right: 30px;
+}
+.billing-content .plan-option-pane .option-description {
+  font-size: 15px;
+  width: 225px;
+  text-align: center;
+  flex: 1;
+}
+.billing-content .plan-option-pane .option-submit {
+  flex: 1;
+}
+.billing-content .plan-option-pane .option-submit .btn-default{
+  float: right;
+  width: 255px;
+  height: 80px;
+  color: #024067;
+  border-color: #024067;
+  text-transform: uppercase;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+}
 /* Sidebar */
 .s-sidebar__trigger {
   z-index: 1002;
@@ -551,7 +657,7 @@ input {
 }
 .sidebar-solarbi-text {
   font-size: 25px;
-  color: #D7DE1F;
+  color: #D7DF23;
   margin: 5px;
   font-family: 'Futura PT Bold';
   text-transform: uppercase;
@@ -616,7 +722,7 @@ input {
 }
 
 .s-sidebar__nav-link:hover {
-  color: #BFD54F;
+  color: #F9ED32;
 }
 
 .s-sidebar__nav-link > i {
@@ -640,12 +746,12 @@ input {
   .s-layout__content {
      margin-left: 4em;
   }
-  
+
   /* Sidebar */
   .s-sidebar__trigger {
      width: 4em;
   }
-  
+
   .s-sidebar__nav {
      width: 4em;
      left: 0;
@@ -675,12 +781,12 @@ input {
   .s-layout__content {
      margin-left: 15em;
   }
-  
+
   /* Sidebar */
   .s-sidebar__trigger {
     display: none
   }
-  
+
   .s-sidebar__nav {
     width: 15em;
   }
@@ -706,7 +812,7 @@ input {
     margin-bottom: 80px;
     margin-top: 50px;
   }
-  
+
   .s-sidebar__nav ul {
      top: 1.3em;
   }

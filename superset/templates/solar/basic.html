@@ -76,11 +76,16 @@
           </div>
         {% endblock %}
     {% else %}
-        {% block side_layout %}
-            <div class="s-layout" style="display: flex; width: 100%; min-height: 100vh">
+        <div class="s-layout" style="display: flex; width: 100%; min-height: 100vh">
+            {% block side_layout %}
                 {% include 'solar/sidebar.html' %}
-            </div>
-        {% endblock %}
+            {% endblock %}
+            {% block solar_content %}
+                <div id="app" class="s-layout__content" data-bootstrap="{{ bootstrap_data }}">
+                  <img src="/static/assets/images/loading.gif" style="width: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%)">
+                </div>
+            {% endblock %}
+        </div>
     {% endif %}
 
     <!-- Modal for misc messages / alerts  -->
@@ -88,7 +93,7 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <button type="button" class="creddisspan>
+            <button type="button" class="creddisspan">
             </button>
             <h4 class="modal-title"></h4>
           </div>
@@ -101,6 +106,7 @@
       </div>
     </div>
     {% block tail_js %}
+        <script src="https://kit.fontawesome.com/ace8403ae5.js"></script>
       {% if entry %}
         {% with filename=entry %}
           {% include "superset/partials/_script_tag.html" %}
