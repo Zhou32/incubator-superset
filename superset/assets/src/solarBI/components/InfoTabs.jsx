@@ -18,16 +18,20 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
 import SaveIcon from '@material-ui/icons/Save';
-import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
+// import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import GoBackModal from './GoBackModal';
 import ExportModal from './ExportModal';
 
 const styles = theme => ({
+  exportBtn: {
+    marginLeft: 60,
+  },
   root: {
     marginBottom: 40,
   },
@@ -37,13 +41,34 @@ const styles = theme => ({
   card: {
     minWidth: 450,
   },
+  infoBtn: {
+    textDecoration: 'none !important',
+    fontFamily: 'Montserrat',
+    width: '30%',
+    borderRadius: '30px',
+    border: '1px solid #0667A3',
+    backgroundColor: 'white',
+    color: '#0667A3',
+    fontSize: 18,
+    padding: '12px 0',
+    transition: 'transform 80ms ease-in',
+    '&:hover': {
+      textShadow: '0px 0px 1px #0667A3',
+      boxShadow: '0px 5px 40px -10px rgba(0,0,0,0.57)',
+      transition: 'all 0.4s ease 0s',
+      cursor: 'pointer',
+    },
+    '&:active': {
+      transform: 'scale(0.95)',
+    },
+    '&:focus': {
+      outline: 'none',
+    },
+  },
   infoCard: {
     minHeight: 200,
     marginTop: 10,
     marginBottom: 100,
-  },
-  cardContent: {
-    margin: '0 20',
   },
   typography: {
     textAlign: 'center',
@@ -55,6 +80,9 @@ const styles = theme => ({
     backgroundColor: '#489795',
     transform: 'scale(1.4)',
     margin: '15 20',
+  },
+  saveBtn: {
+    marginLeft: 50,
   },
   tooltip: {
     fontSize: 14,
@@ -115,7 +143,7 @@ class InfoTabs extends React.Component {
     const { classes, solar_new } = this.props;
     return (
       <div className={classes.root}>
-        <Tooltip title="Go Back" classes={{ tooltip: classes.tooltip }}>
+        {/* <Tooltip title="Go Back" classes={{ tooltip: classes.tooltip }}>
           <IconButton
             id="backIcon"
             className={classes.icon}
@@ -124,33 +152,36 @@ class InfoTabs extends React.Component {
           >
             <KeyboardBackspaceIcon />
           </IconButton>
-        </Tooltip>
-        <div style={{ float: 'right' }}>
+        </Tooltip> */}
+        <div style={{ display: 'flex', width: '50%', float: 'right' }}>
           {this.props.can_save && this.props.solar_new && (
-            <Tooltip title="Save" classes={{ tooltip: classes.tooltip }}>
-              <IconButton
-                id="saveIcon"
-                className={classes.icon}
-                onClick={this.onSaveClick}
-              >
-                <SaveIcon />
-              </IconButton>
-            </Tooltip>
+            <button
+              className={classNames(classes.infoBtn, classes.saveBtn)}
+              onClick={this.onSaveClick}
+            >
+              Save
+            </button>
           )}
           {this.props.can_export && (
-            <Tooltip
-              title="Export As CSV"
-              classes={{ tooltip: classes.tooltip }}
+            <button
+              className={classNames(classes.infoBtn, classes.exportBtn)}
+              onClick={this.toggleExportModal}
             >
-              <IconButton
-                id="exportIcon"
-                className={classes.icon}
-                // href={this.getCSVURL()}
-                onClick={this.toggleExportModal}
-              >
-                <CloudDownloadIcon />
-              </IconButton>
-            </Tooltip>
+              Export
+            </button>
+            // <Tooltip
+            //   title="Export As CSV"
+            //   classes={{ tooltip: classes.tooltip }}
+            // >
+            //   <IconButton
+            //     id="exportIcon"
+            //     className={classes.icon}
+            //     // href={this.getCSVURL()}
+            //     onClick={this.toggleExportModal}
+            //   >
+            //     <CloudDownloadIcon />
+            //   </IconButton>
+            // </Tooltip>
           )}
         </div>
 

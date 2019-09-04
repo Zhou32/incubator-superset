@@ -24,14 +24,18 @@ import { Grid, Row, Col, Alert } from 'react-bootstrap';
 import URI from 'urijs';
 import withWidth from '@material-ui/core/withWidth';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
 import LocationSearchBox from './LocationSearchBox';
 import DemoBox from './DemoBox';
 import { Map, Marker, Circle, InfoWindow, GoogleApiWrapper } from '../../visualizations/SolarBI/google_maps_react';
 import { fetchSolarData } from '../actions/solarActions';
 import SaveModal from './SaveModal';
-// import ExportModal from './ExportModal';
+import CloseButton from './CloseButton';
 import InfoTabs from './InfoTabs';
-import SolarCharts from './SolarCharts';
+import HeatMap from './HeatMap';
+import BarChart from './BarChart';
+// import SolarCharts from './SolarCharts';
 import WelcomePage from './WelcomePage';
 import Loading from './Loading';
 
@@ -317,7 +321,7 @@ export class MapView extends React.Component {
       );
       reactEcharts = (
         <div>
-          <p
+          {/* <p
             style={{
               fontSize: 30,
               fontWeight: 'bold',
@@ -327,8 +331,8 @@ export class MapView extends React.Component {
             }}
           >
             Solar Irradiance Exposure
-          </p>
-          <p
+          </p> */}
+          {/* <p
             style={{
               fontSize: 25,
               textAlign: 'center',
@@ -338,9 +342,9 @@ export class MapView extends React.Component {
             }}
           >
             {queryResponse.form_data.spatial_address.address.slice(0, -11)}
-          </p>
+          </p> */}
 
-          <SolarCharts queryData={queryResponse.data.data} />
+          {/* <SolarCharts queryData={queryResponse.data.data} /> */}
           <InfoTabs
             onBackClick={this.onGoBackClick}
             onSaveClick={this.toggleSaveModal}
@@ -402,7 +406,8 @@ export class MapView extends React.Component {
             </div>
           )}
           {this.state.searching && entry !== 'welcome' && (
-            <Grid style={{ position: 'absolute', top: '200px' }}>
+            // <Grid style={{ position: 'absolute', top: '200px' }}>
+            <Grid style={{ marginTop: 200 }}>
               <Row className="show-grid">
                 <Col xs={10} xsOffset={1} md={10} mdOffset={1}>
                   <LocationSearchBox
@@ -415,6 +420,19 @@ export class MapView extends React.Component {
             </Grid>
           )}
 
+          {/* {this.state.showingMap && (
+            <p
+              style={{
+                fontSize: 25,
+                textAlign: 'center',
+                color: '#68918d',
+                marginTop: 10,
+                marginBottom: 30,
+              }}
+            >
+              {this.state.address.slice(0, -11)}
+            </p>
+          )}
           <Map
             visible={this.state.showingMap}
             google={this.props.google}
@@ -450,18 +468,79 @@ export class MapView extends React.Component {
               fillColor={'#FF0000'}
               fillOpacity={0.2}
             />
-          </Map>
+          </Map> */}
+          {this.state.showingMap && (
+            <Card style={{ margin: '75px auto', width: '93%', height: 900 }}>
+              <CardContent>
+                <CloseButton
+                  onBackClick={this.onGoBackClick}
+                  can_save={this.props.solarBI.can_save}
+                  solar_new={this.state.solar_new}
+                />
+                <Grid>
+                  <Row className="show-grid">
+                    <Col xsOffset={1} xs={10} md={12} mdOffset={0}>
+                      {this.state.showingMap && (
+                        <div>
+                          <p
+                            style={{
+                              fontFamily: 'Montserrat',
+                              fontSize: 21,
+                              textAlign: 'center',
+                              color: '024067',
+                            }}
+                          >
+                            {this.state.address.slice(0, -11)}
+                          </p>
+                          <hr style={{ display: 'block', width: 159, height: 1, border: 0, borderTop: '1px solid #808495', margin: '1em auto 5em', padding: 0 }} />
+                        </div>
+                      )}
+                      <div style={{ display: 'flex', marginLeft: 20 }}>
+                        <Map
+                          visible={this.state.showingMap}
+                          google={this.props.google}
+                          zoom={this.state.zoom}
+                          onClick={this.onMapClicked}
+                          initialCenter={this.state.center}
+                          center={this.state.center}
+                          style={{
+                            boxShadow:
+                              '0 1px 3px rgba(0,0,0,0.12), 0 4px 6px rgba(29,114,12,0.24)',
+                            borderRadius: '1em',
+                            height: '300px',
+                            width: '100%',
+                            position: 'relative',
+                          }}
+                        >
+                          <Marker
+                            position={this.state.center}
+                            name={this.state.address}
+                            icon={defaultIcon}
+                            onClick={this.onMarkerClick}
+                          />
+                          {closestMarker}
+                          {infoWindow}
 
-          <Grid>
-            {this.state.showingMap && (
-              <Row className="show-grid" style={{ marginTop: '2em' }}>
-                <Col xsOffset={1} xs={10} md={12} mdOffset={0}>
-                  {reactEcharts}
-                </Col>
-              </Row>
-            )}
-          </Grid>
-
+                          <Circle
+                            radius={this.state.radius * 1000}
+                            center={this.state.center}
+                            strokeColor="transparent"
+                            strokeOpacity={0}
+                            strokeWeight={5}
+                            fillColor={'#FF0000'}
+                            fillOpacity={0.2}
+                          />
+                        </Map>
+                        {solarStatus === 'success' && queryResponse && <HeatMap queryData={queryResponse.data.data} />}
+                      </div>
+                      {solarStatus === 'success' && queryResponse && <BarChart queryData={queryResponse.data.data} />}
+                      {reactEcharts}
+                    </Col>
+                  </Row>
+                </Grid>
+              </CardContent>
+            </Card>
+          )}
           <SaveModal
             open={this.state.showSaveModal}
             onHide={this.toggleSaveModal}
