@@ -209,7 +209,7 @@
   var mapStyles = {
     container: {
       position: "relative",
-      width: "100%"
+      width: "40%"
       // height: '45%'
     },
     map: {

@@ -423,6 +423,8 @@ class SolarBIModelAddView(SolarBIModelView):
 
     filters_not_for_admin = {}
 
+    list_template = 'solar/list.html',
+
     @expose('/list/')
     @has_access
     def list(self):
@@ -473,15 +475,6 @@ class SolarBIModelAddView(SolarBIModelView):
 
         datasource_id = self.get_solar_datasource()
 
-        # welcome_dashboard_id = (
-        #     db.session
-        #     .query(UserAttribute.welcome_dashboard_id)
-        #     .filter_by(user_id=g.user.get_id())
-        #     .scalar()
-        # )
-        # if welcome_dashboard_id:
-        #     return self.dashboard(str(welcome_dashboard_id))
-
         payload = {
             'user': bootstrap_user_data(g.user),
             'common': BaseSupersetView().common_bootstrap_payload(),
@@ -491,7 +484,7 @@ class SolarBIModelAddView(SolarBIModelView):
         }
 
         return self.render_template(
-            'superset/basic.html',
+            'solar/basic.html',
             entry=entry_point,
             title='Search - SolarBI',
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
@@ -3282,7 +3275,7 @@ class Superset(BaseSupersetView):
                 is_solar = True
 
         return self.render_template(
-            'superset/basic.html',
+            'solar/basic.html',
             entry='solarBI',
             title=title,
             bootstrap_data=json.dumps(bootstrap_data),

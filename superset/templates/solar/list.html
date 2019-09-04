@@ -17,9 +17,9 @@
   under the License.
 #}
 {% import 'appbuilder/general/lib.html' as lib %}
+{% import 'appbuilder/baselib.html' as baselib %}
 <html>
   <head>
-  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAc65tB0eu0jqft4ip7De7VcD56BpYlgio&libraries=places"></script>
     <title>
       {% block title %}
         {% if title %}
@@ -48,6 +48,7 @@
       {% endif %}
 
     {% endblock %}
+
     {% with filename="theme" %}
       {% include "superset/partials/_script_tag.html" %}
     {% endwith %}
@@ -60,58 +61,19 @@
     >
   </head>
 
-  <body {% if standalone_mode %}class="standalone"{% endif %}>
-    {% if not is_solar %}
-        {% block navbar %}
-          {% if not standalone_mode %}
-            <header class="top" role="header">
-              {% include 'appbuilder/navbar.html' %}
-            </header>
-          {% endif %}
-        {% endblock %}
-
-        {% block body %}
-          <div id="app" data-bootstrap="{{ bootstrap_data }}">
-            <img src="/static/assets/images/loading.gif" style="width: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%)">
-          </div>
-        {% endblock %}
-    {% else %}
+  <body>
+    {% block side_layout %}
         <div class="s-layout" style="display: flex; width: 100%; min-height: 100vh">
-            {% block side_layout %}
-                {% include 'solar/sidebar.html' %}
-            {% endblock %}
-            {% block solar_content %}
-                <div id="app" class="s-layout__content" data-bootstrap="{{ bootstrap_data }}">
-                  <img src="/static/assets/images/loading.gif" style="width: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%)">
-                </div>
-            {% endblock %}
+            {% include 'solar/list_with_sidebar.html' %}
         </div>
-    {% endif %}
+    {% endblock %}
 
-    <!-- Modal for misc messages / alerts  -->
-    <div class="misc-modal modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="creddisspan">
-            </button>
-            <h4 class="modal-title"></h4>
-          </div>
-          <div class="modal-body">
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
     {% block tail_js %}
-        <script src="https://kit.fontawesome.com/ace8403ae5.js"></script>
-        {% if entry %}
-            {% with filename=entry %}
-              {% include "superset/partials/_script_tag.html" %}
-            {% endwith %}
-        {% endif %}
+      {% if entry %}
+        {% with filename=entry %}
+          {% include "superset/partials/_script_tag.html" %}
+        {% endwith %}
+      {% endif %}
     {% endblock %}
   </body>
 </html>
