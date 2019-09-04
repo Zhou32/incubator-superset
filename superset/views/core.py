@@ -534,6 +534,39 @@ class SolarBIModelAddView(SolarBIModelView):
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
         )
 
+    @expose('/billing', methods=['GET', 'POST'])
+    def billing(self):
+        if not g.user or not g.user.get_id():
+            return redirect(appbuilder.get_url_for_login)
+
+        entry_point = 'solarBI'
+
+        datasource_id = self.get_solar_datasource()
+
+        # welcome_dashboard_id = (
+        #     db.session
+        #     .query(UserAttribute.welcome_dashboard_id)
+        #     .filter_by(user_id=g.user.get_id())
+        #     .scalar()
+        # )
+        # if welcome_dashboard_id:
+        #     return self.dashboard(str(welcome_dashboard_id))
+
+        payload = {
+            'user': bootstrap_user_data(g.user),
+            'common': BaseSupersetView().common_bootstrap_payload(),
+            'datasource_id': datasource_id,
+            'datasource_type': 'table',
+            'entry': 'add',
+        }
+
+        return self.render_template(
+            'solar/billing.html',
+            entry=entry_point,
+            title='Billing - SolarBI',
+            bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
+        )
+
 
 appbuilder.add_view(
     SolarBIModelAddView,
@@ -546,7 +579,6 @@ appbuilder.add_view(
     category_icon='fa-sun-o',
 )
 
-
 appbuilder.add_view(
     SolarBIModelWelcomeView,
     'Introduction',
@@ -557,18 +589,6 @@ appbuilder.add_view(
     category_label=__('SolarBI'),
     category_icon='fa-sun-o',
 )
-
-# appbuilder.add_view(
-#     SolarBIModelAddView,
-#     'Search your Location',
-#     href='/solar/add',
-#     label=__('Search'),
-#     icon='fa-search',
-#     category='SolarBI',
-#     category_label=__('SolarBI'),
-#     category_icon='fa-sun-o'
-# )
-
 
 appbuilder.add_view(
     SolarBIModelView,
