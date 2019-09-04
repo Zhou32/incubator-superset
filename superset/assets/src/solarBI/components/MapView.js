@@ -77,6 +77,7 @@ export class MapView extends React.Component {
       options: {},
       showSaveModal: false,
       // showExportModal: false,
+      can_save: false,
       searching: true,
       showingMap: false,
       activeMarker: {},
@@ -474,7 +475,6 @@ export class MapView extends React.Component {
               <CardContent>
                 <CloseButton
                   onBackClick={this.onGoBackClick}
-                  can_save={this.props.solarBI.can_save}
                   solar_new={this.state.solar_new}
                 />
                 <Grid>
@@ -497,7 +497,7 @@ export class MapView extends React.Component {
                       )}
                       <div style={{ display: 'flex', marginLeft: 20 }}>
                         <Map
-                          visible={this.state.showingMap}
+                          visible={this.state.showingMap && solarStatus === 'success' && queryResponse}
                           google={this.props.google}
                           zoom={this.state.zoom}
                           onClick={this.onMapClicked}

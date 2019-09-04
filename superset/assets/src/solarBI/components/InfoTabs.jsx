@@ -20,10 +20,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
-import Tooltip from '@material-ui/core/Tooltip';
-import IconButton from '@material-ui/core/IconButton';
-import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
-import SaveIcon from '@material-ui/icons/Save';
 // import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import GoBackModal from './GoBackModal';
 import ExportModal from './ExportModal';
@@ -31,6 +27,7 @@ import ExportModal from './ExportModal';
 const styles = theme => ({
   exportBtn: {
     marginLeft: 60,
+    marginRight: 100,
   },
   root: {
     marginBottom: 40,
@@ -44,7 +41,7 @@ const styles = theme => ({
   infoBtn: {
     textDecoration: 'none !important',
     fontFamily: 'Montserrat',
-    width: '30%',
+    width: 185,
     borderRadius: '30px',
     border: '1px solid #0667A3',
     backgroundColor: 'white',
@@ -140,7 +137,7 @@ class InfoTabs extends React.Component {
 
   render() {
     // eslint-disable-next-line camelcase
-    const { classes, solar_new } = this.props;
+    const { classes } = this.props;
     return (
       <div className={classes.root}>
         {/* <Tooltip title="Go Back" classes={{ tooltip: classes.tooltip }}>
@@ -153,7 +150,7 @@ class InfoTabs extends React.Component {
             <KeyboardBackspaceIcon />
           </IconButton>
         </Tooltip> */}
-        <div style={{ display: 'flex', width: '50%', float: 'right' }}>
+        <div style={{ display: 'flex', float: 'right' }}>
           {this.props.can_save && this.props.solar_new && (
             <button
               className={classNames(classes.infoBtn, classes.saveBtn)}

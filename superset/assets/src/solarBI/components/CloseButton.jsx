@@ -59,22 +59,6 @@ const styles = theme => ({
   root: {
     marginBottom: 20,
   },
-  slider: {
-    padding: '22px 0px',
-  },
-  card: {
-    minWidth: 450,
-  },
-  infoCard: {
-    minHeight: 200,
-    marginTop: 10,
-    marginBottom: 100,
-  },
-  typography: {
-    textAlign: 'center',
-    marginTop: 10,
-    marginBottom: 30,
-  },
   notUse: {
     margin: theme.spacing.unit,
   },
@@ -95,7 +79,7 @@ class CloseButton extends React.Component {
   }
 
   onBackClick() {
-    if (this.props.can_save && this.props.solar_new) {
+    if (this.props.solar_new) {
       this.props.onBackClick(false);
     } else {
       this.props.onBackClick(true);
@@ -129,7 +113,6 @@ class CloseButton extends React.Component {
 CloseButton.propTypes = {
   classes: PropTypes.object.isRequired,
   onBackClick: PropTypes.func.isRequired,
-  can_save: PropTypes.bool.isRequired,
   solar_new: PropTypes.bool.isRequired,
 };
 
