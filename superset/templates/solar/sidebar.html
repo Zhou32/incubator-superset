@@ -21,7 +21,6 @@
 {% set WARNING_MSG = appbuilder.app.config.get('WARNING_MSG') %}
 {% set app_icon_width = appbuilder.app.config.get('APP_ICON_WIDTH', 126) %}
 {% set logo_target_path = appbuilder.app.config.get('LOGO_TARGET_PATH') or '/profile/{}/'.format(current_user.username) %}
-
 <link href="{{url_for('static',filename='assets/stylesheets/solarbi.less')}}?v=1.0" rel="stylesheet">
 
 <!-- Sidebar -->
