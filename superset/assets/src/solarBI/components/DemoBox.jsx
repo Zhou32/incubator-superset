@@ -21,6 +21,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import withWidth from '@material-ui/core/withWidth';
 import Card from '@material-ui/core/Card';
+import Button from '@material-ui/core/Button';
 import CardContent from '@material-ui/core/CardContent';
 
 const propTypes = {
@@ -46,12 +47,12 @@ const styles = tm => ({
     '&:hover': {
       backgroundColor: '#b8b8b8',
     },
-    '&:focus': {
-      outline: 'none !important',
-    },
-    '&:active': {
-      color: '#FFB2B2',
-    },
+    // '&:focus': {
+    //   outline: 'none !important',
+    // },
+    // '&:active': {
+    //   color: '#FFB2B2',
+    // },
   },
   cardFlex: {
     marginTop: 160,
@@ -136,9 +137,9 @@ class DemoBox extends React.Component {
           className={isSmallScreen ? classes.contentInital : classes.contentFlex}
         >
           <div className={classes.demo}>
-            <button className={classes.button}>
+            <Button className={classes.button}>
               NSW
-            </button>
+            </Button>
             <p className={isSmallScreen ? classes.introSmall : classes.introLarge}>
               Lorem Ipsum is simply dummy text of the printing and typesetting
               industry. Lorem Ipsum has been the industry's standard dummy text
@@ -147,9 +148,9 @@ class DemoBox extends React.Component {
           </div>
           {isSmallScreen ? null : <div className={classes.vl} />}
           <div className={classes.demo}>
-            <button className={classes.button}>
+            <Button className={classes.button}>
               VIC
-            </button>
+            </Button>
             <p className={isSmallScreen ? classes.introSmall : classes.introLarge}>
               Lorem Ipsum is simply dummy text of the printing and typesetting
               industry. Lorem Ipsum has been the industry's standard dummy text
@@ -158,9 +159,9 @@ class DemoBox extends React.Component {
           </div>
           {isSmallScreen ? null : <div className={classes.vl} />}
           <div className={classes.demo}>
-            <button className={classes.button}>
+            <Button className={classes.button}>
               QLD
-            </button>
+            </Button>
             <p className={isSmallScreen ? classes.introSmall : classes.introLarge}>
               Lorem Ipsum is simply dummy text of the printing and typesetting
               industry. Lorem Ipsum has been the industry's standard dummy text

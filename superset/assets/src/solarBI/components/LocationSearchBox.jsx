@@ -21,6 +21,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import withWidth from '@material-ui/core/withWidth';
 // import { withStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
 import Fab from '@material-ui/core/Fab';
 // import InputAdornment from '@material-ui/core/InputAdornment';
 import Input from '@material-ui/core/Input';
@@ -89,20 +90,22 @@ const styles = tm => ({
     padding: '0 16px',
     minWidth: 30,
     borderRadius: 60,
+    color: '#0063B0',
     backgroundColor: '#DAD800',
     border: 'none',
     fontSize: 16,
     fontFamily: 'Montserrat, sans-serif',
     fontWeight: 'bold',
     '&:hover': {
-      backgroundColor: '#bab702',
+      color: '#F77E0B',
+      backgroundColor: '#c4c102',
     },
-    '&:focus': {
-      outline: 'none !important',
-    },
-    '&:active': {
-      color: '#FFB2B2',
-    },
+    // '&:focus': {
+    //   outline: 'none !important',
+    // },
+    // '&:active': {
+    //   color: '#FFB2B2',
+    // },
   },
 });
 
@@ -214,7 +217,7 @@ class LocationSearchBox extends React.Component {
               <Search />
             </Fab>
             :
-            <button
+            <Button
               variant="contained"
               aria-label="Search"
               color="primary"
@@ -222,7 +225,7 @@ class LocationSearchBox extends React.Component {
               onClick={this.onSearchClick}
             >
               SEARCH
-            </button>
+            </Button>
           }
           <a className={classes.saved} href="/solar/list">See saved searches</a>
         </CardContent>
