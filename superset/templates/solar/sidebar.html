@@ -37,17 +37,17 @@
       </div>
      <ul>
         <li>
-           <a class="s-sidebar__nav-link" href="/solar/welcome">
+           <a class="s-sidebar__nav-link" href="{{ url_for('SolarBIModelAddView.welcome') }}">
               <i class="fas fa-atom"></i><span>Get Started</span>
            </a>
         </li>
         <li>
-           <a class="s-sidebar__nav-link" href="/solar/add">
+           <a class="s-sidebar__nav-link" href="{{ url_for('SolarBIModelAddView.add') }}">
              <i class="fas fa-chart-bar"></i><span>Demo</span>
            </a>
         </li>
         <li>
-           <a class="s-sidebar__nav-link" href="/solar/list/">
+           <a class="s-sidebar__nav-link" href="{{ url_for('SolarBIModelAddView.list') }}">
               <i class="fas fa-desktop"></i><span>My Data</span>
            </a>
         </li>
@@ -57,7 +57,7 @@
            </a>
         </li>
         <li>
-           <a class="s-sidebar__nav-link" href="#">
+           <a class="s-sidebar__nav-link" href="{{ url_for('SolarBIModelAddView.billing') }}">
               <i class="fas fa-credit-card"></i><span>Billing</span>
            </a>
         </li>

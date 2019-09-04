@@ -47,7 +47,6 @@
       {% endif %}
 
     {% endblock %}
-
     {% with filename="theme" %}
       {% include "superset/partials/_script_tag.html" %}
     {% endwith %}
@@ -107,11 +106,11 @@
     </div>
     {% block tail_js %}
         <script src="https://kit.fontawesome.com/ace8403ae5.js"></script>
-      {% if entry %}
-        {% with filename=entry %}
-          {% include "superset/partials/_script_tag.html" %}
-        {% endwith %}
-      {% endif %}
+        {% if entry %}
+            {% with filename=entry %}
+              {% include "superset/partials/_script_tag.html" %}
+            {% endwith %}
+        {% endif %}
     {% endblock %}
   </body>
 </html>
