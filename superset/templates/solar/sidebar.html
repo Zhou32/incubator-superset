@@ -32,46 +32,56 @@
 
   <nav class="s-sidebar__nav">
       <div class="sidebar-title">
-          <img class="sidebar-solarbi-sun" src="/static/assets/images/solarbi_auth_sun.jpg" alt="solar sun">
+          <img class="sidebar-solarbi-sun" src="/static/assets/images/solarbi_auth_sun.png" alt="solar sun">
           <h4 class="sidebar-solarbi-text">SolarBI</h4>
       </div>
      <ul>
         <li>
-           <a class="s-sidebar__nav-link" href="/solar/welcome">
-              <i class="fa fa-home"></i><em>Welcome</em>
+           <a class="s-sidebar__nav-link" href="{{ url_for('SolarBIModelAddView.welcome') }}">
+              <i class="fas fa-atom"></i><span>Get Started</span>
            </a>
         </li>
         <li>
-           <a class="s-sidebar__nav-link" href="/solar/add">
-             <i class="fa fa-user"></i><em>Search</em>
+           <a class="s-sidebar__nav-link" href="{{ url_for('SolarBIModelAddView.add') }}">
+             <i class="fas fa-chart-bar"></i><span>Demo</span>
            </a>
         </li>
         <li>
-           <a class="s-sidebar__nav-link" href="/solar/list/">
-              <i class="fa fa-camera"></i><em>Save</em>
+           <a class="s-sidebar__nav-link" href="{{ url_for('SolarBIModelAddView.list') }}">
+              <i class="fas fa-desktop"></i><span>My Data</span>
            </a>
         </li>
         <li>
-           <a class="s-sidebar__nav-link" href="mailto:contact@solarbi.com.au?subject=I want to get support on SolarBI">
-              <i class="fa fa-camera"></i><em>Support</em>
+           <a class="s-sidebar__nav-link" href="#">
+              <i class="fas fa-users"></i><span>Team</span>
            </a>
         </li>
+        <li>
+           <a class="s-sidebar__nav-link" href="{{ url_for('SolarBIModelAddView.billing') }}">
+              <i class="fas fa-credit-card"></i><span>Billing</span>
+           </a>
+        </li>
+        <li>
+           <a class="s-sidebar__nav-link" href="#">
+              <i class="fas fa-terminal"></i><span>API</span>
+           </a>
+        </li>
+        <li><hr/></li>
         <li>
             <a class="s-sidebar__nav-link" href="{{appbuilder.get_url_for_userinfo}}">
-                <i class="fa fa-fw fa-user"></i><em>{{_("Profile")}}</em>
+                <i class="fas fa-user"></i><span>{{_("My Profile")}}</span>
             </a>
         </li>
         <li>
+           <a class="s-sidebar__nav-link" href="mailto:contact@solarbi.com.au?subject=I want to get support on SolarBI">
+              <i class="fas fa-tools"></i><span>Support</span>
+           </a>
+        </li>
+        <li>
            <a class="s-sidebar__nav-link" href="{{appbuilder.get_url_for_logout}}">
-               <i class="fa fa-fw fa-sign-out"></i><em>Logout</em>
+               <i class="fas fa-sign-out-alt"></i><span>Logout</span>
            </a>
         </li>
      </ul>
   </nav>
 </div>
-
-{% block side_body %}
-  <div id="app" class="s-layout__content" data-bootstrap="{{ bootstrap_data }}">
-    <img src="/static/assets/images/loading.gif" style="width: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%)">
-  </div>
-{% endblock %}
