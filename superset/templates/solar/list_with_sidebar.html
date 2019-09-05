@@ -20,7 +20,7 @@
       <link rel="icon" type="image/png" href="/static/assets/images/favicon.png">
       <link rel="stylesheet" type="text/css" href="/static/appbuilder/css/flags/flags16.css" />
       <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-      <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700&display=swap" rel="stylesheet">
 
       {% for entry in get_unloaded_chunks(css_manifest('theme'), loaded_chunks) %}
         <link rel="stylesheet" type="text/css" href="{{ entry }}" />
@@ -33,6 +33,7 @@
         {% endfor %}
       {% endif %}
     <link href="{{url_for('static',filename='assets/stylesheets/solarbi.less')}}?v=1.0" rel="stylesheet">
+    <script type="text/javascript" src="/static/appbuilder/js/jquery-latest.js"></script>
     <script src="https://kit.fontawesome.com/fcf8211531.js"></script>
     {% endblock %}
 <!-- Sidebar -->
@@ -52,7 +53,7 @@
           <img class="sidebar-solarbi-sun" src="/static/assets/images/solarbi_auth_sun.png" alt="solar sun">
           <h4 class="sidebar-solarbi-text">SolarBI</h4>
       </div>
-     <ul>
+     <ul id="bar-list" style="font-family: Montserrat,sans-serif; font-weight: 500">
         <li>
            <a class="s-sidebar__nav-link" href="{{ url_for('SolarBIModelAddView.welcome') }}">
               <i class="fas fa-atom"></i><span>Get Started</span>
@@ -102,6 +103,13 @@
      </ul>
    </nav>
 </div>
+
+<script>
+    $(document).ready(function() {
+      $('li.active a').removeClass('current_page_item');
+      $('a[href="' + location.pathname + '"]').addClass('current_page_item');
+    });
+</script>
 
 {% block content %}
 {#    {{ lib.panel_begin(title) }}#}

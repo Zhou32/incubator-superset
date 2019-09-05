@@ -32,9 +32,10 @@
     {% block head_meta %}{% endblock %}
     {% block head_css %}
       <link rel="icon" type="image/png" href="/static/assets/images/favicon.png">
-      <link rel="stylesheet" type="text/css" href="/static/appbuilder/css/flags/flags16.css" />
+{#      <link rel="stylesheet" type="text/css" href="/static/appbuilder/css/flags/flags16.css" />#}
       <link rel="stylesheet" type="text/css" href="/static/appbuilder/css/font-awesome.min.css">
       <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700&display=swap" rel="stylesheet">
+      <script type="text/javascript" src="/static/appbuilder/js/jquery-latest.js"></script>
 
       {% for entry in get_unloaded_chunks(css_manifest('theme'), loaded_chunks) %}
         <link rel="stylesheet" type="text/css" href="{{ entry }}" />

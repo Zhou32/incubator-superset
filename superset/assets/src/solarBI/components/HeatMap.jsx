@@ -116,7 +116,7 @@ class HeatMap extends React.Component {
         right: -20,
         top: '30%',
         inRange: {
-          color: ['#adfff1', '#22c3aa', '#489795'],
+          color: ['#aecee8', '#5fa2d9', '#0063B0'],
         },
       },
       series: [

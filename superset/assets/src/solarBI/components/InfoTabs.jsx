@@ -20,14 +20,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
 // import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import GoBackModal from './GoBackModal';
 import ExportModal from './ExportModal';
 
 const styles = theme => ({
   exportBtn: {
-    marginLeft: 60,
-    marginRight: 100,
+    marginLeft: '40 !important',
+    marginRight: '100 !important',
   },
   root: {
     marginBottom: 40,
@@ -39,24 +40,20 @@ const styles = theme => ({
     minWidth: 450,
   },
   infoBtn: {
-    textDecoration: 'none !important',
-    fontFamily: 'Montserrat',
-    width: 185,
-    borderRadius: '30px',
-    border: '1px solid #0667A3',
-    backgroundColor: 'white',
-    color: '#0667A3',
-    fontSize: 18,
-    padding: '12px 0',
-    transition: 'transform 80ms ease-in',
+    margin: '10 10',
+    height: 40,
+    padding: '0 16px',
+    minWidth: 115,
+    borderRadius: 60,
+    color: '#0063B0',
+    backgroundColor: '#DAD800',
+    border: 'none',
+    fontSize: 16,
+    fontFamily: 'Montserrat, sans-serif',
+    fontWeight: 'bold',
     '&:hover': {
-      textShadow: '0px 0px 1px #0667A3',
-      boxShadow: '0px 5px 40px -10px rgba(0,0,0,0.57)',
-      transition: 'all 0.4s ease 0s',
-      cursor: 'pointer',
-    },
-    '&:active': {
-      transform: 'scale(0.95)',
+      color: '#F77E0B',
+      backgroundColor: '#c4c102',
     },
     '&:focus': {
       outline: 'none',
@@ -152,12 +149,12 @@ class InfoTabs extends React.Component {
         </Tooltip> */}
         <div style={{ display: 'flex', float: 'right' }}>
           {this.props.can_save && this.props.solar_new && (
-            <button
+            <Button
               className={classNames(classes.infoBtn, classes.saveBtn)}
               onClick={this.onSaveClick}
             >
               Save
-            </button>
+            </Button>
           )}
           {this.props.can_export && (
             <button
