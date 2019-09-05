@@ -183,6 +183,7 @@ class InfoTabs extends React.Component {
         </div>
 
         <ExportModal
+          address={this.props.address}
           open={this.state.showExportModal}
           onHide={this.toggleExportModal}
         />
@@ -197,6 +198,7 @@ class InfoTabs extends React.Component {
 }
 
 InfoTabs.propTypes = {
+  address: PropTypes.string.isRequired,
   classes: PropTypes.object.isRequired,
   onBackClick: PropTypes.func.isRequired,
   onSaveClick: PropTypes.func.isRequired,

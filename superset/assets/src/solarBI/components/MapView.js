@@ -347,6 +347,7 @@ export class MapView extends React.Component {
 
           {/* <SolarCharts queryData={queryResponse.data.data} /> */}
           <InfoTabs
+            address={this.state.address}
             onBackClick={this.onGoBackClick}
             onSaveClick={this.toggleSaveModal}
             // onExportClick={this.toggleExportModal}
@@ -497,7 +498,7 @@ export class MapView extends React.Component {
                       )}
                       <div style={{ display: 'flex', marginLeft: 20 }}>
                         <Map
-                          visible={this.state.showingMap && solarStatus === 'success' && queryResponse}
+                          visible={this.state.showingMap && solarStatus === 'success' && queryResponse !== null}
                           google={this.props.google}
                           zoom={this.state.zoom}
                           onClick={this.onMapClicked}

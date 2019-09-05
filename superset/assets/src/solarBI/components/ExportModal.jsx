@@ -19,6 +19,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import classNames from 'classnames';
 import { withStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import Slide from '@material-ui/core/Slide';
 import Button from '@material-ui/core/Button';
@@ -35,6 +36,7 @@ import FormLabel from '@material-ui/core/FormLabel';
 import { requestSolarData } from '../actions/solarActions';
 
 const propTypes = {
+  address: PropTypes.string.isRequired,
   classes: PropTypes.object.isRequired,
   solarBI: PropTypes.object,
   open: PropTypes.bool.isRequired,
@@ -48,31 +50,78 @@ const theme = createMuiTheme({
   },
   palette: {
     primary: {
-      main: '#489795',
+      main: '#0063B0',
+    },
+    secondary: {
+      main: '#DBD800',
     },
   },
 });
 
 
 const styles = tm => ({
+  border: {
+    border: '1px solid #0063B0',
+    borderRadius: 12,
+    margin: 40,
+  },
   button: {
-    fontSize: '1.2em',
+    // fontSize: '1.2em',
+    // width: '18%',
+    margin: '10 10',
+    height: 40,
+    padding: '0 16px',
+    minWidth: 115,
+    borderRadius: 60,
+    color: '#0063B0',
+    backgroundColor: '#DAD800',
+    border: 'none',
+    fontSize: 16,
+    fontFamily: 'Montserrat, sans-serif',
+    fontWeight: 'bold',
+    '&:hover': {
+      color: '#F77E0B',
+      backgroundColor: '#c4c102',
+    },
+  },
+  closeBtn: {
+    marginRight: 40,
+  },
+  dates: {
+    display: 'flex',
+  },
+  dateLabel: {
+    color: '#0063B0',
+    display: 'block',
+    marginBottom: 5,
+  },
+  dateWrapper: {
+    width: 220,
+    textAlign: 'center',
   },
   dialog: {
-    width: '80%',
+    borderRadius: 12,
+    maxWidth: 750,
     padding: 10,
+    fontFamily: 'Montserrat',
+    fontWeight: 'bold',
+    marginLeft: 250,
   },
   endText: {
-    marginLeft: '25px',
+    marginLeft: '15px',
+    '& fieldset': {
+      borderRadius: 12,
+    },
   },
   lengthLabel: {
     fontSize: '1.6rem',
+    color: '#0063B0',
     width: '10%',
     float: 'left',
     borderBottom: 'none',
     marginLeft: '15px',
     marginRight: '30px',
-    marginTop: '25px',
+    marginTop: '45px',
   },
   formControl: {
     marginBottom: '5px',
@@ -82,6 +131,23 @@ const styles = tm => ({
   },
   formControlLabel: {
     fontSize: '1.5rem',
+    color: '#0063B0',
+    fontFamily: 'Montserrat',
+    fontWeight: 500,
+  },
+  head: {
+    textAlign: 'center',
+    height: 50,
+    background: 'linear-gradient(.25turn, #10998C, #09809D, #0063B0)',
+    backgroundColor: 'white',
+    marginTop: -10,
+    marginLeft: -10,
+    width: 760,
+    color: 'white',
+    paddingTop: 15,
+  },
+  labelFocused: {
+    color: '#0063B0 !important',
   },
   loading: {
     width: 60,
@@ -90,23 +156,35 @@ const styles = tm => ({
   },
   resolutionLabel: {
     fontSize: '1.6rem',
+    color: '#0063B0',
     width: '10%',
     float: 'left',
     borderBottom: 'none',
-    marginTop: '15px',
+    marginTop: '35px',
     marginRight: '45px',
   },
   startText: {
     marginLeft: '10px',
+    '& fieldset': {
+      borderRadius: 12,
+    },
   },
   title: {
+    color: '#0063B0',
     fontSize: '1.6em',
+    textAlign: 'center',
+    marginBottom: 30,
   },
   textLabel: {
     fontSize: '16px',
   },
   textInput: {
+    fontFamily: 'Montserrat',
     fontSize: '16px',
+    fontWeight: 500,
+    backgroundColor: '#EEEFF0',
+    borderRadius: 12,
+    lineHeight: '18px',
   },
   typeGroup: {
     flexDirection: 'row',
@@ -115,10 +193,11 @@ const styles = tm => ({
   },
   typeLabel: {
     fontSize: '1.6rem',
+    color: '#0063B0',
     width: '10%',
     float: 'left',
     borderBottom: 'none',
-    marginTop: '15px',
+    marginTop: '35px',
     marginRight: '45px',
   },
   resolutionGroup: {
@@ -197,87 +276,100 @@ class ExportModal extends React.Component {
         <MuiThemeProvider theme={theme}>
           <Dialog
             classes={{ paper: classes.dialog }}
+            fullWidth
             open={open || solarBI.sending}
             onClose={onHide}
             TransitionComponent={Transition}
             keepMounted
           >
-            <DialogTitle
-              disableTypography
-              className={classes.title}
-              id="form-dialog-title"
-            >
-              Options
-            </DialogTitle>
-            <DialogContent>
-              <FormLabel classes={{ root: classes.lengthLabel }} component="legend">Length</FormLabel>
-              <TextField
-                error={new Date(startDate) > new Date(endDate)}
-                id="date"
-                label="Start"
-                type="date"
-                value={startDate}
-                onChange={this.handleStartDateChange}
-                className={classes.startText}
-                InputProps={{
-                  classes: { input: classes.textInput },
-                }}
-                InputLabelProps={{
-                  FormLabelClasses: {
-                    root: classes.textLabel,
-                  },
-                }}
-              />
+            <div className={classes.head}>{this.props.address.slice(0, -11)}</div>
+            <div className={classes.border}>
+              <DialogTitle
+                disableTypography
+                className={classes.title}
+                id="form-dialog-title"
+              >
+                Options
+              </DialogTitle>
+              <DialogContent>
+                <FormLabel classes={{ root: classes.lengthLabel, focused: classes.labelFocused }} component="legend">Length</FormLabel>
+                <div className={classes.dates}>
+                  <div className={classes.dateWrapper}>
+                    <span className={classes.dateLabel}>Start</span>
+                    <TextField
+                      error={new Date(startDate) > new Date(endDate)}
+                      id="date"
+                      type="date"
+                      value={startDate}
+                      placeholder="yyyy-mm-dd"
+                      variant="outlined"
+                      onChange={this.handleStartDateChange}
+                      className={classes.startText}
+                      InputProps={{
+                        classes: { input: classes.textInput },
+                      }}
+                    // InputLabelProps={{
+                    //   FormLabelClasses: {
+                    //     root: classes.textLabel,
+                    //   },
+                    // }}
+                    />
+                  </div>
 
-              <TextField
-                error={new Date(startDate) > new Date(endDate)}
-                id="date"
-                label="End"
-                type="date"
-                value={endDate}
-                onChange={this.handleEndDateChange}
-                className={classes.endText}
-                InputProps={{
-                  classes: { input: classes.textInput },
-                }}
-                InputLabelProps={{
-                  FormLabelClasses: {
-                    root: classes.textLabel,
-                  },
-                }}
-              />
+                  <div className={classes.dateWrapper}>
+                    <span className={classes.dateLabel}>End</span>
+                    <TextField
+                      error={new Date(startDate) > new Date(endDate)}
+                      id="date"
+                      type="date"
+                      value={endDate}
+                      placeholder="yyyy-mm-dd"
+                      variant="outlined"
+                      onChange={this.handleEndDateChange}
+                      className={classes.endText}
+                      InputProps={{
+                        classes: { input: classes.textInput },
+                      }}
+                    // InputLabelProps={{
+                    //   FormLabelClasses: {
+                    //     root: classes.textLabel,
+                    //   },
+                    // }}
+                    />
+                  </div>
+                </div>
+                <FormControl component="fieldset" className={classes.formControl}>
+                  <FormLabel classes={{ root: classes.typeLabel, focused: classes.labelFocused }} component="legend">Type</FormLabel>
+                  <RadioGroup
+                    aria-label="type"
+                    name="type"
+                    className={classes.typeGroup}
+                    value={this.state.type}
+                    onChange={this.handleTypeChange}
+                  >
+                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="dni" control={<Radio color="secondary" />} label="DNI" labelPlacement="bottom" />
+                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="ghi" control={<Radio color="secondary" />} label="GHI" labelPlacement="bottom" />
+                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="both" control={<Radio color="secondary" />} label="Download both" labelPlacement="bottom" />
+                  </RadioGroup>
+                </FormControl>
 
-              <FormControl component="fieldset" className={classes.formControl}>
-                <FormLabel classes={{ root: classes.typeLabel }} component="legend">Type</FormLabel>
-                <RadioGroup
-                  aria-label="type"
-                  name="type"
-                  className={classes.typeGroup}
-                  value={this.state.type}
-                  onChange={this.handleTypeChange}
-                >
-                  <FormControlLabel classes={{ label: classes.formControlLabel }} value="dni" control={<Radio />} label="DNI" />
-                  <FormControlLabel classes={{ label: classes.formControlLabel }} value="ghi" control={<Radio />} label="GHI" />
-                  <FormControlLabel classes={{ label: classes.formControlLabel }} value="both" control={<Radio />} label="Download Both" />
-                </RadioGroup>
-              </FormControl>
-
-              <FormControl component="fieldset" className={classes.formControl}>
-                <FormLabel classes={{ root: classes.resolutionLabel }} component="legend">Resolution</FormLabel>
-                <RadioGroup
-                  aria-label="resolution"
-                  name="resolution"
-                  className={classes.resolutionGroup}
-                  value={this.state.resolution}
-                  onChange={this.handleResolutionChange}
-                >
-                  <FormControlLabel classes={{ label: classes.formControlLabel }} value="hourly" control={<Radio />} label="Hourly" />
-                  <FormControlLabel classes={{ label: classes.formControlLabel }} value="daily" control={<Radio />} label="Daily" />
-                  <FormControlLabel classes={{ label: classes.formControlLabel }} value="weekly" control={<Radio />} label="Weekly" />
-                  <FormControlLabel classes={{ label: classes.formControlLabel }} value="monthly" control={<Radio />} label="Monthly" />
-                </RadioGroup>
-              </FormControl>
-            </DialogContent>
+                <FormControl component="fieldset" className={classes.formControl}>
+                  <FormLabel classes={{ root: classes.resolutionLabel, focused: classes.labelFocused }} component="legend">Resolution</FormLabel>
+                  <RadioGroup
+                    aria-label="resolution"
+                    name="resolution"
+                    className={classes.resolutionGroup}
+                    value={this.state.resolution}
+                    onChange={this.handleResolutionChange}
+                  >
+                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="hourly" control={<Radio color="secondary" />} label="Hourly" labelPlacement="bottom" />
+                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="daily" control={<Radio color="secondary" />} label="Daily" labelPlacement="bottom" />
+                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="weekly" control={<Radio color="secondary" />} label="Weekly" labelPlacement="bottom" />
+                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="monthly" control={<Radio color="secondary" />} label="Monthly" labelPlacement="bottom" />
+                  </RadioGroup>
+                </FormControl>
+              </DialogContent>
+            </div>
             <DialogActions>
               {solarBI.sending ?
                 (<img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />) :
@@ -285,7 +377,7 @@ class ExportModal extends React.Component {
               }
 
               <Button
-                className={classes.button}
+                className={classNames(classes.button, classes.closeBtn)}
                 disabled={solarBI.sending}
                 onClick={onHide}
                 color="primary"
