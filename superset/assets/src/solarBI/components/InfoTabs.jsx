@@ -157,12 +157,12 @@ class InfoTabs extends React.Component {
             </Button>
           )}
           {this.props.can_export && (
-            <button
+            <Button
               className={classNames(classes.infoBtn, classes.exportBtn)}
               onClick={this.toggleExportModal}
             >
               Export
-            </button>
+            </Button>
             // <Tooltip
             //   title="Export As CSV"
             //   classes={{ tooltip: classes.tooltip }}
