@@ -39,11 +39,11 @@
 <!-- Sidebar -->
 <div class="s-layout__sidebar">
 
-    <div class="alert-top">
-            {% block messages %}
-              {% include 'superset/flash_wrapper.html' %}
-            {% endblock %}
-        </div>
+{#    <div class="alert-top">#}
+{#        {% block messages %}#}
+{#          {% include 'superset/flash_wrapper.html' %}#}
+{#        {% endblock %}#}
+{#    </div>#}
   <a class="s-sidebar__trigger" href="#0">
      <i class="fa fa-bars"></i>
   </a>
@@ -106,26 +106,33 @@
    </nav>
 </div>
 
-<script src="{{url_for('appbuilder.static',filename='js/bootstrap.min.js')}}"></script>
-<script>
-    $(document).ready(function() {
-      $('li.active a').removeClass('current_page_item');
-      $('a[href="' + location.pathname + '"]').addClass('current_page_item');
-    });
-</script>
-
 {% block content %}
 {#    {{ lib.panel_begin(title) }}#}
 
     <div class="s-layout__content">
+        <div class="alert-top">
+            {% block messages %}
+              {% include 'superset/flash_wrapper.html' %}
+            {% endblock %}
+        </div>
 {#    {% block list_search scoped %}#}
 {#        {{ widgets.get('search')()|safe }}#}
 {#    {% endblock %}#}
 
-    {% block list_list scoped %}
-        {{ widgets.get('list')()|safe }}
-    {% endblock %}
+        {% block list_list scoped %}
+            {{ widgets.get('list')()|safe }}
+        {% endblock %}
     </div>
 
 {# {{ lib.panel_end() }}#}
+{% endblock %}
+
+{% block tail_js %}
+    <script src="{{url_for('appbuilder.static',filename='js/bootstrap.min.js')}}"></script>
+    <script>
+        $(document).ready(function() {
+          $('li.active a').removeClass('current_page_item');
+          $('a[href="' + location.pathname + '"]').addClass('current_page_item');
+        });
+    </script>
 {% endblock %}

@@ -83,6 +83,11 @@
             {% endblock %}
             {% block solar_content %}
                 <div id="app" class="s-layout__content" data-bootstrap="{{ bootstrap_data }}">
+                    <div class="alert-top">
+                        {% block messages %}
+                          {% include 'superset/flash_wrapper.html' %}
+                        {% endblock %}
+                    </div>
                   <img src="/static/assets/images/loading.gif" style="width: 60px; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%)">
                 </div>
             {% endblock %}
@@ -108,6 +113,7 @@
     </div>
     {% block tail_js %}
         <script src="https://kit.fontawesome.com/ace8403ae5.js"></script>
+        <script src="{{url_for('appbuilder.static',filename='js/bootstrap.min.js')}}"></script>
         {% if entry %}
             {% with filename=entry %}
               {% include "superset/partials/_script_tag.html" %}
