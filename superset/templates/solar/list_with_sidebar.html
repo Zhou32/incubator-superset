@@ -57,13 +57,13 @@
          <li>
            <a {% if request.path == '/solar/add' %}class="s-sidebar__nav-link current_page_item" {% else %}class="s-sidebar__nav-link"{% endif %}
               href="{{ url_for('SolarBIModelAddView.add') }}">
-             <i class="fas fa-chart-bar"></i><span>Get Started</span>
+            <i class="fas fa-atom"></i><span>Get Started</span>
            </a>
         </li>
         <li>
            <a {% if request.path == '/solar/welcome' %}class="s-sidebar__nav-link current_page_item" {% else %}class="s-sidebar__nav-link"{% endif %}
               href="{{ url_for('SolarBIModelAddView.welcome') }}">
-              <i class="fas fa-atom"></i><span>Demo</span>
+              <i class="fas fa-chart-bar"></i><span>Demo</span>
            </a>
         </li>
         <li>
@@ -106,6 +106,7 @@
    </nav>
 </div>
 
+<script src="{{url_for('appbuilder.static',filename='js/bootstrap.min.js')}}"></script>
 <script>
     $(document).ready(function() {
       $('li.active a').removeClass('current_page_item');

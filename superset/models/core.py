@@ -319,6 +319,16 @@ class Slice(Model, AuditMixinNullable, ImportMixin):
         name = escape(self.chart)
         return Markup(f'<a href="{url}">{name}</a>')
 
+    @property
+    def view_slice_name(self):
+        name = escape(self.chart)
+        return Markup(f'<p>{name}</p>')
+
+    @property
+    def view_slice_link(self):
+        url = self.slice_url
+        return Markup(f'<a href="{url}">View Data</a>')
+
     def get_viz(self, force=False):
         """Creates :py:class:viz.BaseViz object from the url_params_multidict.
 
