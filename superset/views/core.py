@@ -50,6 +50,7 @@ import pandas as pd
 import simplejson as json
 from sqlalchemy import and_, or_, select
 from werkzeug.routing import BaseConverter
+from ..solar.forms import SolarBIListWidget
 
 from superset import (
     app,
@@ -418,12 +419,14 @@ class SolarBIModelAddView(SolarBIModelView):
         'slice_name', 'description', 'owners',
     )
     list_columns = [
-        'slice_link', 'creator', 'modified']
+        'slice_link', 'creator', 'modified', 'view_slice_name', 'view_slice_link']
     order_columns = ['modified']
 
     filters_not_for_admin = {}
 
     list_template = 'solar/list.html',
+    list_title = 'My Data - SolarBI'
+    list_widget = SolarBIListWidget
 
     @expose('/list/')
     @has_access

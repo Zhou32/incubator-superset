@@ -212,7 +212,7 @@ class MyIndexView(IndexView):
         else:
             return redirect('/login')
 
-        return redirect(f'/{entry_point}/welcome')
+        return redirect(f'/{entry_point}/add')
 
 
 custom_sm = app.config.get("CUSTOM_SECURITY_MANAGER") or SupersetSecurityManager

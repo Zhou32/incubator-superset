@@ -72,7 +72,7 @@ class BarChart extends React.Component {
           name: '(W/m²)',
         },
         itemStyle: {
-          color: '#489795',
+          color: '#0063B0',
         },
         series: [
           {

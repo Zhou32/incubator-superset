@@ -72,7 +72,7 @@ export class MapView extends React.Component {
       radius: 3.5,
       datasource_id: '',
       datasource_type: '',
-      zoom: 14,
+      zoom: 13,
       address: '',
       options: {},
       showSaveModal: false,
@@ -153,7 +153,7 @@ export class MapView extends React.Component {
             lat,
             lng,
           },
-          zoom: 14,
+          zoom: 13,
           searching: false,
           showingMap: true,
         },
@@ -347,6 +347,7 @@ export class MapView extends React.Component {
 
           {/* <SolarCharts queryData={queryResponse.data.data} /> */}
           <InfoTabs
+            address={this.state.address}
             onBackClick={this.onGoBackClick}
             onSaveClick={this.toggleSaveModal}
             // onExportClick={this.toggleExportModal}
@@ -497,7 +498,7 @@ export class MapView extends React.Component {
                       )}
                       <div style={{ display: 'flex', marginLeft: 20 }}>
                         <Map
-                          visible={this.state.showingMap && solarStatus === 'success' && queryResponse}
+                          visible={this.state.showingMap && solarStatus === 'success' && queryResponse !== null}
                           google={this.props.google}
                           zoom={this.state.zoom}
                           onClick={this.onMapClicked}
