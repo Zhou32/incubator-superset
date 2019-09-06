@@ -117,9 +117,9 @@
 {#    {{ lib.panel_begin(title) }}#}
 
     <div class="s-layout__content">
-    {% block list_search scoped %}
-        {{ widgets.get('search')()|safe }}
-    {% endblock %}
+{#    {% block list_search scoped %}#}
+{#        {{ widgets.get('search')()|safe }}#}
+{#    {% endblock %}#}
 
     {% block list_list scoped %}
         {{ widgets.get('list')()|safe }}

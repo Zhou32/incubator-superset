@@ -424,6 +424,7 @@ class SolarBIModelAddView(SolarBIModelView):
     filters_not_for_admin = {}
 
     list_template = 'solar/list.html',
+    list_title = 'My Data - SolarBI'
 
     @expose('/list/')
     @has_access

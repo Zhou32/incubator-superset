@@ -87,6 +87,15 @@ const styles = tm => ({
   closeBtn: {
     marginRight: 40,
   },
+  contentHr: {
+    display: 'block',
+    width: '95%',
+    height: 1,
+    border: 0,
+    borderTop: '1px solid #AFDEDF',
+    margin: '2em auto 0',
+    padding: 0,
+  },
   dates: {
     display: 'flex',
   },
@@ -173,7 +182,16 @@ const styles = tm => ({
     color: '#0063B0',
     fontSize: '1.6em',
     textAlign: 'center',
-    marginBottom: 30,
+    paddingBottom: 0,
+  },
+  titleHr: {
+    display: 'block',
+    width: 159,
+    height: 1,
+    border: 0,
+    borderTop: '1px solid #AFDEDF',
+    margin: '1em auto 2em',
+    padding: 0,
   },
   textLabel: {
     fontSize: '16px',
@@ -291,6 +309,7 @@ class ExportModal extends React.Component {
               >
                 Options
               </DialogTitle>
+              <hr className={classes.titleHr} />
               <DialogContent>
                 <FormLabel classes={{ root: classes.lengthLabel, focused: classes.labelFocused }} component="legend">Length</FormLabel>
                 <div className={classes.dates}>
@@ -338,6 +357,7 @@ class ExportModal extends React.Component {
                     />
                   </div>
                 </div>
+                <hr className={classes.contentHr} />
                 <FormControl component="fieldset" className={classes.formControl}>
                   <FormLabel classes={{ root: classes.typeLabel, focused: classes.labelFocused }} component="legend">Type</FormLabel>
                   <RadioGroup
@@ -352,7 +372,7 @@ class ExportModal extends React.Component {
                     <FormControlLabel classes={{ label: classes.formControlLabel }} value="both" control={<Radio color="secondary" />} label="Download both" labelPlacement="bottom" />
                   </RadioGroup>
                 </FormControl>
-
+                <hr className={classes.contentHr} />
                 <FormControl component="fieldset" className={classes.formControl}>
                   <FormLabel classes={{ root: classes.resolutionLabel, focused: classes.labelFocused }} component="legend">Resolution</FormLabel>
                   <RadioGroup
