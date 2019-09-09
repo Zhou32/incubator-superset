@@ -33,7 +33,7 @@
 {#{% endif %}#}
 
 {% if count > 0 %}
-    <div style="width: 100%">
+    <div style="width: 100%; font-family: 'Montserrat', sans-serif">
         {% block begin_title %}
         {% endblock %}
 
@@ -48,22 +48,29 @@
 
 {#        {% block end_content scoped %}#}
 {#        {% endblock %}#}
+        {% block tail_js %}
+        {% endblock %}
     </div>
 
-<div class="form-actions-container">
-    {{ lib.render_actions(actions, modelview_name) }}
-</div>
-    {{ lib.action_form(actions,modelview_name) }}
+    <div class="form-actions-container">
+        {{ lib.render_actions(actions, modelview_name) }}
+    </div>
+        {{ lib.action_form(actions,modelview_name) }}
 
 {#<div class="pagination-container pull-right">#}
 {#    <strong>{{ _('Record Count') }}:</strong> {{ count }}#}
 {#    {{ lib.render_pagination(page, page_size, count, modelview_name) }}#}
 {#    {{ lib.render_set_page_size(page, page_size, count, modelview_name) }}#}
 {#</div>#}
-    <script language="javascript">
-        var modelActions = new AdminActions();
-    </script>
+{#    <script language="javascript">#}
+{#        var modelActions = new AdminActions();#}
+{#    </script>#}
 
 {% else %}
-    <b>{{_("No records found")}}</b>
+    <div style="width: 100%; font-family: 'Montserrat', sans-serif">
+        {% block begin_title %}
+        {% endblock %}
+
+         <p>{{_("You have not saved any data yet")}}</p>
+    </div>
 {% endif %}
