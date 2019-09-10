@@ -207,7 +207,7 @@ class MyIndexView(IndexView):
         if hasattr(g.user, 'roles'):
             for role in g.user.roles:
                 if role.name == 'Admin':
-                    entry_point = 'superset'
+                    entry_point = 'chart'
                     break
         else:
             return redirect('/login')
