@@ -99,7 +99,7 @@
 {% endblock %}
 
 {% block tail_js %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+{#    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>#}
     <script>
         $(document).ready(function(){
           $("#searchInput").on("keyup", function() {
@@ -111,7 +111,6 @@
 
           $(".list-card > div > p").each(function() {
               var el= $(this);
-              console.log(el.html());
               var textLength = el.html().length;
               if (textLength > 17) {
                   el.css('font-size', '1.3em');
