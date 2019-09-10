@@ -37,6 +37,7 @@ import HeatMap from './HeatMap';
 import BarChart from './BarChart';
 // import SolarCharts from './SolarCharts';
 import WelcomePage from './WelcomePage';
+import DemoPage from './DemoPage';
 import Loading from './Loading';
 
 const theme = createMuiTheme({
@@ -407,7 +408,12 @@ export class MapView extends React.Component {
               <WelcomePage />
             </div>
           )}
-          {this.state.searching && entry !== 'welcome' && (
+          {this.state.searching && entry === 'demo' && (
+            <div>
+              <DemoPage />
+            </div>
+          )}
+          {this.state.searching && entry !== 'welcome' && entry !== 'demo' && (
             // <Grid style={{ position: 'absolute', top: '200px' }}>
             <Grid style={{ marginTop: 200 }}>
               <Row className="show-grid">

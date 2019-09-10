@@ -537,6 +537,32 @@ class SolarBIModelAddView(SolarBIModelView):
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
         )
 
+    @expose('/demo')
+    def demo(self):
+        """Personalized welcome page"""
+
+        if not g.user or not g.user.get_id():
+            return redirect(appbuilder.get_url_for_login)
+
+        entry_point = 'solarBI'
+
+        datasource_id = self.get_solar_datasource()
+
+        payload = {
+            'user': bootstrap_user_data(g.user),
+            'common': BaseSupersetView().common_bootstrap_payload(),
+            'datasource_id': datasource_id,
+            'datasource_type': 'table',
+            'entry': 'demo',
+        }
+
+        return self.render_template(
+            'solar/basic.html',
+            entry=entry_point,
+            title='Demo - SolarBI',
+            bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
+        )
+
     @expose('/billing', methods=['GET', 'POST'])
     def billing(self):
         if not g.user or not g.user.get_id():

@@ -121,12 +121,6 @@ class DemoBox extends React.Component {
     };
   }
 
-  onChange(name, event) {
-    this.setState({
-      [name]: event.target.value,
-    });
-  }
-
   render() {
     const { classes, width } = this.props;
     const isSmallScreen = /xs|sm|md/.test(width);
