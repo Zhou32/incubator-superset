@@ -6,10 +6,14 @@
 {% block begin_title %}
     <div class="title-card">
         <div class="card-container">
-            <p style="font-size: 20px; color: #707070; margin: 0">Explain more</p>
+            <p style="font-size: 20px; font-weight: bold; color: #707070; margin: 0">Explain more</p>
             <p style="font-size: 15px; color: #707070;">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco la</p>
         </div>
-        <a href="/solar/add" style="position: absolute; right: 50px; top: 70px;">New</a>
+        <a href="/solar/add" class="my-data-add">New</a>
+    </div>
+    <div class="my-data-search-container">
+        <i class="fas fa-search my-data-search-icon"></i>
+        <input id="searchInput" class="my-data-search" type="text" placeholder="Search Data Sets">
     </div>
 {% endblock %}
 
@@ -54,7 +58,6 @@
 {% endblock %}
 
 {% block begin_loop_values %}
-
     {% for item in value_columns %}
         <div class="list-card">
             <div class="list-container">
@@ -64,7 +67,7 @@
                 {% else %}
                     {{ item['view_slice_name'] }}
                 {% endif %}
-                <p><i class="fas fa-chart-pie"></i></p>
+                <i class="fas fa-chart-pie my-data-pie"></i>
                 {{ item['view_slice_link'] }}
             </div>
         </div>
@@ -95,7 +98,32 @@
 {#    {% endfor %}#}
 {% endblock %}
 
-{#{% block end_content scoped %}#}
+{% block tail_js %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function(){
+          $("#searchInput").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $(".list-card").filter(function() {
+              $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+          });
+
+          $(".list-card > div > p").each(function() {
+              var el= $(this);
+              console.log(el.html());
+              var textLength = el.html().length;
+              if (textLength > 17) {
+                  el.css('font-size', '1.3em');
+              } else if (textLength > 25) {
+                  el.css('font-size', '1.0em');
+              }
+          });
+        });
+    </script>
+{% endblock %}
+
+{% block end_content scoped %}
 {#    </table>#}
-{#    </div>#}
-{#{% endblock %}#}
+    </div>
+{% endblock %}

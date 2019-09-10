@@ -59,6 +59,10 @@ class SolarBIRegisterUserDBForm(DynamicForm):
         lazy_gettext("Email"),
         validators=[DataRequired(), Email(), unique_required],
     )
+    # team = StringField(
+    #     lazy_gettext("Team name"),
+    #     validators=[DataRequired()],
+    # )
     password = PasswordField(
         lazy_gettext("Password"),
         validators=[DataRequired()],
@@ -100,3 +104,7 @@ class SolarBIPasswordResetForm(DynamicForm):
 
 class SolarBIPasswordResetFormWidget(FormWidget):
     template = 'appbuilder/general/security/reset_password_form.html'
+
+
+class SolarBIListWidget(FormWidget):
+    template = 'appbuilder/general/widgets/saved_list_widget.html'
