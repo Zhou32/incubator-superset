@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 # pylint: disable=C,R,W
+from flask_appbuilder.fieldwidgets import BS3TextFieldWidget, BS3PasswordFieldWidget
 from flask_babel import lazy_gettext
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 from wtforms import (
@@ -59,10 +60,10 @@ class SolarBIRegisterUserDBForm(DynamicForm):
         lazy_gettext("Email"),
         validators=[DataRequired(), Email(), unique_required],
     )
-    # team = StringField(
-    #     lazy_gettext("Team name"),
-    #     validators=[DataRequired()],
-    # )
+    team = StringField(
+        lazy_gettext("Team name"),
+        validators=[DataRequired()],
+    )
     password = PasswordField(
         lazy_gettext("Password"),
         validators=[DataRequired()],
@@ -104,6 +105,29 @@ class SolarBIPasswordResetForm(DynamicForm):
 
 class SolarBIPasswordResetFormWidget(FormWidget):
     template = 'appbuilder/general/security/reset_password_form.html'
+
+
+class SolarBIRegisterInvitationForm(DynamicForm):
+    team = StringField(lazy_gettext('Team name'), widget=BS3TextFieldWidget(), render_kw={'readonly': True})
+    inviter = StringField(lazy_gettext('Inviter'), widget=BS3TextFieldWidget(), render_kw={'readonly': True})
+    role = StringField(lazy_gettext('Role'), widget=BS3TextFieldWidget(), render_kw={'readonly': True})
+    first_name = StringField(lazy_gettext('First Name'), validators=[DataRequired()], widget=BS3TextFieldWidget())
+    last_name = StringField(lazy_gettext('Last Name'), validators=[DataRequired()], widget=BS3TextFieldWidget())
+    email = StringField(lazy_gettext('Email'), widget=BS3TextFieldWidget(), render_kw={'readonly': True})
+    password = PasswordField(lazy_gettext('Password'),
+                             description=lazy_gettext(
+                                 'Please use a good password policy, this application does not check this for you'),
+                             validators=[DataRequired()],
+                             widget=BS3PasswordFieldWidget())
+    conf_password = PasswordField(lazy_gettext('Confirm Password'),
+                                  description=lazy_gettext('Please rewrite the password to confirm'),
+                                  validators=[EqualTo('password', message=lazy_gettext('Passwords must match'))],
+                                  widget=BS3PasswordFieldWidget())
+
+
+class SolarBIRegisterInvitationUserDBForm(DynamicForm):
+    role = SelectField(lazy_gettext('Invitation Role'))
+    email = StringField(lazy_gettext('Email'), validators=[DataRequired(), Email()], widget=BS3TextFieldWidget())
 
 
 class SolarBIListWidget(FormWidget):

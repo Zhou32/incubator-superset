@@ -495,7 +495,7 @@ class SolarBIModelAddView(SolarBIModelView):
 
     def get_solar_datasource(self):
         for role in g.user.roles:
-            if 'solar' in role.name:
+            if 'solar' in role.name or 'team_owner' in role.name:
                 for permission in role.permissions:
                     if permission.permission.name == 'datasource_access':
                         datasource_id = \
@@ -3300,7 +3300,7 @@ class Superset(BaseSupersetView):
             if role.name == 'Admin':
                 is_solar = False
                 break
-            if role.name == 'solar_default':
+            if role.name == 'solar_default' or role.name == 'team_owner':
                 is_solar = True
 
         return self.render_template(

@@ -1,0 +1,17 @@
+{% extends "solar/basic.html" %}
+{% import 'appbuilder/general/lib.html' as lib %}
+
+{% set languages = appbuilder.languages %}
+{% set WARNING_MSG = appbuilder.app.config.get('WARNING_MSG') %}
+{% set app_icon_width = appbuilder.app.config.get('APP_ICON_WIDTH', 126) %}
+
+{% block solar_content %}
+    <div class="s-layout__content">
+        <div class="list-alert-top">
+            {% block messages %}
+              {% include 'superset/flash_wrapper.html' %}
+            {% endblock %}
+        </div>
+        {{ widgets.get('edit')(form_action=form_action)|safe }}
+    </div>
+{% endblock %}

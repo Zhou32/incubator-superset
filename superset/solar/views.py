@@ -182,3 +182,5 @@ class SolarBIResetPasswordView(PublicFormView):
             return self.appbuilder.get_url_for_index
 
         return None
+
+
