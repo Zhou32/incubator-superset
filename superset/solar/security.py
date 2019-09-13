@@ -255,6 +255,7 @@ class CustomSecurityManager(SupersetSecurityManager):
             user.first_name = first_name
             user.last_name = last_name
             user.active = True
+            user.email_confirm = True
             user.password = hashed_password
             role = self.get_session.query(self.role_model).filter_by(id=role_id).first()
             user.roles.append(role)
@@ -357,6 +358,53 @@ class CustomSecurityManager(SupersetSecurityManager):
             elif role.name == 'Admin':
                 return [(str(invite_role.id), invite_role.name) for invite_role in self.get_all_roles()]
 
+    def find_solar_default_role_id(self):
+        return self.get_session.query(self.role_model).filter_by(name='solar_default').first()
+
+    def get_awaiting_emails(self, user_id):
+        team_name = self.find_team(user_id=user_id).team_name
+        all_waiting_users = self.get_session.query(self.registeruser_model).filter_by(team=team_name).all()
+        return self.invitation_is_valid(all_waiting_users)
+
+    def get_registered_user(self, user_email):
+        reg_user = self.get_session.query(self.registeruser_model).filter_by(email=user_email).first()
+        return reg_user
+
+    def get_team_members(self, user_id):
+        team_name = self.find_team(user_id=user_id).team_name
+        team = self.get_session.query(self.team_model).filter_by(team_name=team_name).first()
+        email_role = []
+        for user in team.users:
+            user_role = user.roles[0].name
+            if user_role == 'team_owner':
+                email_role.append((user.email, 'Admin'))
+            else:
+                email_role.append((user.email, 'User'))
+
+        return email_role
+
+    def update_team_name(self, user_id, new_team_name):
+        current_team_name = self.find_team(user_id=user_id).team_name
+        awaiting_users = self.get_session.query(self.registeruser_model).filter_by(
+            team=current_team_name).all()
+        for user in awaiting_users:
+            user.team = new_team_name
+
+        team = self.get_session.query(self.team_model).filter_by(team_name=current_team_name).first()
+        team.team_name = new_team_name
+        self.get_session.commit()
+        return True
+
+    def invitation_is_valid(self, users):
+        user_valid = []
+        for user in users:
+            if datetime.datetime.now() > user.valid_date:
+                user_valid.append((user.email, False))
+            else:
+                user_valid.append((user.email, True))
+
+        return user_valid
+
     def add_invite_register_user(self, email, team, first_name=None, last_name=None,
                                  role=None, inviter=None, password='', hashed_password=''):
         invited_user = self.registeruser_model()
@@ -387,3 +435,13 @@ class CustomSecurityManager(SupersetSecurityManager):
             logging.error(e)
             raise ValueError('Invitation is failed because of database integrity error')
         return invited_user
+
+    def delete_invited_user(self, user_email):
+        try:
+            user = self.get_session.query(self.registeruser_model).\
+                filter_by(email=user_email).first()
+            self.del_register_user(user)
+            return True
+        except Exception:
+            self.get_session.rollback()
+            return False

@@ -424,7 +424,7 @@ class SolarBIModelAddView(SolarBIModelView):
 
     filters_not_for_admin = {}
 
-    list_template = 'solar/list.html',
+    list_template = 'solar/my_data_list.html',
     list_title = 'My Data - SolarBI'
     list_widget = SolarBIListWidget
 

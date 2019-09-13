@@ -19,7 +19,7 @@ import json
 import time
 import logging
 
-from flask import flash, redirect, url_for, g, request, make_response
+from flask import flash, redirect, url_for, g, request, make_response, jsonify
 from flask_mail import Mail, Message
 
 from flask_appbuilder._compat import as_unicode
@@ -31,7 +31,7 @@ from flask_login import login_user
 
 from .forms import (
     SolarBIRegisterFormWidget, SolarBIRegisterUserDBForm, SolarBIRegisterInvitationForm,
-    SolarBIRegisterInvitationUserDBForm
+    SolarBIRegisterInvitationUserDBForm, SolarBITeamFormWidget
 )
 from .models import SolarBIUser
 from .utils import post_request
@@ -154,11 +154,11 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
     redirect_url = '/'
     route_base = '/solar'
     form = SolarBIRegisterInvitationUserDBForm
-    form_template = 'appbuilder/general/security/invite_form_template.html'
+    form_title = 'Team - SolarBI'
+    form_template = 'appbuilder/general/security/team_form_template.html'
     msg = 'Invitation has been sent to the email.'
     email_subject = 'You are invited to join SavvyBI'
-    '''TODO'''
-    # edit_widget = ...
+    edit_widget = SolarBITeamFormWidget
 
     def send_email(self, register_user):
         """
@@ -192,48 +192,56 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
             form.email.validators.append(Unique(datamodel_user, 'email'))
             form.email.validators.append(Unique(datamodel_register_user, 'email'))
 
-    @expose('/invite', methods=['GET'])
+    @expose('/my-team', methods=['GET'])
     @has_access
     def invitation(self):
         self._init_vars()
         form = self.form.refresh()
-        form.role.choices = self.appbuilder.sm.find_invite_roles(g.user.id)
+        # form.role.choices = self.appbuilder.sm.find_invite_roles(g.user.id)
+        awaiting_emails = self.appbuilder.sm.get_awaiting_emails(g.user.id)
+        team_members = self.appbuilder.sm.get_team_members(g.user.id)
+        team_name = self.appbuilder.sm.find_team(user_id=g.user.id).team_name
         widgets = self._get_edit_widget(form=form)
         self.update_redirect()
         self.add_form_unique_validations(form)
         return self.render_template(self.form_template,
+                                    team_name=team_name,
+                                    team_members=team_members,
+                                    awaiting_emails=awaiting_emails,
                                     title=self.form_title,
                                     widgets=widgets,
                                     appbuilder=self.appbuilder
                                     )
 
-    @expose('/invite', methods=['POST'])
+    @expose('/my-team', methods=['POST'])
     @has_access
     def invitation_post(self):
         form = self.form.refresh()
         self.add_form_unique_validations(form)
 
         # choices placeholder to pass validation
-        form.role.choices = self.appbuilder.sm.find_invite_roles(g.user.id)
+        # form.role.choices = self.appbuilder.sm.find_invite_roles(g.user.id)
+        role_id = self.appbuilder.sm.find_solar_default_role_id().id
         if form.validate_on_submit():
             user_id = g.user.id
             try:
                 team = self.appbuilder.sm.find_team(user_id=user_id)
                 reg_user = self.appbuilder.sm.add_invite_register_user(email=form.email.data,
                                                                        team=team,
-                                                                       role=form.role.data,
+                                                                       role=role_id,
                                                                        inviter=user_id)
                 if reg_user:
                     if self.send_email(reg_user):
                         flash(as_unicode('Invitation sent to %s' % form.email.data), 'info')
-                        return self.invitation()
+                        return redirect('/solar/my-team')
                     else:
                         flash(as_unicode('Cannot send invitation to user'), 'danger')
-                        return self.invitation()
+                        return redirect('/solar/my-team')
             except Exception as e:
                 flash(as_unicode(e), 'danger')
-                return self.invitation()
+                return redirect('/solar/my-team')
         else:
+            flash(as_unicode('Invalid form'), 'danger')
             widgets = self._get_edit_widget(form=form)
             return self.render_template(self.form_template,
                                         title=self.form_title,
@@ -241,9 +249,32 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
                                         appbuilder=self.appbuilder
                                         )
 
+    @expose('/update-team-name', methods=['POST'])
+    def update_team_name(self):
+        new_team_name = request.json['new_team_name']
+        if self.appbuilder.sm.update_team_name(g.user.id, new_team_name):
+            return jsonify(dict(redirect='/solar/my-team'))
+
+    @expose('/resend-email', methods=['POST'])
+    def resend_email(self):
+        user_email = request.json['selected_email']
+        reg_user = self.appbuilder.sm.get_registered_user(user_email)
+        self.send_email(reg_user)
+        flash(as_unicode('Resend invitation to %s' % user_email), 'info')
+        return jsonify(dict(redirect='/solar/my-team'))
+
+    @expose('/delete-invitation', methods=['POST'])
+    def delete_invitation(self):
+        user_email = request.json['selected_email']
+        self.appbuilder.sm.delete_invited_user(user_email=user_email)
+        flash(as_unicode('Invitation to %s has been removed' % user_email), 'info')
+        return jsonify(dict(redirect='/solar/my-team'))
+
 
 class SolarBIRegisterInvitationView(BaseRegisterUser):
     form = SolarBIRegisterInvitationForm
+    form_template = 'appbuilder/general/security/invitation_registration.html'
+    activation_template = 'appbuilder/general/security/activation.html'
 
     email_template = 'appbuilder/general/security/register_mail.html'
     email_subject = 'SolarBI - Registration'

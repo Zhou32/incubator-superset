@@ -126,9 +126,13 @@ class SolarBIRegisterInvitationForm(DynamicForm):
 
 
 class SolarBIRegisterInvitationUserDBForm(DynamicForm):
-    role = SelectField(lazy_gettext('Invitation Role'))
+    # role = SelectField(lazy_gettext('Invitation Role'))
     email = StringField(lazy_gettext('Email'), validators=[DataRequired(), Email()], widget=BS3TextFieldWidget())
 
 
 class SolarBIListWidget(FormWidget):
     template = 'appbuilder/general/widgets/saved_list_widget.html'
+
+
+class SolarBITeamFormWidget(FormWidget):
+    template = 'appbuilder/general/widgets/add_member_form.html'
