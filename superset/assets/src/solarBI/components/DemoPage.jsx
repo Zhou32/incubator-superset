@@ -161,16 +161,15 @@ class DemoPage extends React.Component {
   }
 
   render() {
-    const { classes, width } = this.props;
+    // const { classes, width } = this.props;
+    const { classes } = this.props;
     const { value } = this.state;
-    const isSmallScreen = /xs|sm|md/.test(width);
+    // const isSmallScreen = /xs|sm|md/.test(width);
 
     return (
       <MuiThemeProvider theme={theme}>
-        <Card className={isSmallScreen ? classes.cardInitial : classes.cardFlex}>
-          <CardContent
-            className={isSmallScreen ? classes.contentInital : classes.contentFlex}
-          >
+        <Card className={classes.cardFlex}>
+          <CardContent className={classes.contentFlex}>
             <div className={classes.demo}>
               <AppBar position="static">
                 <Tabs

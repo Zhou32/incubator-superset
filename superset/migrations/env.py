@@ -103,6 +103,7 @@ def run_migrations_online():
         target_metadata=target_metadata,
         # compare_type=True,
         process_revision_directives=process_revision_directives,
+        render_as_batch=True,
         **kwargs
     )
 

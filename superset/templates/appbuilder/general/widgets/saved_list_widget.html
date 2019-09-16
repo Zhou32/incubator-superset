@@ -1,13 +1,13 @@
-{% import 'appbuilder/general/lib.html' as lib %}
 {% extends 'appbuilder/general/widgets/saved_base_list.html' %}
+{% import 'appbuilder/general/lib.html' as lib %}
 
 <link href="{{url_for('static',filename='assets/stylesheets/solarbi.less')}}?v=1.0" rel="stylesheet">
 
 {% block begin_title %}
     <div class="title-card">
         <div class="card-container">
-            <p style="font-size: 20px; font-weight: bold; color: #707070; margin: 0">Explain more</p>
-            <p style="font-size: 15px; color: #707070;">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco la</p>
+            <p style="font-size: 20px; font-weight: 500; color: #0063B0; margin: 0">Explain more</p>
+            <p style="font-size: 15px; color: #0063B0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco la</p>
         </div>
         <a href="/solar/add" class="my-data-add">New</a>
     </div>
@@ -99,7 +99,7 @@
 {% endblock %}
 
 {% block tail_js %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+{#    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>#}
     <script>
         $(document).ready(function(){
           $("#searchInput").on("keyup", function() {
@@ -111,7 +111,6 @@
 
           $(".list-card > div > p").each(function() {
               var el= $(this);
-              console.log(el.html());
               var textLength = el.html().length;
               if (textLength > 17) {
                   el.css('font-size', '1.3em');

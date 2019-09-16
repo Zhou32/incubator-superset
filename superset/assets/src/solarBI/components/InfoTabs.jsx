@@ -26,6 +26,9 @@ import GoBackModal from './GoBackModal';
 import ExportModal from './ExportModal';
 
 const styles = theme => ({
+  disabled: {
+    backgroundColor: 'lightgray',
+  },
   exportBtn: {
     marginLeft: '40 !important',
     marginRight: '100 !important',
@@ -158,6 +161,7 @@ class InfoTabs extends React.Component {
           )}
           {this.props.can_export && (
             <Button
+              classes={{ disabled: classes.disabled }}
               className={classNames(classes.infoBtn, classes.exportBtn)}
               onClick={this.toggleExportModal}
             >

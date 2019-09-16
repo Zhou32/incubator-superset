@@ -21,6 +21,7 @@
 {% set WARNING_MSG = appbuilder.app.config.get('WARNING_MSG') %}
 {% set app_icon_width = appbuilder.app.config.get('APP_ICON_WIDTH', 126) %}
 {% set logo_target_path = appbuilder.app.config.get('LOGO_TARGET_PATH') or '/profile/{}/'.format(current_user.username) %}
+{% set current_user_role = current_user.roles[0].name %}
 <link href="{{url_for('static',filename='assets/stylesheets/solarbi.less')}}?v=1.0" rel="stylesheet">
 
 <!-- Sidebar -->
@@ -60,16 +61,19 @@
 {#           </a>#}
 {#        </li>#}
         <li>
-           <a {% if request.path == '/solar/list' or request.path[:15] == '/superset/solar' %}class="s-sidebar__nav-link current_page_item" {% else %}class="s-sidebar__nav-link"{% endif %}
+           <a {% if request.path == '/solar/list/' or request.path[:15] == '/superset/solar' %}class="s-sidebar__nav-link current_page_item" {% else %}class="s-sidebar__nav-link"{% endif %}
               href="{{ url_for('SolarBIModelAddView.list') }}">
               <i class="fas fa-desktop"></i><span>My Data</span>
            </a>
         </li>
-        <li>
-           <a class="s-sidebar__nav-link" href="#">
-              <i class="fas fa-users"></i><span>Team</span>
-           </a>
-        </li>
+        {% if current_user_role == 'team_owner' %}
+            <li>
+               <a {% if request.path == '/solar/my-team' %}class="s-sidebar__nav-link current_page_item" {% else %}class="s-sidebar__nav-link"{% endif %}
+                  href="{{ url_for('SolarBIRegisterInvitationUserDBView.invitation') }}">
+                  <i class="fas fa-users"></i><span>Team</span>
+               </a>
+            </li>
+        {% endif %}
         <li>
            <a {% if request.path == '/solar/billing' %}class="s-sidebar__nav-link current_page_item" {% else %}class="s-sidebar__nav-link"{% endif %}
               href="{{ url_for('SolarBIModelAddView.billing') }}">
