@@ -149,7 +149,7 @@ const styles = tm => ({
     backgroundColor: 'white',
     marginTop: -10,
     marginLeft: -10,
-    width: 760,
+    width: 750,
     color: 'white',
     paddingTop: 15,
   },
