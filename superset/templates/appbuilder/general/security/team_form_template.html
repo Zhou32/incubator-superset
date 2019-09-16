@@ -36,7 +36,7 @@
                     <h3>Team Settings</h3>
                     <hr>
                     <div class="team-name">
-                        <label>Team Name</label>
+                        <label for="team_name_input">Team Name</label>
                         <input id="team_name_input" name="team_name" type="text" value="{{ team_name }}" disabled style="background: lightgray">
                         <button class="edit-team-info">edit</button>
                     </div>
@@ -77,9 +77,9 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Email</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
+                                    <th style="min-width: 250px">Email</th>
+                                    <th style="min-width: 180px">Status</th>
+                                    <th style="min-width: 180px">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -152,6 +152,7 @@
         $('.resend_email').click(function() {
             let selected_email = $(this).parent().prev().prev().html();
             let csrf_token = "{{ csrf_token() if csrf_token else '' }}";
+            $(this).replaceWith("<span>sending...</span>");
             $.ajaxSetup({
                 beforeSend: function(xhr, settings) {
                     if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {

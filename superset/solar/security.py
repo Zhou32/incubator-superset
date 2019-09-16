@@ -25,7 +25,7 @@ from flask_appbuilder.models.sqla.interface import SQLAInterface
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from superset.solar.views import SolarBIPasswordRecoverView, SolarBIAuthDBView, \
-    SolarBIResetPasswordView
+    SolarBIResetPasswordView, SolarBIUserInfoEditView, SolarBIResetMyPasswordView
 from superset.solar.registerviews import (
     SolarBIRegisterUserDBView, SolarBIRegisterInvitationView,
     SolarBIRegisterInvitationUserDBView
@@ -64,6 +64,8 @@ OWNER_PERMISSION_MODEL = {
     'SolarBIRegisterInvitationUserDBView',
     'SolarBIRegisterUserModelView',
     'SolarBIUserStatsChartView',
+    'SolarBIUserInfoEditView',
+    'SolarBIResetMyPasswordView',
 }
 
 OWNER_NOT_ALLOWED_PERM_MENU = {
@@ -103,8 +105,9 @@ class CustomSecurityManager(SupersetSecurityManager):
     registeruserdbview = SolarBIRegisterUserDBView
     authdbview = SolarBIAuthDBView
     registeruser_model = TeamRegisterUser
-    '''TODO: Create UerDBModelView to have a new user info page'''
     # userdbmodelview = SolarBIUserDBModelView
+    userinfoeditview = SolarBIUserInfoEditView
+    resetmypasswordview = SolarBIResetMyPasswordView
 
     resetRequest_model = ResetRequest
     team_model = Team

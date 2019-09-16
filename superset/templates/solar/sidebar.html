@@ -87,8 +87,8 @@
         </li>
         <li><hr/></li>
         <li>
-            <a {% if request.path == '/users/userinfo' %}class="s-sidebar__nav-link current_page_item" {% else %}class="s-sidebar__nav-link"{% endif %}
-               href="{{appbuilder.get_url_for_userinfo}}">
+            <a {% if request.path == '/solarbiuserinfoeditview/form' or request.path == '/resetmypassword/form' %}class="s-sidebar__nav-link current_page_item" {% else %}class="s-sidebar__nav-link"{% endif %}
+               href="/solarbiuserinfoeditview/form">
                 <i class="fas fa-user"></i><span>{{_("My Profile")}}</span>
             </a>
         </li>

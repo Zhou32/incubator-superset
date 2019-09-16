@@ -24,13 +24,7 @@ from wtforms.fields.html5 import EmailField
 
 from flask_appbuilder.security.sqla.models import User, RegisterUser
 from flask_appbuilder.security.forms import DynamicForm
-from flask_appbuilder.widgets import FormWidget
-
-
-class SolarBILoginForm_db(DynamicForm):
-    username = StringField(lazy_gettext("User Name"), validators=[DataRequired()])
-    password = PasswordField(lazy_gettext("Password"), validators=[DataRequired()])
-    remember_me = BooleanField(lazy_gettext('remember me'), default=False)
+from flask_appbuilder.widgets import FormWidget, RenderTemplateWidget
 
 
 def unique_required(form, field):
@@ -41,6 +35,12 @@ def unique_required(form, field):
             raise ValidationError("Email already exists")
         if db.session.query(RegisterUser).filter_by(email=field.data).first() is not None:
             raise ValidationError("Email exists, waiting to be activated")
+
+
+class SolarBILoginForm_db(DynamicForm):
+    username = StringField(lazy_gettext("User Name"), validators=[DataRequired()])
+    password = PasswordField(lazy_gettext("Password"), validators=[DataRequired()])
+    remember_me = BooleanField(lazy_gettext('remember me'), default=False)
 
 
 class SolarBIRegisterUserDBForm(DynamicForm):
@@ -136,3 +136,32 @@ class SolarBIListWidget(FormWidget):
 
 class SolarBITeamFormWidget(FormWidget):
     template = 'appbuilder/general/widgets/add_member_form.html'
+
+
+class SolarBIUserInfoEditForm(DynamicForm):
+    first_name = StringField(
+        lazy_gettext("First Name"),
+        validators=[DataRequired()],
+        widget=BS3TextFieldWidget(),
+        description=lazy_gettext("Write the user first name or names"),
+    )
+    last_name = StringField(
+        lazy_gettext("Last Name"),
+        validators=[DataRequired()],
+        widget=BS3TextFieldWidget(),
+        description=lazy_gettext("Write the user last name"),
+    )
+    email = StringField(
+        lazy_gettext("Email"),
+        validators=[DataRequired()],
+        widget=BS3TextFieldWidget(),
+        description=lazy_gettext("Write the user last name"),
+    )
+
+
+class SolarBIIUserInfoEditWidget(RenderTemplateWidget):
+    template = 'appbuilder/general/widgets/edit_user_info_widget.html'
+
+
+class SolarBIResetMyPasswordWidget(RenderTemplateWidget):
+    template = 'appbuilder/general/widgets/reset_my_password_widget.html'

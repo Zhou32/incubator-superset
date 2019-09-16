@@ -209,7 +209,7 @@ class LocationSearchBox extends React.Component {
             <Fab
               id="searchFab"
               size="medium"
-              color="primary"
+              color="secondary"
               aria-label="Search"
               className={classes.fab}
               onClick={this.onSearchClick}
