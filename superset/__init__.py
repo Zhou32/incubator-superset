@@ -100,7 +100,7 @@ parse_manifest_json()
 def is_solar_user():
     if not g.user.is_anonymous:
         for role in g.user.roles:
-            if 'solar' in role.name:
+            if 'solar' in role.name or 'team_owner' in role.name:
                 return True
     return False
 
@@ -207,7 +207,7 @@ class MyIndexView(IndexView):
         if hasattr(g.user, 'roles'):
             for role in g.user.roles:
                 if role.name == 'Admin':
-                    entry_point = 'superset'
+                    entry_point = 'chart'
                     break
         else:
             return redirect('/login')

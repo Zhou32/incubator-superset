@@ -161,16 +161,15 @@ class DemoPage extends React.Component {
   }
 
   render() {
-    const { classes, width } = this.props;
+    // const { classes, width } = this.props;
+    const { classes } = this.props;
     const { value } = this.state;
-    const isSmallScreen = /xs|sm|md/.test(width);
+    // const isSmallScreen = /xs|sm|md/.test(width);
 
     return (
       <MuiThemeProvider theme={theme}>
-        <Card className={isSmallScreen ? classes.cardInitial : classes.cardFlex}>
-          <CardContent
-            className={isSmallScreen ? classes.contentInital : classes.contentFlex}
-          >
+        <Card className={classes.cardFlex}>
+          <CardContent className={classes.contentFlex}>
             <div className={classes.demo}>
               <AppBar position="static">
                 <Tabs
@@ -190,9 +189,9 @@ class DemoPage extends React.Component {
               {value === 0 && <TabContainer>
                 <div className={classes.textWrapper}>
                   <p className={classes.text}>Read one of our case studies:</p>
-                  <Button className={classes.button} color="#DAD800">WIND FARM</Button>
-                  <Button className={classes.button} color="#DAD800">SOLAR FARM</Button>
-                  <Button className={classes.button} color="#DAD800">LARGE BUILDING</Button>
+                  <Button className={classes.button}>WIND FARM</Button>
+                  <Button className={classes.button}>SOLAR FARM</Button>
+                  <Button className={classes.button}>LARGE BUILDING</Button>
                 </div>
               </TabContainer>}
               {value === 1 && <TabContainer>Item Two</TabContainer>}

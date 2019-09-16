@@ -18,6 +18,7 @@
 import logging
 
 from flask import flash, redirect, url_for, g, request, make_response
+from flask_appbuilder import has_access
 from flask_babel import lazy_gettext
 from flask_mail import Mail, Message
 from flask_login import login_user
@@ -30,11 +31,14 @@ from .forms import (
     SolarBIPasswordRecoverForm,
     SolarBIPasswordRecoverFormWidget,
     SolarBIPasswordResetFormWidget,
-    SolarBIPasswordResetForm
+    SolarBIPasswordResetForm,
+    SolarBIUserInfoEditForm,
+    SolarBIIUserInfoEditWidget,
+    SolarBIResetMyPasswordWidget,
 )
 from flask_appbuilder._compat import as_unicode
 
-from flask_appbuilder.security.views import AuthDBView
+from flask_appbuilder.security.views import AuthDBView, UserInfoEditView, ResetMyPasswordView
 
 
 log = logging.getLogger(__name__)
@@ -182,3 +186,42 @@ class SolarBIResetPasswordView(PublicFormView):
             return self.appbuilder.get_url_for_index
 
         return None
+
+
+class SolarBIUserInfoEditView(UserInfoEditView):
+    form_title = 'My Profile - SolarBI'
+    form = SolarBIUserInfoEditForm
+    form_template = 'appbuilder/general/security/edit_user_info.html'
+    edit_widget = SolarBIIUserInfoEditWidget
+
+    @expose("/form", methods=["POST"])
+    @has_access
+    def this_form_post(self):
+        self._init_vars()
+        form = self.form.refresh()
+
+        if form.validate_on_submit():
+            response = self.form_post(form)
+            if not response:
+                return redirect("/solarbiuserinfoeditview/form")
+            return response
+        else:
+            widgets = self._get_edit_widget(form=form)
+            return self.render_template(
+                self.form_template,
+                title=self.form_title,
+                widgets=widgets,
+                appbuilder=self.appbuilder,
+            )
+
+
+class SolarBIResetMyPasswordView(ResetMyPasswordView):
+    form_template = 'appbuilder/general/security/reset_my_password.html'
+    edit_widget = SolarBIResetMyPasswordWidget
+# class SolarBIUserDBModelView(UserDBModelView):
+#     # pass
+#     # route_base = '/solar'
+#     show_template = 'appbuilder/general/security/my_profile.html'
+#     show_widget = SolarBIShowWidget
+
+
