@@ -258,9 +258,26 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
     @expose('/resend-email', methods=['POST'])
     def resend_email(self):
         user_email = request.json['selected_email']
-        reg_user = self.appbuilder.sm.get_registered_user(user_email)
-        self.send_email(reg_user)
-        flash(as_unicode('Resend invitation to %s' % user_email), 'info')
+        # First delete the current invitation
+        self.appbuilder.sm.delete_invited_user(user_email=user_email)
+        # Then send a new and updated invitation link
+        role_id = self.appbuilder.sm.find_solar_default_role_id().id
+        team = self.appbuilder.sm.find_team(user_id=g.user.id)
+        reg_user = self.appbuilder.sm.add_invite_register_user(email=user_email,
+                                                               team=team,
+                                                               role=role_id,
+                                                               inviter=g.user.id)
+        if reg_user:
+            if self.send_email(reg_user):
+                flash(as_unicode('Resend invitation to %s' % user_email), 'info')
+                return jsonify(dict(redirect='/solar/my-team'))
+            else:
+                flash(as_unicode('Cannot resend invitation to user'), 'danger')
+                return jsonify(dict(redirect='/solar/my-team'))
+
+        # reg_user = self.appbuilder.sm.get_registered_user(user_email)
+        # self.send_email(reg_user)
+        # flash(as_unicode('Resend invitation to %s' % user_email), 'info')
         return jsonify(dict(redirect='/solar/my-team'))
 
     @expose('/delete-invitation', methods=['POST'])
