@@ -37,10 +37,11 @@
                     <hr>
                     <div class="team-name">
                         <label for="team_name_input">Team Name</label>
-                        <input id="team_name_input" name="team_name" type="text" value="{{ team_name }}" disabled style="background: lightgray">
-                        <button class="edit-team-info">edit</button>
+                        <input id="team_name_input" name="team_name" type="text" value="{{ team_name }}" style="background-color: #FCFAFA; width: 90%; border: 1px solid #CCCCCC; height: 50px; font-size: 18px;">
+{#                        <button class="edit-team-info">edit</button>#}
                     </div>
-                    <button id="update_team" disabled>Update Team</button>
+                    <hr>
+                    <button id="update_team" class="invite-btn">Update Team</button>
                 </div>
             {% endblock %}
 
@@ -87,13 +88,14 @@
                                     <tr>
                                         <td>{{ email }}</td>
                                         {% if valid %}
-                                            <td>Awaiting Response</td>
+                                            <td><p class="invite-status">Awaiting Response</p></td>
                                         {% else %}
-                                            <td>Invitation Expired</td>
+                                            <td><p class="invite-status">Invitation Expired</p></td>
                                         {% endif %}
                                         <td>
-                                            <button class="resend_email">Resend</button>
-                                            <button class="delete_invitation">Remove</button>
+
+                                            <button class="resend-email">Resend</button>
+                                            <button class="delete-invitation">Remove</button>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -111,16 +113,14 @@
     <script src="https://kit.fontawesome.com/ace8403ae5.js"></script>
     <script src="{{url_for('appbuilder.static',filename='js/bootstrap.min.js')}}"></script>
     <script>
-        $(".edit-team-info").click(function() {
-            $("input[name='team_name']")
-                .prop('disabled', false)
-                .css("background-color", "yellow")
-                .focus();
-        });
+        {#$(".edit-team-info").click(function() {#}
+        {#    $("input[name='team_name']")#}
+        {#        .prop('disabled', false)#}
+        {#        .css("background-color", "yellow")#}
+        {#        .focus();});#}
 
-        $("input[name='team_name']").change(function() {
-            $("#update_team").prop('disabled', false);
-        });
+        {#$("input[name='team_name']").change(function() {#}
+        {#    $("#update_team").prop('disabled', false);});#}
 
         $('#update_team').click(function() {
             let new_team_name = $('#team_name_input').val();
@@ -149,10 +149,10 @@
             });
         });
 
-        $('.resend_email').click(function() {
+        $('.resend-email').click(function() {
             let selected_email = $(this).parent().prev().prev().html();
             let csrf_token = "{{ csrf_token() if csrf_token else '' }}";
-            $(this).replaceWith("<span>sending...</span>");
+            $(this).replaceWith("<img src=\"/static/assets/images/loading.gif\" style=\"width: 40px; margin-right: 17px; margin-left: 20px;\">");
             $.ajaxSetup({
                 beforeSend: function(xhr, settings) {
                     if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
@@ -174,7 +174,7 @@
             });
         });
 
-        $('.delete_invitation').click(function() {
+        $('.delete-invitation').click(function() {
             let selected_email = $(this).parent().prev().prev().html();
             let csrf_token = "{{ csrf_token() if csrf_token else '' }}";
             $.ajaxSetup({
