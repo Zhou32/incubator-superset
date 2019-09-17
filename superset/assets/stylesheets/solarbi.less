@@ -957,7 +957,7 @@ input {
   color: #707070;
 }
 .invite-btn {
-  background: #0667A3 0% 0% no-repeat padding-box;
+  background-color: #024067; 
   font-family: 'Montserrat';
   font-weight: 500;
   width: 145px;
@@ -983,17 +983,46 @@ input {
 .invite-btn:focus {
 	outline: none;
 }
+.invite-btn:disabled {
+  background-color: #ccc;
+  color: white;
+  box-shadow: none;
+  border: 1px solid #ccc;
+  text-shadow: none;
+  cursor: default;
+}
 .team-card {
+  font-family: 'Montserrat';
   padding: 25 50;
   max-height: 400;
   overflow-y: auto;
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
   transition: 0.3s;
   width: 750px;
-  // height: 270px;
   background-color: white;
   margin: 30px;
   border-radius: 10px;
+}
+.team-card h3 {
+  font-family: 'Montserrat';
+  font-weight: bold;
+  text-align: center;
+}
+.team-card hr {
+  border-bottom: 1px solid #CCCCCC;
+  margin-left: -50;
+  width: 116%;
+}
+.team-card td {
+  height: 35px;
+}
+.team-card th {
+  font-size: 16px;
+  line-height: 21px;
+  color: #CCCCCC;
+}
+#update_team {
+  margin-left: 40%;
 }
 .invite-wrapper {
   display: flex;
@@ -1014,6 +1043,30 @@ input {
 }
 .team-card td {
   width: 30%;
+}
+.invite-status {
+  border: 1px solid #CCC;
+  border-radius: 20px;
+  width: 140px;
+  height: 24px;
+  font-size: 12px;
+  text-align: center;
+  color: #CCC;
+  padding-top: 5px;
+  margin-bottom: 0;
+}
+.resend-email {
+  outline: none;
+  border-radius: 10px;
+  border: 1px solid #499AFF;
+  color: #499AFF;
+}
+.delete-invitation {
+  outline: none;
+  border-radius: 10px;
+  border: 1px solid #F65060;;
+  color: #F65060;;
+
 }
 .user-info-card {
   padding: 30;
