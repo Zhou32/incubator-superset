@@ -253,6 +253,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
     def update_team_name(self):
         new_team_name = request.json['new_team_name']
         if self.appbuilder.sm.update_team_name(g.user.id, new_team_name):
+            flash(as_unicode('Successfully update the team name'), 'info')
             return jsonify(dict(redirect='/solar/my-team'))
 
     @expose('/resend-email', methods=['POST'])
