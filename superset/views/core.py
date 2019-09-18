@@ -1412,6 +1412,10 @@ class Superset(BaseSupersetView):
             select_str = "SELECT year, month, radiationtype, avg(radiation) AS radiation"
             group_str = "GROUP BY year, month, radiationtype"
             order_str = "ORDER BY year ASC, month ASC"
+        elif resolution == 'annual':
+            select_str = "SELECT year, radiationtype, avg(radiation) AS radiation"
+            group_str = "GROUP BY year, radiationtype"
+            order_str = "ORDER BY year ASC"
 
         if type != 'both':
             athena_query = select_str \
