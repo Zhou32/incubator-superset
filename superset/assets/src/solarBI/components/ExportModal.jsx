@@ -341,7 +341,7 @@ class ExportModal extends React.Component {
                   <div className={classes.dateWrapper}>
                     <span className={classes.dateLabel}>Start</span>
                     <TextField
-                      error={new Date(startDate) > new Date(endDate)}
+                      error={new Date(startDate) > new Date(endDate) || new Date(startDate) < new Date('1990-01-01')}
                       id="date"
                       type="date"
                       value={startDate}
@@ -363,7 +363,7 @@ class ExportModal extends React.Component {
                   <div className={classes.dateWrapper}>
                     <span className={classes.dateLabel}>End</span>
                     <TextField
-                      error={new Date(startDate) > new Date(endDate)}
+                      error={new Date(startDate) > new Date(endDate) || new Date(endDate) > new Date('2019-07-31')}
                       id="date"
                       type="date"
                       value={endDate}
@@ -405,7 +405,8 @@ class ExportModal extends React.Component {
                     }}
                   >
                     <Typography className={classes.typography}>
-                      Both Start and End years are inclusive
+                      Availabel date: 01/01/1990 ~ 31/07/2019.
+                      Both Start and End date are inclusive.
                     </Typography>
                   </Popover>
                 </div>
