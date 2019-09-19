@@ -31,7 +31,7 @@ from flask_login import login_user
 
 from .forms import (
     SolarBIRegisterFormWidget, SolarBIRegisterUserDBForm, SolarBIRegisterInvitationForm,
-    SolarBIRegisterInvitationUserDBForm, SolarBITeamFormWidget
+    SolarBIRegisterInvitationUserDBForm, SolarBITeamFormWidget, SolarBIInvitationWidget,
 )
 from .models import SolarBIUser
 from .utils import post_request
@@ -293,6 +293,7 @@ class SolarBIRegisterInvitationView(BaseRegisterUser):
     form = SolarBIRegisterInvitationForm
     form_template = 'appbuilder/general/security/invitation_registration.html'
     activation_template = 'appbuilder/general/security/activation.html'
+    edit_widget = SolarBIInvitationWidget
 
     email_template = 'appbuilder/general/security/register_mail.html'
     email_subject = 'SolarBI - Registration'

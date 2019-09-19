@@ -165,3 +165,7 @@ class SolarBIIUserInfoEditWidget(RenderTemplateWidget):
 
 class SolarBIResetMyPasswordWidget(RenderTemplateWidget):
     template = 'appbuilder/general/widgets/reset_my_password_widget.html'
+
+
+class SolarBIInvitationWidget(RenderTemplateWidget):
+    template = 'appbuilder/general/widgets/invitation_widget.html'
