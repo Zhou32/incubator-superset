@@ -17,6 +17,8 @@
 # pylint: disable=C,R,W
 import datetime
 import logging
+import random
+import string
 import uuid
 
 from flask import url_for
@@ -416,7 +418,8 @@ class CustomSecurityManager(SupersetSecurityManager):
         # email and team parameters should be always available.
         invited_user.email = email
         invited_user.team = team.team_name
-        invited_user.username = email
+        invited_user.username = 'solarbi_' + \
+            ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=8))
 
         if first_name:
             invited_user.first_name = first_name
