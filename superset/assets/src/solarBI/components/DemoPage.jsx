@@ -194,12 +194,24 @@ class DemoPage extends React.Component {
                   <Button className={classes.button}>LARGE BUILDING</Button>
                 </div>
               </TabContainer>}
-              {value === 1 && <TabContainer>Item Two</TabContainer>}
-              {value === 2 && <TabContainer>Item Three</TabContainer>}
-              {value === 3 && <TabContainer>Item One</TabContainer>}
-              {value === 4 && <TabContainer>Item Two</TabContainer>}
-              {value === 5 && <TabContainer>Item Three</TabContainer>}
-              {value === 6 && <TabContainer>Item Three</TabContainer>}
+              {value === 1 && <TabContainer>
+                <p className={classes.text}>Read one of our case studies:</p>
+                </TabContainer>}
+              {value === 2 && <TabContainer>
+                <p className={classes.text}>Read one of our case studies:</p>
+                </TabContainer>}
+              {value === 3 && <TabContainer>
+                <p className={classes.text}>Read one of our case studies:</p>
+              </TabContainer>}
+              {value === 4 && <TabContainer>
+                <p className={classes.text}>Read one of our case studies:</p>
+              </TabContainer>}
+              {value === 5 && <TabContainer>
+                <p className={classes.text}>Read one of our case studies:</p>
+              </TabContainer>}
+              {value === 6 && <TabContainer>
+                <p className={classes.text}>Read one of our case studies:</p>
+              </TabContainer>}
             </div>
           </CardContent>
         </Card>
