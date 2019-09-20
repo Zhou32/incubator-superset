@@ -20,6 +20,7 @@ import time
 import logging
 
 from flask import flash, redirect, url_for, g, request, make_response, jsonify
+from flask_babel import lazy_gettext
 from flask_mail import Mail, Message
 
 from flask_appbuilder._compat import as_unicode
@@ -241,13 +242,14 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
                 flash(as_unicode(e), 'danger')
                 return redirect('/solar/my-team')
         else:
-            flash(as_unicode('Invalid form'), 'danger')
+            flash(as_unicode('Email already existed'), 'danger')
             widgets = self._get_edit_widget(form=form)
-            return self.render_template(self.form_template,
-                                        title=self.form_title,
-                                        widgets=widgets,
-                                        appbuilder=self.appbuilder
-                                        )
+            # return self.render_template(self.form_template,
+            #                             title=self.form_title,
+            #                             widgets=widgets,
+            #                             appbuilder=self.appbuilder
+            #                             )
+            return redirect('/solar/my-team')
 
     @expose('/update-team-name', methods=['POST'])
     def update_team_name(self):
@@ -290,6 +292,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
 
 
 class SolarBIRegisterInvitationView(BaseRegisterUser):
+    error_message = lazy_gettext("Username already existed")
     form = SolarBIRegisterInvitationForm
     form_template = 'appbuilder/general/security/invitation_registration.html'
     activation_template = 'appbuilder/general/security/activation.html'
@@ -364,9 +367,11 @@ class SolarBIRegisterInvitationView(BaseRegisterUser):
         if form.validate_on_submit() and self.appbuilder.sm.find_register_user(invitation_hash):
             response = self.edit_invited_register_user(form, invitation_hash)
             if not response:
+                # flash(as_unicode(self.error_message), 'danger')
                 return redirect(self.appbuilder.get_url_for_index)
             return redirect(response)
         else:
+            flash(as_unicode(self.error_message), 'danger')
             widgets = self._get_edit_widget(form=form)
             return self.render_template(
                 self.form_template,

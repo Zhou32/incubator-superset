@@ -36,6 +36,12 @@ def unique_required(form, field):
         if db.session.query(RegisterUser).filter_by(email=field.data).first() is not None:
             raise ValidationError("Email exists, waiting to be activated")
 
+    if field.name == 'username':
+        if db.session.query(User).filter_by(username=field.data).first() is not None:
+            raise ValidationError("Username already exists")
+        if db.session.query(RegisterUser).filter_by(username=field.data).first() is not None:
+            raise ValidationError("Username exists, waiting to be activated")
+
 
 class SolarBILoginForm_db(DynamicForm):
     username = StringField(lazy_gettext("User Name"), validators=[DataRequired()])
@@ -113,7 +119,7 @@ class SolarBIRegisterInvitationForm(DynamicForm):
     role = StringField(lazy_gettext('Role'), widget=BS3TextFieldWidget(), render_kw={'readonly': True})
     first_name = StringField(lazy_gettext('First Name'), validators=[DataRequired()], widget=BS3TextFieldWidget())
     last_name = StringField(lazy_gettext('Last Name'), validators=[DataRequired()], widget=BS3TextFieldWidget())
-    username = StringField(lazy_gettext('Username'), validators=[DataRequired()], widget=BS3TextFieldWidget())
+    username = StringField(lazy_gettext('Username'), validators=[DataRequired(), unique_required], widget=BS3TextFieldWidget())
     email = StringField(lazy_gettext('Email'), widget=BS3TextFieldWidget(), render_kw={'readonly': True})
     password = PasswordField(lazy_gettext('Password'),
                              description=lazy_gettext(
