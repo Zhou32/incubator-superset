@@ -345,6 +345,7 @@ class SolarBIRegisterInvitationView(BaseRegisterUser):
         register_user = self.appbuilder.sm.edit_invite_register_user_by_hash(invitation_hash,
                                                                              first_name=form.first_name.data,
                                                                              last_name=form.last_name.data,
+                                                                             username=form.username.data,
                                                                              password=form.password.data,)
         if register_user:
             if self.send_email(register_user):
@@ -383,6 +384,7 @@ class SolarBIRegisterInvitationView(BaseRegisterUser):
         if not self.appbuilder.sm.add_team_user(email=reg.email,
                                                 first_name=reg.first_name,
                                                 last_name=reg.last_name,
+                                                username=reg.username,
                                                 role_id=reg.role_assigned,
                                                 team=reg.team,
                                                 hashed_password=reg.password):
