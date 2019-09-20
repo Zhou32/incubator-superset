@@ -249,12 +249,12 @@ class CustomSecurityManager(SupersetSecurityManager):
             return self.get_session.query(self.team_model).\
                 filter(self.team_model.users.any(id=user_id)).scalar()
 
-    def add_team_user(self, email, first_name, last_name, hashed_password, team, role_id):
+    def add_team_user(self, email, first_name, last_name, username, hashed_password, team, role_id):
         try:
             team = self.find_team(team)
             user = self.user_model()
             user.email = email
-            user.username = email
+            user.username = username
             user.first_name = first_name
             user.last_name = last_name
             user.active = True
@@ -332,13 +332,15 @@ class CustomSecurityManager(SupersetSecurityManager):
             logging.error(e)
             return None, None, None, None
 
-    def edit_invite_register_user_by_hash(self, invitation_hash, first_name=None, last_name=None,
+    def edit_invite_register_user_by_hash(self, invitation_hash, first_name=None, last_name=None, username=None,
                                           password='', hashed_password=''):
         invited_user = self.find_register_user(invitation_hash)
         if first_name:
             invited_user.first_name = first_name
         if last_name:
             invited_user.last_name = last_name
+        if username:
+            invited_user.username = username
         if hashed_password:
             invited_user.password = hashed_password
         else:
