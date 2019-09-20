@@ -328,7 +328,9 @@ class CustomSecurityManager(SupersetSecurityManager):
             email = reg_user.email
             role = self.get_session.query(self.role_model).filter_by(id=reg_user.role_assigned).first()
             if datetime.datetime.now() > reg_user.valid_date:
-                raise Exception
+                raise Exception("Invitation link expired")
+            if reg_user.first_name is not None:
+                raise Exception("Invitation link already used")
             return team_name, inviter, email, role.name
         except Exception as e:
             logging.error(e)
