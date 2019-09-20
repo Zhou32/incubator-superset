@@ -75,6 +75,28 @@ input {
   -webkit-transition: all .2s ease;
   transition: all .2s ease;
 }
+#member_info{
+  margin-top: 100px;
+} 
+.invite-input-fields {
+  width: 80%;
+  margin: auto;
+}
+.invite-member-form {
+  display: flex;
+  margin: 30;
+}
+.invite-member-form label {
+  display: inline-block;
+  max-width: 100%;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  font-weight: 700;
+  width: 140;
+}
+.invite-member-form input {
+  width: 80%;
+}
 .left {
   width: 50%; 
   height: 100%; 
@@ -111,6 +133,7 @@ input {
   color: #0667A3;
   margin: 10px;
   font-family: 'Montserrat';
+  font-weight: bold;
 }
 .solarbi-welcome {
   text-align: center;
@@ -459,6 +482,28 @@ input {
   top: 0;
   font-size: 25px;
 }
+.invite-match-message {
+  position: absolute;
+  z-index: 10;
+  right: 90;
+  font-size: 25px;
+}
+@media only screen and (min-width: 1200px) {
+  .invite-match-message {
+    position: absolute;
+    z-index: 10;
+    right: 120;
+    font-size: 25px;
+  }
+}
+@media only screen and (min-width: 1700px) {
+  .invite-match-message {
+    position: absolute;
+    z-index: 10;
+    right: 140;
+    font-size: 25px;
+  }
+}
 .send-request-btn {
   margin-top: 40px;
   background: #024067 0% 0% no-repeat padding-box;
@@ -664,10 +709,11 @@ input {
   height: 15px;
   position: relative;
   top: 5px;
-  left: 47px;
+  left: 54px;
 }
 .sidebar-solarbi-text {
   font-size: 25px;
+  font-weight: bold;
   color: #D7DF23;
   margin: 5px;
   font-family: 'Montserrat';
@@ -725,7 +771,6 @@ input {
   font-size: 16px;
   color: white;
 }
-
 .s-sidebar__nav-link span {
   position: absolute;
   top: 50%;
@@ -733,6 +778,30 @@ input {
   transform: translateY(-50%);
 }
 
+.s-sidebar__nav-link-disabled {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  height: 3em;
+  font-size: 16px;
+  color: white;
+}
+.s-sidebar__nav-link-disabled span {
+  position: absolute;
+  top: 50%;
+  left: 3em;
+  transform: translateY(-50%);
+}
+.s-sidebar__nav-link-disabled:hover {
+  color: white;
+}
+.s-sidebar__nav-link-disabled:focus {
+  color: white;
+}
+
+.s-sidebar__nav-link:focus {
+  color: #F9ED32;
+}
 .s-sidebar__nav-link:hover {
   color: #F9ED32;
 }
@@ -751,14 +820,35 @@ input {
   width: 2em;
   height: 3em;
 }
-
 .s-sidebar__nav-link > i::before {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
+.s-sidebar__nav-link-disabled > i {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-block;
+  width: 2em;
+  height: 3em;
+}
 
+.s-sidebar__nav-link-disabled > i::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.coming-soon {
+  position: absolute !important;
+  display: block;
+  left: 70 !important;
+  top: 15 !important;
+  opacity: 0.8;
+  font-size: 11;
+}
 /* Mobile First */
 @media (min-width: 42em) {
   .s-layout__content {
@@ -903,12 +993,15 @@ input {
   height: 280px;
   background-color: white;
   margin: 30px;
+  border-radius: 10px;
 }
 .list-card:hover {
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
 }
 .list-container p {
-  font-size: 22px;
+  font-size: 24px !important;
+  color: #0063B0 !important;
+  font-weight: bold;
 }
 .list-container a {
   font-size: 22px;
@@ -1114,4 +1207,19 @@ input {
 }
 .reset-psw-btn:hover {
   color: white;
+}
+.reset-my-psw {
+  display: flex;
+  margin: 30;
+}
+.reset-my-psw label {
+  display: inline-block;
+  max-width: 100%;
+  margin-bottom: 5px;
+  margin-top: 10px;
+  font-weight: 700;
+  width: 140;
+}
+.reset-my-psw input {
+  width: 70%;
 }
