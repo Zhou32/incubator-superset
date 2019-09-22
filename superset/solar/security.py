@@ -17,6 +17,8 @@
 # pylint: disable=C,R,W
 import datetime
 import logging
+import random
+import string
 import uuid
 
 from flask import url_for
@@ -25,7 +27,7 @@ from flask_appbuilder.models.sqla.interface import SQLAInterface
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from superset.solar.views import SolarBIPasswordRecoverView, SolarBIAuthDBView, \
-    SolarBIResetPasswordView
+    SolarBIResetPasswordView, SolarBIUserInfoEditView, SolarBIResetMyPasswordView
 from superset.solar.registerviews import (
     SolarBIRegisterUserDBView, SolarBIRegisterInvitationView,
     SolarBIRegisterInvitationUserDBView
@@ -64,6 +66,8 @@ OWNER_PERMISSION_MODEL = {
     'SolarBIRegisterInvitationUserDBView',
     'SolarBIRegisterUserModelView',
     'SolarBIUserStatsChartView',
+    'SolarBIUserInfoEditView',
+    'SolarBIResetMyPasswordView',
 }
 
 OWNER_NOT_ALLOWED_PERM_MENU = {
@@ -103,8 +107,9 @@ class CustomSecurityManager(SupersetSecurityManager):
     registeruserdbview = SolarBIRegisterUserDBView
     authdbview = SolarBIAuthDBView
     registeruser_model = TeamRegisterUser
-    '''TODO: Create UerDBModelView to have a new user info page'''
     # userdbmodelview = SolarBIUserDBModelView
+    userinfoeditview = SolarBIUserInfoEditView
+    resetmypasswordview = SolarBIResetMyPasswordView
 
     resetRequest_model = ResetRequest
     team_model = Team
@@ -246,12 +251,12 @@ class CustomSecurityManager(SupersetSecurityManager):
             return self.get_session.query(self.team_model).\
                 filter(self.team_model.users.any(id=user_id)).scalar()
 
-    def add_team_user(self, email, first_name, last_name, hashed_password, team, role_id):
+    def add_team_user(self, email, first_name, last_name, username, hashed_password, team, role_id):
         try:
             team = self.find_team(team)
             user = self.user_model()
             user.email = email
-            user.username = email
+            user.username = username
             user.first_name = first_name
             user.last_name = last_name
             user.active = True
@@ -323,19 +328,23 @@ class CustomSecurityManager(SupersetSecurityManager):
             email = reg_user.email
             role = self.get_session.query(self.role_model).filter_by(id=reg_user.role_assigned).first()
             if datetime.datetime.now() > reg_user.valid_date:
-                raise Exception
+                raise Exception("Invitation link expired")
+            if reg_user.first_name is not None:
+                raise Exception("Invitation link already used")
             return team_name, inviter, email, role.name
         except Exception as e:
             logging.error(e)
             return None, None, None, None
 
-    def edit_invite_register_user_by_hash(self, invitation_hash, first_name=None, last_name=None,
+    def edit_invite_register_user_by_hash(self, invitation_hash, first_name=None, last_name=None, username=None,
                                           password='', hashed_password=''):
         invited_user = self.find_register_user(invitation_hash)
         if first_name:
             invited_user.first_name = first_name
         if last_name:
             invited_user.last_name = last_name
+        if username:
+            invited_user.username = username
         if hashed_password:
             invited_user.password = hashed_password
         else:
@@ -411,7 +420,8 @@ class CustomSecurityManager(SupersetSecurityManager):
         # email and team parameters should be always available.
         invited_user.email = email
         invited_user.team = team.team_name
-        invited_user.username = email
+        invited_user.username = 'solarbi_' + \
+            ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=8))
 
         if first_name:
             invited_user.first_name = first_name

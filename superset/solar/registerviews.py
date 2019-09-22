@@ -20,6 +20,7 @@ import time
 import logging
 
 from flask import flash, redirect, url_for, g, request, make_response, jsonify
+from flask_babel import lazy_gettext
 from flask_mail import Mail, Message
 
 from flask_appbuilder._compat import as_unicode
@@ -31,7 +32,7 @@ from flask_login import login_user
 
 from .forms import (
     SolarBIRegisterFormWidget, SolarBIRegisterUserDBForm, SolarBIRegisterInvitationForm,
-    SolarBIRegisterInvitationUserDBForm, SolarBITeamFormWidget
+    SolarBIRegisterInvitationUserDBForm, SolarBITeamFormWidget, SolarBIInvitationWidget,
 )
 from .models import SolarBIUser
 from .utils import post_request
@@ -241,18 +242,20 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
                 flash(as_unicode(e), 'danger')
                 return redirect('/solar/my-team')
         else:
-            flash(as_unicode('Invalid form'), 'danger')
+            flash(as_unicode('Email already existed'), 'danger')
             widgets = self._get_edit_widget(form=form)
-            return self.render_template(self.form_template,
-                                        title=self.form_title,
-                                        widgets=widgets,
-                                        appbuilder=self.appbuilder
-                                        )
+            # return self.render_template(self.form_template,
+            #                             title=self.form_title,
+            #                             widgets=widgets,
+            #                             appbuilder=self.appbuilder
+            #                             )
+            return redirect('/solar/my-team')
 
     @expose('/update-team-name', methods=['POST'])
     def update_team_name(self):
         new_team_name = request.json['new_team_name']
         if self.appbuilder.sm.update_team_name(g.user.id, new_team_name):
+            flash(as_unicode('Successfully update the team name'), 'info')
             return jsonify(dict(redirect='/solar/my-team'))
 
     @expose('/resend-email', methods=['POST'])
@@ -289,9 +292,11 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
 
 
 class SolarBIRegisterInvitationView(BaseRegisterUser):
+    error_message = lazy_gettext("Username already existed")
     form = SolarBIRegisterInvitationForm
     form_template = 'appbuilder/general/security/invitation_registration.html'
     activation_template = 'appbuilder/general/security/activation.html'
+    edit_widget = SolarBIInvitationWidget
 
     email_template = 'appbuilder/general/security/register_mail.html'
     email_subject = 'SolarBI - Registration'
@@ -343,6 +348,7 @@ class SolarBIRegisterInvitationView(BaseRegisterUser):
         register_user = self.appbuilder.sm.edit_invite_register_user_by_hash(invitation_hash,
                                                                              first_name=form.first_name.data,
                                                                              last_name=form.last_name.data,
+                                                                             username=form.username.data,
                                                                              password=form.password.data,)
         if register_user:
             if self.send_email(register_user):
@@ -361,9 +367,11 @@ class SolarBIRegisterInvitationView(BaseRegisterUser):
         if form.validate_on_submit() and self.appbuilder.sm.find_register_user(invitation_hash):
             response = self.edit_invited_register_user(form, invitation_hash)
             if not response:
+                # flash(as_unicode(self.error_message), 'danger')
                 return redirect(self.appbuilder.get_url_for_index)
             return redirect(response)
         else:
+            flash(as_unicode(self.error_message), 'danger')
             widgets = self._get_edit_widget(form=form)
             return self.render_template(
                 self.form_template,
@@ -381,6 +389,7 @@ class SolarBIRegisterInvitationView(BaseRegisterUser):
         if not self.appbuilder.sm.add_team_user(email=reg.email,
                                                 first_name=reg.first_name,
                                                 last_name=reg.last_name,
+                                                username=reg.username,
                                                 role_id=reg.role_assigned,
                                                 team=reg.team,
                                                 hashed_password=reg.password):

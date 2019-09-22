@@ -30,8 +30,6 @@
               {% include 'superset/flash_wrapper.html' %}
             {% endblock %}
         </div>
-        <div>
-            {{ widgets.get('list')()|safe }}
-        </div>
+        {{ widgets.get('list')()|safe }}
     </div>
 {% endblock %}

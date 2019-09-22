@@ -24,6 +24,10 @@ import { withStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/
 import Slide from '@material-ui/core/Slide';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
+import Typography from '@material-ui/core/Typography';
+import IconButton from '@material-ui/core/IconButton';
+import Popover from '@material-ui/core/Popover';
+import HelpIcon from '@material-ui/icons/Help';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import TextField from '@material-ui/core/TextField';
@@ -108,7 +112,7 @@ const styles = tm => ({
   },
   dialog: {
     borderRadius: 12,
-    maxWidth: 750,
+    maxWidth: 800,
     padding: 10,
     fontFamily: 'Montserrat',
     fontWeight: 'bold',
@@ -149,9 +153,15 @@ const styles = tm => ({
     backgroundColor: 'white',
     marginTop: -10,
     marginLeft: -10,
-    width: 760,
+    width: 810,
     color: 'white',
     paddingTop: 15,
+  },
+  iconButton: {
+    padding: '5 8',
+    height: 40,
+    marginLeft: 20,
+    marginTop: 15,
   },
   labelFocused: {
     color: '#0063B0 !important',
@@ -216,6 +226,11 @@ const styles = tm => ({
     marginTop: '35px',
     marginRight: '45px',
   },
+  typography: {
+    margin: theme.spacing.unit * 2,
+    fontSize: 15,
+    width: 300,
+  },
   resolutionGroup: {
     flexDirection: 'row',
     width: '80%',
@@ -235,6 +250,7 @@ class ExportModal extends React.Component {
     super(props);
 
     this.state = {
+      anchorEl: null,
       type: 'dni',
       startDate: '2017-01-01',
       endDate: '2018-01-01',
@@ -246,6 +262,8 @@ class ExportModal extends React.Component {
     this.handleEndDateChange = this.handleEndDateChange.bind(this);
     this.handleResolutionChange = this.handleResolutionChange.bind(this);
     this.handleRequestData = this.handleRequestData.bind(this);
+    this.handleQuestionClick = this.handleQuestionClick.bind(this);
+    this.handleQuestionClose = this.handleQuestionClose.bind(this);
   }
 
   handleTypeChange(event) {
@@ -264,11 +282,22 @@ class ExportModal extends React.Component {
     this.setState({ resolution: event.target.value });
   }
 
+  handleQuestionClick(event) {
+    this.setState({ anchorEl: event.currentTarget });
+  }
+
+  handleQuestionClose() {
+    this.setState({ anchorEl: null });
+  }
+
   handleRequestData() {
     const sDate = new Date(this.state.startDate);
     const eDate = new Date(this.state.endDate);
     if (sDate > eDate) {
       alert('Start date cannot be later than end date!'); // eslint-disable-line no-alert
+    } else if (new Date(sDate) < new Date('1990-01-01') ||
+                new Date(eDate) > new Date('2019-07-31')) {
+      alert('Availabel date: 01/01/1990 ~ 31/07/2019.'); // eslint-disable-line no-alert
     } else {
       const queryData = {
         lat: this.props.solarBI.queryResponse.data.lat + '',
@@ -285,7 +314,8 @@ class ExportModal extends React.Component {
 
   render() {
     const { classes, open, onHide, solarBI } = this.props;
-    const { startDate, endDate } = this.state;
+    const { startDate, endDate, anchorEl } = this.state;
+    const openAnchor = Boolean(anchorEl);
 
     return (
       <div>
@@ -314,7 +344,7 @@ class ExportModal extends React.Component {
                   <div className={classes.dateWrapper}>
                     <span className={classes.dateLabel}>Start</span>
                     <TextField
-                      error={new Date(startDate) > new Date(endDate)}
+                      error={new Date(startDate) > new Date(endDate) || new Date(startDate) < new Date('1990-01-01')}
                       id="date"
                       type="date"
                       value={startDate}
@@ -336,7 +366,7 @@ class ExportModal extends React.Component {
                   <div className={classes.dateWrapper}>
                     <span className={classes.dateLabel}>End</span>
                     <TextField
-                      error={new Date(startDate) > new Date(endDate)}
+                      error={new Date(startDate) > new Date(endDate) || new Date(endDate) > new Date('2019-07-31')}
                       id="date"
                       type="date"
                       value={endDate}
@@ -354,6 +384,34 @@ class ExportModal extends React.Component {
                     // }}
                     />
                   </div>
+                  <IconButton
+                    aria-label="More"
+                    // aria-owns={openAnchor ? 'long-menu' : undefined}
+                    // aria-haspopup="true"
+                    className={classes.iconButton}
+                    onClick={this.handleQuestionClick}
+                  >
+                    <HelpIcon />
+                  </IconButton>
+                  <Popover
+                    id="heatmap-popper"
+                    open={openAnchor}
+                    anchorEl={anchorEl}
+                    onClose={this.handleQuestionClose}
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'center',
+                    }}
+                    transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'center',
+                    }}
+                  >
+                    <Typography className={classes.typography}>
+                      Availabel date: 01/01/1990 ~ 31/07/2019.
+                      Both Start and End date are inclusive.
+                    </Typography>
+                  </Popover>
                 </div>
                 <hr className={classes.contentHr} />
                 <FormControl component="fieldset" className={classes.formControl}>
@@ -384,6 +442,7 @@ class ExportModal extends React.Component {
                     <FormControlLabel classes={{ label: classes.formControlLabel }} value="daily" control={<Radio color="secondary" />} label="Daily" labelPlacement="bottom" />
                     <FormControlLabel classes={{ label: classes.formControlLabel }} value="weekly" control={<Radio color="secondary" />} label="Weekly" labelPlacement="bottom" />
                     <FormControlLabel classes={{ label: classes.formControlLabel }} value="monthly" control={<Radio color="secondary" />} label="Monthly" labelPlacement="bottom" />
+                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="annual" control={<Radio color="secondary" />} label="Annual" labelPlacement="bottom" />
                   </RadioGroup>
                 </FormControl>
               </DialogContent>

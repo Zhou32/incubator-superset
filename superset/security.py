@@ -77,7 +77,11 @@ SOLAR_PERMISSIONS = [
     ('can_this_form_get', 'ResetMyPasswordView'),
     ('can_this_form_post', 'UserInfoEditView'),
     ('can_this_form_get', 'UserInfoEditView'),
-    ('can_userinfo', 'UserDBModelView'),
+    ('can_this_form_post', 'SolarBIUserInfoEditView'),
+    ('can_this_form_get', 'SolarBIUserInfoEditView'),
+    ('can_this_form_post', 'SolarBIResetMyPasswordView'),
+    ('can_this_form_get', 'SolarBIResetMyPasswordView'),
+    # ('can_userinfo', 'UserDBModelView'),
     ('userinfoedit', 'UserDBModelView'),
 ]
 
