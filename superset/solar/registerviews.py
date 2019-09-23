@@ -292,6 +292,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
 
 
 class SolarBIRegisterInvitationView(BaseRegisterUser):
+    activation_message = lazy_gettext("Register successfully! An activation email has been sent to you")
     error_message = lazy_gettext("Username already existed")
     form = SolarBIRegisterInvitationForm
     form_template = 'appbuilder/general/security/invitation_registration.html'
@@ -352,7 +353,7 @@ class SolarBIRegisterInvitationView(BaseRegisterUser):
                                                                              password=form.password.data,)
         if register_user:
             if self.send_email(register_user):
-                flash(as_unicode(self.message), 'info')
+                flash(as_unicode(self.activation_message), 'info')
                 return self.appbuilder.get_url_for_index
             else:
                 flash(as_unicode(self.error_message), 'danger')
