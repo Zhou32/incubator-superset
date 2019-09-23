@@ -131,7 +131,9 @@
           $(".list-card > div > p").each(function() {
               var el= $(this);
               var textLength = el.html().length;
-              if (textLength > 17) {
+              if (textLength <= 17) {
+                  el.css('font-size', '1.5em');
+              } else if (textLength > 17 && textLength <= 25) {
                   el.css('font-size', '1.3em');
               } else if (textLength > 25) {
                   el.css('font-size', '1.0em');
