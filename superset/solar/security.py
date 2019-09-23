@@ -52,32 +52,32 @@ OWNER_NOT_ALLOWED_MENU = {
     'SQL Lab',
 }
 
-OWNER_PERMISSION_MODEL = {
-    'UserDBModelView',
-    'DatabaseView',
-    'SliceModelView',
-    'SliceAddView',
-    'TableModelView',
-    # 'DashboardModelView',
-    # 'DashboardAddView',
-    'SolarBIModelAddView',
-    'SolarBIModelWelcomeView',
-    'SolarBIModelView',
-    'SolarBIRegisterInvitationUserDBView',
-    'SolarBIRegisterUserModelView',
-    'SolarBIUserStatsChartView',
-    'SolarBIUserInfoEditView',
-    'SolarBIResetMyPasswordView',
-}
+# OWNER_PERMISSION_MODEL = {
+#     'UserDBModelView',
+#     'DatabaseView',
+#     'SliceModelView',
+#     'SliceAddView',
+#     'TableModelView',
+#     # 'DashboardModelView',
+#     # 'DashboardAddView',
+#     'SolarBIModelAddView',
+#     'SolarBIModelWelcomeView',
+#     'SolarBIModelView',
+#     'SolarBIRegisterInvitationUserDBView',
+#     'SolarBIRegisterUserModelView',
+#     'SolarBIUserStatsChartView',
+#     'SolarBIUserInfoEditView',
+#     'SolarBIResetMyPasswordView',
+# }
 
-OWNER_NOT_ALLOWED_PERM_MENU = {
-    'SavvySiteModelView': ['can_add', 'can_delete'],
-    'UserDBModelView': ['can_list', 'can_add', 'can_edit', 'can_delete'],
-    'RegisterUserModelView': ['can_list'],
-    'LogModelView': ['can_list', 'can_download', 'can_edit', 'can_show', 'can_delete', 'can_add'],
-    'RoleModelView': ['can_list', 'can_download', 'can_edit', 'can_show', 'can_delete', 'can_add'],
-    'DashboardModelView': ['can_list', 'can_download', 'can_edit', 'can_show', 'can_delete', 'can_add'],
-}
+# OWNER_NOT_ALLOWED_PERM_MENU = {
+#     'SavvySiteModelView': ['can_add', 'can_delete'],
+#     'UserDBModelView': ['can_list', 'can_add', 'can_edit', 'can_delete'],
+#     'RegisterUserModelView': ['can_list'],
+#     'LogModelView': ['can_list', 'can_download', 'can_edit', 'can_show', 'can_delete', 'can_add'],
+#     'RoleModelView': ['can_list', 'can_download', 'can_edit', 'can_show', 'can_delete', 'can_add'],
+#     'DashboardModelView': ['can_list', 'can_download', 'can_edit', 'can_show', 'can_delete', 'can_add'],
+# }
 
 OWNER_PERMISSION_MENU = {
     'SolarBI', 'Search your Location', 'Saved Solar Data', 'Introduction'
@@ -86,6 +86,26 @@ OWNER_PERMISSION_MENU = {
 OWNER_INVITE_ROLES = {
     'solar_default',
 }
+
+OWNER_PERMISSIONS_VIEWS = [
+    ('can_explore_json', 'Superset'),
+    ('resetmypassword', 'UserDBModelView'),
+    ('can_this_form_post', 'ResetMyPasswordView'),
+    ('can_this_form_get', 'ResetMyPasswordView'),
+    ('can_this_form_post', 'UserInfoEditView'),
+    ('can_this_form_get', 'UserInfoEditView'),
+    ('can_this_form_post', 'SolarBIUserInfoEditView'),
+    ('can_this_form_get', 'SolarBIUserInfoEditView'),
+    ('can_this_form_post', 'SolarBIResetMyPasswordView'),
+    ('can_this_form_get', 'SolarBIResetMyPasswordView'),
+    # ('can_userinfo', 'UserDBModelView'),
+    ('userinfoedit', 'UserDBModelView'),
+    ('can_invitation', 'SolarBIRegisterInvitationUserDBView'),
+    ('can_invitation_post', 'SolarBIRegisterInvitationUserDBView'),
+]
+OWNER_PERMISSIONS_COMMON = ['can_show', 'can_list', 'can_delete', 'can_add']
+OWNER_PERMISSIONS_VIEW = ['SolarBIModelAddView', 'SolarBIModelWelcomeView',
+                          'SolarBIModelView']
 
 # SUPERUSER_INVITE_ROLES = {
 #     'org_user', 'org_viewer',
@@ -155,23 +175,37 @@ class CustomSecurityManager(SupersetSecurityManager):
         self.clean_perms()
 
     def is_owner_pvm(self, pvm):
-        # print(pvm.view_menu.name)
-        result = self._is_gamma_pvm(pvm)
-
-        for permission in PERMISSION_COMMON:
-            for view in OWNER_PERMISSION_MODEL:
+        result = False
+        for item in OWNER_PERMISSIONS_VIEWS:
+            result = result or (pvm.view_menu.name == item[1] and
+                                pvm.permission.name == item[0])
+        for permission in OWNER_PERMISSIONS_COMMON:
+            for view in OWNER_PERMISSIONS_VIEW:
                 result = result or (pvm.view_menu.name == view and
                                     pvm.permission.name == permission)
-        result = result or (pvm.view_menu.name not in OWNER_NOT_ALLOWED_MENU)
-        if pvm.view_menu.name in OWNER_NOT_ALLOWED_MENU or pvm.permission.name in NOT_ALLOWED_SQL_PERM:
-            return False
-        if self._is_user_defined_permission(pvm) or pvm.permission.name == 'all_database_access'\
-                or pvm.permission.name == 'all_datasource_access':
-            return False
-        if pvm.view_menu.name in OWNER_NOT_ALLOWED_PERM_MENU \
-                and pvm.permission.name in OWNER_NOT_ALLOWED_PERM_MENU[pvm.view_menu.name]:
-            return False
+        # for menu in SOLAR_PERMISSIONS_MENU:
+        #     result = result or (pvm.view_menu.name == menu and
+        #                         pvm.permission.name == 'menu_access')
         return result
+
+    # def is_owner_pvm(self, pvm):
+    #     # print(pvm.view_menu.name)
+    #     result = self._is_gamma_pvm(pvm)
+    #
+    #     for permission in PERMISSION_COMMON:
+    #         for view in OWNER_PERMISSION_MODEL:
+    #             result = result or (pvm.view_menu.name == view and
+    #                                 pvm.permission.name == permission)
+    #     result = result or (pvm.view_menu.name not in OWNER_NOT_ALLOWED_MENU)
+    #     if pvm.view_menu.name in OWNER_NOT_ALLOWED_MENU or pvm.permission.name in NOT_ALLOWED_SQL_PERM:
+    #         return False
+    #     if self._is_user_defined_permission(pvm) or pvm.permission.name == 'all_database_access'\
+    #             or pvm.permission.name == 'all_datasource_access':
+    #         return False
+    #     if pvm.view_menu.name in OWNER_NOT_ALLOWED_PERM_MENU \
+    #             and pvm.permission.name in OWNER_NOT_ALLOWED_PERM_MENU[pvm.view_menu.name]:
+    #         return False
+    #     return result
 
     @property
     def get_url_for_recover(self):
