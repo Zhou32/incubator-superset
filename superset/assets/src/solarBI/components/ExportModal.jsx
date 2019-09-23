@@ -297,7 +297,7 @@ class ExportModal extends React.Component {
       alert('Start date cannot be later than end date!'); // eslint-disable-line no-alert
     } else if (new Date(sDate) < new Date('1990-01-01') ||
                 new Date(eDate) > new Date('2019-07-31')) {
-      alert('Availabel date: 01/01/1990 ~ 31/07/2019.'); // eslint-disable-line no-alert
+      alert('Available date: 01/01/1990 ~ 31/07/2019.'); // eslint-disable-line no-alert
     } else {
       const queryData = {
         lat: this.props.solarBI.queryResponse.data.lat + '',
@@ -408,7 +408,7 @@ class ExportModal extends React.Component {
                     }}
                   >
                     <Typography className={classes.typography}>
-                      Availabel date: 01/01/1990 ~ 31/07/2019.
+                      Available date: 01/01/1990 ~ 31/07/2019.
                       Both Start and End date are inclusive.
                     </Typography>
                   </Popover>
