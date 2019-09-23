@@ -45,7 +45,7 @@ NOT_ALLOWED_SQL_PERM = {
 }
 
 OWNER_NOT_ALLOWED_MENU = {
-    'List Roles', 'Base Permissions', 'Views/Menus',
+    'List Users', 'List Roles', 'Base Permissions', 'Views/Menus',
     'Permission on Views/Menus', 'Action Log',
     'Manage', 'Druid Clusters', 'Druid Datasources',
     'Scan New Datasources', 'Refresh Druid Metadata',
@@ -58,8 +58,8 @@ OWNER_PERMISSION_MODEL = {
     'SliceModelView',
     'SliceAddView',
     'TableModelView',
-    'DashboardModelView',
-    'DashboardAddView',
+    # 'DashboardModelView',
+    # 'DashboardAddView',
     'SolarBIModelAddView',
     'SolarBIModelWelcomeView',
     'SolarBIModelView',
@@ -72,6 +72,11 @@ OWNER_PERMISSION_MODEL = {
 
 OWNER_NOT_ALLOWED_PERM_MENU = {
     'SavvySiteModelView': ['can_add', 'can_delete'],
+    'UserDBModelView': ['can_list', 'can_add', 'can_edit', 'can_delete'],
+    'RegisterUserModelView': ['can_list'],
+    'LogModelView': ['can_list', 'can_download', 'can_edit', 'can_show', 'can_delete', 'can_add'],
+    'RoleModelView': ['can_list', 'can_download', 'can_edit', 'can_show', 'can_delete', 'can_add'],
+    'DashboardModelView': ['can_list', 'can_download', 'can_edit', 'can_show', 'can_delete', 'can_add'],
 }
 
 OWNER_PERMISSION_MENU = {
@@ -86,10 +91,10 @@ OWNER_INVITE_ROLES = {
 #     'org_user', 'org_viewer',
 # }
 
-USER_NOT_ALLOWED = {
-    'Druid Clusters', 'Druid Datasources', 'Scan New Datasources', 'SavvyRegisterInvitationUserDBView',
-    'SavvyGroupModelView', 'List Group', 'SavvySiteModelView',
-}
+# USER_NOT_ALLOWED = {
+#     'Druid Clusters', 'Druid Datasources', 'Scan New Datasources', 'SavvyRegisterInvitationUserDBView',
+#     'SavvyGroupModelView', 'List Group', 'SavvySiteModelView',
+# }
 
 # VIEWER_NOT_ALLOWED = {
 #     'Sources',
@@ -145,12 +150,12 @@ class CustomSecurityManager(SupersetSecurityManager):
             self.set_role('Public', self._is_gamma_pvm)
 
         self.create_missing_perms()
-
         # commit role and view menu updates
         self.get_session.commit()
         self.clean_perms()
 
     def is_owner_pvm(self, pvm):
+        # print(pvm.view_menu.name)
         result = self._is_gamma_pvm(pvm)
 
         for permission in PERMISSION_COMMON:

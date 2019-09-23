@@ -45,6 +45,8 @@ log = logging.getLogger(__name__)
 
 
 class SolarBIAuthDBView(AuthDBView):
+    invalid_login_message = lazy_gettext("Email/Username/Password incorrect. Please try again.")
+    not_activated_message = lazy_gettext("Account has not been activated yet.")
     login_template = "appbuilder/general/security/solarbi_login_db.html"
     @expose("/login/", methods=["GET", "POST"])
     def login(self):
@@ -56,7 +58,7 @@ class SolarBIAuthDBView(AuthDBView):
                 form.username.data, form.password.data
             )
             if not user:
-                flash(as_unicode(self.invalid_login_message), "warning")
+                flash(as_unicode(self.not_activated_message), "warning")
                 return redirect(self.appbuilder.get_url_for_login)
 
             remember = form.remember_me.data
