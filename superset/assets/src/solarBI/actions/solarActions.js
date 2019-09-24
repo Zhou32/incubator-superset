@@ -194,7 +194,8 @@ export function requestSolarData(queryData, timeout = 60) {
       '/superset/request_data/' +
       queryData.lat + '/' + queryData.lng + '/' +
       queryData.startDate + '/' + queryData.endDate + '/' +
-      queryData.type + '/' + queryData.resolution + '/';
+      queryData.type + '/' + queryData.resolution + '/' +
+      queryData.address_name + '/';
     // const logStart = Logger.getTimestamp();
     const controller = new AbortController();
     const { signal } = controller;

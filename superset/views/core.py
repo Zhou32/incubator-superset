@@ -1334,7 +1334,7 @@ class Superset(BaseSupersetView):
             viz_obj, csv=csv, query=query, results=results, samples=samples
         )
 
-    def send_email(self, user):
+    def send_email(self, user, address_name):
         """
             Method for sending the Email to the user
         """
@@ -1348,11 +1348,11 @@ class Superset(BaseSupersetView):
             return False
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
-        msg.sender = 'SavvyBI', 'chenyang.wang@zawee.work'
+        msg.sender = 'SolarBI', 'chenyang.wang@zawee.work'
         msg.subject = "SolarBI - Your data request is received"
         msg.html = self.render_template(email_template,
                                         username=user.username,
-                                        first_name=user.first_name)
+                                        address_name=address_name)
         msg.recipients = [user.email]
         try:
             mail.send(msg)
@@ -1364,10 +1364,10 @@ class Superset(BaseSupersetView):
     @event_logger.log_this
     @api
     @handle_api_exception
-    @expose('/request_data/<lat>/<lng>/<start_date>/<end_date>/<type>/<resolution>/',
+    @expose('/request_data/<lat>/<lng>/<start_date>/<end_date>/<type>/<resolution>/<address_name>/',
             methods=['GET', 'POST'])
     def request_data(self, lat=None, lng=None, start_date=None, end_date=None,
-                    type=None, resolution=None):
+                    type=None, resolution=None, address_name=None):
         """Serves all request that GET or POST form_data
 
         This endpoint evolved to be the entry point of many different
@@ -1383,7 +1383,7 @@ class Superset(BaseSupersetView):
         # samples = request.args.get('samples') == 'true'
         # force = request.args.get('force') == 'true'
 
-        self.send_email(g.user)
+        self.send_email(g.user, address_name)
 
         start_year, start_month, start_day = start_date.split('-')
         end_year, end_month, end_day = end_date.split('-')
@@ -1466,7 +1466,7 @@ class Superset(BaseSupersetView):
             },
         )
 
-        print(response)
+        print(response['QueryExecutionId'])
         return json_success(json.dumps({'query_id': response['QueryExecutionId']}))
 
     @event_logger.log_this

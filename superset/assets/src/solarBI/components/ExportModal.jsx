@@ -306,6 +306,7 @@ class ExportModal extends React.Component {
         endDate: this.state.endDate,
         type: this.state.type,
         resolution: this.state.resolution,
+        address_name: this.props.address.slice(0, -11),
       };
       this.props.onHide();
       this.props.requestSolarData(queryData);

@@ -75,7 +75,7 @@ class SolarBIPasswordRecoverView(PublicFormView):
 
     route_base = '/password-recover'
 
-    email_template = 'appbuilder/general/security/recover_mail.html'
+    email_template = 'appbuilder/general/security/password_recover_mail.html'
     """ The template used to generate the email sent to the user """
 
     email_subject = lazy_gettext('SolarBI - Reset Your Password')
@@ -97,6 +97,7 @@ class SolarBIPasswordRecoverView(PublicFormView):
         """
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
+        msg.sender = 'SolarBI', 'chenyang.wang@zawee.work'
         msg.subject = self.email_subject
         url = url_for('.reset', _external=True, reset_hash=hash_val)
         msg.html = self.render_template(self.email_template,
