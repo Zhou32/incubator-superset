@@ -44,13 +44,13 @@
      <ul id="bar-list" style="font-family: Montserrat,sans-serif; font-weight: 500">
          <li>
            <a {% if request.path == '/solar/add' %}class="s-sidebar__nav-link current_page_item" {% else %}class="s-sidebar__nav-link"{% endif %}
-              href="{{ url_for('SolarBIModelAddView.add') }}">
+              href="{{ url_for('SolarBIModelView.add') }}">
              <i class="fas fa-atom"></i><span>Get Started</span>
            </a>
         </li>
         <li>
            <a {% if request.path == '/solar/demo' %}class="s-sidebar__nav-link current_page_item" {% else %}class="s-sidebar__nav-link"{% endif %}
-              href="{{ url_for('SolarBIModelAddView.demo') }}">
+              href="{{ url_for('SolarBIModelView.demo') }}">
               <i class="fas fa-chart-bar"></i><span>Demo</span>
            </a>
         </li>
@@ -62,7 +62,7 @@
 {#        </li>#}
         <li>
            <a {% if request.path == '/solar/list/' or request.path[:15] == '/superset/solar' %}class="s-sidebar__nav-link current_page_item" {% else %}class="s-sidebar__nav-link"{% endif %}
-              href="{{ url_for('SolarBIModelAddView.list') }}">
+              href="{{ url_for('SolarBIModelView.list') }}">
               <i class="fas fa-desktop"></i><span>My Data</span>
            </a>
         </li>
@@ -76,7 +76,7 @@
         {% endif %}
         <li>
            <a {% if request.path == '/solar/billing' %}class="s-sidebar__nav-link current_page_item" {% else %}class="s-sidebar__nav-link"{% endif %}
-              href="{{ url_for('SolarBIModelAddView.billing') }}">
+              href="{{ url_for('SolarBIModelView.billing') }}">
               <i class="fas fa-credit-card"></i><span>Billing</span>
            </a>
         </li>

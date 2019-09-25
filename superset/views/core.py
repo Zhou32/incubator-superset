@@ -18,6 +18,7 @@
 import os
 from contextlib import closing
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 import logging
 import re
 import time
@@ -400,17 +401,18 @@ def get_user():
     return g.user
 
 
-class SolarBIModelView(SliceModelView):  # noqa
-    pass
+# class SolarBIModelView(SliceModelView):  # noqa
+#     pass
 
 
-class SolarBIModelWelcomeView(SolarBIModelView):
-    pass
+# class SolarBIModelWelcomeView(SolarBIModelView):
+#     pass
 
 
-class SolarBIModelAddView(SolarBIModelView):
+class SolarBIModelView(SupersetModelView, DeleteMixin):
     route_base = '/solar'
-    datamodel = SQLAInterface(models.Slice)
+    # datamodel = SQLAInterface(models.Slice)
+    datamodel = SQLAInterface(models.SolarBISlice)
     base_filters = [['viz_type', FilterEqual, 'solarBI'],
                     ['created_by', FilterEqualFunction, get_user]]
     base_permissions = ['can_list', 'can_show', 'can_add', 'can_delete', 'can_edit']
@@ -420,6 +422,15 @@ class SolarBIModelAddView(SolarBIModelView):
     )
     list_columns = [
         'slice_link', 'creator', 'modified', 'view_slice_name', 'view_slice_link']
+    edit_columns = [
+        "slice_name",
+        "description",
+        "viz_type",
+        "owners",
+        "params",
+        "cache_timeout",
+    ]
+
     order_columns = ['modified']
 
     filters_not_for_admin = {}
@@ -597,27 +608,27 @@ class SolarBIModelAddView(SolarBIModelView):
         )
 
 
-appbuilder.add_view(
-    SolarBIModelAddView,
-    'Search your Location',
-    href='/solar/add',
-    label=__('Search'),
-    icon='fa-search',
-    category='SolarBI',
-    category_label=__('SolarBI'),
-    category_icon='fa-sun-o',
-)
-
-appbuilder.add_view(
-    SolarBIModelWelcomeView,
-    'Introduction',
-    href='/solar/welcome',
-    label=__('Welcome'),
-    icon='fa-home',
-    category='SolarBI',
-    category_label=__('SolarBI'),
-    category_icon='fa-sun-o',
-)
+# appbuilder.add_view(
+#     SolarBIModelAddView,
+#     'Search your Location',
+#     href='/solar/add',
+#     label=__('Search'),
+#     icon='fa-search',
+#     category='SolarBI',
+#     category_label=__('SolarBI'),
+#     category_icon='fa-sun-o',
+# )
+#
+# appbuilder.add_view(
+#     SolarBIModelWelcomeView,
+#     'Introduction',
+#     href='/solar/welcome',
+#     label=__('Welcome'),
+#     icon='fa-home',
+#     category='SolarBI',
+#     category_label=__('SolarBI'),
+#     category_icon='fa-sun-o',
+# )
 
 appbuilder.add_view(
     SolarBIModelView,
@@ -1382,7 +1393,6 @@ class Superset(BaseSupersetView):
         # results = request.args.get('results') == 'true'
         # samples = request.args.get('samples') == 'true'
         # force = request.args.get('force') == 'true'
-
         self.send_email(g.user, address_name)
 
         start_year, start_month, start_day = start_date.split('-')
@@ -1466,7 +1476,18 @@ class Superset(BaseSupersetView):
             },
         )
 
-        print(response['QueryExecutionId'])
+        # print(response['QueryExecutionId'])
+        form_data = get_form_data()[0]
+        args = {'action': 'saveas',
+                'slice_name': address_name + '_' + form_data['startDate'] + '_' +
+                              form_data['endDate'] + '_' + type + '_' + resolution}
+        datasource = ConnectorRegistry.get_datasource(
+            form_data['datasource_type'], form_data['datasource_id'], db.session)
+        self.form_overwrite_solarbislice(args, None, True, None, False, form_data['datasource_id'],
+                                         form_data['datasource_type'], datasource.name,
+                                         query_id=response['QueryExecutionId'], start_date=form_data['startDate'],
+                                         end_date=form_data['endDate'], data_type=type, resolution=resolution)
+
         return json_success(json.dumps({'query_id': response['QueryExecutionId']}))
 
     @event_logger.log_this
@@ -1657,7 +1678,7 @@ class Superset(BaseSupersetView):
         )
         return json_success(payload)
 
-    def save_or_overwrite_slice(
+    def form_overwrite_slice(
         self,
         args,
         slc,
@@ -3203,13 +3224,131 @@ class Superset(BaseSupersetView):
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
         )
 
+    def get_form_data_in_solarbi_slices(self, slice_id=None, use_slice_data=False):
+        form_data = {}
+        post_data = request.form.get("form_data")
+        request_args_data = request.args.get("form_data")
+        # Supporting POST
+        if post_data:
+            form_data.update(json.loads(post_data))
+        # request params can overwrite post body
+        if request_args_data:
+            form_data.update(json.loads(request_args_data))
+
+        url_id = request.args.get("r")
+        if url_id:
+            saved_url = db.session.query(models.Url).filter_by(id=url_id).first()
+            if saved_url:
+                url_str = parse.unquote_plus(
+                    saved_url.url.split("?")[1][10:], encoding="utf-8", errors=None
+                )
+                url_form_data = json.loads(url_str)
+                # allow form_date in request override saved url
+                url_form_data.update(form_data)
+                form_data = url_form_data
+
+        form_data = {
+            k: v for k, v in form_data.items() if k not in FORM_DATA_KEY_BLACKLIST
+        }
+
+        # When a slice_id is present, load from DB and override
+        # the form_data from the DB with the other form_data provided
+        slice_id = form_data.get("slice_id") or slice_id
+        slc = None
+
+        # Check if form data only contains slice_id
+        contains_only_slc_id = not any(key != "slice_id" for key in form_data)
+
+        # Include the slice_form_data if request from explore or slice calls
+        # or if form_data only contains slice_id
+        if slice_id and (use_slice_data or contains_only_slc_id):
+            slc = db.session.query(models.SolarBISlice).filter_by(id=slice_id).one_or_none()
+            if slc:
+                slice_form_data = slc.form_data.copy()
+                slice_form_data.update(form_data)
+                form_data = slice_form_data
+
+        update_time_range(form_data)
+
+        return form_data, slc
+
+    def form_overwrite_solarbislice(
+        self,
+        args,
+        slc,
+        slice_add_perm,
+        slice_overwrite_perm,
+        slice_download_perm,
+        datasource_id,
+        datasource_type,
+        datasource_name,
+        query_id=None,
+        start_date=None,
+        end_date=None,
+        data_type=None,
+        resolution=None,
+    ):
+        """Save or overwrite a slice"""
+        slice_name = args.get("slice_name")
+        action = args.get("action")
+        form_data = get_form_data()[0]
+
+        if action in ("saveas"):
+            if "slice_id" in form_data:
+                form_data.pop("slice_id")  # don't save old slice_id
+            slc = models.SolarBISlice(owners=[g.user] if g.user else [])
+
+        slc.params = json.dumps(form_data, indent=2, sort_keys=True)
+        slc.datasource_name = datasource_name
+        slc.viz_type = form_data["viz_type"]
+        slc.datasource_type = datasource_type
+        slc.datasource_id = datasource_id
+        slc.slice_name = slice_name
+        slc.query_status = 'N/A'
+        if query_id:
+            slc.query_status = 'running'
+            slc.paid = True
+            slc.valid_date = datetime.now() + timedelta(hours=24*31*12*99)
+            slc.query_id = query_id
+        if start_date:
+            slc.start_date = datetime.strptime(start_date, '%Y-%m-%d')
+        if end_date:
+            slc.end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        if data_type:
+            slc.data_type = data_type
+        if resolution:
+            slc.resolution = resolution
+
+        if action in ("saveas") and slice_add_perm:
+            self.save_slice(slc)
+        elif action == "overwrite" and slice_overwrite_perm:
+            self.overwrite_slice(slc)
+
+        # Adding slice to a dashboard if requested
+        dash = None
+
+        response = {
+            "can_add": slice_add_perm,
+            "can_download": slice_download_perm,
+            "can_overwrite": is_owner(slc, g.user),
+            "form_data": slc.form_data,
+            "slice": slc.data,
+            "dashboard_id": dash.id if dash else None,
+        }
+
+        if request.args.get("goto_dash") == "true":
+            response.update({"dashboard": dash.url})
+
+        return json_success(json.dumps(response))
+
     @expose('/solar/', methods=('GET', 'POST'))
     def solar(self):
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
 
         user_id = g.user.get_id() if g.user else None
-        form_data, slc = self.get_form_data(use_slice_data=True)
+        # form_data, slc = self.get_form_data(use_slice_data=True)
+        form_data, slc = self.get_form_data_in_solarbi_slices(use_slice_data=True)
 
         datasource_id, datasource_type = get_datasource_info(
             form_data['datasource_id']
@@ -3267,7 +3406,7 @@ class Superset(BaseSupersetView):
                 status=400)
 
         if action in ('saveas', 'overwrite'):
-            return self.save_or_overwrite_slice(
+            return self.form_overwrite_solarbislice(
                 request.args,
                 slc, slice_add_perm,
                 slice_overwrite_perm,
@@ -3275,6 +3414,14 @@ class Superset(BaseSupersetView):
                 datasource_id,
                 datasource_type,
                 datasource.name)
+            # return self.form_overwrite_slice(
+            #     request.args,
+            #     slc, slice_add_perm,
+            #     slice_overwrite_perm,
+            #     slice_download_perm,
+            #     datasource_id,
+            #     datasource_type,
+            #     datasource.name)
 
         standalone = request.args.get('standalone') == 'true'
         bootstrap_data = {

@@ -18,7 +18,8 @@
 """A collection of ORM sqlalchemy models for Superset"""
 from contextlib import closing
 from copy import copy, deepcopy
-from datetime import datetime
+from datetime import datetime, timedelta
+# from dateutil.relativedelta import relativedelta
 import json
 import logging
 import textwrap
@@ -403,6 +404,275 @@ class Slice(Model, AuditMixinNullable, ImportMixin):
 
 sqla.event.listen(Slice, "before_insert", set_related_perm)
 sqla.event.listen(Slice, "before_update", set_related_perm)
+
+
+solarbislice_user = Table(
+    "solarbislice_user",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("user_id", Integer, ForeignKey("ab_user.id")),
+    Column("solarbislice_id", Integer, ForeignKey("solarbi_slices.id")),
+)
+
+
+class SolarBISlice(Model, AuditMixinNullable, ImportMixin):
+    __tablename__ = 'solarbi_slices'
+    id = Column(Integer, primary_key=True)
+    slice_name = Column(String(250))
+    datasource_id = Column(Integer)
+    datasource_type = Column(String(200))
+    datasource_name = Column(String(2000))
+    viz_type = Column(String(250))
+    params = Column(Text)
+    description = Column(Text)
+    cache_timeout = Column(Integer)
+    perm = Column(String(1000))
+    query_id = Column(Integer)
+    start_date = Column(String(200))
+    end_date = Column(DateTime)
+    data_type = Column(String(200))
+    resolution = Column(String(200))
+    query_status = Column(String(200))
+    valid_date = Column(DateTime, default=(lambda: datetime.now() + timedelta(hours=24*30)))
+    paid = Column(Boolean, default=False)
+    owners = relationship(security_manager.user_model, secondary=solarbislice_user)
+
+    export_fields = (
+        "slice_name",
+        "datasource_type",
+        "datasource_name",
+        "viz_type",
+        "params",
+        "cache_timeout",
+    )
+
+    def __repr__(self):
+        return self.slice_name or str(self.id)
+
+    @property
+    def cls_model(self):
+        return ConnectorRegistry.sources[self.datasource_type]
+
+    @property
+    def datasource(self):
+        return self.get_datasource
+
+    def clone(self):
+        return SolarBISlice(
+            slice_name=self.slice_name,
+            datasource_id=self.datasource_id,
+            datasource_type=self.datasource_type,
+            datasource_name=self.datasource_name,
+            viz_type=self.viz_type,
+            params=self.params,
+            description=self.description,
+            cache_timeout=self.cache_timeout,
+        )
+
+    @datasource.getter  # type: ignore
+    @utils.memoized
+    def get_datasource(self):
+        return db.session.query(self.cls_model).filter_by(id=self.datasource_id).first()
+
+    @renders("datasource_name")
+    def datasource_link(self):
+        # pylint: disable=no-member
+        datasource = self.datasource
+        return datasource.link if datasource else None
+
+    def datasource_name_text(self):
+        # pylint: disable=no-member
+        datasource = self.datasource
+        return datasource.name if datasource else None
+
+    @property
+    def datasource_edit_url(self):
+        # pylint: disable=no-member
+        datasource = self.datasource
+        return datasource.url if datasource else None
+
+    @property  # type: ignore
+    @utils.memoized
+    def viz(self):
+        d = json.loads(self.params)
+        viz_class = viz_types[self.viz_type]
+        # pylint: disable=no-member
+        return viz_class(datasource=self.datasource, form_data=d)
+
+    @property
+    def description_markeddown(self):
+        return utils.markdown(self.description)
+
+    @property
+    def data(self):
+        """Data used to render slice in templates"""
+        d = {}
+        self.token = ""
+        try:
+            d = self.viz.data
+            self.token = d.get("token")
+        except Exception as e:
+            logging.exception(e)
+            d["error"] = str(e)
+        return {
+            "datasource": self.datasource_name,
+            "description": self.description,
+            "description_markeddown": self.description_markeddown,
+            "edit_url": self.edit_url,
+            "form_data": self.form_data,
+            "slice_id": self.id,
+            "slice_name": self.slice_name,
+            "slice_url": self.slice_url,
+            "modified": self.modified(),
+            "changed_on_humanized": self.changed_on_humanized,
+            "changed_on": self.changed_on.isoformat(),
+        }
+
+    @property
+    def json_data(self):
+        return json.dumps(self.data)
+
+    @property
+    def form_data(self):
+        form_data = {}
+        try:
+            form_data = json.loads(self.params)
+        except Exception as e:
+            logging.error("Malformed json in slice's params")
+            logging.exception(e)
+        form_data.update(
+            {
+                "slice_id": self.id,
+                "viz_type": self.viz_type,
+                "datasource": "{}__{}".format(self.datasource_id, self.datasource_type),
+            }
+        )
+
+        if self.cache_timeout:
+            form_data["cache_timeout"] = self.cache_timeout
+        update_time_range(form_data)
+        return form_data
+
+    def get_explore_url(self, base_url=None, overrides=None):
+        if not base_url:
+            if self.viz_type == 'solarBI':
+                base_url = '/superset/solar'
+            else:
+                base_url = '/superset/explore'
+        overrides = overrides or {}
+        form_data = {"slice_id": self.id}
+        form_data.update(overrides)
+        params = parse.quote(json.dumps(form_data))
+        return f"{base_url}/?form_data={params}"
+
+    @property
+    def slice_url(self):
+        """Defines the url to access the slice"""
+        return self.get_explore_url()
+
+    @property
+    def explore_json_url(self):
+        """Defines the url to access the slice"""
+        return self.get_explore_url("/superset/explore_json")
+
+    @property
+    def edit_url(self):
+        return "/chart/edit/{}".format(self.id)
+
+    @property
+    def chart(self):
+        return self.slice_name or "<empty>"
+
+    @property
+    def slice_link(self):
+        url = self.slice_url
+        name = escape(self.chart)
+        return Markup(f'<a href="{url}">{name}</a>')
+
+    @property
+    def view_slice_name(self):
+        name = escape(self.chart)
+        return Markup(f'<p>{name}</p>')
+
+    @property
+    def view_slice_link(self):
+        url = self.slice_url
+        return Markup(f'<a href="{url}">View Data</a>')
+
+    def get_viz(self, force=False):
+        """Creates :py:class:viz.BaseViz object from the url_params_multidict.
+
+        :return: object of the 'viz_type' type that is taken from the
+            url_params_multidict or self.params.
+        :rtype: :py:class:viz.BaseViz
+        """
+        slice_params = json.loads(self.params)
+        slice_params["slice_id"] = self.id
+        slice_params["json"] = "false"
+        slice_params["slice_name"] = self.slice_name
+        slice_params["viz_type"] = self.viz_type if self.viz_type else "table"
+
+        return viz_types[slice_params.get("viz_type")](
+            self.datasource, form_data=slice_params, force=force
+        )
+
+    @property
+    def icons(self):
+        return f"""
+        <a
+                href="{self.datasource_edit_url}"
+                data-toggle="tooltip"
+                title="{self.datasource}">
+            <i class="fa fa-database"></i>
+        </a>
+        """
+
+    @classmethod
+    def import_obj(cls, slc_to_import, slc_to_override, import_time=None):
+        """Inserts or overrides slc in the database.
+
+        remote_id and import_time fields in params_dict are set to track the
+        slice origin and ensure correct overrides for multiple imports.
+        Slice.perm is used to find the datasources and connect them.
+
+        :param Slice slc_to_import: Slice object to import
+        :param Slice slc_to_override: Slice to replace, id matches remote_id
+        :returns: The resulting id for the imported slice
+        :rtype: int
+        """
+        session = db.session
+        make_transient(slc_to_import)
+        slc_to_import.dashboards = []
+        slc_to_import.alter_params(remote_id=slc_to_import.id, import_time=import_time)
+
+        slc_to_import = slc_to_import.copy()
+        slc_to_import.reset_ownership()
+        params = slc_to_import.params_dict
+        slc_to_import.datasource_id = ConnectorRegistry.get_datasource_by_name(
+            session,
+            slc_to_import.datasource_type,
+            params["datasource_name"],
+            params["schema"],
+            params["database_name"],
+        ).id
+        if slc_to_override:
+            slc_to_override.override(slc_to_import)
+            session.flush()
+            return slc_to_override.id
+        session.add(slc_to_import)
+        logging.info("Final slice: {}".format(slc_to_import.to_json()))
+        session.flush()
+        return slc_to_import.id
+
+    @property
+    def url(self):
+        return "/superset/explore/?form_data=%7B%22slice_id%22%3A%20{0}%7D".format(
+            self.id
+        )
+
+
+sqla.event.listen(SolarBISlice, "before_insert", set_related_perm)
+sqla.event.listen(SolarBISlice, "before_update", set_related_perm)
 
 
 dashboard_slices = Table(
