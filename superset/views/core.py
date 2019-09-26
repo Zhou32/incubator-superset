@@ -18,6 +18,7 @@
 import os
 from contextlib import closing
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 import logging
 import re
 import time
@@ -400,17 +401,18 @@ def get_user():
     return g.user
 
 
-class SolarBIModelView(SliceModelView):  # noqa
-    pass
+# class SolarBIModelView(SliceModelView):  # noqa
+#     pass
 
 
-class SolarBIModelWelcomeView(SolarBIModelView):
-    pass
+# class SolarBIModelWelcomeView(SolarBIModelView):
+#     pass
 
 
-class SolarBIModelAddView(SolarBIModelView):
+class SolarBIModelView(SupersetModelView, DeleteMixin):
     route_base = '/solar'
-    datamodel = SQLAInterface(models.Slice)
+    # datamodel = SQLAInterface(models.Slice)
+    datamodel = SQLAInterface(models.SolarBISlice)
     base_filters = [['viz_type', FilterEqual, 'solarBI'],
                     ['created_by', FilterEqualFunction, get_user]]
     base_permissions = ['can_list', 'can_show', 'can_add', 'can_delete', 'can_edit']
@@ -419,7 +421,18 @@ class SolarBIModelAddView(SolarBIModelView):
         'slice_name', 'description', 'owners',
     )
     list_columns = [
-        'slice_link', 'creator', 'modified', 'view_slice_name', 'view_slice_link']
+        'slice_link', 'creator', 'modified', 'view_slice_name', 'view_slice_link', 'slice_query_id',
+        'slice_download_link'
+    ]
+    edit_columns = [
+        "slice_name",
+        "description",
+        "viz_type",
+        "owners",
+        "params",
+        "cache_timeout",
+    ]
+
     order_columns = ['modified']
 
     filters_not_for_admin = {}
@@ -442,6 +455,100 @@ class SolarBIModelAddView(SolarBIModelView):
         return self.render_template(self.list_template,
                                     title=self.list_title,
                                     widgets=widgets)
+
+    def _get_list_widget(
+            self,
+            filters,
+            actions=None,
+            order_column="",
+            order_direction="",
+            page=None,
+            page_size=None,
+            widgets=None,
+            **args
+    ):
+        """ get joined base filter and current active filter for query """
+        widgets = widgets or {}
+        actions = actions or self.actions
+        page_size = page_size or self.page_size
+        if not order_column and self.base_order:
+            order_column, order_direction = self.base_order
+        joined_filters = filters.get_joined_filters(self._base_filters)
+        count, lst = self.datamodel.query(
+            joined_filters,
+            order_column,
+            order_direction,
+            page=page,
+            page_size=page_size,
+        )
+        pks = self.datamodel.get_keys(lst)
+
+        # serialize composite pks
+        pks = [self._serialize_pk_if_composite(pk) for pk in pks]
+
+        # get all object keys in s3 under the user sub folder
+        all_object_keys = self.list_object_key('colin-query-test', g.user.email + '/')
+        avail_object_keys = [key for key in all_object_keys if key.endswith('.csv')]
+        obj_keys = [key.split('/')[1].replace('.csv', '') for key in avail_object_keys]
+        # for key in avail_object_keys:
+        #     obj_keys.append(key.split('/')[1].replace('.csv', ''))
+
+        widgets["list"] = self.list_widget(
+            obj_keys=obj_keys,
+            label_columns=self.label_columns,
+            include_columns=self.list_columns,
+            value_columns=self.datamodel.get_values(lst, self.list_columns),
+            order_columns=self.order_columns,
+            formatters_columns=self.formatters_columns,
+            page=page,
+            page_size=page_size,
+            count=count,
+            pks=pks,
+            actions=actions,
+            filters=filters,
+            modelview_name=self.__class__.__name__,
+        )
+        return widgets
+
+    def list_object_key(self, bucket, prefix):
+        AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
+        AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
+        session = boto3.session.Session(aws_access_key_id=AWS_ACCESS_KEY_ID,
+                                        aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
+        client = session.client('s3', region_name='ap-southeast-2')
+        key_list = []
+        response = client.list_objects_v2(
+            Bucket=bucket,
+            Prefix=prefix
+        )
+        contents = None
+        try:
+            contents = response['Contents']
+        except:
+            pass
+
+        is_truncated = response['IsTruncated']
+        for content in contents:
+            try:
+                key_list.append(content['Key'])
+            except:
+                pass
+
+        if is_truncated:
+            cont_token = response['NextContinuationToken']
+        while is_truncated:
+            response = client.list_objects_v2(
+                Bucket=bucket,
+                Prefix=prefix,
+                ContinuationToken=cont_token
+            )
+            contents = response['Contents']
+            is_truncated = response['IsTruncated']
+            for content in contents:
+                key_list.append(content['Key'])
+            if is_truncated:
+                cont_token = response['NextContinuationToken']
+        return sorted(key_list)
 
     def remove_filters_for_role(self, role_name):
         if role_name == 'Admin':
@@ -597,27 +704,27 @@ class SolarBIModelAddView(SolarBIModelView):
         )
 
 
-appbuilder.add_view(
-    SolarBIModelAddView,
-    'Search your Location',
-    href='/solar/add',
-    label=__('Search'),
-    icon='fa-search',
-    category='SolarBI',
-    category_label=__('SolarBI'),
-    category_icon='fa-sun-o',
-)
-
-appbuilder.add_view(
-    SolarBIModelWelcomeView,
-    'Introduction',
-    href='/solar/welcome',
-    label=__('Welcome'),
-    icon='fa-home',
-    category='SolarBI',
-    category_label=__('SolarBI'),
-    category_icon='fa-sun-o',
-)
+# appbuilder.add_view(
+#     SolarBIModelAddView,
+#     'Search your Location',
+#     href='/solar/add',
+#     label=__('Search'),
+#     icon='fa-search',
+#     category='SolarBI',
+#     category_label=__('SolarBI'),
+#     category_icon='fa-sun-o',
+# )
+#
+# appbuilder.add_view(
+#     SolarBIModelWelcomeView,
+#     'Introduction',
+#     href='/solar/welcome',
+#     label=__('Welcome'),
+#     icon='fa-home',
+#     category='SolarBI',
+#     category_label=__('SolarBI'),
+#     category_icon='fa-sun-o',
+# )
 
 appbuilder.add_view(
     SolarBIModelView,
@@ -1334,7 +1441,7 @@ class Superset(BaseSupersetView):
             viz_obj, csv=csv, query=query, results=results, samples=samples
         )
 
-    def send_email(self, user):
+    def send_email(self, user, address_name):
         """
             Method for sending the Email to the user
         """
@@ -1348,11 +1455,11 @@ class Superset(BaseSupersetView):
             return False
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
-        msg.sender = 'SavvyBI', 'chenyang.wang@zawee.work'
+        msg.sender = 'SolarBI', 'chenyang.wang@zawee.work'
         msg.subject = "SolarBI - Your data request is received"
         msg.html = self.render_template(email_template,
                                         username=user.username,
-                                        first_name=user.first_name)
+                                        address_name=address_name)
         msg.recipients = [user.email]
         try:
             mail.send(msg)
@@ -1364,10 +1471,10 @@ class Superset(BaseSupersetView):
     @event_logger.log_this
     @api
     @handle_api_exception
-    @expose('/request_data/<lat>/<lng>/<start_date>/<end_date>/<type>/<resolution>/',
+    @expose('/request_data/<lat>/<lng>/<start_date>/<end_date>/<type>/<resolution>/<address_name>/',
             methods=['GET', 'POST'])
     def request_data(self, lat=None, lng=None, start_date=None, end_date=None,
-                    type=None, resolution=None):
+                    type=None, resolution=None, address_name=None):
         """Serves all request that GET or POST form_data
 
         This endpoint evolved to be the entry point of many different
@@ -1382,8 +1489,7 @@ class Superset(BaseSupersetView):
         # results = request.args.get('results') == 'true'
         # samples = request.args.get('samples') == 'true'
         # force = request.args.get('force') == 'true'
-
-        self.send_email(g.user)
+        self.send_email(g.user, address_name)
 
         start_year, start_month, start_day = start_date.split('-')
         end_year, end_month, end_day = end_date.split('-')
@@ -1466,7 +1572,18 @@ class Superset(BaseSupersetView):
             },
         )
 
-        print(response)
+        # print(response['QueryExecutionId'])
+        form_data = get_form_data()[0]
+        args = {'action': 'saveas',
+                'slice_name': address_name + '_' + form_data['startDate'] + '_' +
+                              form_data['endDate'] + '_' + type + '_' + resolution}
+        datasource = ConnectorRegistry.get_datasource(
+            form_data['datasource_type'], form_data['datasource_id'], db.session)
+        self.form_overwrite_solarbislice(args, None, True, None, False, form_data['datasource_id'],
+                                         form_data['datasource_type'], datasource.name,
+                                         query_id=response['QueryExecutionId'], start_date=form_data['startDate'],
+                                         end_date=form_data['endDate'], data_type=type, resolution=resolution)
+
         return json_success(json.dumps({'query_id': response['QueryExecutionId']}))
 
     @event_logger.log_this
@@ -1657,7 +1774,7 @@ class Superset(BaseSupersetView):
         )
         return json_success(payload)
 
-    def save_or_overwrite_slice(
+    def form_overwrite_slice(
         self,
         args,
         slc,
@@ -3203,13 +3320,131 @@ class Superset(BaseSupersetView):
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
         )
 
+    def get_form_data_in_solarbi_slices(self, slice_id=None, use_slice_data=False):
+        form_data = {}
+        post_data = request.form.get("form_data")
+        request_args_data = request.args.get("form_data")
+        # Supporting POST
+        if post_data:
+            form_data.update(json.loads(post_data))
+        # request params can overwrite post body
+        if request_args_data:
+            form_data.update(json.loads(request_args_data))
+
+        url_id = request.args.get("r")
+        if url_id:
+            saved_url = db.session.query(models.Url).filter_by(id=url_id).first()
+            if saved_url:
+                url_str = parse.unquote_plus(
+                    saved_url.url.split("?")[1][10:], encoding="utf-8", errors=None
+                )
+                url_form_data = json.loads(url_str)
+                # allow form_date in request override saved url
+                url_form_data.update(form_data)
+                form_data = url_form_data
+
+        form_data = {
+            k: v for k, v in form_data.items() if k not in FORM_DATA_KEY_BLACKLIST
+        }
+
+        # When a slice_id is present, load from DB and override
+        # the form_data from the DB with the other form_data provided
+        slice_id = form_data.get("slice_id") or slice_id
+        slc = None
+
+        # Check if form data only contains slice_id
+        contains_only_slc_id = not any(key != "slice_id" for key in form_data)
+
+        # Include the slice_form_data if request from explore or slice calls
+        # or if form_data only contains slice_id
+        if slice_id and (use_slice_data or contains_only_slc_id):
+            slc = db.session.query(models.SolarBISlice).filter_by(id=slice_id).one_or_none()
+            if slc:
+                slice_form_data = slc.form_data.copy()
+                slice_form_data.update(form_data)
+                form_data = slice_form_data
+
+        update_time_range(form_data)
+
+        return form_data, slc
+
+    def form_overwrite_solarbislice(
+        self,
+        args,
+        slc,
+        slice_add_perm,
+        slice_overwrite_perm,
+        slice_download_perm,
+        datasource_id,
+        datasource_type,
+        datasource_name,
+        query_id=None,
+        start_date=None,
+        end_date=None,
+        data_type=None,
+        resolution=None,
+    ):
+        """Save or overwrite a slice"""
+        slice_name = args.get("slice_name")
+        action = args.get("action")
+        form_data = get_form_data()[0]
+
+        if action in ("saveas"):
+            if "slice_id" in form_data:
+                form_data.pop("slice_id")  # don't save old slice_id
+            slc = models.SolarBISlice(owners=[g.user] if g.user else [])
+
+        slc.params = json.dumps(form_data, indent=2, sort_keys=True)
+        slc.datasource_name = datasource_name
+        slc.viz_type = form_data["viz_type"]
+        slc.datasource_type = datasource_type
+        slc.datasource_id = datasource_id
+        slc.slice_name = slice_name
+        slc.query_status = 'N/A'
+        if query_id:
+            slc.query_status = 'running'
+            slc.paid = True
+            slc.valid_date = datetime.now() + timedelta(hours=24*31*12*99)
+            slc.query_id = query_id
+        if start_date:
+            slc.start_date = datetime.strptime(start_date, '%Y-%m-%d')
+        if end_date:
+            slc.end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        if data_type:
+            slc.data_type = data_type
+        if resolution:
+            slc.resolution = resolution
+
+        if action in ("saveas") and slice_add_perm:
+            self.save_slice(slc)
+        elif action == "overwrite" and slice_overwrite_perm:
+            self.overwrite_slice(slc)
+
+        # Adding slice to a dashboard if requested
+        dash = None
+
+        response = {
+            "can_add": slice_add_perm,
+            "can_download": slice_download_perm,
+            "can_overwrite": is_owner(slc, g.user),
+            "form_data": slc.form_data,
+            "slice": slc.data,
+            "dashboard_id": dash.id if dash else None,
+        }
+
+        if request.args.get("goto_dash") == "true":
+            response.update({"dashboard": dash.url})
+
+        return json_success(json.dumps(response))
+
     @expose('/solar/', methods=('GET', 'POST'))
     def solar(self):
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
 
         user_id = g.user.get_id() if g.user else None
-        form_data, slc = self.get_form_data(use_slice_data=True)
+        # form_data, slc = self.get_form_data(use_slice_data=True)
+        form_data, slc = self.get_form_data_in_solarbi_slices(use_slice_data=True)
 
         datasource_id, datasource_type = get_datasource_info(
             form_data['datasource_id']
@@ -3267,7 +3502,7 @@ class Superset(BaseSupersetView):
                 status=400)
 
         if action in ('saveas', 'overwrite'):
-            return self.save_or_overwrite_slice(
+            return self.form_overwrite_solarbislice(
                 request.args,
                 slc, slice_add_perm,
                 slice_overwrite_perm,
@@ -3275,6 +3510,14 @@ class Superset(BaseSupersetView):
                 datasource_id,
                 datasource_type,
                 datasource.name)
+            # return self.form_overwrite_slice(
+            #     request.args,
+            #     slc, slice_add_perm,
+            #     slice_overwrite_perm,
+            #     slice_download_perm,
+            #     datasource_id,
+            #     datasource_type,
+            #     datasource.name)
 
         standalone = request.args.get('standalone') == 'true'
         bootstrap_data = {

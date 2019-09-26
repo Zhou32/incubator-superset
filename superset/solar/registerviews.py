@@ -45,6 +45,7 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
     edit_widget = SolarBIRegisterFormWidget
     form_template = 'appbuilder/general/security/register_form_template.html'
     email_subject = 'SolarBI - Team Created Confirmation'
+    email_template = 'appbuilder/general/security/account_activation_mail.html'
 
     @expose('/activation/<string:activation_hash>')
     def activation(self, activation_hash):
@@ -158,7 +159,8 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
     form_title = 'Team - SolarBI'
     form_template = 'appbuilder/general/security/team_form_template.html'
     msg = 'Invitation has been sent to the email.'
-    email_subject = 'You are invited to join SavvyBI'
+    email_subject = 'You are invited to join SolarBI'
+    email_template = 'appbuilder/general/security/team_member_invitation_mail.html'
     edit_widget = SolarBITeamFormWidget
 
     def send_email(self, register_user):
@@ -167,16 +169,17 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
         """
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
+        msg.sender = 'SolarBI', 'chenyang.wang@zawee.work'
         msg.subject = self.email_subject
         url = self.appbuilder.sm.get_url_for_invitation(register_user.registration_hash)
-        team_owner = self.appbuilder.session.query(SolarBIUser).filter_by(id=g.user.id).first()
-        title = '{team_owner_firstname} {team_owner_lastname} inviting you to join at ' \
-                '{workspace}'.format(team_owner_firstname=team_owner.first_name.capitalize(),
-                                     team_owner_lastname=team_owner.last_name.capitalize(),
-                                     workspace=register_user.team)
+        # team_owner = self.appbuilder.session.query(SolarBIUser).filter_by(id=g.user.id).first()
+        # title = '{team_owner_firstname} {team_owner_lastname} inviting you to join at ' \
+        #         '{workspace}'.format(team_owner_firstname=team_owner.first_name.capitalize(),
+        #                              team_owner_lastname=team_owner.last_name.capitalize(),
+        #                              workspace=register_user.team)
         msg.html = self.render_template(self.email_template,
                                         url=url,
-                                        title=title
+                                        team_name=register_user.team
                                         )
         msg.recipients = [register_user.email]
         try:
@@ -299,8 +302,8 @@ class SolarBIRegisterInvitationView(BaseRegisterUser):
     activation_template = 'appbuilder/general/security/activation.html'
     edit_widget = SolarBIInvitationWidget
 
-    email_template = 'appbuilder/general/security/register_mail.html'
-    email_subject = 'SolarBI - Registration'
+    email_template = 'appbuilder/general/security/account_activation_mail.html'
+    email_subject = 'SolarBI - Team Member Activation'
 
     def send_email(self, register_user):
         """
@@ -308,11 +311,13 @@ class SolarBIRegisterInvitationView(BaseRegisterUser):
         """
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
+        msg.sender = 'SolarBI', 'chenyang.wang@zawee.work'
         msg.subject = self.email_subject
         url = url_for('.activate', _external=True, invitation_hash=register_user.registration_hash)
         msg.html = self.render_template(self.email_template,
                                         url=url,
-                                        title=register_user.team)
+                                        username=register_user.username,
+                                        team_name=register_user.team)
         msg.recipients = [register_user.email]
         try:
             mail.send(msg)
