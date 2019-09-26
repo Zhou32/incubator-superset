@@ -20,6 +20,7 @@ from contextlib import closing
 from copy import copy, deepcopy
 from datetime import datetime, timedelta
 # from dateutil.relativedelta import relativedelta
+import urllib
 import json
 import logging
 import textwrap
@@ -565,6 +566,15 @@ class SolarBISlice(Model, AuditMixinNullable, ImportMixin):
         params = parse.quote(json.dumps(form_data))
         return f"{base_url}/?form_data={params}"
 
+    def get_query_id(self):
+        query_id = self.query_id
+        return query_id
+
+    def get_slice_download_link(self):
+        download_link = "https://colin-query-test.s3-ap-southeast-2.amazonaws.com/" + \
+                        urllib.parse.quote(self.owners[0].email, safe='') + '/' + str(self.query_id) + '.csv'
+        return download_link
+
     @property
     def slice_url(self):
         """Defines the url to access the slice"""
@@ -598,6 +608,16 @@ class SolarBISlice(Model, AuditMixinNullable, ImportMixin):
     def view_slice_link(self):
         url = self.slice_url
         return Markup(f'<a href="{url}">View Data</a>')
+
+    @property
+    def slice_query_id(self):
+        query_id = self.get_query_id()
+        return Markup(f'{query_id}')
+
+    @property
+    def slice_download_link(self):
+        download_link = self.get_slice_download_link()
+        return Markup(f'<a href="{download_link}">Download Data</a>')
 
     def get_viz(self, force=False):
         """Creates :py:class:viz.BaseViz object from the url_params_multidict.

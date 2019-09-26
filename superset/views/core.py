@@ -421,7 +421,9 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
         'slice_name', 'description', 'owners',
     )
     list_columns = [
-        'slice_link', 'creator', 'modified', 'view_slice_name', 'view_slice_link']
+        'slice_link', 'creator', 'modified', 'view_slice_name', 'view_slice_link', 'slice_query_id',
+        'slice_download_link'
+    ]
     edit_columns = [
         "slice_name",
         "description",
@@ -453,6 +455,100 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
         return self.render_template(self.list_template,
                                     title=self.list_title,
                                     widgets=widgets)
+
+    def _get_list_widget(
+            self,
+            filters,
+            actions=None,
+            order_column="",
+            order_direction="",
+            page=None,
+            page_size=None,
+            widgets=None,
+            **args
+    ):
+        """ get joined base filter and current active filter for query """
+        widgets = widgets or {}
+        actions = actions or self.actions
+        page_size = page_size or self.page_size
+        if not order_column and self.base_order:
+            order_column, order_direction = self.base_order
+        joined_filters = filters.get_joined_filters(self._base_filters)
+        count, lst = self.datamodel.query(
+            joined_filters,
+            order_column,
+            order_direction,
+            page=page,
+            page_size=page_size,
+        )
+        pks = self.datamodel.get_keys(lst)
+
+        # serialize composite pks
+        pks = [self._serialize_pk_if_composite(pk) for pk in pks]
+
+        # get all object keys in s3 under the user sub folder
+        all_object_keys = self.list_object_key('colin-query-test', g.user.email + '/')
+        avail_object_keys = [key for key in all_object_keys if key.endswith('.csv')]
+        obj_keys = [key.split('/')[1].replace('.csv', '') for key in avail_object_keys]
+        # for key in avail_object_keys:
+        #     obj_keys.append(key.split('/')[1].replace('.csv', ''))
+
+        widgets["list"] = self.list_widget(
+            obj_keys=obj_keys,
+            label_columns=self.label_columns,
+            include_columns=self.list_columns,
+            value_columns=self.datamodel.get_values(lst, self.list_columns),
+            order_columns=self.order_columns,
+            formatters_columns=self.formatters_columns,
+            page=page,
+            page_size=page_size,
+            count=count,
+            pks=pks,
+            actions=actions,
+            filters=filters,
+            modelview_name=self.__class__.__name__,
+        )
+        return widgets
+
+    def list_object_key(self, bucket, prefix):
+        AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
+        AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
+        session = boto3.session.Session(aws_access_key_id=AWS_ACCESS_KEY_ID,
+                                        aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
+        client = session.client('s3', region_name='ap-southeast-2')
+        key_list = []
+        response = client.list_objects_v2(
+            Bucket=bucket,
+            Prefix=prefix
+        )
+        contents = None
+        try:
+            contents = response['Contents']
+        except:
+            pass
+
+        is_truncated = response['IsTruncated']
+        for content in contents:
+            try:
+                key_list.append(content['Key'])
+            except:
+                pass
+
+        if is_truncated:
+            cont_token = response['NextContinuationToken']
+        while is_truncated:
+            response = client.list_objects_v2(
+                Bucket=bucket,
+                Prefix=prefix,
+                ContinuationToken=cont_token
+            )
+            contents = response['Contents']
+            is_truncated = response['IsTruncated']
+            for content in contents:
+                key_list.append(content['Key'])
+            if is_truncated:
+                cont_token = response['NextContinuationToken']
+        return sorted(key_list)
 
     def remove_filters_for_role(self, role_name):
         if role_name == 'Admin':

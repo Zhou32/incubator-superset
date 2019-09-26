@@ -309,10 +309,15 @@ class ExportModal extends React.Component {
         datasource_id: this.props.solarBI.queryResponse.form_data.datasource_id,
         datasource_type: this.props.solarBI.queryResponse.form_data.datasource_type,
         viz_type: this.props.solarBI.queryResponse.form_data.viz_type,
+        radius: this.props.solarBI.queryResponse.radius,
+        spatial_address: { ...this.props.solarBI.queryResponse.form_data.spatial_address },
         address_name: this.props.address.slice(0, -11),
       };
       this.props.onHide();
-      this.props.requestSolarData(queryData);
+      this.props.requestSolarData(queryData)
+        .then(() => {
+          window.location = '/solar/list';
+      });
     }
   }
 

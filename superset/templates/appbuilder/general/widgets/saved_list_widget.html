@@ -87,7 +87,15 @@
                 {% endif %}
                 <hr style="border-bottom: 1px solid #C7C9CB; width: 80px; margin: -10px auto 20px;">
                 <i class="fas fa-chart-pie my-data-pie"></i>
-                {{ item['view_slice_link'] }}
+                {% if 'None' in item['slice_query_id'] %}
+                    {{ item['view_slice_link'] }}
+                {% else %}
+                    {% if item['slice_query_id'] in obj_keys %}
+                        {{ item['slice_download_link'] }}
+                    {% else %}
+                        <p>still running</p>
+                    {% endif %}
+                {% endif %}
             </div>
         </div>
     {% endfor %}
