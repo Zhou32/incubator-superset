@@ -19,7 +19,7 @@
 /* eslint-disable camelcase */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/styles';
 // import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import GoBackModal from './GoBackModal';
 
@@ -60,7 +60,7 @@ const styles = theme => ({
     marginBottom: 20,
   },
   notUse: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
 });
 

@@ -19,7 +19,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-import withWidth from '@material-ui/core/withWidth';
 import Card from '@material-ui/core/Card';
 import Button from '@material-ui/core/Button';
 import CardContent from '@material-ui/core/CardContent';
@@ -43,7 +42,6 @@ TabContainer.propTypes = {
 
 const propTypes = {
   classes: PropTypes.object.isRequired,
-  width: PropTypes.string.isRequired,
 };
 
 const theme = createMuiTheme({
@@ -161,10 +159,8 @@ class DemoPage extends React.Component {
   }
 
   render() {
-    // const { classes, width } = this.props;
     const { classes } = this.props;
     const { value } = this.state;
-    // const isSmallScreen = /xs|sm|md/.test(width);
 
     return (
       <MuiThemeProvider theme={theme}>
@@ -196,10 +192,10 @@ class DemoPage extends React.Component {
               </TabContainer>}
               {value === 1 && <TabContainer>
                 <p className={classes.text}>Read one of our case studies:</p>
-                </TabContainer>}
+              </TabContainer>}
               {value === 2 && <TabContainer>
                 <p className={classes.text}>Read one of our case studies:</p>
-                </TabContainer>}
+              </TabContainer>}
               {value === 3 && <TabContainer>
                 <p className={classes.text}>Read one of our case studies:</p>
               </TabContainer>}
@@ -230,4 +226,4 @@ class DemoPage extends React.Component {
 
 DemoPage.propTypes = propTypes;
 
-export default withWidth()(withStyles(styles)(DemoPage));
+export default withStyles(styles)(DemoPage);

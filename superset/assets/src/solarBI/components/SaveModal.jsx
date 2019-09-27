@@ -20,7 +20,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { withStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
+import { createMuiTheme } from '@material-ui/core/styles';
+import { withStyles, ThemeProvider } from '@material-ui/styles';
 import Slide from '@material-ui/core/Slide';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -55,10 +56,10 @@ const propTypes = {
 const styles = tm => ({
   modal: {
     position: 'absolute',
-    width: theme.spacing.unit * 60,
+    width: theme.spacing(60),
     backgroundColor: theme.palette.background.paper,
     boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
-    padding: theme.spacing.unit * 4,
+    padding: theme.spacing(4),
   },
   button: {
     fontSize: '1.2em',
@@ -78,9 +79,9 @@ const styles = tm => ({
   },
 });
 
-function Transition(props) {
-  return <Slide direction="up" {...props} />;
-}
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 class SaveModal extends React.Component {
   constructor(props) {
@@ -166,7 +167,7 @@ class SaveModal extends React.Component {
     const { classes } = this.props;
     return (
       <div>
-        <MuiThemeProvider theme={theme}>
+        <ThemeProvider theme={theme}>
           <Dialog
             classes={{ paper: classes.dialog }}
             open={this.props.open}
@@ -222,7 +223,7 @@ class SaveModal extends React.Component {
               </Button>
             </DialogActions>
           </Dialog>
-        </MuiThemeProvider>
+        </ThemeProvider>
       </div>
     );
   }

@@ -19,12 +19,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReactEcharts from 'echarts-for-react';
-import { withStyles } from '@material-ui/core/styles';
-import withWidth from '@material-ui/core/withWidth';
+import { withStyles } from '@material-ui/styles';
 
 const styles = theme => ({
   typography: {
-    margin: theme.spacing.unit * 2,
+    margin: theme.spacing(2),
     fontSize: 15,
     width: 300,
   },
@@ -121,8 +120,7 @@ class BarChart extends React.Component {
 
 BarChart.propTypes = {
   classes: PropTypes.object.isRequired,
-  width: PropTypes.string.isRequired,
   queryData: PropTypes.array.isRequired,
 };
 
-export default withWidth()(withStyles(styles)(BarChart));
+export default withStyles(styles)(BarChart);

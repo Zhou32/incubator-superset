@@ -20,7 +20,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
-import { withStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
+import { createMuiTheme } from '@material-ui/core/styles';
+import { withStyles, ThemeProvider } from '@material-ui/styles';
 import Slide from '@material-ui/core/Slide';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -138,7 +139,7 @@ const styles = tm => ({
     marginBottom: '5px',
     width: '90%',
     display: 'inline-block',
-    margin: theme.spacing.unit * 2,
+    margin: theme.spacing(2),
   },
   formControlLabel: {
     fontSize: '1.5rem',
@@ -227,7 +228,7 @@ const styles = tm => ({
     marginRight: '45px',
   },
   typography: {
-    margin: theme.spacing.unit * 2,
+    margin: theme.spacing(2),
     fontSize: 15,
     width: 300,
   },
@@ -241,9 +242,9 @@ const styles = tm => ({
   },
 });
 
-function Transition(props) {
-  return <Slide direction="up" {...props} />;
-}
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 class ExportModal extends React.Component {
   constructor(props) {
@@ -296,7 +297,7 @@ class ExportModal extends React.Component {
     if (sDate > eDate) {
       alert('Start date cannot be later than end date!'); // eslint-disable-line no-alert
     } else if (new Date(sDate) < new Date('1990-01-01') ||
-                new Date(eDate) > new Date('2019-07-31')) {
+      new Date(eDate) > new Date('2019-07-31')) {
       alert('Available date: 01/01/1990 ~ 31/07/2019.'); // eslint-disable-line no-alert
     } else {
       const queryData = {
@@ -317,7 +318,7 @@ class ExportModal extends React.Component {
       this.props.requestSolarData(queryData)
         .then(() => {
           window.location = '/solar/list';
-      });
+        });
     }
   }
 

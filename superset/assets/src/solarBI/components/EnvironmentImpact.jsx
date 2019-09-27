@@ -51,7 +51,7 @@ const styles = theme => ({
     textAlign: 'center',
   },
   notUse: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
 });
 

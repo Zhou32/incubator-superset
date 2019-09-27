@@ -19,7 +19,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/styles';
 import Button from '@material-ui/core/Button';
 // import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import GoBackModal from './GoBackModal';
@@ -88,7 +88,7 @@ const styles = theme => ({
     fontWeight: 300,
   },
   notUse: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
 });
 
