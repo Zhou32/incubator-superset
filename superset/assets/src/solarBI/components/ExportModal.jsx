@@ -290,28 +290,29 @@ class ExportModal extends React.Component {
   }
 
   calculateCost() {
-    let timeCost = {
+    const timeCost = {
       years: 5,
       months: 0.42,
       days: 0.01,
-    }
-    let gran = {
+    };
+    const gran = {
       monthly: 5,
       weekly: 7.5,
       daily: 9,
       hourly: 11,
-    }
-    let type = {
+    };
+    const type = {
       dni: 0,
       ghi: 0,
       both: 0,
-    }
-    let dt1 = new Date(this.state.startDate);
-    let dt2 = new Date(this.state.endDate);
-    let diff = this.dateDiff(dt1, dt2)
-    let result = diff['days'] * timeCost.days + diff['months'] * timeCost.months + diff['years'] * timeCost.years
-    let granularity
-    switch(this.state.resolution) {
+    };
+    const dt1 = new Date(this.state.startDate);
+    const dt2 = new Date(this.state.endDate);
+    const diff = this.dateDiff(dt1, dt2);
+    let result = diff.days * timeCost.days + diff.months * timeCost.months +
+      diff.years * timeCost.years;
+    let granularity;
+    switch (this.state.resolution) {
       case 'hourly':
         granularity = gran.hourly;
         break;
@@ -327,8 +328,8 @@ class ExportModal extends React.Component {
       default:
         granularity = 0;
     }
-    let t
-    switch(this.state.type) {
+    let t;
+    switch (this.state.type) {
       case 'dni':
         t = type.dni;
         break;
@@ -341,20 +342,19 @@ class ExportModal extends React.Component {
       default:
         t = 0;
     }
-    result = result + granularity + t
-    result = result.toFixed(2)
-    console.log(result)
-    this.setState({cost: result})
+    result = result + granularity + t;
+    result = result.toFixed(2);
+    // console.log(result)
+    this.setState({ cost: result });
   }
 
   dateDiff(dt1, dt2) {
-    var ret = {days:0, months:0, years:0};
-    if (dt1 == dt2) return ret;
-    if (dt1 > dt2)
-    {
-        var dtmp = dt2;
-        dt2 = dt1;
-        dt1 = dtmp;
+    const ret = { days: 0, months: 0, years: 0 };
+    if (dt1 === dt2) return ret;
+    if (dt1 > dt2) {
+      var dtmp = dt2;
+      dt2 = dt1;
+      dt1 = dtmp;
     }
 
     /*
@@ -386,27 +386,25 @@ class ExportModal extends React.Component {
      * First if the day difference is negative
      * eg dt2 = 13 oct, dt1 = 25 sept
      */
-    if (ret['days'] < 0)
-    {
-        /*
-         * Use temporary dates to get the number of days remaining in the month
-         */
-        var dtmp1 = new Date(dt1.getFullYear(), dt1.getMonth() + 1, 1, 0, 0, -1);
+    if (ret['days'] < 0) {
+      /*
+       * Use temporary dates to get the number of days remaining in the month
+       */
+      var dtmp1 = new Date(dt1.getFullYear(), dt1.getMonth() + 1, 1, 0, 0, -1);
 
-        var numDays = dtmp1.getDate();
+      var numDays = dtmp1.getDate();
 
-        ret['months'] -= 1;
-        ret['days'] += numDays;
+      ret['months'] -= 1;
+      ret['days'] += numDays;
 
     }
 
     /*
      * Now if the month difference is negative
      */
-    if (ret['months'] < 0)
-    {
-        ret['months'] += 12;
-        ret['years'] -= 1;
+    if (ret['months'] < 0) {
+      ret['months'] += 12;
+      ret['years'] -= 1;
     }
 
     return ret;
@@ -483,7 +481,7 @@ class ExportModal extends React.Component {
 
     return (
       <div>
-        <MuiThemeProvider theme={theme}>
+        <ThemeProvider theme={theme}>
           <Dialog
             classes={{ paper: classes.dialog }}
             fullWidth
@@ -611,13 +609,13 @@ class ExportModal extends React.Component {
                 </FormControl>
                 <hr className={classes.contentHr} />
                 <div>
-                <FormLabel classes={{ root: classes.costLabel, focused: classes.labelFocused }} component="legend">Approx cost</FormLabel>
-                <TextField
-                      id="cost"
-                      variant="outlined"
-                      className={classes.costOutput}
-                      value={this.state.cost}
-                />
+                  <FormLabel classes={{ root: classes.costLabel, focused: classes.labelFocused }} component="legend">Approx cost</FormLabel>
+                  <TextField
+                    id="cost"
+                    variant="outlined"
+                    className={classes.costOutput}
+                    value={this.state.cost}
+                  />
                 </div>
               </DialogContent>
             </div>
@@ -637,7 +635,7 @@ class ExportModal extends React.Component {
               </Button>
             </DialogActions>
           </Dialog>
-        </MuiThemeProvider>
+        </ThemeProvider>
       </div>
     );
   }
