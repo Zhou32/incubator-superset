@@ -28,6 +28,28 @@ const styles = theme => ({
     fontSize: 15,
     width: 300,
   },
+  csvLink: {
+    position: 'absolute',
+    right: 180,
+    top: 445,
+    zIndex: 200,
+    color: '#424242',
+    '& span': {
+      display: 'none',
+    },
+    '&:hover span': {
+      top: 0,
+      left: -70,
+      width: 160,
+      margin: 10,
+      display: 'block',
+      padding: '5px 20px 5px 5px',
+      zIndex: 200,
+      position: 'absolute',
+      textDecoration: 'none',
+      color: '#4297bd',
+    },
+  },
 });
 
 class BarChart extends React.Component {
@@ -45,7 +67,7 @@ class BarChart extends React.Component {
 
   getBarchartOption(data) {
     if (data) {
-      // const data1 = data[1].map(x => x.toNumber());
+      // const data1 = data[1].map(x => x.toNumber());=
       const data1 = data[1];
       const xAxisData = data[0];
       // console.log(mergedData);
@@ -105,7 +127,7 @@ class BarChart extends React.Component {
 
   render() {
     // const { queryData, width } = this.props;
-    const { queryData } = this.props;
+    const { queryData, classes } = this.props;
     const mergedData = [];
     for (let i = 0; i < queryData[0].length; i++) {
       mergedData.push({ date: queryData[0][i], solar_data: queryData[1][i] });
@@ -122,8 +144,8 @@ class BarChart extends React.Component {
 
     return (
       <div style={{ ...rootStyle }}>
-        <CSVLink data={mergedData} headers={this.state.headers} style={{ marginLeft: 50 }}>
-          <i className="fas fa-download" />
+        <CSVLink className={classes.csvLink} data={mergedData} headers={this.state.headers}>
+          <i className="fas fa-download" /><span>Download As CSV</span>
         </CSVLink>
         <ReactEcharts
           style={{ width: '100%', height: 300 }}

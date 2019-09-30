@@ -38,6 +38,7 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import { requestSolarData } from '../actions/solarActions';
 
 const propTypes = {
@@ -99,6 +100,19 @@ const styles = tm => ({
     margin: '2em auto 0',
     padding: 0,
   },
+  costOutput: {
+    fontFamily: 'Montserrat',
+    fontSize: '16px',
+    fontWeight: 500,
+    backgroundColor: '#EEEFF0',
+    borderRadius: 12,
+    lineHeight: '18px',
+    marginTop: '25px',
+    marginLeft: '30px',
+    '& fieldset': {
+      borderRadius: 12,
+    },
+  },
   dates: {
     display: 'flex',
   },
@@ -118,6 +132,11 @@ const styles = tm => ({
     fontFamily: 'Montserrat',
     fontWeight: 'bold',
     marginLeft: 250,
+  },
+  dollar: {
+    '& p': {
+      fontSize: 16,
+    },
   },
   endText: {
     marginLeft: '15px',
@@ -140,6 +159,9 @@ const styles = tm => ({
     width: '90%',
     display: 'inline-block',
     margin: theme.spacing(2),
+    '& svg': {
+      fontSize: '1.5em',
+    }
   },
   formControlLabel: {
     fontSize: '1.5rem',
@@ -159,7 +181,7 @@ const styles = tm => ({
     paddingTop: 15,
   },
   iconButton: {
-    padding: '5 8',
+    padding: '5 12',
     height: 40,
     marginLeft: 20,
     marginTop: 15,
@@ -221,16 +243,6 @@ const styles = tm => ({
     backgroundColor: '#EEEFF0',
     borderRadius: 12,
     lineHeight: '18px',
-  },
-  costOutput: {
-    fontFamily: 'Montserrat',
-    fontSize: '16px',
-    fontWeight: 500,
-    backgroundColor: '#EEEFF0',
-    borderRadius: 12,
-    lineHeight: '18px',
-    marginTop: '25px',
-    marginLeft: '30px',
   },
   typeGroup: {
     flexDirection: 'row',
@@ -609,12 +621,17 @@ class ExportModal extends React.Component {
                 </FormControl>
                 <hr className={classes.contentHr} />
                 <div>
-                  <FormLabel classes={{ root: classes.costLabel, focused: classes.labelFocused }} component="legend">Approx cost</FormLabel>
+                  <FormLabel classes={{ root: classes.costLabel, focused: classes.labelFocused }} component="legend">Approx Cost</FormLabel>
                   <TextField
                     id="cost"
                     variant="outlined"
+                    disabled
                     className={classes.costOutput}
                     value={this.state.cost}
+                    InputProps={{
+                      classes: { input: classes.textInput },
+                      startAdornment: <InputAdornment className={classes.dollar} position="start">$</InputAdornment>,
+                    }}
                   />
                 </div>
               </DialogContent>
