@@ -246,6 +246,8 @@ export class MapView extends React.Component {
   requestData() {
     const formData = this.getFormData();
     this.props.fetchSolarData(formData, false, 60, '');
+    console.log(window.location)
+    window.location = '/solar/result'
   }
 
   handleWrongErrorAlert() {
@@ -403,11 +405,11 @@ export class MapView extends React.Component {
             </Grid>
           )}
 
-          {this.state.searching && entry === 'welcome' && (
+          {/* {this.state.searching && entry === 'welcome' && (
             <div>
               <WelcomePage />
             </div>
-          )}
+          )} */}
           {this.state.searching && entry === 'demo' && (
             <div>
               <DemoPage />
