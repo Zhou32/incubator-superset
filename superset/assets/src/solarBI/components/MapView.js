@@ -478,7 +478,7 @@ export class MapView extends React.Component {
             />
           </Map> */}
           {this.state.showingMap && (
-            <Card style={{ margin: '75px auto', width: '93%', height: 900 }}>
+            <Card style={{ margin: '75px auto', width: '93%', height: 930 }}>
               <CardContent>
                 <CloseButton
                   onBackClick={this.onGoBackClick}
