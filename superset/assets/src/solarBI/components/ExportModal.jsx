@@ -161,7 +161,7 @@ const styles = tm => ({
     margin: theme.spacing(2),
     '& svg': {
       fontSize: '1.5em',
-    }
+    },
   },
   formControlLabel: {
     fontSize: '1.5rem',
@@ -364,8 +364,10 @@ class ExportModal extends React.Component {
     const ret = { days: 0, months: 0, years: 0 };
     if (dt1 === dt2) return ret;
     if (dt1 > dt2) {
-      var dtmp = dt2;
+      const dtmp = dt2;
+      // eslint-disable-next-line no-param-reassign
       dt2 = dt1;
+      // eslint-disable-next-line no-param-reassign
       dt1 = dtmp;
     }
 
@@ -373,22 +375,21 @@ class ExportModal extends React.Component {
      * First get the number of full years
      */
 
-    var year1 = dt1.getFullYear();
-    var year2 = dt2.getFullYear();
+    const year1 = dt1.getFullYear();
+    const year2 = dt2.getFullYear();
 
-    var month1 = dt1.getMonth();
-    var month2 = dt2.getMonth();
+    const month1 = dt1.getMonth();
+    const month2 = dt2.getMonth();
 
-    var day1 = dt1.getDate();
-    var day2 = dt2.getDate();
+    const day1 = dt1.getDate();
+    const day2 = dt2.getDate();
 
     /*
      * Set initial values bearing in mind the months or days may be negative
      */
-
-    ret['years'] = year2 - year1;
-    ret['months'] = month2 - month1;
-    ret['days'] = day2 - day1;
+    ret.years = year2 - year1;
+    ret.months = month2 - month1;
+    ret.days = day2 - day1;
 
     /*
      * Now we deal with the negatives
@@ -398,25 +399,25 @@ class ExportModal extends React.Component {
      * First if the day difference is negative
      * eg dt2 = 13 oct, dt1 = 25 sept
      */
-    if (ret['days'] < 0) {
+    if (ret.days < 0) {
       /*
        * Use temporary dates to get the number of days remaining in the month
        */
-      var dtmp1 = new Date(dt1.getFullYear(), dt1.getMonth() + 1, 1, 0, 0, -1);
+      const dtmp1 = new Date(dt1.getFullYear(), dt1.getMonth() + 1, 1, 0, 0, -1);
 
-      var numDays = dtmp1.getDate();
+      const numDays = dtmp1.getDate();
 
-      ret['months'] -= 1;
-      ret['days'] += numDays;
+      ret.months -= 1;
+      ret.days += numDays;
 
     }
 
     /*
      * Now if the month difference is negative
      */
-    if (ret['months'] < 0) {
-      ret['months'] += 12;
-      ret['years'] -= 1;
+    if (ret.months < 0) {
+      ret.months += 12;
+      ret.years -= 1;
     }
 
     return ret;
