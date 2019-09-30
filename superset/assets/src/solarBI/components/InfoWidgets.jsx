@@ -18,7 +18,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/styles';
 import Typography from '@material-ui/core/Typography';
 import Slider from '@material-ui/lab/Slider';
 import Card from '@material-ui/core/Card';
@@ -61,7 +61,7 @@ const styles = theme => ({
     textAlign: 'center',
   },
   notUse: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
 });
 

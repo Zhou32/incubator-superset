@@ -44,7 +44,7 @@ const styles = theme => ({
     width: 40,
   },
   typography: {
-    margin: theme.spacing.unit * 2,
+    margin: theme.spacing(2),
     fontSize: 15,
     width: 300,
   },

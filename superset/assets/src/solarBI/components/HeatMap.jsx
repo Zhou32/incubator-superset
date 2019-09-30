@@ -20,11 +20,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ReactEcharts from 'echarts-for-react';
 import { withStyles } from '@material-ui/core/styles';
-import withWidth from '@material-ui/core/withWidth';
 
 const styles = theme => ({
   typography: {
-    margin: theme.spacing.unit * 2,
+    margin: theme.spacing(2),
     fontSize: 15,
     width: 300,
   },
@@ -146,13 +145,10 @@ class HeatMap extends React.Component {
   }
 
   render() {
-    // const { queryData, width } = this.props;
     const { queryData } = this.props;
     const heatmapOptions = this.getHeatmapOption(queryData);
 
-    // const isSmallScreen = /xs|sm|md/.test(width);
     const rootStyle = {
-      // display: isSmallScreen ? 'initial' : 'flex',
       width: '48%',
     };
 
@@ -169,8 +165,7 @@ class HeatMap extends React.Component {
 
 HeatMap.propTypes = {
   classes: PropTypes.object.isRequired,
-  width: PropTypes.string.isRequired,
   queryData: PropTypes.array.isRequired,
 };
 
-export default withWidth()(withStyles(styles)(HeatMap));
+export default withStyles(styles)(HeatMap);

@@ -22,8 +22,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Grid, Row, Col, Alert } from 'react-bootstrap';
 import URI from 'urijs';
-import withWidth from '@material-ui/core/withWidth';
-import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
+import { createMuiTheme } from '@material-ui/core/styles';
+import { ThemeProvider } from '@material-ui/styles';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import LocationSearchBox from './LocationSearchBox';
@@ -57,7 +57,7 @@ const theme = createMuiTheme({
 const propTypes = {
   solarBI: PropTypes.object.isRequired,
   fetchSolarData: PropTypes.func.isRequired,
-  width: PropTypes.string.isRequired,
+  // width: PropTypes.string.isRequired,
   google: PropTypes.object.isRequired,
 };
 
@@ -379,7 +379,7 @@ export class MapView extends React.Component {
 
     return (
       <div>
-        <MuiThemeProvider theme={theme}>
+        <ThemeProvider theme={theme}>
           {this.state.showingEmptyAlert && (
             <Grid style={{ position: 'absolute', top: 0 }}>
               <Row className="show-grid" xs={12}>
@@ -567,7 +567,7 @@ export class MapView extends React.Component {
             }}
             userId={''}
           />
-        </MuiThemeProvider>
+        </ThemeProvider>
       </div>
     );
   }
@@ -579,13 +579,11 @@ const mapStateToProps = state => ({
   solarBI: state.solarBI,
 });
 
-export default withWidth()(
-  connect(
-    mapStateToProps,
-    { fetchSolarData },
-  )(
-    GoogleApiWrapper({
-      apiKey: 'AIzaSyAc65tB0eu0jqft4ip7De7VcD56BpYlgio',
-    })(MapView),
-  ),
+export default connect(
+  mapStateToProps,
+  { fetchSolarData },
+)(
+  GoogleApiWrapper({
+    apiKey: 'AIzaSyAc65tB0eu0jqft4ip7De7VcD56BpYlgio',
+  })(MapView),
 );
