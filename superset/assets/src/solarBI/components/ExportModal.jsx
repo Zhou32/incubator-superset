@@ -287,7 +287,7 @@ class ExportModal extends React.Component {
       startDate: '2017-01-01',
       endDate: '2018-01-01',
       resolution: 'hourly',
-      cost: 0,
+      cost: (16).toFixed(2),
     };
 
     this.handleTypeChange = this.handleTypeChange.bind(this);

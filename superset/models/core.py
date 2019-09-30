@@ -617,7 +617,8 @@ class SolarBISlice(Model, AuditMixinNullable, ImportMixin):
     @property
     def slice_download_link(self):
         download_link = self.get_slice_download_link()
-        return Markup(f'<a href="{download_link}">Download Data</a>')
+        # return Markup(f'<a href="{download_link}">Download Data</a>')
+        return Markup(f'{download_link}')
 
     def get_viz(self, force=False):
         """Creates :py:class:viz.BaseViz object from the url_params_multidict.
