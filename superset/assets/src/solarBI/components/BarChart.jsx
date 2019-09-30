@@ -144,7 +144,7 @@ class BarChart extends React.Component {
 
     return (
       <div style={{ ...rootStyle }}>
-        <CSVLink className={classes.csvLink} data={mergedData} headers={this.state.headers}>
+        <CSVLink filename={'solar-data.csv'} className={classes.csvLink} data={mergedData} headers={this.state.headers}>
           <i className="fas fa-download" /><span>Download As CSV</span>
         </CSVLink>
         <ReactEcharts
