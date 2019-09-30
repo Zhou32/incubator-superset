@@ -247,8 +247,6 @@ export class MapView extends React.Component {
   requestData() {
     const formData = this.getFormData();
     this.props.fetchSolarData(formData, false, 60, '');
-    console.log(window.location)
-    window.location = '/solar/result'
   }
 
   handleWrongErrorAlert() {

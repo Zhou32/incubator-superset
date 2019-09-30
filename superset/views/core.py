@@ -689,22 +689,6 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
         )
 
-    @expose('/result', methods=['GET','POST'])
-    def solar_result(self):
-
-        entry_point = 'solarBI'
-        payload = {
-            'user': bootstrap_user_data(g.user),
-            'common': BaseSupersetView().common_bootstrap_payload(),
-            'entry': 'result',
-        }
-        return self.render_template(
-            'solar/basic.html',
-            entry=entry_point,
-            title='Result - SolarBI',
-            bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
-        )
-
     @expose('/billing', methods=['GET', 'POST'])
     def billing(self):
         if not g.user or not g.user.get_id():
@@ -1475,19 +1459,6 @@ class Superset(BaseSupersetView):
         return self.generate_json(
             viz_obj, csv=csv, query=query, results=results, samples=samples
         )
-
-    @api
-    @expose("/search_solar/", methods=["GET","POST"])
-    def search_solar(self, datasource_type=None, datasource_id=None):
-        print('hello')
-        form_data = get_form_data()[0]
-        try:
-            datasource_id, datasource_type = get_datasource_info(
-                datasource_id, datasource_type, form_data
-            )
-        except SupersetException as e:
-            return json_error_response(utils.error_msg_from_exception(e))
-        return None
 
     def send_email(self, user, address_name):
         """
