@@ -1029,6 +1029,38 @@ input {
 .list-container a {
   font-size: 22px;
 }
+.list-card table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 10;
+  font-size: 14; 
+}
+.list-card td {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+  font-weight: 500;
+}
+.list-card td:first-child {
+  font-size: 1.2em;
+  color: #0063B0 !important;
+}
+.download-link {
+  color: #0667A3;
+  font-size: 20;
+  margin-left: 20;
+}
+.download-link:hover {
+  text-shadow: 0px 0px 1px rgba(255, 255, 255, 1);
+  box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+  -webkit-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+  -moz-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+  transition: all 0.4s ease 0s;
+  cursor: pointer;
+}
+.download-container {
+  position: relative;
+}
 .title-card {
   box-shadow: 0px 1px 1px #00000029;
   transition: 0.3s;
@@ -1245,4 +1277,67 @@ input {
 }
 .reset-my-psw input {
   width: 70%;
+}
+
+
+/* common */
+.ribbon {
+  width: 150px;
+  height: 150px;
+  overflow: hidden;
+  position: absolute;
+  opacity: 0.6; 
+}
+.ribbon::before {
+  position: absolute;
+  z-index: -1;
+  content: '';
+  display: block;
+  border: 5px solid #2980b9;
+}
+.ribbon::after {
+  position: absolute;
+  z-index: -1;
+  content: '';
+  display: block;
+  border: 5px solid #2980b9;
+}
+.ribbon span {
+  position: absolute;
+  display: block;
+  width: 225px;
+  padding: 3px 0;
+  background-color: #3498db;
+  box-shadow: 0 5px 10px rgba(0,0,0,.1);
+  color: #fff;
+  font-weight: bold;
+  text-shadow: 0 1px 1px rgba(0,0,0,.2);
+  text-transform: uppercase;
+  text-align: center;
+  opacity: 0.5;
+  padding-left: 30;
+}
+
+/* top right*/
+.ribbon-top-right {
+  top: -10px;
+  right: -10px;
+}
+.ribbon-top-right::before,
+.ribbon-top-right::after {
+  border-top-color: transparent;
+  border-right-color: transparent;
+}
+.ribbon-top-right::before {
+  top: 0;
+  left: 28;
+}
+.ribbon-top-right::after {
+  bottom: 28;
+  right: 0;
+}
+.ribbon-top-right span {
+  left: -25px;
+  top: 30px;
+  transform: rotate(45deg);
 }
