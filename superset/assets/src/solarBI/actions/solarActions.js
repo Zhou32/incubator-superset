@@ -207,10 +207,8 @@ export function requestSolarData(queryData, timeout = 60) {
       signal,
       timeout: timeout * 1000,
     })
-      .then(({ json }) => {
-        dispatch(requestSolarDataSucceeded(json));
-        dispatch(addSuccessToast(t('Request confirmed! An email has been sent to you.')));
-      })
+      .then(({ json }) => dispatch(requestSolarDataSucceeded(json)))
+      // dispatch(addSuccessToast(t('Request confirmed! An email has been sent to you.')));
       .catch(() => {
         dispatch(addDangerToast(t('Request failed.')));
       });

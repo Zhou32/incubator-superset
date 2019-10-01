@@ -66,13 +66,17 @@ const theme = createMuiTheme({
 
 
 const styles = tm => ({
+  backdrop: {
+    backgroundColor: 'transparent',
+  },
   border: {
     border: '1px solid #0063B0',
     borderRadius: 12,
-    margin: 40,
+    width: '55%',
+    margin: '140 auto 10px',
   },
   button: {
-    margin: '10 10',
+    margin: '10 0',
     height: 40,
     padding: '0 16px',
     minWidth: 115,
@@ -88,8 +92,13 @@ const styles = tm => ({
       backgroundColor: '#034980',
     },
   },
-  closeBtn: {
-    marginRight: 40,
+  buttons: {
+    width: '55%',
+    margin: '0 auto',
+    display: 'inline-block',
+  },
+  requestBtn: {
+    float: 'right',
   },
   contentHr: {
     display: 'block',
@@ -127,11 +136,10 @@ const styles = tm => ({
   },
   dialog: {
     borderRadius: 12,
-    maxWidth: 800,
     padding: 10,
     fontFamily: 'Montserrat',
     fontWeight: 'bold',
-    marginLeft: 250,
+    marginLeft: '15em',
   },
   dollar: {
     '& p': {
@@ -176,7 +184,7 @@ const styles = tm => ({
     backgroundColor: 'white',
     marginTop: -10,
     marginLeft: -10,
-    width: 810,
+    width: '105%',
     color: 'white',
     paddingTop: 15,
   },
@@ -192,7 +200,7 @@ const styles = tm => ({
   loading: {
     width: 60,
     margin: 0,
-    marginRight: '10px',
+    float: 'right',
   },
   resolutionLabel: {
     fontSize: '1.6rem',
@@ -274,7 +282,7 @@ const styles = tm => ({
 });
 
 const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
+  return <Slide direction="left" ref={ref} {...props} />;
 });
 
 class ExportModal extends React.Component {
@@ -481,8 +489,10 @@ class ExportModal extends React.Component {
       };
       this.props.onHide();
       this.props.requestSolarData(queryData)
-        .then(() => {
-          window.location = '/solar/list';
+        .then((json) => {
+          if (json.type === 'REQEUST_SOLAR_DATA_SUCCEEDED') {
+            window.location = '/solar/list';
+          }
         });
     }
   }
@@ -497,11 +507,17 @@ class ExportModal extends React.Component {
         <ThemeProvider theme={theme}>
           <Dialog
             classes={{ paper: classes.dialog }}
+            fullScreen
             fullWidth
             open={open || solarBI.sending}
             onClose={onHide}
             TransitionComponent={Transition}
             keepMounted
+            BackdropProps={{
+              classes: {
+                root: classes.backdrop,
+              },
+            }}
           >
             <div className={classes.head}>{this.props.address.slice(0, -11)}</div>
             <div className={classes.border}>
@@ -637,20 +653,19 @@ class ExportModal extends React.Component {
                 </div>
               </DialogContent>
             </div>
-            <DialogActions>
-              {solarBI.sending ?
-                (<img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />) :
-                (<Button className={classes.button} onClick={this.handleRequestData} color="primary">Request</Button>)
-              }
-
+            <DialogActions className={classes.buttons}>
               <Button
                 className={classNames(classes.button, classes.closeBtn)}
                 disabled={solarBI.sending}
                 onClick={onHide}
                 color="primary"
               >
-                Close
+                Back
               </Button>
+              {solarBI.sending ?
+                (<img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />) :
+                (<Button className={classNames(classes.button, classes.requestBtn)} onClick={this.handleRequestData} color="primary">Pay</Button>)
+              }
             </DialogActions>
           </Dialog>
         </ThemeProvider>

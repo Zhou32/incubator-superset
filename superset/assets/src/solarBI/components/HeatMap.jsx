@@ -34,7 +34,23 @@ class HeatMap extends React.Component {
     super(props);
 
     this.getHeatmapOption = this.getHeatmapOption.bind(this);
+    this.onUnload = this.onUnload.bind(this);
   }
+
+  componentDidMount() {
+    window.addEventListener('beforeunload', this.onUnload);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('beforeunload', this.onUnload);
+  }
+
+  onUnload(event) { // the method that will be used for both add and remove event
+    // console.log("hellooww")
+    // eslint-disable-next-line no-param-reassign
+    event.returnValue = 'This will go back to search page, are you sure?';
+  }
+
 
   getHeatmapOption(data) {
     const months = [

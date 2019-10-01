@@ -59,7 +59,7 @@ class BarChart extends React.Component {
     this.state = {
       headers: [
         { label: 'Date', key: 'date' },
-        { label: 'Solar Data', key: 'solar_data' },
+        { label: 'Solar Radiation', key: 'solar_data' },
       ],
     };
 

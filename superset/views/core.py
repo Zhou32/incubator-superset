@@ -468,6 +468,7 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
             **args
     ):
         """ get joined base filter and current active filter for query """
+        # pylint: disable=unpacking-non-sequence
         widgets = widgets or {}
         actions = actions or self.actions
         page_size = page_size or self.page_size
@@ -1584,7 +1585,7 @@ class Superset(BaseSupersetView):
                               form_data['endDate'] + '_' + type + '_' + resolution}
         datasource = ConnectorRegistry.get_datasource(
             form_data['datasource_type'], form_data['datasource_id'], db.session)
-        self.form_overwrite_solarbislice(args, None, True, None, False, form_data['datasource_id'],
+        self.save_or_overwrite_solarbislice(args, None, True, None, False, form_data['datasource_id'],
                                          form_data['datasource_type'], datasource.name,
                                          query_id=response['QueryExecutionId'], start_date=form_data['startDate'],
                                          end_date=form_data['endDate'], data_type=type, resolution=resolution)
@@ -1779,7 +1780,7 @@ class Superset(BaseSupersetView):
         )
         return json_success(payload)
 
-    def form_overwrite_slice(
+    def save_or_overwrite_slice(
         self,
         args,
         slc,
@@ -3373,7 +3374,7 @@ class Superset(BaseSupersetView):
 
         return form_data, slc
 
-    def form_overwrite_solarbislice(
+    def save_or_overwrite_solarbislice(
         self,
         args,
         slc,
@@ -3507,7 +3508,7 @@ class Superset(BaseSupersetView):
                 status=400)
 
         if action in ('saveas', 'overwrite'):
-            return self.form_overwrite_solarbislice(
+            return self.save_or_overwrite_solarbislice(
                 request.args,
                 slc, slice_add_perm,
                 slice_overwrite_perm,
@@ -3515,14 +3516,6 @@ class Superset(BaseSupersetView):
                 datasource_id,
                 datasource_type,
                 datasource.name)
-            # return self.form_overwrite_slice(
-            #     request.args,
-            #     slc, slice_add_perm,
-            #     slice_overwrite_perm,
-            #     slice_download_perm,
-            #     datasource_id,
-            #     datasource_type,
-            #     datasource.name)
 
         standalone = request.args.get('standalone') == 'true'
         bootstrap_data = {
