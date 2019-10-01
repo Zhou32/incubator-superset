@@ -36,6 +36,7 @@ const styles = theme => ({
     color: '#424242',
     '& span': {
       display: 'none',
+      fontSize: 12,
     },
     '&:hover span': {
       top: 0,
