@@ -88,7 +88,7 @@ const styles = theme => ({
     fontWeight: 300,
   },
   notUse: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
 });
 

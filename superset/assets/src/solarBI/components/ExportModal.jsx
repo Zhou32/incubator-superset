@@ -20,7 +20,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
-import { withStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
+import { createMuiTheme } from '@material-ui/core/styles';
+import { withStyles, ThemeProvider } from '@material-ui/styles';
 import Slide from '@material-ui/core/Slide';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -37,6 +38,7 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import { requestSolarData } from '../actions/solarActions';
 
 const propTypes = {
@@ -98,6 +100,19 @@ const styles = tm => ({
     margin: '2em auto 0',
     padding: 0,
   },
+  costOutput: {
+    fontFamily: 'Montserrat',
+    fontSize: '16px',
+    fontWeight: 500,
+    backgroundColor: '#EEEFF0',
+    borderRadius: 12,
+    lineHeight: '18px',
+    marginTop: '25px',
+    marginLeft: '30px',
+    '& fieldset': {
+      borderRadius: 12,
+    },
+  },
   dates: {
     display: 'flex',
   },
@@ -117,6 +132,11 @@ const styles = tm => ({
     fontFamily: 'Montserrat',
     fontWeight: 'bold',
     marginLeft: 250,
+  },
+  dollar: {
+    '& p': {
+      fontSize: 16,
+    },
   },
   endText: {
     marginLeft: '15px',
@@ -138,7 +158,10 @@ const styles = tm => ({
     marginBottom: '5px',
     width: '90%',
     display: 'inline-block',
-    margin: theme.spacing.unit * 2,
+    margin: theme.spacing(2),
+    '& svg': {
+      fontSize: '1.5em',
+    },
   },
   formControlLabel: {
     fontSize: '1.5rem',
@@ -158,7 +181,7 @@ const styles = tm => ({
     paddingTop: 15,
   },
   iconButton: {
-    padding: '5 8',
+    padding: '5 12',
     height: 40,
     marginLeft: 20,
     marginTop: 15,
@@ -221,16 +244,6 @@ const styles = tm => ({
     borderRadius: 12,
     lineHeight: '18px',
   },
-  costOutput: {
-    fontFamily: 'Montserrat',
-    fontSize: '16px',
-    fontWeight: 500,
-    backgroundColor: '#EEEFF0',
-    borderRadius: 12,
-    lineHeight: '18px',
-    marginTop: '25px',
-    marginLeft: '30px',
-  },
   typeGroup: {
     flexDirection: 'row',
     width: '70%',
@@ -246,7 +259,7 @@ const styles = tm => ({
     marginRight: '45px',
   },
   typography: {
-    margin: theme.spacing.unit * 2,
+    margin: theme.spacing(2),
     fontSize: 15,
     width: 300,
   },
@@ -260,9 +273,9 @@ const styles = tm => ({
   },
 });
 
-function Transition(props) {
-  return <Slide direction="up" {...props} />;
-}
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 class ExportModal extends React.Component {
   constructor(props) {
@@ -274,7 +287,7 @@ class ExportModal extends React.Component {
       startDate: '2017-01-01',
       endDate: '2018-01-01',
       resolution: 'hourly',
-      cost: 0,
+      cost: (16).toFixed(2),
     };
 
     this.handleTypeChange = this.handleTypeChange.bind(this);
@@ -289,28 +302,29 @@ class ExportModal extends React.Component {
   }
 
   calculateCost() {
-    let timeCost = {
+    const timeCost = {
       years: 5,
       months: 0.42,
       days: 0.01,
-    }
-    let gran = {
+    };
+    const gran = {
       monthly: 5,
       weekly: 7.5,
       daily: 9,
       hourly: 11,
-    }
-    let type = {
+    };
+    const type = {
       dni: 0,
       ghi: 0,
       both: 0,
-    }
-    let dt1 = new Date(this.state.startDate);
-    let dt2 = new Date(this.state.endDate);
-    let diff = this.dateDiff(dt1, dt2)
-    let result = diff['days'] * timeCost.days + diff['months'] * timeCost.months + diff['years'] * timeCost.years
-    let granularity
-    switch(this.state.resolution) {
+    };
+    const dt1 = new Date(this.state.startDate);
+    const dt2 = new Date(this.state.endDate);
+    const diff = this.dateDiff(dt1, dt2);
+    let result = diff.days * timeCost.days + diff.months * timeCost.months +
+      diff.years * timeCost.years;
+    let granularity;
+    switch (this.state.resolution) {
       case 'hourly':
         granularity = gran.hourly;
         break;
@@ -326,8 +340,8 @@ class ExportModal extends React.Component {
       default:
         granularity = 0;
     }
-    let t
-    switch(this.state.type) {
+    let t;
+    switch (this.state.type) {
       case 'dni':
         t = type.dni;
         break;
@@ -340,42 +354,42 @@ class ExportModal extends React.Component {
       default:
         t = 0;
     }
-    result = result + granularity + t
-    result = result.toFixed(2)
-    console.log(result)
-    this.setState({cost: result})
+    result = result + granularity + t;
+    result = result.toFixed(2);
+    // console.log(result)
+    this.setState({ cost: result });
   }
 
   dateDiff(dt1, dt2) {
-    var ret = {days:0, months:0, years:0};
-    if (dt1 == dt2) return ret;
-    if (dt1 > dt2)
-    {
-        var dtmp = dt2;
-        dt2 = dt1;
-        dt1 = dtmp;
+    const ret = { days: 0, months: 0, years: 0 };
+    if (dt1 === dt2) return ret;
+    if (dt1 > dt2) {
+      const dtmp = dt2;
+      // eslint-disable-next-line no-param-reassign
+      dt2 = dt1;
+      // eslint-disable-next-line no-param-reassign
+      dt1 = dtmp;
     }
 
     /*
      * First get the number of full years
      */
 
-    var year1 = dt1.getFullYear();
-    var year2 = dt2.getFullYear();
+    const year1 = dt1.getFullYear();
+    const year2 = dt2.getFullYear();
 
-    var month1 = dt1.getMonth();
-    var month2 = dt2.getMonth();
+    const month1 = dt1.getMonth();
+    const month2 = dt2.getMonth();
 
-    var day1 = dt1.getDate();
-    var day2 = dt2.getDate();
+    const day1 = dt1.getDate();
+    const day2 = dt2.getDate();
 
     /*
      * Set initial values bearing in mind the months or days may be negative
      */
-
-    ret['years'] = year2 - year1;
-    ret['months'] = month2 - month1;
-    ret['days'] = day2 - day1;
+    ret.years = year2 - year1;
+    ret.months = month2 - month1;
+    ret.days = day2 - day1;
 
     /*
      * Now we deal with the negatives
@@ -385,27 +399,25 @@ class ExportModal extends React.Component {
      * First if the day difference is negative
      * eg dt2 = 13 oct, dt1 = 25 sept
      */
-    if (ret['days'] < 0)
-    {
-        /*
-         * Use temporary dates to get the number of days remaining in the month
-         */
-        var dtmp1 = new Date(dt1.getFullYear(), dt1.getMonth() + 1, 1, 0, 0, -1);
+    if (ret.days < 0) {
+      /*
+       * Use temporary dates to get the number of days remaining in the month
+       */
+      const dtmp1 = new Date(dt1.getFullYear(), dt1.getMonth() + 1, 1, 0, 0, -1);
 
-        var numDays = dtmp1.getDate();
+      const numDays = dtmp1.getDate();
 
-        ret['months'] -= 1;
-        ret['days'] += numDays;
+      ret.months -= 1;
+      ret.days += numDays;
 
     }
 
     /*
      * Now if the month difference is negative
      */
-    if (ret['months'] < 0)
-    {
-        ret['months'] += 12;
-        ret['years'] -= 1;
+    if (ret.months < 0) {
+      ret.months += 12;
+      ret.years -= 1;
     }
 
     return ret;
@@ -450,7 +462,7 @@ class ExportModal extends React.Component {
     if (sDate > eDate) {
       alert('Start date cannot be later than end date!'); // eslint-disable-line no-alert
     } else if (new Date(sDate) < new Date('1990-01-01') ||
-                new Date(eDate) > new Date('2019-07-31')) {
+      new Date(eDate) > new Date('2019-07-31')) {
       alert('Available date: 01/01/1990 ~ 31/07/2019.'); // eslint-disable-line no-alert
     } else {
       const queryData = {
@@ -471,7 +483,7 @@ class ExportModal extends React.Component {
       this.props.requestSolarData(queryData)
         .then(() => {
           window.location = '/solar/list';
-      });
+        });
     }
   }
 
@@ -482,7 +494,7 @@ class ExportModal extends React.Component {
 
     return (
       <div>
-        <MuiThemeProvider theme={theme}>
+        <ThemeProvider theme={theme}>
           <Dialog
             classes={{ paper: classes.dialog }}
             fullWidth
@@ -610,13 +622,18 @@ class ExportModal extends React.Component {
                 </FormControl>
                 <hr className={classes.contentHr} />
                 <div>
-                <FormLabel classes={{ root: classes.costLabel, focused: classes.labelFocused }} component="legend">Approx cost</FormLabel>
-                <TextField
-                      id="cost"
-                      variant="outlined"
-                      className={classes.costOutput}
-                      value={this.state.cost}
-                />
+                  <FormLabel classes={{ root: classes.costLabel, focused: classes.labelFocused }} component="legend">Approx Cost</FormLabel>
+                  <TextField
+                    id="cost"
+                    variant="outlined"
+                    disabled
+                    className={classes.costOutput}
+                    value={this.state.cost}
+                    InputProps={{
+                      classes: { input: classes.textInput },
+                      startAdornment: <InputAdornment className={classes.dollar} position="start">$</InputAdornment>,
+                    }}
+                  />
                 </div>
               </DialogContent>
             </div>
@@ -636,7 +653,7 @@ class ExportModal extends React.Component {
               </Button>
             </DialogActions>
           </Dialog>
-        </MuiThemeProvider>
+        </ThemeProvider>
       </div>
     );
   }

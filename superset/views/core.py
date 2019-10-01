@@ -487,9 +487,14 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
         pks = [self._serialize_pk_if_composite(pk) for pk in pks]
 
         # get all object keys in s3 under the user sub folder
-        all_object_keys = self.list_object_key('colin-query-test', g.user.email + '/')
-        avail_object_keys = [key for key in all_object_keys if key.endswith('.csv')]
-        obj_keys = [key.split('/')[1].replace('.csv', '') for key in avail_object_keys]
+        try:
+            all_object_keys = self.list_object_key('colin-query-test', g.user.email + '/')
+        except Exception:
+            all_object_keys = []
+        obj_keys = []
+        if all_object_keys:
+            avail_object_keys = [key for key in all_object_keys if key.endswith('.csv')]
+            obj_keys = [key.split('/')[1].replace('.csv', '') for key in avail_object_keys]
         # for key in avail_object_keys:
         #     obj_keys.append(key.split('/')[1].replace('.csv', ''))
 

@@ -18,9 +18,8 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/styles';
 import withWidth from '@material-ui/core/withWidth';
-// import { withStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Fab from '@material-ui/core/Fab';
 // import InputAdornment from '@material-ui/core/InputAdornment';
@@ -167,7 +166,7 @@ class LocationSearchBox extends React.Component {
 
   render() {
     const { classes, width } = this.props;
-    const isXSScreen = /xs|sm|md/.test(width);
+    const isSmallScreen = /xs|sm|md/.test(width);
 
     return (
       <Card className={classes.card}>
@@ -188,24 +187,8 @@ class LocationSearchBox extends React.Component {
               },
             }}
             disableUnderline
-          // endAdornment={
-          //   <MuiThemeProvider theme={theme}>
-          //     <InputAdornment position="end">
-          //       <Fab
-          //         id="searchFab"
-          //         size="medium"
-          //         color="primary"
-          //         aria-label="Search"
-          //         className={classes.fab}
-          //         onClick={this.onSearchClick}
-          //       >
-          //         <Search />
-          //       </Fab>
-          //     </InputAdornment>
-          //   </MuiThemeProvider>
-          // }
           />
-          {isXSScreen ?
+          {isSmallScreen ?
             <Fab
               id="searchFab"
               size="medium"
@@ -237,3 +220,4 @@ class LocationSearchBox extends React.Component {
 LocationSearchBox.propTypes = propTypes;
 
 export default withWidth()(withStyles(styles)(LocationSearchBox));
+
