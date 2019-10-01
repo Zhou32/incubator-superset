@@ -22,45 +22,35 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import MapView from './MapView';
-import ResultView from './ResultView';
+// import ResultView from './ResultView';
 import WelcomePage from './WelcomePage';
 import DemoPage from './DemoPage';
 
 const propTypes = {
-  solarBI: PropTypes.object.isRequired,
+  entry: PropTypes.object.isRequired,
   // width: PropTypes.string.isRequired,
 };
 
-class SolarView extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    const { entry } = this.props.solarBI;
-
-    return (
-      <div>
-        {entry === 'demo' && (
-          <div>
-            <DemoPage />
-          </div>
-        )}
-        {entry === 'result' && (
-          <div>
-            <WelcomePage />
-          </div>
-        )}
-        {entry === 'add' && (
-          <div>
-            <MapView />
-          </div>
-        )}
-      </div>
-
-    );
-  }
-
+function SolarView({ entry }) {
+  return (
+    <div>
+      {entry === 'demo' && (
+        <div>
+          <DemoPage />
+        </div>
+      )}
+      {entry === 'result' && (
+        <div>
+          <WelcomePage />
+        </div>
+      )}
+      {entry === 'add' && (
+        <div>
+          <MapView />
+        </div>
+      )}
+    </div>
+  );
 }
 
 SolarView.propTypes = propTypes;
@@ -71,5 +61,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  {}
+  {},
 )(SolarView);
