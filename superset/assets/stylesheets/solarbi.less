@@ -1324,7 +1324,7 @@ input {
 
 /* top right*/
 .ribbon-top-right {
-  top: -10px;
+  top: -20px;
   right: -10px;
 }
 .ribbon-top-right::before,
@@ -1335,12 +1335,39 @@ input {
 .ribbon-top-right::before {
   top: 0;
   left: 35;
+  opacity: 0.6;
 }
 .ribbon-top-right::after {
   bottom: 35;
   right: 0;
+  opacity: 0.6;
 }
 .ribbon-top-right span {
+  left: -25px;
+  top: 30px;
+  transform: rotate(45deg);
+}
+
+.saved-ribbon-top-right {
+  top: -30px;
+  right: -10px;
+}
+.saved-ribbon-top-right::before,
+.saved-ribbon-top-right::after {
+  border-top-color: transparent;
+  border-right-color: transparent;
+}
+.saved-ribbon-top-right::before {
+  top: 0;
+  left: 35;
+  opacity: 0.6;
+}
+.saved-ribbon-top-right::after {
+  bottom: 35;
+  right: 0;
+  opacity: 0.6;
+}
+.saved-ribbon-top-right span {
   left: -25px;
   top: 30px;
   transform: rotate(45deg);

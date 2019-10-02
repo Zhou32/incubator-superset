@@ -81,6 +81,7 @@
             {% set formatter = formatters_columns.get(value) %}
             {% if 'None' in item['slice_query_id'] %}
                 <div class="list-container">
+                    <div class="ribbon saved-ribbon-top-right"><span>saved</span></div>
                     {% if formatter %}
                         {{ formatter(item['view_slice_name']) }}
                     {% else %}
@@ -96,7 +97,7 @@
                     {{ formatter(item['view_slice_name']) }}
                 {% else %}
                    {% set info = item['view_slice_name'].split('_') %}
-                   <div class="ribbon ribbon-top-right"><span>$</span></div>
+                   <div class="ribbon ribbon-top-right"><span>paid</span></div>
                    <table>
                       <tr>
                         <td>Address</td>
