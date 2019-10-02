@@ -307,7 +307,25 @@ class ExportModal extends React.Component {
     this.handleQuestionClose = this.handleQuestionClose.bind(this);
     this.calculateCost = this.calculateCost.bind(this);
     this.dateDiff = this.dateDiff.bind(this);
+    this.onUnload = this.onUnload.bind(this);
   }
+
+  componentDidMount() {
+    window.addEventListener('beforeunload', this.onUnload);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('beforeunload', this.onUnload);
+  }
+
+  onUnload(event) { // the method that will be used for both add and remove event
+    // console.log("hellooww")
+    if (this.props.solarBI.requestStatus !== 'success') {
+      // eslint-disable-next-line no-param-reassign
+      event.returnValue = 'This will go back to search page, are you sure?';
+    }
+  }
+
 
   calculateCost() {
     const timeCost = {
