@@ -39,6 +39,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import InputAdornment from '@material-ui/core/InputAdornment';
+import SolarStepper from './SolarStepper';
 import { requestSolarData } from '../actions/solarActions';
 
 const propTypes = {
@@ -135,7 +136,6 @@ const styles = tm => ({
     textAlign: 'center',
   },
   dialog: {
-    borderRadius: 12,
     padding: 10,
     fontFamily: 'Montserrat',
     fontWeight: 'bold',
@@ -251,6 +251,7 @@ const styles = tm => ({
     backgroundColor: '#EEEFF0',
     borderRadius: 12,
     lineHeight: '18px',
+    textAlign: 'center',
   },
   typeGroup: {
     flexDirection: 'row',
@@ -538,6 +539,9 @@ class ExportModal extends React.Component {
             }}
           >
             <div className={classes.head}>{this.props.address.slice(0, -11)}</div>
+            <div style={{ padding: 0, width: '70%', position: 'absolute', top: 30, right: 200 }}>
+              <SolarStepper activeStep={2} />
+            </div>
             <div className={classes.border}>
               <DialogTitle
                 disableTypography
@@ -656,13 +660,12 @@ class ExportModal extends React.Component {
                 </FormControl>
                 <hr className={classes.contentHr} />
                 <div>
-                  <FormLabel classes={{ root: classes.costLabel, focused: classes.labelFocused }} component="legend">Approx Cost</FormLabel>
+                  <FormLabel classes={{ root: classes.costLabel, focused: classes.labelFocused }} component="legend">Cost</FormLabel>
                   <TextField
                     id="cost"
                     variant="outlined"
-                    disabled
                     className={classes.costOutput}
-                    value={this.state.cost}
+                    value={new Date(startDate) > new Date(endDate) || new Date(startDate) < new Date('1990-01-01') || new Date(endDate) > new Date('2019-07-31') ? 'NaN' : this.state.cost}
                     InputProps={{
                       classes: { input: classes.textInput },
                       startAdornment: <InputAdornment className={classes.dollar} position="start">$</InputAdornment>,

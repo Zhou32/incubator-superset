@@ -33,9 +33,6 @@ const styles = theme => ({
     marginLeft: '40 !important',
     marginRight: '100 !important',
   },
-  root: {
-    marginBottom: 40,
-  },
   slider: {
     padding: '22px 0px',
   },
