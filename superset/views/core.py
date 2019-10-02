@@ -1593,6 +1593,15 @@ class Superset(BaseSupersetView):
         return json_success(json.dumps({'query_id': response['QueryExecutionId']}))
 
     @event_logger.log_this
+    @api
+    @handle_api_exception
+    @expose('/process_payment/', methods=['GET', 'POST'])
+    def process_payment(self):
+        print('processing')
+        form_data = get_form_data()[0]
+        return json_success(json.dumps({'status': 'success'}))
+
+    @event_logger.log_this
     @has_access
     @expose("/import_dashboards", methods=["GET", "POST"])
     def import_dashboards(self):

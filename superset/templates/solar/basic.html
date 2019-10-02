@@ -115,6 +115,7 @@
     {% block tail_js %}
 {#        <script src="https://kit.fontawesome.com/ace8403ae5.js"></script>#}
         <script src="{{url_for('appbuilder.static',filename='js/bootstrap.min.js')}}"></script>
+        <script src="https://js.stripe.com/v3/"></script>
         {% if entry %}
             {% with filename=entry %}
               {% include "superset/partials/_script_tag.html" %}

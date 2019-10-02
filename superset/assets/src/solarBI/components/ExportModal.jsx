@@ -39,6 +39,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import InputAdornment from '@material-ui/core/InputAdornment';
+import PaymentModal from './PaymentModal';
 import { requestSolarData } from '../actions/solarActions';
 
 const propTypes = {
@@ -116,7 +117,7 @@ const styles = tm => ({
     backgroundColor: '#EEEFF0',
     borderRadius: 12,
     lineHeight: '18px',
-    marginTop: '25px',
+    marginTop: '15px',
     marginLeft: '30px',
     '& fieldset': {
       borderRadius: 12,
@@ -135,7 +136,7 @@ const styles = tm => ({
     textAlign: 'center',
   },
   dialog: {
-    borderRadius: 12,
+    // borderRadius: 12,
     padding: 10,
     fontFamily: 'Montserrat',
     fontWeight: 'bold',
@@ -249,6 +250,7 @@ const styles = tm => ({
     fontSize: '16px',
     fontWeight: 500,
     backgroundColor: '#EEEFF0',
+    textAlign: 'center',
     borderRadius: 12,
     lineHeight: '18px',
   },
@@ -302,7 +304,7 @@ class ExportModal extends React.Component {
     this.handleStartDateChange = this.handleStartDateChange.bind(this);
     this.handleEndDateChange = this.handleEndDateChange.bind(this);
     this.handleResolutionChange = this.handleResolutionChange.bind(this);
-    this.handleRequestData = this.handleRequestData.bind(this);
+    // this.handleRequestData = this.handleRequestData.bind(this);
     this.handleQuestionClick = this.handleQuestionClick.bind(this);
     this.handleQuestionClose = this.handleQuestionClose.bind(this);
     this.calculateCost = this.calculateCost.bind(this);
@@ -482,38 +484,38 @@ class ExportModal extends React.Component {
     this.setState({ anchorEl: null });
   }
 
-  handleRequestData() {
-    const sDate = new Date(this.state.startDate);
-    const eDate = new Date(this.state.endDate);
-    if (sDate > eDate) {
-      alert('Start date cannot be later than end date!'); // eslint-disable-line no-alert
-    } else if (new Date(sDate) < new Date('1990-01-01') ||
-      new Date(eDate) > new Date('2019-07-31')) {
-      alert('Available date: 01/01/1990 ~ 31/07/2019.'); // eslint-disable-line no-alert
-    } else {
-      const queryData = {
-        lat: this.props.solarBI.queryResponse.data.lat + '',
-        lng: this.props.solarBI.queryResponse.data.lng + '',
-        startDate: this.state.startDate,
-        endDate: this.state.endDate,
-        type: this.state.type,
-        resolution: this.state.resolution,
-        datasource_id: this.props.solarBI.queryResponse.form_data.datasource_id,
-        datasource_type: this.props.solarBI.queryResponse.form_data.datasource_type,
-        viz_type: this.props.solarBI.queryResponse.form_data.viz_type,
-        radius: this.props.solarBI.queryResponse.radius,
-        spatial_address: { ...this.props.solarBI.queryResponse.form_data.spatial_address },
-        address_name: this.props.address.slice(0, -11),
-      };
-      this.props.onHide();
-      this.props.requestSolarData(queryData)
-        .then((json) => {
-          if (json.type === 'REQEUST_SOLAR_DATA_SUCCEEDED') {
-            window.location = '/solar/list';
-          }
-        });
-    }
-  }
+  // handleRequestData() {
+  //   const sDate = new Date(this.state.startDate);
+  //   const eDate = new Date(this.state.endDate);
+  //   if (sDate > eDate) {
+  //     alert('Start date cannot be later than end date!'); // eslint-disable-line no-alert
+  //   } else if (new Date(sDate) < new Date('1990-01-01') ||
+  //     new Date(eDate) > new Date('2019-07-31')) {
+  //     alert('Available date: 01/01/1990 ~ 31/07/2019.'); // eslint-disable-line no-alert
+  //   } else {
+  //     const queryData = {
+  //       lat: this.props.solarBI.queryResponse.data.lat + '',
+  //       lng: this.props.solarBI.queryResponse.data.lng + '',
+  //       startDate: this.state.startDate,
+  //       endDate: this.state.endDate,
+  //       type: this.state.type,
+  //       resolution: this.state.resolution,
+  //       datasource_id: this.props.solarBI.queryResponse.form_data.datasource_id,
+  //       datasource_type: this.props.solarBI.queryResponse.form_data.datasource_type,
+  //       viz_type: this.props.solarBI.queryResponse.form_data.viz_type,
+  //       radius: this.props.solarBI.queryResponse.radius,
+  //       spatial_address: { ...this.props.solarBI.queryResponse.form_data.spatial_address },
+  //       address_name: this.props.address.slice(0, -11),
+  //     };
+  //     this.props.onHide();
+  //     this.props.requestSolarData(queryData)
+  //       .then((json) => {
+  //         if (json.type === 'REQEUST_SOLAR_DATA_SUCCEEDED') {
+  //           window.location = '/solar/list';
+  //         }
+  //       });
+  //   }
+  // }
 
   render() {
     const { classes, open, onHide, solarBI } = this.props;
@@ -656,11 +658,10 @@ class ExportModal extends React.Component {
                 </FormControl>
                 <hr className={classes.contentHr} />
                 <div>
-                  <FormLabel classes={{ root: classes.costLabel, focused: classes.labelFocused }} component="legend">Approx Cost</FormLabel>
+                  <FormLabel classes={{ root: classes.costLabel, focused: classes.labelFocused }} component="legend">Cost</FormLabel>
                   <TextField
                     id="cost"
                     variant="outlined"
-                    disabled
                     className={classes.costOutput}
                     value={this.state.cost}
                     InputProps={{
@@ -682,7 +683,8 @@ class ExportModal extends React.Component {
               </Button>
               {solarBI.sending ?
                 (<img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />) :
-                (<Button className={classNames(classes.button, classes.requestBtn)} onClick={this.handleRequestData} color="primary">Pay</Button>)
+                (<PaymentModal />)
+                // (<Button className={classNames(classes.button, classes.requestBtn)} onClick={this.handleRequestData} color="primary">Pay</Button>)
               }
             </DialogActions>
           </Dialog>

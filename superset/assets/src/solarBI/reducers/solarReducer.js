@@ -114,7 +114,26 @@ export default function (state = {}, action) {
     [actions.REQUEST_SOLAR_DATA_FAILED]() {
       return {
         ...state,
+        sending: false,
         requestStatus: 'failed',
+      };
+    },
+    [actions.PROCESS_PAYMENT_STARTED]() {
+      return {
+        ...state,
+        payment: 'processing',
+      };
+    },
+    [actions.PROCESS_PAYMENT_SUCCEEDED]() {
+      return {
+        ...state,
+        payment: 'success',
+      };
+    },
+    [actions.PROCESS_PAYMENT_FAILED]() {
+      return {
+        ...state,
+        payment: 'failed',
       };
     },
   };

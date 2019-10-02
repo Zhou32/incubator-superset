@@ -214,3 +214,41 @@ export function requestSolarData(queryData, timeout = 60) {
       });
   };
 }
+
+export const PROCESS_PAYMENT_STARTED = 'PROCESS_PAYMENT_STARTED';
+export function processPaymentStarted() {
+  return { type: PROCESS_PAYMENT_STARTED };
+}
+
+export const PROCESS_PAYMENT_SUCCEEDED = 'PROCESS_PAYMENT_SUCCEEDED';
+export function processPaymentSucceeded(data) {
+  return { type: PROCESS_PAYMENT_SUCCEEDED, data };
+}
+
+export const PROCESS_PAYMENT_FAILED = 'PROCESS_PAYMENT_FAILED';
+export function processPaymentFailed() {
+  return { type: PROCESS_PAYMENT_FAILED };
+}
+
+export function processPayment(paymentInfo, timeout = 60) {
+  return (dispatch) => {
+    const url = '/superset/proess_payment/';
+    // const logStart = Logger.getTimestamp();
+    const controller = new AbortController();
+    const { signal } = controller;
+    dispatch(processPaymentStarted());
+
+    return SupersetClient.post({
+      url,
+      postPayload: { form_data: paymentInfo },
+      signal,
+      timeout: timeout * 1000,
+    })
+      .then(({ json }) => dispatch(processPaymentSucceeded(json)))
+      // dispatch(addSuccessToast(t('Request confirmed! An email has been sent to you.')));
+      .catch(() => {
+        dispatch(processPaymentFailed());
+        dispatch(addDangerToast(t('Payment failed.')));
+      });
+  };
+}

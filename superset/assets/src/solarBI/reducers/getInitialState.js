@@ -23,6 +23,7 @@ export default function getInitialState(bootstrapData) {
     solarBI: {
       ...bootstrapData,
       sending: false,
+      paymentProcessing: false,
       solarAlert: null,
       solarStatus: 'waiting',
       solarStackTrace: null,
