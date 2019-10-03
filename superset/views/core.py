@@ -1878,9 +1878,12 @@ class Superset(BaseSupersetView):
 
         return json_success(json.dumps(response))
 
-    def save_slice(self, slc):
+    def save_slice(self, slc, paid=False):
         session = db.session()
-        msg = _("Chart [{}] has been saved").format(slc.slice_name)
+        if not paid:
+            msg = _("Your quick result record for [{}] has been saved.").format(slc.slice_name)
+        else:
+            msg = _("A confirmation email has been sent to you. This record is also saved below.").format(slc.slice_name)
         session.add(slc)
         session.commit()
         flash(msg, "info")
@@ -3422,7 +3425,7 @@ class Superset(BaseSupersetView):
             slc.resolution = resolution
 
         if action in ("saveas") and slice_add_perm:
-            self.save_slice(slc)
+            self.save_slice(slc, paid=slc.paid)
         elif action == "overwrite" and slice_overwrite_perm:
             self.overwrite_slice(slc)
 
