@@ -755,7 +755,7 @@ class SupersetSecurityManager(SecurityManager):
             (pvm.view_menu.name in self.USER_MODEL_VIEWS and
              pvm.permission.name == 'can_list'))
 
-    def is_granter_pvm(self, pvm):
+    def _is_granter_pvm(self, pvm):
         return pvm.permission.name in {
             'can_override_role_permissions', 'can_approve',
         }

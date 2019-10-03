@@ -1041,6 +1041,11 @@ input {
   padding: 8px;
   font-weight: 500;
 }
+.list-card td div {
+  min-height: 50;
+  height: 50;
+  overflow-y: scroll;
+}
 .list-card td:first-child {
   font-size: 1.2em;
   color: #0063B0 !important;
@@ -1282,11 +1287,11 @@ input {
 
 /* common */
 .ribbon {
-  width: 150px;
-  height: 150px;
+  width: 100px;
+  height: 100px;
   overflow: hidden;
   position: absolute;
-  opacity: 0.6; 
+  opacity: 0.8; 
 }
 .ribbon::before {
   position: absolute;
@@ -1306,7 +1311,6 @@ input {
   position: absolute;
   display: block;
   width: 225px;
-  padding: 3px 0;
   background-color: #3498db;
   box-shadow: 0 5px 10px rgba(0,0,0,.1);
   color: #fff;
@@ -1314,13 +1318,13 @@ input {
   text-shadow: 0 1px 1px rgba(0,0,0,.2);
   text-transform: uppercase;
   text-align: center;
-  opacity: 0.5;
-  padding-left: 30;
+  opacity: 0.8;
+  padding-right: 30;
 }
 
 /* top right*/
 .ribbon-top-right {
-  top: -10px;
+  top: -20px;
   right: -10px;
 }
 .ribbon-top-right::before,
@@ -1330,13 +1334,40 @@ input {
 }
 .ribbon-top-right::before {
   top: 0;
-  left: 28;
+  left: 35;
+  opacity: 0.6;
 }
 .ribbon-top-right::after {
-  bottom: 28;
+  bottom: 35;
   right: 0;
+  opacity: 0.6;
 }
 .ribbon-top-right span {
+  left: -25px;
+  top: 30px;
+  transform: rotate(45deg);
+}
+
+.saved-ribbon-top-right {
+  top: -30px;
+  right: -10px;
+}
+.saved-ribbon-top-right::before,
+.saved-ribbon-top-right::after {
+  border-top-color: transparent;
+  border-right-color: transparent;
+}
+.saved-ribbon-top-right::before {
+  top: 0;
+  left: 35;
+  opacity: 0.6;
+}
+.saved-ribbon-top-right::after {
+  bottom: 35;
+  right: 0;
+  opacity: 0.6;
+}
+.saved-ribbon-top-right span {
   left: -25px;
   top: 30px;
   transform: rotate(45deg);

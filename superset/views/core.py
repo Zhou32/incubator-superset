@@ -468,6 +468,7 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
             **args
     ):
         """ get joined base filter and current active filter for query """
+        # pylint: disable=unpacking-non-sequence
         widgets = widgets or {}
         actions = actions or self.actions
         page_size = page_size or self.page_size
@@ -1584,7 +1585,7 @@ class Superset(BaseSupersetView):
                               form_data['endDate'] + '_' + type + '_' + resolution}
         datasource = ConnectorRegistry.get_datasource(
             form_data['datasource_type'], form_data['datasource_id'], db.session)
-        self.form_overwrite_solarbislice(args, None, True, None, False, form_data['datasource_id'],
+        self.save_or_overwrite_solarbislice(args, None, True, None, False, form_data['datasource_id'],
                                          form_data['datasource_type'], datasource.name,
                                          query_id=response['QueryExecutionId'], start_date=form_data['startDate'],
                                          end_date=form_data['endDate'], data_type=type, resolution=resolution)
@@ -1779,7 +1780,7 @@ class Superset(BaseSupersetView):
         )
         return json_success(payload)
 
-    def form_overwrite_slice(
+    def save_or_overwrite_slice(
         self,
         args,
         slc,
@@ -1877,9 +1878,12 @@ class Superset(BaseSupersetView):
 
         return json_success(json.dumps(response))
 
-    def save_slice(self, slc):
+    def save_slice(self, slc, paid=False):
         session = db.session()
-        msg = _("Chart [{}] has been saved").format(slc.slice_name)
+        if not paid:
+            msg = _("Your quick result record for [{}] has been saved.").format(slc.slice_name)
+        else:
+            msg = _("A confirmation email has been sent to you. This record is also saved below.").format(slc.slice_name)
         session.add(slc)
         session.commit()
         flash(msg, "info")
@@ -3373,7 +3377,7 @@ class Superset(BaseSupersetView):
 
         return form_data, slc
 
-    def form_overwrite_solarbislice(
+    def save_or_overwrite_solarbislice(
         self,
         args,
         slc,
@@ -3421,7 +3425,7 @@ class Superset(BaseSupersetView):
             slc.resolution = resolution
 
         if action in ("saveas") and slice_add_perm:
-            self.save_slice(slc)
+            self.save_slice(slc, paid=slc.paid)
         elif action == "overwrite" and slice_overwrite_perm:
             self.overwrite_slice(slc)
 
@@ -3507,7 +3511,7 @@ class Superset(BaseSupersetView):
                 status=400)
 
         if action in ('saveas', 'overwrite'):
-            return self.form_overwrite_solarbislice(
+            return self.save_or_overwrite_solarbislice(
                 request.args,
                 slc, slice_add_perm,
                 slice_overwrite_perm,
@@ -3515,14 +3519,6 @@ class Superset(BaseSupersetView):
                 datasource_id,
                 datasource_type,
                 datasource.name)
-            # return self.form_overwrite_slice(
-            #     request.args,
-            #     slc, slice_add_perm,
-            #     slice_overwrite_perm,
-            #     slice_download_perm,
-            #     datasource_id,
-            #     datasource_type,
-            #     datasource.name)
 
         standalone = request.args.get('standalone') == 'true'
         bootstrap_data = {

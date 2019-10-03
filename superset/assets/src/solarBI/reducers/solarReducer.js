@@ -89,12 +89,14 @@ export default function (state = {}, action) {
     [actions.SAVE_SOLAR_DATA_SUCCESS]() {
       return {
         ...state,
+        saveStatus: 'success',
         data: action.data,
       };
     },
     [actions.SAVE_SOLAR_DATA_FAILED]() {
       return {
         ...state,
+        saveStatus: 'failed',
         saveModalAlert: 'Failed to save slice',
       };
     },

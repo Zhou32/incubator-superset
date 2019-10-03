@@ -23,6 +23,7 @@ from wtforms import (
 from wtforms.fields.html5 import EmailField
 
 from flask_appbuilder.security.sqla.models import User, RegisterUser
+from .models import Team, TeamRegisterUser
 from flask_appbuilder.security.forms import DynamicForm
 from flask_appbuilder.widgets import FormWidget, RenderTemplateWidget
 
@@ -33,14 +34,20 @@ def unique_required(form, field):
     if field.name == "email":
         if db.session.query(User).filter_by(email=field.data).first() is not None:
             raise ValidationError("Email already exists")
-        if db.session.query(RegisterUser).filter_by(email=field.data).first() is not None:
+        if db.session.query(TeamRegisterUser).filter_by(email=field.data).first() is not None:
             raise ValidationError("Email exists, waiting to be activated")
 
     if field.name == 'username':
         if db.session.query(User).filter_by(username=field.data).first() is not None:
             raise ValidationError("Username already exists")
-        if db.session.query(RegisterUser).filter_by(username=field.data).first() is not None:
+        if db.session.query(TeamRegisterUser).filter_by(username=field.data).first() is not None:
             raise ValidationError("Username exists, waiting to be activated")
+
+    if field.name == 'team':
+        if db.session.query(Team).filter_by(team_name=field.data).first() is not None:
+            raise ValidationError("Team name already exists")
+        if db.session.query(TeamRegisterUser).filter_by(team=field.data).first() is not None:
+            raise ValidationError("Team name already exists, waiting team admin to activate")
 
 
 class SolarBILoginForm_db(DynamicForm):
@@ -60,7 +67,7 @@ class SolarBIRegisterUserDBForm(DynamicForm):
     )
     username = StringField(
         lazy_gettext("Username"),
-        validators=[DataRequired()],
+        validators=[DataRequired(), unique_required],
     )
     email = StringField(
         lazy_gettext("Email"),
@@ -68,7 +75,7 @@ class SolarBIRegisterUserDBForm(DynamicForm):
     )
     team = StringField(
         lazy_gettext("Team name"),
-        validators=[DataRequired()],
+        validators=[DataRequired(), unique_required],
     )
     password = PasswordField(
         lazy_gettext("Password"),

@@ -31,11 +31,12 @@ const styles = theme => ({
   csvLink: {
     position: 'absolute',
     right: 180,
-    top: 445,
+    top: 403,
     zIndex: 200,
     color: '#424242',
     '& span': {
       display: 'none',
+      fontSize: 12,
     },
     '&:hover span': {
       top: 0,
@@ -58,7 +59,7 @@ class BarChart extends React.Component {
     this.state = {
       headers: [
         { label: 'Date', key: 'date' },
-        { label: 'Solar Data', key: 'solar_data' },
+        { label: 'Solar Radiation', key: 'solar_data' },
       ],
     };
 
@@ -67,10 +68,8 @@ class BarChart extends React.Component {
 
   getBarchartOption(data) {
     if (data) {
-      // const data1 = data[1].map(x => x.toNumber());=
       const data1 = data[1];
       const xAxisData = data[0];
-      // console.log(mergedData);
 
       const option = {
         // title: {

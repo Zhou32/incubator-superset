@@ -21,11 +21,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Grid, Row, Col, Alert } from 'react-bootstrap';
-import URI from 'urijs';
+// import URI from 'urijs';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
+import SolarStepper from './SolarStepper';
 import LocationSearchBox from './LocationSearchBox';
 import DemoBox from './DemoBox';
 import { Map, Marker, Circle, InfoWindow, GoogleApiWrapper } from '../../visualizations/SolarBI/google_maps_react';
@@ -36,7 +37,7 @@ import InfoTabs from './InfoTabs';
 import HeatMap from './HeatMap';
 import BarChart from './BarChart';
 // import SolarCharts from './SolarCharts';
-import WelcomePage from './WelcomePage';
+// import WelcomePage from './WelcomePage';
 import DemoPage from './DemoPage';
 import Loading from './Loading';
 
@@ -46,12 +47,13 @@ const theme = createMuiTheme({
   },
   palette: {
     primary: {
-      main: '#DAD800',
+      main: '#0063B0',
     },
     secondary: {
       main: '#0063B0',
     },
   },
+
 });
 
 const propTypes = {
@@ -94,7 +96,7 @@ export class MapView extends React.Component {
     this.toggleSaveModal = this.toggleSaveModal.bind(this);
     // this.toggleExportModal = this.toggleExportModal.bind(this);
     this.getFormData = this.getFormData.bind(this);
-    this.getCSVURL = this.getCSVURL.bind(this);
+    // this.getCSVURL = this.getCSVURL.bind(this);
     this.onMarkerClick = this.onMarkerClick.bind(this);
     this.onInfoWindowClose = this.onInfoWindowClose.bind(this);
     this.onMapClicked = this.onMapClicked.bind(this);
@@ -223,26 +225,25 @@ export class MapView extends React.Component {
     };
   }
 
-  getCSVURL() {
-    const formData = this.getFormData();
-    const uri = new URI('/');
-    const directory =
-      '/superset/explore_json/' +
-      formData.datasource_type +
-      '/' +
-      formData.datasource_id +
-      '/';
-    const search = uri.search(true);
-    search.form_data = JSON.stringify(formData);
-    search.standalone = 'true';
-    search.csv = 'true';
-    const part_uri = uri
-      .directory(directory)
-      .search(search)
-      .toString();
-    return window.location.origin + part_uri + `&height=${this.state.height}`;
-  }
-
+  // getCSVURL() {
+  //   const formData = this.getFormData();
+  //   const uri = new URI('/');
+  //   const directory =
+  //     '/superset/explore_json/' +
+  //     formData.datasource_type +
+  //     '/' +
+  //     formData.datasource_id +
+  //     '/';
+  //   const search = uri.search(true);
+  //   search.form_data = JSON.stringify(formData);
+  //   search.standalone = 'true';
+  //   search.csv = 'true';
+  //   const part_uri = uri
+  //     .directory(directory)
+  //     .search(search)
+  //     .toString();
+  //   return window.location.origin + part_uri + `&height=${this.state.height}`;
+  // }
   requestData() {
     const formData = this.getFormData();
     this.props.fetchSolarData(formData, false, 60, '');
@@ -323,36 +324,12 @@ export class MapView extends React.Component {
       );
       reactEcharts = (
         <div>
-          {/* <p
-            style={{
-              fontSize: 30,
-              fontWeight: 'bold',
-              textAlign: 'center',
-              color: 'black',
-              marginTop: 10,
-            }}
-          >
-            Solar Irradiance Exposure
-          </p> */}
-          {/* <p
-            style={{
-              fontSize: 25,
-              textAlign: 'center',
-              color: '#68918d',
-              marginTop: 10,
-              marginBottom: 30,
-            }}
-          >
-            {queryResponse.form_data.spatial_address.address.slice(0, -11)}
-          </p> */}
-
-          {/* <SolarCharts queryData={queryResponse.data.data} /> */}
           <InfoTabs
             address={this.state.address}
             onBackClick={this.onGoBackClick}
             onSaveClick={this.toggleSaveModal}
             // onExportClick={this.toggleExportModal}
-            getCSVURL={this.getCSVURL}
+            // getCSVURL={this.getCSVURL}
             can_save={this.props.solarBI.can_save}
             can_export={this.props.solarBI.can_export}
             solar_new={this.state.solar_new}
@@ -360,7 +337,7 @@ export class MapView extends React.Component {
         </div>
       );
     } else if (solarStatus === 'loading') {
-      reactEcharts = <Loading size={80} />;
+      reactEcharts = (<Loading size={80} />);
     } else if (solarStatus === 'failed') {
       reactEcharts = (
         <Alert bsStyle="danger">
@@ -403,19 +380,21 @@ export class MapView extends React.Component {
             </Grid>
           )}
 
-          {this.state.searching && entry === 'welcome' && (
+          {/* {this.state.searching && entry === 'welcome' && (
             <div>
               <WelcomePage />
             </div>
-          )}
+          )} */}
           {this.state.searching && entry === 'demo' && (
             <div>
               <DemoPage />
             </div>
           )}
           {this.state.searching && entry !== 'welcome' && entry !== 'demo' && (
-            // <Grid style={{ position: 'absolute', top: '200px' }}>
             <Grid style={{ marginTop: 200 }}>
+              <div style={{ padding: 0, width: '70%', position: 'absolute', top: 0, right: 220 }}>
+                <SolarStepper activeStep={0} />
+              </div>
               <Row className="show-grid">
                 <Col xs={10} xsOffset={1} md={10} mdOffset={1}>
                   <LocationSearchBox
@@ -427,126 +406,81 @@ export class MapView extends React.Component {
               </Row>
             </Grid>
           )}
-
-          {/* {this.state.showingMap && (
-            <p
-              style={{
-                fontSize: 25,
-                textAlign: 'center',
-                color: '#68918d',
-                marginTop: 10,
-                marginBottom: 30,
-              }}
-            >
-              {this.state.address.slice(0, -11)}
-            </p>
-          )}
-          <Map
-            visible={this.state.showingMap}
-            google={this.props.google}
-            zoom={this.state.zoom}
-            onClick={this.onMapClicked}
-            initialCenter={this.state.center}
-            center={this.state.center}
-            style={{
-              marginTop: '-19px',
-              boxShadow:
-                '0 1px 3px rgba(0,0,0,0.12), 0 4px 6px rgba(29,114,12,0.24)',
-              borderRadius: '1em',
-              height: '300px',
-              width: '100%',
-              position: 'relative',
-            }}
-          >
-            <Marker
-              position={this.state.center}
-              name={this.state.address}
-              icon={defaultIcon}
-              onClick={this.onMarkerClick}
-            />
-            {closestMarker}
-            {infoWindow}
-
-            <Circle
-              radius={this.state.radius * 1000}
-              center={this.state.center}
-              strokeColor="transparent"
-              strokeOpacity={0}
-              strokeWeight={5}
-              fillColor={'#FF0000'}
-              fillOpacity={0.2}
-            />
-          </Map> */}
           {this.state.showingMap && (
-            <Card style={{ margin: '75px auto', width: '93%', height: 930 }}>
-              <CardContent>
-                <CloseButton
-                  onBackClick={this.onGoBackClick}
-                  solar_new={this.state.solar_new}
-                />
-                <Grid>
-                  <Row className="show-grid">
-                    <Col xsOffset={1} xs={10} md={12} mdOffset={0}>
-                      {this.state.showingMap && (
-                        <div>
-                          <p
+            <React.Fragment>
+              <div style={{ padding: 0, width: '70%', position: 'absolute', top: 0, right: 220 }}>
+                <SolarStepper activeStep={1} />
+              </div>
+              <Card style={{ margin: '90px auto', width: '93%', height: 840 }}>
+                <CardContent>
+                  <CloseButton
+                    onBackClick={this.onGoBackClick}
+                    solar_new={this.state.solar_new}
+                  />
+                  <Grid>
+                    <Row className="show-grid">
+                      <Col xsOffset={1} xs={10} md={12} mdOffset={0}>
+                        {this.state.showingMap && (
+                          <div>
+                            <p
+                              style={{
+                                fontFamily: 'Montserrat',
+                                fontSize: 21,
+                                textAlign: 'center',
+                                color: '024067',
+                              }}
+                            >
+                              {this.state.address.slice(0, -11)}
+                            </p>
+                            <hr style={{ display: 'block', width: 159, height: 1, border: 0, borderTop: '1px solid #808495', margin: '1em auto 2em', padding: 0 }} />
+                          </div>
+                        )}
+                        <div style={{ display: 'flex', marginLeft: 20 }}>
+                          <Map
+                            visible={this.state.showingMap && solarStatus === 'success' && queryResponse !== null}
+                            google={this.props.google}
+                            zoom={this.state.zoom}
+                            onClick={this.onMapClicked}
+                            initialCenter={this.state.center}
+                            center={this.state.center}
                             style={{
-                              fontFamily: 'Montserrat',
-                              fontSize: 21,
-                              textAlign: 'center',
-                              color: '024067',
+                              boxShadow:
+                                '0 1px 3px rgba(0,0,0,0.12), 0 4px 6px rgba(29,114,12,0.24)',
+                              borderRadius: '1em',
+                              height: '300px',
+                              width: '100%',
+                              position: 'relative',
                             }}
                           >
-                            {this.state.address.slice(0, -11)}
-                          </p>
-                          <hr style={{ display: 'block', width: 159, height: 1, border: 0, borderTop: '1px solid #808495', margin: '1em auto 5em', padding: 0 }} />
-                        </div>
-                      )}
-                      <div style={{ display: 'flex', marginLeft: 20 }}>
-                        <Map
-                          visible={this.state.showingMap && solarStatus === 'success' && queryResponse !== null}
-                          google={this.props.google}
-                          zoom={this.state.zoom}
-                          onClick={this.onMapClicked}
-                          initialCenter={this.state.center}
-                          center={this.state.center}
-                          style={{
-                            boxShadow:
-                              '0 1px 3px rgba(0,0,0,0.12), 0 4px 6px rgba(29,114,12,0.24)',
-                            borderRadius: '1em',
-                            height: '300px',
-                            width: '100%',
-                            position: 'relative',
-                          }}
-                        >
-                          <Marker
-                            position={this.state.center}
-                            name={this.state.address}
-                            icon={defaultIcon}
-                            onClick={this.onMarkerClick}
-                          />
-                          {closestMarker}
-                          {infoWindow}
+                            <Marker
+                              position={this.state.center}
+                              name={this.state.address}
+                              icon={defaultIcon}
+                              onClick={this.onMarkerClick}
+                            />
+                            {closestMarker}
+                            {infoWindow}
 
-                          <Circle
-                            radius={this.state.radius * 1000}
-                            center={this.state.center}
-                            strokeColor="transparent"
-                            strokeOpacity={0}
-                            strokeWeight={5}
-                            fillColor={'#FF0000'}
-                            fillOpacity={0.2}
-                          />
-                        </Map>
-                        {solarStatus === 'success' && queryResponse && <HeatMap queryData={queryResponse.data.data} />}
-                      </div>
-                      {solarStatus === 'success' && queryResponse && <BarChart queryData={queryResponse.data.data} />}
-                      {reactEcharts}
-                    </Col>
-                  </Row>
-                </Grid>
-              </CardContent>
-            </Card>
+                            <Circle
+                              radius={this.state.radius * 1000}
+                              center={this.state.center}
+                              strokeColor="transparent"
+                              strokeOpacity={0}
+                              strokeWeight={5}
+                              fillColor={'#FF0000'}
+                              fillOpacity={0.2}
+                            />
+                          </Map>
+                          {solarStatus === 'success' && queryResponse && <HeatMap queryData={queryResponse.data.data} />}
+                        </div>
+                        {solarStatus === 'success' && queryResponse && <BarChart queryData={queryResponse.data.data} />}
+                        {reactEcharts}
+                      </Col>
+                    </Row>
+                  </Grid>
+                </CardContent>
+              </Card>
+            </React.Fragment>
           )}
           <SaveModal
             open={this.state.showSaveModal}

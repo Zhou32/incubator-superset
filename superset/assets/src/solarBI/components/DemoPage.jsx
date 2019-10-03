@@ -26,6 +26,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
+import DemoChart from './DemoChart';
 
 function TabContainer(props) {
   return (
@@ -92,6 +93,16 @@ const styles = tm => ({
     minHeight: 290,
     height: 530,
     borderRadius: 12,
+  },
+  chartCard: {
+    marginTop: 90,
+    minHeight: 400,
+    height: 400,
+    borderRadius: 12,
+    fontFamily: 'Montserrat',
+  },
+  chartCardContent: {
+    padding: 0,
   },
   contentFlex: {
     display: 'flex',
@@ -161,6 +172,7 @@ class DemoPage extends React.Component {
   render() {
     const { classes } = this.props;
     const { value } = this.state;
+    const ausStates = ['VIC', 'NSW', 'QLD', 'NT', 'SA', 'WA', 'TAS'];
 
     return (
       <MuiThemeProvider theme={theme}>
@@ -212,11 +224,12 @@ class DemoPage extends React.Component {
           </CardContent>
         </Card>
 
-        <Card className={classes.cardFlex}>
-          <CardContent
-            className={classes.contentFlex}
-          >
-            <div className={classes.head}>VIC</div>
+        <Card className={classes.chartCard}>
+          <CardContent className={classes.chartCardContent}>
+            <div className={classes.head}>{ausStates[value]}</div>
+            <div style={{ width: '100%' }}>
+              <DemoChart ausState={ausStates[value]} />
+            </div>
           </CardContent>
         </Card>
       </MuiThemeProvider>

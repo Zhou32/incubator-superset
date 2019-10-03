@@ -33,9 +33,6 @@ const styles = theme => ({
     marginLeft: '40 !important',
     marginRight: '100 !important',
   },
-  root: {
-    marginBottom: 40,
-  },
   slider: {
     padding: '22px 0px',
   },
@@ -203,7 +200,7 @@ InfoTabs.propTypes = {
   classes: PropTypes.object.isRequired,
   onBackClick: PropTypes.func.isRequired,
   onSaveClick: PropTypes.func.isRequired,
-  getCSVURL: PropTypes.func.isRequired,
+  // getCSVURL: PropTypes.func.isRequired,
   can_save: PropTypes.bool.isRequired,
   can_export: PropTypes.bool.isRequired,
   solar_new: PropTypes.bool.isRequired,

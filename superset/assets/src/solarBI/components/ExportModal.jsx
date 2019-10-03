@@ -39,6 +39,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import InputAdornment from '@material-ui/core/InputAdornment';
+import SolarStepper from './SolarStepper';
 import { requestSolarData } from '../actions/solarActions';
 
 const propTypes = {
@@ -66,13 +67,17 @@ const theme = createMuiTheme({
 
 
 const styles = tm => ({
+  backdrop: {
+    backgroundColor: 'transparent',
+  },
   border: {
     border: '1px solid #0063B0',
     borderRadius: 12,
-    margin: 40,
+    width: '55%',
+    margin: '140 auto 10px',
   },
   button: {
-    margin: '10 10',
+    margin: '10 0',
     height: 40,
     padding: '0 16px',
     minWidth: 115,
@@ -88,8 +93,13 @@ const styles = tm => ({
       backgroundColor: '#034980',
     },
   },
-  closeBtn: {
-    marginRight: 40,
+  buttons: {
+    width: '55%',
+    margin: '0 auto',
+    display: 'inline-block',
+  },
+  requestBtn: {
+    float: 'right',
   },
   contentHr: {
     display: 'block',
@@ -126,12 +136,10 @@ const styles = tm => ({
     textAlign: 'center',
   },
   dialog: {
-    borderRadius: 12,
-    maxWidth: 800,
     padding: 10,
     fontFamily: 'Montserrat',
     fontWeight: 'bold',
-    marginLeft: 250,
+    marginLeft: '15em',
   },
   dollar: {
     '& p': {
@@ -176,7 +184,7 @@ const styles = tm => ({
     backgroundColor: 'white',
     marginTop: -10,
     marginLeft: -10,
-    width: 810,
+    width: '105%',
     color: 'white',
     paddingTop: 15,
   },
@@ -192,7 +200,7 @@ const styles = tm => ({
   loading: {
     width: 60,
     margin: 0,
-    marginRight: '10px',
+    float: 'right',
   },
   resolutionLabel: {
     fontSize: '1.6rem',
@@ -243,6 +251,7 @@ const styles = tm => ({
     backgroundColor: '#EEEFF0',
     borderRadius: 12,
     lineHeight: '18px',
+    textAlign: 'center',
   },
   typeGroup: {
     flexDirection: 'row',
@@ -274,7 +283,7 @@ const styles = tm => ({
 });
 
 const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
+  return <Slide direction="left" ref={ref} {...props} />;
 });
 
 class ExportModal extends React.Component {
@@ -299,7 +308,25 @@ class ExportModal extends React.Component {
     this.handleQuestionClose = this.handleQuestionClose.bind(this);
     this.calculateCost = this.calculateCost.bind(this);
     this.dateDiff = this.dateDiff.bind(this);
+    this.onUnload = this.onUnload.bind(this);
   }
+
+  componentDidMount() {
+    window.addEventListener('beforeunload', this.onUnload);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('beforeunload', this.onUnload);
+  }
+
+  onUnload(event) { // the method that will be used for both add and remove event
+    // console.log("hellooww")
+    if (!(this.props.solarBI.requestStatus === 'success' || this.props.solarBI.saveStatus === 'success')) {
+      // eslint-disable-next-line no-param-reassign
+      event.returnValue = 'This will go back to search page, are you sure?';
+    }
+  }
+
 
   calculateCost() {
     const timeCost = {
@@ -481,8 +508,10 @@ class ExportModal extends React.Component {
       };
       this.props.onHide();
       this.props.requestSolarData(queryData)
-        .then(() => {
-          window.location = '/solar/list';
+        .then((json) => {
+          if (json.type === 'REQEUST_SOLAR_DATA_SUCCEEDED') {
+            window.location = '/solar/list';
+          }
         });
     }
   }
@@ -497,13 +526,22 @@ class ExportModal extends React.Component {
         <ThemeProvider theme={theme}>
           <Dialog
             classes={{ paper: classes.dialog }}
+            fullScreen
             fullWidth
             open={open || solarBI.sending}
             onClose={onHide}
             TransitionComponent={Transition}
             keepMounted
+            BackdropProps={{
+              classes: {
+                root: classes.backdrop,
+              },
+            }}
           >
             <div className={classes.head}>{this.props.address.slice(0, -11)}</div>
+            <div style={{ padding: 0, width: '70%', position: 'absolute', top: 30, right: 220 }}>
+              <SolarStepper activeStep={2} />
+            </div>
             <div className={classes.border}>
               <DialogTitle
                 disableTypography
@@ -622,13 +660,12 @@ class ExportModal extends React.Component {
                 </FormControl>
                 <hr className={classes.contentHr} />
                 <div>
-                  <FormLabel classes={{ root: classes.costLabel, focused: classes.labelFocused }} component="legend">Approx Cost</FormLabel>
+                  <FormLabel classes={{ root: classes.costLabel, focused: classes.labelFocused }} component="legend">Cost</FormLabel>
                   <TextField
                     id="cost"
                     variant="outlined"
-                    disabled
                     className={classes.costOutput}
-                    value={this.state.cost}
+                    value={new Date(startDate) > new Date(endDate) || new Date(startDate) < new Date('1990-01-01') || new Date(endDate) > new Date('2019-07-31') ? 'NaN' : this.state.cost}
                     InputProps={{
                       classes: { input: classes.textInput },
                       startAdornment: <InputAdornment className={classes.dollar} position="start">$</InputAdornment>,
@@ -637,20 +674,19 @@ class ExportModal extends React.Component {
                 </div>
               </DialogContent>
             </div>
-            <DialogActions>
-              {solarBI.sending ?
-                (<img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />) :
-                (<Button className={classes.button} onClick={this.handleRequestData} color="primary">Request</Button>)
-              }
-
+            <DialogActions className={classes.buttons}>
               <Button
                 className={classNames(classes.button, classes.closeBtn)}
                 disabled={solarBI.sending}
                 onClick={onHide}
                 color="primary"
               >
-                Close
+                Back
               </Button>
+              {solarBI.sending ?
+                (<img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />) :
+                (<Button className={classNames(classes.button, classes.requestBtn)} onClick={this.handleRequestData} color="primary">Pay</Button>)
+              }
             </DialogActions>
           </Dialog>
         </ThemeProvider>
