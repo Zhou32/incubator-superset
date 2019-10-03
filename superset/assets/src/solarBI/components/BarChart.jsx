@@ -68,10 +68,8 @@ class BarChart extends React.Component {
 
   getBarchartOption(data) {
     if (data) {
-      // const data1 = data[1].map(x => x.toNumber());=
       const data1 = data[1];
       const xAxisData = data[0];
-      // console.log(mergedData);
 
       const option = {
         // title: {

@@ -321,7 +321,7 @@ class ExportModal extends React.Component {
 
   onUnload(event) { // the method that will be used for both add and remove event
     // console.log("hellooww")
-    if (this.props.solarBI.requestStatus !== 'success') {
+    if (!(this.props.solarBI.requestStatus === 'success' || this.props.solarBI.saveStatus === 'success')) {
       // eslint-disable-next-line no-param-reassign
       event.returnValue = 'This will go back to search page, are you sure?';
     }
@@ -539,7 +539,7 @@ class ExportModal extends React.Component {
             }}
           >
             <div className={classes.head}>{this.props.address.slice(0, -11)}</div>
-            <div style={{ padding: 0, width: '70%', position: 'absolute', top: 30, right: 200 }}>
+            <div style={{ padding: 0, width: '70%', position: 'absolute', top: 30, right: 220 }}>
               <SolarStepper activeStep={2} />
             </div>
             <div className={classes.border}>

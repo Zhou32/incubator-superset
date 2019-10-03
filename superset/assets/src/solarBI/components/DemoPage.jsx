@@ -161,6 +161,7 @@ class DemoPage extends React.Component {
   render() {
     const { classes } = this.props;
     const { value } = this.state;
+    const ausStates = ['VIC', 'NSW', 'QLD', 'NT', 'SA', 'WA', 'TAS'];
 
     return (
       <MuiThemeProvider theme={theme}>
@@ -216,7 +217,7 @@ class DemoPage extends React.Component {
           <CardContent
             className={classes.contentFlex}
           >
-            <div className={classes.head}>VIC</div>
+            <div className={classes.head}>{ausStates[value]}</div>
           </CardContent>
         </Card>
       </MuiThemeProvider>
