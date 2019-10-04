@@ -22,7 +22,7 @@ import thunk from 'redux-thunk';
 import { createStore, applyMiddleware, compose } from 'redux';
 import { Provider } from 'react-redux';
 import { initFeatureFlags } from 'src/featureFlags';
-import SolarView from './components/SolarView';
+import MapView from './components/MapView';
 import ToastPresenter from '../messageToasts/containers/ToastPresenter';
 import { initEnhancer } from '../reduxUtils';
 import getInitialState from './reducers/getInitialState';
@@ -51,7 +51,7 @@ const store = createStore(
 const App = () => (
   <Provider store={store}>
     <div>
-      <SolarView />
+      <MapView />
       <ToastPresenter />
     </div>
   </Provider>
