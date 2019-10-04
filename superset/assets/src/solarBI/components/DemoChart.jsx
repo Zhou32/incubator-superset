@@ -338,6 +338,7 @@ function DemoChart({ ausState }) {
         legend: {
           data: ['dni', 'ghi'],
           align: 'left',
+          top: 10,
         },
         grid: {
           left: 50,
@@ -359,19 +360,19 @@ function DemoChart({ ausState }) {
         // },
         series: [
           {
-            name: '☀️ dni',
+            name: 'dni',
             type: 'bar',
             data: dni,
             animationDelay(idx) {
-              return idx * 10;
+              return idx * 20;
             },
           },
           {
-            name: '☀️ ghi',
+            name: 'ghi',
             type: 'bar',
             data: ghi,
             animationDelay(idx) {
-              return idx * 10 + 100;
+              return idx * 20 + 100;
             },
           },
         ],

@@ -119,6 +119,7 @@ const styles = tm => ({
     lineHeight: '18px',
     marginTop: '25px',
     marginLeft: '30px',
+    marginBottom: '40px',
     '& fieldset': {
       borderRadius: 12,
     },
