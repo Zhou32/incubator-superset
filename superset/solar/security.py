@@ -161,7 +161,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         self.set_role("Admin", self._is_admin_pvm)
         self.set_role("Alpha", self._is_alpha_pvm)
         self.set_role("Gamma", self._is_gamma_pvm)
-        self.set_role("granter", self.is_granter_pvm)
+        self.set_role("granter", self._is_granter_pvm)
         self.set_role("sql_lab", self._is_sql_lab_pvm)
         self.set_role("solar_default", self.is_solar_pvm)
         self.set_role('team_owner', self.is_owner_pvm)
