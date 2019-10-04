@@ -116,9 +116,9 @@ class InfoTabs extends React.Component {
     this.props.onSaveClick();
   }
 
-  getCSVURL() {
-    return this.props.getCSVURL();
-  }
+  // getCSVURL() {
+  //   return this.props.getCSVURL();
+  // }
 
   toggleGoBackModal() {
     this.setState({ showGoBackModal: !this.state.showGoBackModal });
@@ -162,7 +162,7 @@ class InfoTabs extends React.Component {
               className={classNames(classes.infoBtn, classes.exportBtn)}
               onClick={this.toggleExportModal}
             >
-              Export
+              Next
             </Button>
             // <Tooltip
             //   title="Export As CSV"
