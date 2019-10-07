@@ -135,7 +135,7 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
             self.appbuilder.get_session.commit()
 
             if self.send_email(register_user):
-                flash(as_unicode(self.message), 'info')
+                flash(as_unicode(lazy_gettext("Register success! An activation email has been sent to you.")), 'info')
                 return register_user
             else:
                 flash(as_unicode(self.error_message), 'danger')

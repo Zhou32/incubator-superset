@@ -37,6 +37,7 @@ const styles = theme => ({
     '& span': {
       display: 'none',
       fontSize: 12,
+      transform: 'translateY(3px)',
     },
     '&:hover span': {
       top: 0,

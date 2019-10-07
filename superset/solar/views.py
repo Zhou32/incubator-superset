@@ -25,6 +25,8 @@ from flask_login import login_user
 
 from flask_appbuilder.views import expose, PublicFormView, ModelView
 from flask_appbuilder.security.forms import ResetPasswordForm
+from .models import SolarBIUser
+
 
 from .forms import (
     SolarBILoginForm_db,
@@ -46,6 +48,7 @@ log = logging.getLogger(__name__)
 
 class SolarBIAuthDBView(AuthDBView):
     invalid_login_message = lazy_gettext("Email/Username or password incorrect. Please try again.")
+    inactivated_login_message = lazy_gettext("Your account has not been activated yet. Please check your email.")
     login_template = "appbuilder/general/security/solarbi_login_db.html"
     @expose("/login/", methods=["GET", "POST"])
     def login(self):
@@ -58,6 +61,13 @@ class SolarBIAuthDBView(AuthDBView):
             )
             if not user:
                 flash(as_unicode(self.invalid_login_message), "warning")
+                return redirect(self.appbuilder.get_url_for_login)
+
+            curr_user = self.appbuilder.get_session.query(SolarBIUser).filter_by(username=form.username.data).first()
+            if not curr_user:
+                curr_user = self.appbuilder.get_session.query(SolarBIUser).filter_by(email=form.username.data).first()
+            if curr_user and not curr_user.email_confirm:
+                flash(as_unicode(self.inactivated_login_message), "warning")
                 return redirect(self.appbuilder.get_url_for_login)
 
             remember = form.remember_me.data
