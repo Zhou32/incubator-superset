@@ -50,6 +50,7 @@ const propTypes = {
   open: PropTypes.bool.isRequired,
   onHide: PropTypes.func.isRequired,
   requestSolarData: PropTypes.func.isRequired,
+  solar_new: PropTypes.bool.isRequired,
 };
 
 const theme = createMuiTheme({
@@ -329,7 +330,9 @@ class ExportModal extends React.Component {
 
   onUnload(event) { // the method that will be used for both add and remove event
     // console.log("hellooww")
-    if (!(this.props.solarBI.requestStatus === 'success' || this.props.solarBI.saveStatus === 'success')) {
+    if (!(this.props.solarBI.requestStatus === 'success' ||
+      this.props.solarBI.saveStatus === 'success' ||
+      this.props.solar_new === false)) {
       // eslint-disable-next-line no-param-reassign
       event.returnValue = 'This will go back to search page, are you sure?';
     }

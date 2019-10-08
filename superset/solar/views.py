@@ -56,7 +56,7 @@ class SolarBIAuthDBView(AuthDBView):
             return redirect(self.appbuilder.get_url_for_index)
         form = SolarBILoginForm_db()
         if form.validate_on_submit():
-            user = self.appbuilder.sm.auth_user_db(
+            user = self.appbuilder.sm.auth_solarbi_user_db(
                 form.username.data, form.password.data
             )
             if not user:

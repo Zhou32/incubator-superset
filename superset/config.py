@@ -507,9 +507,9 @@ MAIL_SERVER = 'smtp.gmail.com'
 MAIL_PORT = 465
 MAIL_USE_TLS = False
 MAIL_USE_SSL = True
-MAIL_USERNAME = 'chenyang.wang@zawee.work'
-MAIL_PASSWORD = 'WANGcy888'
-MAIL_DEFAULT_SENDER = 'chenyang.wang@zawee.work'
+MAIL_USERNAME = 'zhongfan.dou@zawee.work'
+MAIL_PASSWORD = os.environ["EMAIL_PASSWORD"]
+MAIL_DEFAULT_SENDER = 'zhongfan.dou@zawee.work'
 
 
 if not CACHE_DEFAULT_TIMEOUT:

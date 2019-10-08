@@ -239,6 +239,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
                         flash(as_unicode('Invitation sent to %s' % form.email.data), 'info')
                         return redirect('/solar/my-team')
                     else:
+                        self.appbuilder.sm.delete_invited_user(user_email=form.email.data)
                         flash(as_unicode('Cannot send invitation to user'), 'danger')
                         return redirect('/solar/my-team')
             except Exception as e:
