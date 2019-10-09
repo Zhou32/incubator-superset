@@ -124,20 +124,22 @@ input {
 }
 .solarbi-sun {
   margin-top: 16%;
-  width: 100px;
-  height: 100px;
+  width: 20px;
+  height: 20px;
+  margin-left: 168px;
+  transform: translateY(10px);
 }
 .solarbi-text {
   font-size: 35px;
-  letter-spacing: 7px;
-  color: #0667A3;
+  letter-spacing: 3px;
+  color: #d7df23;
   margin: 10px;
   font-family: 'Montserrat';
   font-weight: bold;
 }
 .solarbi-welcome {
   text-align: center;
-  color: #CCCCCC;
+  color: #736b6b;
   font-size: 18px;
   opacity: 0.5;
   font-family: 'Montserrat';
@@ -272,9 +274,11 @@ input {
 }
 
 .signup-solarbi-sun {
-  margin-top: 20px;
-  width: 100px;
-  height: 100px;
+  margin-top: 50px;
+  margin-left: 170px;
+  width: 20px;
+  height: 20px;
+  transform: translateY(8px);
 }
 .inline-names {
   display: inline-block;
@@ -952,8 +956,8 @@ input {
 
 .my-data-add {
   position: absolute; 
-  right: 50px; 
-  top: 70px;
+  right: 150px; 
+  top: 60px;
   text-decoration: none !important;
   width: 185;
   text-align: center;
@@ -983,7 +987,7 @@ input {
 }
 .my-data-search-container {
   width: 40%;
-  margin: 60 auto;
+  margin: 200px auto 60px;
 }
 .my-data-search-icon {
   transform: translate(20px, 32px);
@@ -1003,7 +1007,35 @@ input {
 .my-data-search:focus {
   outline: none;
   border: 2px solid #87CEFA;
-  transition: all 0.4s ease 0s;
+  //transition: all 0.4s ease 0s;
+}
+.my-data-radio-group input[type=radio] {
+  position: absolute;
+  visibility: hidden;
+  display: none;
+}
+.my-data-radio-group label {
+  color: #0063B0;
+  display: inline-block;
+  cursor: pointer;
+  font-weight: 500;
+  padding: 5px 20px;
+  margin: 0;
+}
+.my-data-radio-group input[type=radio]:checked + label{
+  color: white;
+  background: #0063B0;
+}
+.my-data-radio-group label + input[type=radio] + label {
+  border-left: 1px solid #0063B0;
+}
+.my-data-radio-group {
+  border: 1px solid #0063B0;
+  display: inline-block;
+  margin-top: 20px;
+  margin-left: 30%;
+  border-radius: 10px;
+  overflow: hidden;
 }
 .list-cards-wrapper {
   display: flex;
@@ -1069,8 +1101,11 @@ input {
 .title-card {
   box-shadow: 0px 1px 1px #00000029;
   transition: 0.3s;
-  width: 100%;
   height: 170;
+  z-index: 500;
+  position: fixed;
+  top: 0;
+  width: 93%;
   background-color: white;
 }
 .title-card .card-container {
@@ -1113,7 +1148,7 @@ input {
 }
 .empty-saved {
   font-size: 35px;
-  width: 600px;
+  width: 680px;
   margin: 20 auto;
   color: #707070;
 }

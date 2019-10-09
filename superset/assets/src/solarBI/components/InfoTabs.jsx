@@ -184,6 +184,7 @@ class InfoTabs extends React.Component {
           address={this.props.address}
           open={this.state.showExportModal}
           onHide={this.toggleExportModal}
+          solar_new={this.props.solar_new}
         />
         <GoBackModal
           onBackClick={this.onBackClick}

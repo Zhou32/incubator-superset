@@ -401,6 +401,10 @@ def get_user():
     return g.user
 
 
+def get_team_id():
+    return g.user.team[0].id
+
+
 # class SolarBIModelView(SliceModelView):  # noqa
 #     pass
 
@@ -414,7 +418,8 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
     # datamodel = SQLAInterface(models.Slice)
     datamodel = SQLAInterface(models.SolarBISlice)
     base_filters = [['viz_type', FilterEqual, 'solarBI'],
-                    ['created_by', FilterEqualFunction, get_user]]
+                    ['team_id', FilterEqualFunction, get_team_id]]
+                    # ['created_by', FilterEqualFunction, get_user]]
     base_permissions = ['can_list', 'can_show', 'can_add', 'can_delete', 'can_edit']
 
     search_columns = (
@@ -487,11 +492,19 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
         # serialize composite pks
         pks = [self._serialize_pk_if_composite(pk) for pk in pks]
 
-        # get all object keys in s3 under the user sub folder
-        try:
-            all_object_keys = self.list_object_key('colin-query-test', g.user.email + '/')
-        except Exception:
-            all_object_keys = []
+        # get all object keys in s3 under all team users' sub folders
+        team_members_email_role = appbuilder.sm.get_team_members(g.user.id)
+        team_member_emails = []
+        for email, _ in team_members_email_role:
+            team_member_emails.append(email)
+
+        all_object_keys = []
+        for me in team_member_emails:
+            try:
+                all_object_keys += self.list_object_key('colin-query-test', me + '/')
+            except Exception:
+                continue
+
         obj_keys = []
         if all_object_keys:
             avail_object_keys = [key for key in all_object_keys if key.endswith('.csv')]
@@ -1461,7 +1474,7 @@ class Superset(BaseSupersetView):
             return False
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
-        msg.sender = 'SolarBI', 'chenyang.wang@zawee.work'
+        msg.sender = 'SolarBI', 'no-reply@solarbi.com.au'
         msg.subject = "SolarBI - Your data request is received"
         msg.html = self.render_template(email_template,
                                         username=user.username,
@@ -3403,6 +3416,7 @@ class Superset(BaseSupersetView):
                 form_data.pop("slice_id")  # don't save old slice_id
             slc = models.SolarBISlice(owners=[g.user] if g.user else [])
 
+        slc.team_id = g.user.team[0].id
         slc.params = json.dumps(form_data, indent=2, sort_keys=True)
         slc.datasource_name = datasource_name
         slc.viz_type = form_data["viz_type"]

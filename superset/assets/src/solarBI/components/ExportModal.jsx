@@ -24,21 +24,22 @@ import { createMuiTheme } from '@material-ui/core/styles';
 import { withStyles, ThemeProvider } from '@material-ui/styles';
 import Slide from '@material-ui/core/Slide';
 import Button from '@material-ui/core/Button';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
 import Dialog from '@material-ui/core/Dialog';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import Popover from '@material-ui/core/Popover';
 import HelpIcon from '@material-ui/icons/Help';
-import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import TextField from '@material-ui/core/TextField';
-import DialogTitle from '@material-ui/core/DialogTitle';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import InputAdornment from '@material-ui/core/InputAdornment';
+import Container from '@material-ui/core/Container';
 import SolarStepper from './SolarStepper';
 import { requestSolarData } from '../actions/solarActions';
 
@@ -49,6 +50,7 @@ const propTypes = {
   open: PropTypes.bool.isRequired,
   onHide: PropTypes.func.isRequired,
   requestSolarData: PropTypes.func.isRequired,
+  solar_new: PropTypes.bool.isRequired,
 };
 
 const theme = createMuiTheme({
@@ -94,8 +96,8 @@ const styles = tm => ({
     },
   },
   buttons: {
-    width: '55%',
-    margin: '0 auto',
+    width: '80%',
+    marginLeft: '50',
     display: 'inline-block',
   },
   requestBtn: {
@@ -141,6 +143,7 @@ const styles = tm => ({
     fontFamily: 'Montserrat',
     fontWeight: 'bold',
     marginLeft: '15em',
+    backgroundColor: '#f5f5f5',
   },
   dollar: {
     '& p': {
@@ -152,6 +155,11 @@ const styles = tm => ({
     '& fieldset': {
       borderRadius: 12,
     },
+  },
+  exportCard: {
+    margin: '90px auto',
+    width: '75%',
+    height: 680,
   },
   lengthLabel: {
     fontSize: '1.6rem',
@@ -322,7 +330,9 @@ class ExportModal extends React.Component {
 
   onUnload(event) { // the method that will be used for both add and remove event
     // console.log("hellooww")
-    if (!(this.props.solarBI.requestStatus === 'success' || this.props.solarBI.saveStatus === 'success')) {
+    if (!(this.props.solarBI.requestStatus === 'success' ||
+      this.props.solarBI.saveStatus === 'success' ||
+      this.props.solar_new === false)) {
       // eslint-disable-next-line no-param-reassign
       event.returnValue = 'This will go back to search page, are you sure?';
     }
@@ -539,156 +549,153 @@ class ExportModal extends React.Component {
               },
             }}
           >
-            <div className={classes.head}>{this.props.address.slice(0, -11)}</div>
-            <div style={{ padding: 0, width: '70%', position: 'absolute', top: 30, right: 220 }}>
+            <div style={{ padding: 0, width: '70%', position: 'absolute', top: 0, right: 220 }}>
               <SolarStepper activeStep={2} />
             </div>
-            <div className={classes.border}>
-              <DialogTitle
-                disableTypography
-                className={classes.title}
-                id="form-dialog-title"
-              >
-                Options
-              </DialogTitle>
-              <hr className={classes.titleHr} />
-              <DialogContent>
-                <FormLabel classes={{ root: classes.lengthLabel, focused: classes.labelFocused }} component="legend">Length</FormLabel>
-                <div className={classes.dates}>
-                  <div className={classes.dateWrapper}>
-                    <span className={classes.dateLabel}>Start</span>
-                    <TextField
-                      error={new Date(startDate) > new Date(endDate) || new Date(startDate) < new Date('1990-01-01')}
-                      id="date"
-                      type="date"
-                      value={startDate}
-                      placeholder="yyyy-mm-dd"
-                      variant="outlined"
-                      onChange={this.handleStartDateChange}
-                      className={classes.startText}
-                      InputProps={{
-                        classes: { input: classes.textInput },
+            <DialogContent>
+              <Card className={classes.exportCard}>
+                <CardContent>
+                  <div>
+                    <p
+                      style={{
+                        fontFamily: 'Montserrat',
+                        fontSize: 21,
+                        textAlign: 'center',
+                        color: '024067',
+                        fontWeight: 'normal',
                       }}
-                    // InputLabelProps={{
-                    //   FormLabelClasses: {
-                    //     root: classes.textLabel,
-                    //   },
-                    // }}
-                    />
+                    >
+                      {this.props.address.slice(0, -11)}
+                    </p>
+                    <hr style={{ display: 'block', width: 159, height: 1, border: 0, borderTop: '1px solid #808495', margin: '1em auto 2em', padding: 0 }} />
                   </div>
+                  <Container maxWidth="md">
+                    <FormLabel classes={{ root: classes.lengthLabel, focused: classes.labelFocused }} component="legend">Length</FormLabel>
+                    <div className={classes.dates}>
+                      <div className={classes.dateWrapper}>
+                        <span className={classes.dateLabel}>Start</span>
+                        <TextField
+                          error={new Date(startDate) > new Date(endDate) || new Date(startDate) < new Date('1990-01-01')}
+                          id="date"
+                          type="date"
+                          value={startDate}
+                          placeholder="yyyy-mm-dd"
+                          variant="outlined"
+                          onChange={this.handleStartDateChange}
+                          className={classes.startText}
+                          InputProps={{
+                            classes: { input: classes.textInput },
+                          }}
+                        />
+                      </div>
 
-                  <div className={classes.dateWrapper}>
-                    <span className={classes.dateLabel}>End</span>
-                    <TextField
-                      error={new Date(startDate) > new Date(endDate) || new Date(endDate) > new Date('2019-07-31')}
-                      id="date"
-                      type="date"
-                      value={endDate}
-                      placeholder="yyyy-mm-dd"
-                      variant="outlined"
-                      onChange={this.handleEndDateChange}
-                      className={classes.endText}
-                      InputProps={{
-                        classes: { input: classes.textInput },
-                      }}
-                    // InputLabelProps={{
-                    //   FormLabelClasses: {
-                    //     root: classes.textLabel,
-                    //   },
-                    // }}
-                    />
-                  </div>
-                  <IconButton
-                    aria-label="More"
-                    // aria-owns={openAnchor ? 'long-menu' : undefined}
-                    // aria-haspopup="true"
-                    className={classes.iconButton}
-                    onClick={this.handleQuestionClick}
-                  >
-                    <HelpIcon />
-                  </IconButton>
-                  <Popover
-                    id="heatmap-popper"
-                    open={openAnchor}
-                    anchorEl={anchorEl}
-                    onClose={this.handleQuestionClose}
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'center',
-                    }}
-                    transformOrigin={{
-                      vertical: 'top',
-                      horizontal: 'center',
-                    }}
-                  >
-                    <Typography className={classes.typography}>
-                      Available date: 01/01/1990 ~ 31/07/2019.
-                      Both Start and End date are inclusive.
-                    </Typography>
-                  </Popover>
-                </div>
-                <hr className={classes.contentHr} />
-                <FormControl component="fieldset" className={classes.formControl}>
-                  <FormLabel classes={{ root: classes.typeLabel, focused: classes.labelFocused }} component="legend">Type</FormLabel>
-                  <RadioGroup
-                    aria-label="type"
-                    name="type"
-                    className={classes.typeGroup}
-                    value={this.state.type}
-                    onChange={this.handleTypeChange}
-                  >
-                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="dni" control={<Radio color="secondary" />} label="DNI" labelPlacement="bottom" />
-                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="ghi" control={<Radio color="secondary" />} label="GHI" labelPlacement="bottom" />
-                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="both" control={<Radio color="secondary" />} label="Download both" labelPlacement="bottom" />
-                  </RadioGroup>
-                </FormControl>
-                <hr className={classes.contentHr} />
-                <FormControl component="fieldset" className={classes.formControl}>
-                  <FormLabel classes={{ root: classes.resolutionLabel, focused: classes.labelFocused }} component="legend">Resolution</FormLabel>
-                  <RadioGroup
-                    aria-label="resolution"
-                    name="resolution"
-                    className={classes.resolutionGroup}
-                    value={this.state.resolution}
-                    onChange={this.handleResolutionChange}
-                  >
-                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="hourly" control={<Radio color="secondary" />} label="Hourly" labelPlacement="bottom" />
-                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="daily" control={<Radio color="secondary" />} label="Daily" labelPlacement="bottom" />
-                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="weekly" control={<Radio color="secondary" />} label="Weekly" labelPlacement="bottom" />
-                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="monthly" control={<Radio color="secondary" />} label="Monthly" labelPlacement="bottom" />
-                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="annual" control={<Radio color="secondary" />} label="Annual" labelPlacement="bottom" />
-                  </RadioGroup>
-                </FormControl>
-                <hr className={classes.contentHr} />
-                <div>
-                  <FormLabel classes={{ root: classes.costLabel, focused: classes.labelFocused }} component="legend">Cost</FormLabel>
-                  <TextField
-                    id="cost"
-                    variant="outlined"
-                    className={classes.costOutput}
-                    value={new Date(startDate) > new Date(endDate) || new Date(startDate) < new Date('1990-01-01') || new Date(endDate) > new Date('2019-07-31') ? 'NaN' : this.state.cost}
-                    InputProps={{
-                      classes: { input: classes.textInput },
-                      startAdornment: <InputAdornment className={classes.dollar} position="start">$</InputAdornment>,
-                    }}
-                  />
-                </div>
-              </DialogContent>
-            </div>
-            <DialogActions className={classes.buttons}>
-              <Button
-                className={classNames(classes.button, classes.closeBtn)}
-                disabled={solarBI.sending}
-                onClick={onHide}
-                color="primary"
-              >
-                Back
-              </Button>
-              {solarBI.sending ?
-                (<img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />) :
-                (<Button className={classNames(classes.button, classes.requestBtn)} onClick={this.handleRequestData} color="primary">Pay</Button>)
-              }
-            </DialogActions>
+                      <div className={classes.dateWrapper}>
+                        <span className={classes.dateLabel}>End</span>
+                        <TextField
+                          error={new Date(startDate) > new Date(endDate) || new Date(endDate) > new Date('2019-07-31')}
+                          id="date"
+                          type="date"
+                          value={endDate}
+                          placeholder="yyyy-mm-dd"
+                          variant="outlined"
+                          onChange={this.handleEndDateChange}
+                          className={classes.endText}
+                          InputProps={{
+                            classes: { input: classes.textInput },
+                          }}
+                        />
+                      </div>
+                      <IconButton
+                        aria-label="More"
+                        className={classes.iconButton}
+                        onClick={this.handleQuestionClick}
+                      >
+                        <HelpIcon />
+                      </IconButton>
+                      <Popover
+                        id="heatmap-popper"
+                        open={openAnchor}
+                        anchorEl={anchorEl}
+                        onClose={this.handleQuestionClose}
+                        anchorOrigin={{
+                          vertical: 'bottom',
+                          horizontal: 'center',
+                        }}
+                        transformOrigin={{
+                          vertical: 'top',
+                          horizontal: 'center',
+                        }}
+                      >
+                        <Typography className={classes.typography}>
+                          Available date: 01/01/1990 ~ 31/07/2019.
+                          Both Start and End date are inclusive.
+                        </Typography>
+                      </Popover>
+                    </div>
+                    <hr className={classes.contentHr} />
+                    <FormControl component="fieldset" className={classes.formControl}>
+                      <FormLabel classes={{ root: classes.typeLabel, focused: classes.labelFocused }} component="legend">Type</FormLabel>
+                      <RadioGroup
+                        aria-label="type"
+                        name="type"
+                        className={classes.typeGroup}
+                        value={this.state.type}
+                        onChange={this.handleTypeChange}
+                      >
+                        <FormControlLabel classes={{ label: classes.formControlLabel }} value="dni" control={<Radio color="secondary" />} label="DNI" labelPlacement="bottom" />
+                        <FormControlLabel classes={{ label: classes.formControlLabel }} value="ghi" control={<Radio color="secondary" />} label="GHI" labelPlacement="bottom" />
+                        <FormControlLabel classes={{ label: classes.formControlLabel }} value="both" control={<Radio color="secondary" />} label="Download both" labelPlacement="bottom" />
+                      </RadioGroup>
+                    </FormControl>
+                    <hr className={classes.contentHr} />
+                    <FormControl component="fieldset" className={classes.formControl}>
+                      <FormLabel classes={{ root: classes.resolutionLabel, focused: classes.labelFocused }} component="legend">Resolution</FormLabel>
+                      <RadioGroup
+                        aria-label="resolution"
+                        name="resolution"
+                        className={classes.resolutionGroup}
+                        value={this.state.resolution}
+                        onChange={this.handleResolutionChange}
+                      >
+                        <FormControlLabel classes={{ label: classes.formControlLabel }} value="hourly" control={<Radio color="secondary" />} label="Hourly" labelPlacement="bottom" />
+                        <FormControlLabel classes={{ label: classes.formControlLabel }} value="daily" control={<Radio color="secondary" />} label="Daily" labelPlacement="bottom" />
+                        <FormControlLabel classes={{ label: classes.formControlLabel }} value="weekly" control={<Radio color="secondary" />} label="Weekly" labelPlacement="bottom" />
+                        <FormControlLabel classes={{ label: classes.formControlLabel }} value="monthly" control={<Radio color="secondary" />} label="Monthly" labelPlacement="bottom" />
+                        <FormControlLabel classes={{ label: classes.formControlLabel }} value="annual" control={<Radio color="secondary" />} label="Annual" labelPlacement="bottom" />
+                      </RadioGroup>
+                    </FormControl>
+                    <hr className={classes.contentHr} />
+                    <div>
+                      <FormLabel classes={{ root: classes.costLabel, focused: classes.labelFocused }} component="legend">Cost</FormLabel>
+                      <TextField
+                        id="cost"
+                        variant="outlined"
+                        className={classes.costOutput}
+                        value={new Date(startDate) > new Date(endDate) || new Date(startDate) < new Date('1990-01-01') || new Date(endDate) > new Date('2019-07-31') ? 'NaN' : this.state.cost}
+                        InputProps={{
+                          classes: { input: classes.textInput },
+                          startAdornment: <InputAdornment className={classes.dollar} position="start">$</InputAdornment>,
+                        }}
+                      />
+                    </div>
+                    <React.Fragment>
+                      <Button
+                        className={classNames(classes.button, classes.closeBtn)}
+                        disabled={solarBI.sending}
+                        onClick={onHide}
+                        color="primary"
+                      >
+                        Back
+                      </Button>
+                      {solarBI.sending ?
+                        (<img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />) :
+                        (<Button className={classNames(classes.button, classes.requestBtn)} onClick={this.handleRequestData} color="primary">Pay</Button>)
+                      }
+                    </React.Fragment>
+                  </Container>
+                </CardContent>
+              </Card>
+            </DialogContent>
           </Dialog>
         </ThemeProvider>
       </div>

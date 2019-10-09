@@ -436,6 +436,7 @@ class SolarBISlice(Model, AuditMixinNullable, ImportMixin):
     query_status = Column(String(200))
     valid_date = Column(DateTime, default=(lambda: datetime.now() + timedelta(hours=24*30)))
     paid = Column(Boolean, default=False)
+    team_id = Column(Integer)
     owners = relationship(security_manager.user_model, secondary=solarbislice_user)
 
     export_fields = (

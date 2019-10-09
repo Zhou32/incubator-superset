@@ -494,3 +494,39 @@ class CustomSecurityManager(SupersetSecurityManager):
         except Exception:
             self.get_session.rollback()
             return False
+
+    def auth_solarbi_user_db(self, username, password):
+        """
+            Method for authenticating SolarBI user, auth db style
+
+            :param username:
+                The username or registered email address
+            :param password:
+                The password, will be tested against hashed password on db
+        """
+        if username is None or username == "":
+            return None
+        user = self.find_solarbi_user(username=username)
+        if user is None:
+            user = self.find_solarbi_user(email=username)
+        if user is None or (not user.is_active):
+            # log.info(LOGMSG_WAR_SEC_LOGIN_FAILED.format(username))
+            return None
+        elif check_password_hash(user.password, password):
+            self.update_user_auth_stat(user, True)
+            return user
+        else:
+            self.update_user_auth_stat(user, False)
+            # log.info(LOGMSG_WAR_SEC_LOGIN_FAILED.format(username))
+            return None
+
+    def find_solarbi_user(self, username=None, email=None):
+        if username:
+            return (
+                self.get_session.query(self.user_model).filter(self.user_model.username == username)
+                .first()
+            )
+        elif email:
+            return (
+                self.get_session.query(self.user_model).filter_by(email=email).first()
+            )
