@@ -32,10 +32,15 @@
     <div class="my-data-search-container">
         <i class="fas fa-search my-data-search-icon"></i>
         <input id="searchInput" class="my-data-search" type="text" placeholder="Search Data Sets">
+        <div class="my-data-radio-group">
+            <input type="radio" id="option-one" name="selector" value="all" checked="checked"><label for="option-one">All</label><input type="radio" id="option-two" name="selector" value="saved"><label for="option-two">Saved</label><input type="radio" id="option-three" name="selector" value="paid"><label for="option-three">Paid</label>
+        </div>
     </div>
-     <div class="my-data-radio-group">
-        <input type="radio" id="option-one" name="selector" value="all"><label for="option-one">All</label><input type="radio" id="option-two" name="selector" value="saved"><label for="option-two">Saved</label><input type="radio" id="option-three" name="selector" value="paid"><label for="option-three">Paid</label>
-     </div>
+{##}
+{#     <div class="my-data-radio-group">#}
+{#        <input type="radio" id="option-one" name="selector" value="all" checked="checked"><label for="option-one">All</label><input type="radio" id="option-two" name="selector" value="saved"><label for="option-two">Saved</label><input type="radio" id="option-three" name="selector" value="paid"><label for="option-three">Paid</label>#}
+{#     </div>#}
+
 {% endblock %}
 
 {% block begin_content scoped %}
@@ -168,15 +173,27 @@
 {#    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>#}
     <script>
         $(document).ready(function(){
-          $("#searchInput").on("keyup", function() {
-            var value = $(this).val().toLowerCase();
+            $("#searchInput").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                if ($('input:radio[name="selector"]:checked').val() === 'all') {
+                    $(".list-card").filter(function() {
+                        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                    });
+                } else if ($('input:radio[name="selector"]:checked').val() === 'saved') {
+                    $(".list-card").filter(function() {
+                        $(this).toggle(
+                            $(this).text().toLowerCase().indexOf(value) > -1 && $(this).find('span').text().toLowerCase().indexOf('saved') > -1
+                        )
+                    });
+                } else {
+                    $(".list-card").filter(function() {
+                        $(this).toggle(
+                            $(this).text().toLowerCase().indexOf(value) > -1 && $(this).find('span').text().toLowerCase().indexOf('paid') > -1
+                        )
+                    });
+                }
 
-            console.log($('input:radio[name="selector"]:checked').val());
-
-            $(".list-card").filter(function() {
-              $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
             });
-          });
 
           $(".list-card > div > p").each(function() {
               var el= $(this);
@@ -192,17 +209,18 @@
         });
 
         $('input:radio[name="selector"]').change(function() {
+            $('#searchInput').val('');
             if ($(this).val() === 'all') {
-             $(".list-card").show()
-          } else if ($(this).val() === 'saved') {
-             $(".list-card").filter(function() {
-                 $(this).toggle($(this).find('span').text().toLowerCase().indexOf('saved') > -1)
-             });
-          } else if ($(this).val() === 'paid') {
-             $(".list-card").filter(function() {
-                 $(this).toggle($(this).find('span').text().toLowerCase().indexOf('paid') > -1)
-             });
-          }
+                $(".list-card").show()
+            } else if ($(this).val() === 'saved') {
+                $(".list-card").filter(function() {
+                    $(this).toggle($(this).find('span').text().toLowerCase().indexOf('saved') > -1)
+                });
+            } else if ($(this).val() === 'paid') {
+                $(".list-card").filter(function() {
+                    $(this).toggle($(this).find('span').text().toLowerCase().indexOf('paid') > -1)
+                });
+            }
         });
 
     </script>
