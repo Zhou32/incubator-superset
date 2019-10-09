@@ -172,6 +172,16 @@ class DemoPage extends React.Component {
   render() {
     const { classes } = this.props;
     const { value } = this.state;
+    const stateFullName = {
+      WA: 'Western Australia',
+      NT: 'Northern Territory',
+      QLD: 'Queensland',
+      NSW: 'New South Wales',
+      ACT: 'Australian Capital Territory',
+      VIC: 'Victoria',
+      SA: 'South Australia',
+      TAS: 'Tasmania',
+    };
     const ausStates = ['VIC', 'NSW', 'QLD', 'NT', 'SA', 'WA', 'TAS'];
 
     return (
@@ -226,7 +236,7 @@ class DemoPage extends React.Component {
 
         <Card className={classes.chartCard}>
           <CardContent className={classes.chartCardContent}>
-            <div className={classes.head}>{ausStates[value]}</div>
+            <div className={classes.head}>{stateFullName[ausStates[value]]}</div>
             <div style={{ width: '100%' }}>
               <DemoChart ausState={ausStates[value]} />
             </div>

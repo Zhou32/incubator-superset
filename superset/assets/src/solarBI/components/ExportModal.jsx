@@ -563,6 +563,7 @@ class ExportModal extends React.Component {
                         textAlign: 'center',
                         color: '024067',
                         fontWeight: 'normal',
+                        marginTop: 25,
                       }}
                     >
                       {this.props.address.slice(0, -11)}
