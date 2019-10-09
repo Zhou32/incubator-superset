@@ -1474,7 +1474,7 @@ class Superset(BaseSupersetView):
             return False
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
-        msg.sender = 'SolarBI', 'chenyang.wang@zawee.work'
+        msg.sender = 'SolarBI', 'no-reply@solarbi.com.au'
         msg.subject = "SolarBI - Your data request is received"
         msg.html = self.render_template(email_template,
                                         username=user.username,

@@ -169,7 +169,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
         """
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
-        msg.sender = 'SolarBI', 'chenyang.wang@zawee.work'
+        msg.sender = 'SolarBI', 'no-reply@solarbi.com.au'
         msg.subject = self.email_subject
         url = self.appbuilder.sm.get_url_for_invitation(register_user.registration_hash)
         # team_owner = self.appbuilder.session.query(SolarBIUser).filter_by(id=g.user.id).first()
@@ -312,7 +312,7 @@ class SolarBIRegisterInvitationView(BaseRegisterUser):
         """
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
-        msg.sender = 'SolarBI', 'chenyang.wang@zawee.work'
+        msg.sender = 'SolarBI', 'no-reply@solarbi.com.au'
         msg.subject = self.email_subject
         url = url_for('.activate', _external=True, invitation_hash=register_user.registration_hash)
         msg.html = self.render_template(self.email_template,

@@ -119,7 +119,7 @@ class SolarBIPasswordRecoverView(PublicFormView):
         """
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
-        msg.sender = 'SolarBI', 'chenyang.wang@zawee.work'
+        msg.sender = 'SolarBI', 'no-reply@solarbi.com.au'
         msg.subject = self.email_subject
         url = url_for('.reset', _external=True, reset_hash=hash_val)
         msg.html = self.render_template(self.email_template,

@@ -956,8 +956,8 @@ input {
 
 .my-data-add {
   position: absolute; 
-  right: 50px; 
-  top: 70px;
+  right: 150px; 
+  top: 60px;
   text-decoration: none !important;
   width: 185;
   text-align: center;
@@ -987,7 +987,7 @@ input {
 }
 .my-data-search-container {
   width: 40%;
-  margin: 60 auto;
+  margin: 200px auto 60px;
 }
 .my-data-search-icon {
   transform: translate(20px, 32px);
@@ -1008,6 +1008,33 @@ input {
   outline: none;
   border: 2px solid #87CEFA;
   transition: all 0.4s ease 0s;
+}
+.my-data-radio-group input[type=radio] {
+  position: absolute;
+  visibility: hidden;
+  display: none;
+}
+.my-data-radio-group label {
+  color: #0063B0;
+  display: inline-block;
+  cursor: pointer;
+  font-weight: 500;
+  padding: 5px 20px;
+  margin: 0;
+}
+.my-data-radio-group input[type=radio]:checked + label{
+  color: white;
+  background: #0063B0;
+}
+.my-data-radio-group label + input[type=radio] + label {
+  border-left: 1px solid #0063B0;
+}
+.my-data-radio-group {
+  border: 1px solid #0063B0;
+  display: inline-block;
+  margin: 20px;
+  border-radius: 10px;
+  overflow: hidden;
 }
 .list-cards-wrapper {
   display: flex;
@@ -1073,8 +1100,11 @@ input {
 .title-card {
   box-shadow: 0px 1px 1px #00000029;
   transition: 0.3s;
-  width: 100%;
   height: 170;
+  z-index: 500;
+  position: fixed;
+  top: 0;
+  width: 93%;
   background-color: white;
 }
 .title-card .card-container {
