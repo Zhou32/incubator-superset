@@ -67,8 +67,7 @@ class SolarBIAuthDBView(AuthDBView):
                     reg_user = self.appbuilder.get_session.query(TeamRegisterUser).\
                         filter_by(email=form.username.data).first()
                 if reg_user:
-                    flash(as_unicode(lazy_gettext("Your account has not been activated yet. Please check your email")),
-                          "warning")
+                    flash(as_unicode(self.inactivated_login_message), "warning")
                     return redirect(self.appbuilder.get_url_for_login)
 
                 flash(as_unicode(self.invalid_login_message), "warning")
