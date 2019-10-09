@@ -421,7 +421,7 @@ export class MapView extends React.Component {
                     <Row className="show-grid">
                       <Col xsOffset={1} xs={10} md={12} mdOffset={0}>
                         {this.state.showingMap && (
-                          <div>
+                          <div style={{ marginRight: 75 }}>
                             <p
                               style={{
                                 fontFamily: 'Montserrat',
