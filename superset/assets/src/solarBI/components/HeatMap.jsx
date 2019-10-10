@@ -70,7 +70,7 @@ class HeatMap extends React.Component {
       '5',
       '6',
     ];
-    const years = ['2018/07\n--\n2019/06'];
+    const years = ['2018/07\n~\n2019/06'];
 
     let solarData = [
       [0, 0, Math.round(data[1][18])],

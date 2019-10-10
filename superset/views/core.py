@@ -1508,7 +1508,7 @@ class Superset(BaseSupersetView):
         # results = request.args.get('results') == 'true'
         # samples = request.args.get('samples') == 'true'
         # force = request.args.get('force') == 'true'
-        # self.send_email(g.user, address_name)
+        self.send_email(g.user, address_name)
 
         start_year, start_month, start_day = start_date.split('-')
         end_year, end_month, end_day = end_date.split('-')
@@ -1582,7 +1582,7 @@ class Superset(BaseSupersetView):
             },
         )
 
-        self.send_email(g.user, address_name)
+        # self.send_email(g.user, address_name)
         # print(response['QueryExecutionId'])
         form_data = get_form_data()[0]
         args = {'action': 'saveas',
