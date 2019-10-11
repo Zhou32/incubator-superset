@@ -16,3 +16,5 @@ sudo apt install -y python3-venv
 
 pip install --upgrade --user awscli
 export PATH=/home/ubuntu/.local/bin:$PATH
+
+sudo apt-get install redis-server -y
