@@ -6,8 +6,7 @@ sudo ln -sT /usr/bin/python3 /usr/bin/python
 sudo apt-get install python3-pip -y
 sudo ln -sT /usr/bin/pip3 /usr/bin/pip
 
-curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
-sudo apt install -y nodejs
+sudo apt-get install -y nodejs
 
 sudo apt install default-jre -y
 sudo apt install openjdk-8-jre-headless 
