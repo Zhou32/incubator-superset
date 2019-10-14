@@ -157,9 +157,9 @@ const styles = tm => ({
     },
   },
   exportCard: {
-    margin: '90px auto',
+    margin: '40px auto',
     width: '75%',
-    height: 680,
+    // height: 680,
   },
   lengthLabel: {
     fontSize: '1.6rem',
@@ -549,7 +549,7 @@ class ExportModal extends React.Component {
               },
             }}
           >
-            <div style={{ padding: 0, width: '70%', position: 'absolute', top: 0, right: 220 }}>
+            <div style={{ padding: 0, width: 800, margin: 'auto' }}>
               <SolarStepper activeStep={2} />
             </div>
             <DialogContent>
