@@ -18,6 +18,7 @@
 import json
 import time
 import logging
+import stripe
 
 from flask import flash, redirect, url_for, g, request, make_response, jsonify
 from flask_babel import lazy_gettext
@@ -63,7 +64,6 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
         # Automatically confirm the user email
         user = self.appbuilder.get_session.query(SolarBIUser).filter_by(email=reg.email).first()
         user.email_confirm = True
-        self.appbuilder.get_session.commit()
 
         team_reg = self.appbuilder.sm.add_team(reg, user)
         # self.handle_aws_info(org_reg, user)
@@ -73,9 +73,13 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
         # else:
         #     is_first_login = False
 
+        # Register stripe user for the team using user's email
+        self.appbuilder.sm.create_stripe_user_and_sub(user, team_reg)
+
         self.appbuilder.sm.update_user_auth_stat(user, True)
         login_user(user)
 
+        self.appbuilder.get_session.commit()
         flash(as_unicode('Your account has been successfully activated!'), 'success')
         return redirect(self.appbuilder.get_url_for_index)
 

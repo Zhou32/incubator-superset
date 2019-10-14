@@ -25,7 +25,8 @@ from flask_login import login_user
 
 from flask_appbuilder.views import expose, PublicFormView, ModelView
 from flask_appbuilder.security.forms import ResetPasswordForm
-from .models import SolarBIUser, TeamRegisterUser
+from .models import SolarBIUser, TeamRegisterUser, Plan
+
 
 
 from .forms import (
@@ -67,8 +68,7 @@ class SolarBIAuthDBView(AuthDBView):
                     reg_user = self.appbuilder.get_session.query(TeamRegisterUser).\
                         filter_by(email=form.username.data).first()
                 if reg_user:
-                    flash(as_unicode(lazy_gettext("Your account has not been activated yet. Please check your email")),
-                          "warning")
+                    flash(as_unicode(self.inactivated_login_message), "warning")
                     return redirect(self.appbuilder.get_url_for_login)
 
                 flash(as_unicode(self.invalid_login_message), "warning")
@@ -247,5 +247,3 @@ class SolarBIResetMyPasswordView(ResetMyPasswordView):
 #     # route_base = '/solar'
 #     show_template = 'appbuilder/general/security/my_profile.html'
 #     show_widget = SolarBIShowWidget
-
-

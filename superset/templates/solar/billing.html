@@ -74,6 +74,47 @@
                             <div class="option-description">$1000 month flat fee for all the downloads you can do !</div>
                             <div class=" option-submit"><button class="btn btn-default">Choose</button></div>
                         </div>
+                        <form action="/charge" method="post" id="payment-form">
+                          <div class="form-row">
+                            <label for="card-element">
+                              Credit or debit card
+                            </label>
+                            <div id="card-element">
+                              <!-- A Stripe Element will be inserted here. -->
+                            </div>
+
+                            <!-- Used to display form errors. -->
+                            <div id="card-errors" role="alert"></div>
+                          </div>
+
+                          <button>Submit Payment</button>
+                        </form>
+                        <script>
+                            var stripe = Stripe('pk_test_2CT1LvA7viLp1j7yCHJ2MezU00xXxxnRdM');
+                            var elements = stripe.elements();
+                            // Custom styling can be passed to options when creating an Element.
+                            var style = {
+                              base: {
+                                // Add your base input styles here. For example:
+                                fontSize: '16px',
+                                color: "#32325d",
+                              }
+                            };
+
+                            // Create an instance of the card Element.
+                            var card = elements.create('card', {style: style});
+
+                            // Add an instance of the card Element into the `card-element` <div>.
+                            card.mount('#card-element');
+                            card.addEventListener('change', ({error}) => {
+                              const displayError = document.getElementById('card-errors');
+                              if (error) {
+                                displayError.textContent = error.message;
+                              } else {
+                                displayError.textContent = '';
+                              }
+                            });
+                        </script>
                     </div>
                 </div>
             </div>

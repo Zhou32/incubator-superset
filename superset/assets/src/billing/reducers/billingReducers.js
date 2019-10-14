@@ -16,37 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
+import { t } from '@superset-ui/translation';
+import { now } from '../../modules/dates';
+import * as actions from '../actions/billingActions';
 
-const propTypes = {
-  size: PropTypes.number,
-};
-const defaultProps = {
-  size: 50,
-};
+export default function (state = {}, action) {
+  const actionHandlers = {
+    // [actions.SOLAR_UPDATE_STARTED]() {
+    //   return {
+    //     ...state,
+    //     solarStatus: 'loading',
+    //     solarStackTrace: null,
+    //     solarAlert: null,
+    //     solarUpdateEndTime: null,
+    //     solarUpdateStartTime: now(),
+    //     can_save: false,
+    //     can_export: false,
+    //     queryController: action.queryController,
+    //   };
+    // },
+  };
 
-export default function Loading({ size }) {
-  return (
-    <img
-      className="loading"
-      alt="Loading..."
-      src="/static/assets/images/loading.gif"
-      style={{
-        width: Math.min(size, 80),
-        // height is auto
-        padding: 0,
-        // margin: 30,
-        margin: 'auto',
-        marginTop: 200,
-        position: 'absolute',
-        left: '47%',
-        top: '50%',
-        transform: 'translate(-50%, -50%)',
-      }}
-    />
-  );
+  if (action.type in actionHandlers) {
+    return actionHandlers[action.type]();
+  }
+
+  return state;
 }
-
-Loading.propTypes = propTypes;
-Loading.defaultProps = defaultProps;

@@ -16,37 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
+import { combineReducers } from 'redux';
 
-const propTypes = {
-  size: PropTypes.number,
-};
-const defaultProps = {
-  size: 50,
-};
+import billing from './billingReducers';
+import messageToasts from '../../messageToasts/reducers/index';
 
-export default function Loading({ size }) {
-  return (
-    <img
-      className="loading"
-      alt="Loading..."
-      src="/static/assets/images/loading.gif"
-      style={{
-        width: Math.min(size, 80),
-        // height is auto
-        padding: 0,
-        // margin: 30,
-        margin: 'auto',
-        marginTop: 200,
-        position: 'absolute',
-        left: '47%',
-        top: '50%',
-        transform: 'translate(-50%, -50%)',
-      }}
-    />
-  );
-}
-
-Loading.propTypes = propTypes;
-Loading.defaultProps = defaultProps;
+export default combineReducers({
+  billing,
+  messageToasts,
+});

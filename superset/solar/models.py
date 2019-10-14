@@ -52,7 +52,8 @@ class Team(Model):
     team_name = Column(String(250))
     users = relationship('SolarBIUser', secondary=assoc_team_user, backref='team')
     date_created = Column(DateTime, default=datetime.datetime.now)
-
+    stripe_user_id = Column(String(64))
+    stripe_pm_id = Column(String(64))
     def __repr__(self):
         return self.team_name
 
@@ -73,6 +74,25 @@ class TeamRegisterUser(Model):
     valid_date = Column(DateTime, default=(lambda: datetime.datetime.now() + timedelta(hours=24)),
                         nullable=True)
     role_assigned = Column('role_id', Integer, ForeignKey('ab_role.id'), nullable=True)
+
+
+class Plan(Model):
+    __tablename__ = 'ab_plan'
+    id = Column(Integer, Sequence("plan_id_seq"), primary_key=True)
+    plan_name = Column(String(64))
+    description = Column(String(256))
+    price = Column(Float)
+    stripe_id = Column(String(64))
+    num_request = Column(Integer)
+
+
+class TeamSubscription(Model):
+    __tablename__ = 'team_subscription'
+    id = Column(Integer, Sequence("team_subscription_id_seq"), primary_key=True)
+    team = Column('team_id', Integer, ForeignKey('team.id'), nullable=False)
+    plan = Column('plan_id', Integer, ForeignKey('ab_plan.id'), nullable=False)
+    remain_count = Column(Integer, default=0)
+    stripe_sub_id = Column(String(64))
 
 
 class SolarBIUser(User):

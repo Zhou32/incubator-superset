@@ -16,37 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
+import getToastsFromPyFlashMessages from '../../messageToasts/utils/getToastsFromPyFlashMessages';
 
-const propTypes = {
-  size: PropTypes.number,
-};
-const defaultProps = {
-  size: 50,
-};
-
-export default function Loading({ size }) {
-  return (
-    <img
-      className="loading"
-      alt="Loading..."
-      src="/static/assets/images/loading.gif"
-      style={{
-        width: Math.min(size, 80),
-        // height is auto
-        padding: 0,
-        // margin: 30,
-        margin: 'auto',
-        marginTop: 200,
-        position: 'absolute',
-        left: '47%',
-        top: '50%',
-        transform: 'translate(-50%, -50%)',
-      }}
-    />
-  );
+export default function getInitialState(bootstrapData) {
+  return {
+    billing: {
+      ...bootstrapData,
+    },
+    messageToasts: getToastsFromPyFlashMessages({}.flash_messages || []),
+  };
 }
-
-Loading.propTypes = propTypes;
-Loading.defaultProps = defaultProps;

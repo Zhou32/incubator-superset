@@ -16,37 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
+/* eslint camelcase: 0 */
+import { SupersetClient } from '@superset-ui/connection';
+import { t } from '@superset-ui/translation';
+import URI from 'urijs';
+import { logEvent } from '../../logger/actions';
+import { Logger, LOG_ACTIONS_LOAD_CHART } from '../../logger/LogUtils';
+import getClientErrorObject from '../../utils/getClientErrorObject';
+import {
+  addSuccessToast as addSuccessToastAction,
+  addDangerToast as addDangerToastAction,
+  addInfoToast as addInfoToastAction,
+} from '../../messageToasts/actions/index';
 
-const propTypes = {
-  size: PropTypes.number,
-};
-const defaultProps = {
-  size: 50,
-};
-
-export default function Loading({ size }) {
-  return (
-    <img
-      className="loading"
-      alt="Loading..."
-      src="/static/assets/images/loading.gif"
-      style={{
-        width: Math.min(size, 80),
-        // height is auto
-        padding: 0,
-        // margin: 30,
-        margin: 'auto',
-        marginTop: 200,
-        position: 'absolute',
-        left: '47%',
-        top: '50%',
-        transform: 'translate(-50%, -50%)',
-      }}
-    />
-  );
-}
-
-Loading.propTypes = propTypes;
-Loading.defaultProps = defaultProps;
