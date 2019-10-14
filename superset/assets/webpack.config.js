@@ -120,6 +120,7 @@ const config = {
     welcome: addPreamble('/src/welcome/index.jsx'),
     profile: addPreamble('/src/profile/index.jsx'),
     solarBI: addPreamble('/src/solarBI/index.jsx'),
+    billing: addPreamble('/src/billing/index.jsx'),
     showSavedQuery: [path.join(APP_DIR, '/src/showSavedQuery/index.jsx')],
   },
   output,
@@ -161,7 +162,7 @@ const config = {
           {
             loader: 'thread-loader',
             options: {
-                // there should be 1 cpu for the fork-ts-checker-webpack-plugin
+              // there should be 1 cpu for the fork-ts-checker-webpack-plugin
               workers: os.cpus().length - 1,
             },
           },

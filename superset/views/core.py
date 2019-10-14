@@ -1544,7 +1544,7 @@ class Superset(BaseSupersetView):
 
         if type != 'both':
             athena_query = select_str \
-                + " FROM \"solar_radiation_solarbi\".\"gzip_lat_temp\"" \
+                + " FROM \"solar_radiation_hill\".\"lat_partition_v2\"" \
                 + " WHERE (CAST(year AS BIGINT)*10000" \
                 + " + CAST(month AS BIGINT)*100 + day)" \
                 + " BETWEEN " + start_year + start_month + start_day \
@@ -1553,23 +1553,14 @@ class Superset(BaseSupersetView):
                 + "' AND radiationtype = '" + type + "' AND radiation != -999 " \
                 + group_str + " " + order_str
         else:
-            athena_query = "(" + select_str \
-                + " FROM \"solar_radiation_solarbi\".\"gzip_lat_temp\"" \
+            athena_query = select_str \
+                + " FROM \"solar_radiation_hill\".\"lat_partition_v2\"" \
                 + " WHERE (CAST(year AS BIGINT)*10000" \
                 + " + CAST(month AS BIGINT)*100 + day)" \
                 + " BETWEEN " + start_year + start_month + start_day \
                 + " AND " + end_year + end_month + end_day \
                 + " AND latitude = '" + lat + "' AND longitude = '" + lng \
-                + "' AND radiationtype = 'dni' AND radiation != -999 " \
-                + group_str + " " + order_str + ") UNION ALL (" \
-                + select_str + " FROM \"solar_radiation_solarbi\".\"gzip_lat_temp\"" \
-                + " WHERE (CAST(year AS BIGINT)*10000" \
-                + " + CAST(month AS BIGINT)*100 + day)" \
-                + " BETWEEN " + start_year + start_month + start_day \
-                + " AND " + end_year + end_month + end_day \
-                + " AND latitude = '" + lat + "' AND longitude = '" + lng \
-                + "' AND radiationtype = 'ghi' AND radiation != -999 " \
-                + group_str + " " + order_str + ")"
+                + "' AND radiation != -999 " + group_str + " " + order_str
 
         AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
         AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
@@ -1578,9 +1569,9 @@ class Superset(BaseSupersetView):
         client = session.client('athena', region_name='ap-southeast-2')
         response = client.start_query_execution(
             QueryString=athena_query,
-            ClientRequestToken=g.user.email+'_'+str(time.time()),
+            # ClientRequestToken=g.user.email+'_'+str(time.time()),
             QueryExecutionContext={
-                'Database': 'solar_radiation_solarbi'
+                'Database': 'solar_radiation_hill'
             },
             ResultConfiguration={
                 'OutputLocation': 's3://colin-query-test/' + g.user.email,
@@ -1591,6 +1582,7 @@ class Superset(BaseSupersetView):
             },
         )
 
+        # self.send_email(g.user, address_name)
         # print(response['QueryExecutionId'])
         form_data = get_form_data()[0]
         args = {'action': 'saveas',

@@ -157,9 +157,9 @@ const styles = tm => ({
     },
   },
   exportCard: {
-    margin: '90px auto',
+    margin: '40px auto',
     width: '75%',
-    height: 680,
+    // height: 680,
   },
   lengthLabel: {
     fontSize: '1.6rem',
@@ -504,8 +504,8 @@ class ExportModal extends React.Component {
       alert('Available date: 01/01/1990 ~ 31/07/2019.'); // eslint-disable-line no-alert
     } else {
       const queryData = {
-        lat: this.props.solarBI.queryResponse.data.lat + '',
-        lng: this.props.solarBI.queryResponse.data.lng + '',
+        lat: this.props.solarBI.queryResponse.data.lat.toFixed(7) + '',
+        lng: this.props.solarBI.queryResponse.data.lng.toFixed(7) + '',
         startDate: this.state.startDate,
         endDate: this.state.endDate,
         type: this.state.type,
@@ -517,7 +517,7 @@ class ExportModal extends React.Component {
         spatial_address: { ...this.props.solarBI.queryResponse.form_data.spatial_address },
         address_name: this.props.address.slice(0, -11),
       };
-      this.props.onHide();
+      // this.props.onHide();
       this.props.requestSolarData(queryData)
         .then((json) => {
           if (json.type === 'REQEUST_SOLAR_DATA_SUCCEEDED') {
@@ -549,7 +549,7 @@ class ExportModal extends React.Component {
               },
             }}
           >
-            <div style={{ padding: 0, width: '70%', position: 'absolute', top: 0, right: 220 }}>
+            <div style={{ padding: 0, width: 800, margin: 'auto' }}>
               <SolarStepper activeStep={2} />
             </div>
             <DialogContent>

@@ -391,8 +391,8 @@ export class MapView extends React.Component {
             </div>
           )}
           {this.state.searching && entry !== 'welcome' && entry !== 'demo' && (
-            <Grid style={{ marginTop: 200 }}>
-              <div style={{ padding: 0, width: '70%', position: 'absolute', top: 0, right: 220 }}>
+            <Grid>
+              <div className="solar-stepper">
                 <SolarStepper activeStep={0} />
               </div>
               <Row className="show-grid">
@@ -408,10 +408,10 @@ export class MapView extends React.Component {
           )}
           {this.state.showingMap && (
             <React.Fragment>
-              <div style={{ padding: 0, width: '70%', position: 'absolute', top: 0, right: 220 }}>
+              <div style={{ padding: 0, width: 800, margin: 'auto' }}>
                 <SolarStepper activeStep={1} />
               </div>
-              <Card style={{ margin: '90px auto', width: '93%', height: 840 }}>
+              <Card style={{ margin: '40px auto', width: '93%', height: 840 }}>
                 <CardContent>
                   <CloseButton
                     onBackClick={this.onGoBackClick}

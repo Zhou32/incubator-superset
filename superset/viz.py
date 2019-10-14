@@ -2818,8 +2818,8 @@ class SolarBI(BaseViz):
                                 self.load_data('solar_locations/lng839.pk')]
         self.get_closest_point((float(lat), float(lng)), self.lat_list679,
                                self.lng_list839)
-        where = f"latitude = '{self.nearest_lat}' AND " \
-            f"longitude = '{self.nearest_lng}' AND " \
+        where = f"latitude = '{format(self.nearest_lat,'.7f')}' AND " \
+            f"longitude = '{format(self.nearest_lng,'.7f')}' AND " \
             f"radiationtype = 'dni' AND radiation != -999"
         return where
 
