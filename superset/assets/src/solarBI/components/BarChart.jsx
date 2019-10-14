@@ -129,7 +129,7 @@ class BarChart extends React.Component {
     // const { queryData, width } = this.props;
     const { queryData, classes } = this.props;
     const mergedData = [];
-    for (let i = 0; i < queryData[0].length; i++) {
+    for (let i = 18; i < 30; i++) {
       mergedData.push({ date: queryData[0][i], solar_data: queryData[1][i] });
     }
 
