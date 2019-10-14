@@ -94,6 +94,9 @@ const styles = tm => ({
       color: 'white',
       backgroundColor: '#034980',
     },
+    '&:disabled': {
+      backgroundColor: 'lightgray',
+    },
   },
   buttons: {
     width: '80%',
@@ -219,6 +222,9 @@ const styles = tm => ({
     borderBottom: 'none',
     marginTop: '35px',
     marginRight: '45px',
+  },
+  remainCount: {
+    float: 'right',
   },
   costLabel: {
     fontSize: '1.6rem',
@@ -679,7 +685,7 @@ class ExportModal extends React.Component {
                         }}
                       />
                     </div>
-                    <React.Fragment>
+                    <div>
                       <Button
                         className={classNames(classes.button, classes.closeBtn)}
                         disabled={solarBI.sending}
@@ -690,9 +696,12 @@ class ExportModal extends React.Component {
                       </Button>
                       {solarBI.sending ?
                         (<img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />) :
-                        (<Button className={classNames(classes.button, classes.requestBtn)} onClick={this.handleRequestData} color="primary">Pay</Button>)
+                        (<Button className={classNames(classes.button, classes.requestBtn)} onClick={this.handleRequestData} color="primary" disabled={solarBI.remain_count === 0}>Pay</Button>)
                       }
-                    </React.Fragment>
+                    </div>
+                    <p className={classes.remainCount}>
+                      * Remaining request(s): {solarBI.remain_count}
+                    </p>
                   </Container>
                 </CardContent>
               </Card>
