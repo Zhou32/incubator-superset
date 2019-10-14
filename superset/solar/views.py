@@ -25,7 +25,8 @@ from flask_login import login_user
 
 from flask_appbuilder.views import expose, PublicFormView, ModelView
 from flask_appbuilder.security.forms import ResetPasswordForm
-from .models import SolarBIUser, TeamRegisterUser
+from .models import SolarBIUser, TeamRegisterUser, Plan
+
 
 
 from .forms import (
@@ -246,5 +247,3 @@ class SolarBIResetMyPasswordView(ResetMyPasswordView):
 #     # route_base = '/solar'
 #     show_template = 'appbuilder/general/security/my_profile.html'
 #     show_widget = SolarBIShowWidget
-
-

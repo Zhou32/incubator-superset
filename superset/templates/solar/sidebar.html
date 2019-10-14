@@ -75,8 +75,8 @@
             </li>
 
             <li>
-               <a {% if request.path == '/solar/billing' %}class="s-sidebar__nav-link current_page_item" {% else %}class="s-sidebar__nav-link"{% endif %}
-                  href="{{ url_for('SolarBIModelView.billing') }}">
+               <a {% if request.path == '/billing' %}class="s-sidebar__nav-link current_page_item" {% else %}class="s-sidebar__nav-link"{% endif %}
+                  href="{{ url_for('SolarBIBillingView.billing') }}">
                   <i class="fas fa-credit-card"></i><span>Billing</span>
                </a>
             </li>

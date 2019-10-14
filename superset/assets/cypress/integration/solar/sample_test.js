@@ -18,6 +18,7 @@ describe('Solar Test', () => {
             }
         })
     })
+
     // LoginPageTest();
     SearchPageTest();
 })

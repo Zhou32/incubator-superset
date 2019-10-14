@@ -26,6 +26,7 @@ import traceback
 import boto3
 from typing import Dict, List  # noqa: F401
 from urllib import parse
+import stripe
 
 from flask import (
     abort,
@@ -45,6 +46,7 @@ from flask_appbuilder.models.sqla.filters import FilterEqual, \
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder.security.decorators import has_access, has_access_api
 from flask_appbuilder.security.sqla import models as ab_models
+from flask_appbuilder.views import ModelView
 from flask_babel import gettext as __
 from flask_babel import lazy_gettext as _
 import pandas as pd
@@ -52,6 +54,7 @@ import simplejson as json
 from sqlalchemy import and_, or_, select
 from werkzeug.routing import BaseConverter
 from ..solar.forms import SolarBIListWidget
+from ..solar.models import Plan
 
 from superset import (
     app,
@@ -121,6 +124,8 @@ ALL_DATASOURCE_ACCESS_ERR = __(
 DATASOURCE_MISSING_ERR = __("The data source seems to have been deleted")
 ACCESS_REQUEST_MISSING_ERR = __("The access requests seem to have been deleted")
 USER_MISSING_ERR = __("The user seems to have been deleted")
+
+stripe.api_key = os.getenv('STRIPE_SK')
 
 FORM_DATA_KEY_BLACKLIST: List[str] = []
 if not config.get("ENABLE_JAVASCRIPT_CONTROLS"):
@@ -693,7 +698,8 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
     def billing(self):
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
-
+        team = self.appbuilder.sm.find_team(user_id=g.user.id)
+        logging.info(team.stripe_user_id)
         entry_point = 'solarBI'
 
         datasource_id = self.get_solar_datasource()
@@ -721,6 +727,7 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
             title='Billing - SolarBI',
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
         )
+
 
 
 # appbuilder.add_view(
@@ -752,6 +759,70 @@ appbuilder.add_view(
     icon='fa-save',
     category='SolarBI',
     category_label=__('SolarBI'),
+    category_icon='fa-sun-o',
+)
+
+
+class SolarBIBillingView(ModelView):
+    route_base = '/billing'
+    datamodel = SQLAInterface(Plan)
+
+    @expose('/', methods=['GET', 'POST'])
+    def billing(self):
+        if not g.user or not g.user.get_id():
+            return redirect(appbuilder.get_url_for_login)
+        team = self.appbuilder.sm.find_team(user_id=g.user.id)
+        entry_point = 'billing'
+
+        # welcome_dashboard_id = (
+        #     db.session
+        #     .query(UserAttribute.welcome_dashboard_id)
+        #     .filter_by(user_id=g.user.get_id())
+        #     .scalar()
+        # )
+        # if welcome_dashboard_id:
+        #     return self.dashboard(str(welcome_dashboard_id))
+
+        payload = {
+            'user': bootstrap_user_data(g.user),
+            'common': BaseSupersetView().common_bootstrap_payload(),
+        }
+
+        return self.render_template(
+            'solar/billing.html',
+            entry=entry_point,
+            title='Billing - SolarBI',
+            bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
+        )
+
+    #TODO endpoint for changing plan
+    @expose('/changeplan/<plan_id>', methods=['GET','POST'])
+    def change_plan(self, plan_id, user_id):
+        if not g.user or not g.user.get_id():
+            return json_error_response('Incorrect call to endpoint')
+        team = self.appbuilder.sm.find_team(user_id=g.user.id)
+        logging.info(team.stripe_user_id)
+        stripe_customer = stripe.Customer.retrieve(id=team.stripe_user_id)
+        # strip_pmIntent = stripe.PaymentIntent.create()
+        pass
+
+    #TODO endpoint for adding payment
+    @expose('/addpm/<pm_id>')
+    def add_paymen_method(self):
+        pass
+
+    #TODO for future, endpoint for on demmand payment
+    def on_demand_pay(self):
+        pass
+
+
+appbuilder.add_view(
+    SolarBIBillingView,
+    'Billing',
+    label=__('Billing'),
+    icon='fa-save',
+    category='Billing',
+    category_label=__('Billing'),
     category_icon='fa-sun-o',
 )
 
