@@ -16,13 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import getToastsFromPyFlashMessages from '../../messageToasts/utils/getToastsFromPyFlashMessages';
+/* eslint camelcase: 0 */
+import { SupersetClient } from '@superset-ui/connection';
+import { t } from '@superset-ui/translation';
+import URI from 'urijs';
+import { logEvent } from '../../logger/actions';
+import { Logger, LOG_ACTIONS_LOAD_CHART } from '../../logger/LogUtils';
+import getClientErrorObject from '../../utils/getClientErrorObject';
+import {
+  addSuccessToast as addSuccessToastAction,
+  addDangerToast as addDangerToastAction,
+  addInfoToast as addInfoToastAction,
+} from '../../messageToasts/actions/index';
 
-export default function getInitialState(bootstrapData) {
-  return {
-    billing: {
-      ...bootstrapData,
-    },
-    messageToasts: getToastsFromPyFlashMessages({}.flash_messages || []),
-  };
-}

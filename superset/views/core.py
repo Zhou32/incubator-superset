@@ -774,22 +774,13 @@ class SolarBIBillingView(ModelView):
         team = self.appbuilder.sm.find_team(user_id=g.user.id)
         entry_point = 'billing'
 
-        # welcome_dashboard_id = (
-        #     db.session
-        #     .query(UserAttribute.welcome_dashboard_id)
-        #     .filter_by(user_id=g.user.get_id())
-        #     .scalar()
-        # )
-        # if welcome_dashboard_id:
-        #     return self.dashboard(str(welcome_dashboard_id))
-
         payload = {
             'user': bootstrap_user_data(g.user),
             'common': BaseSupersetView().common_bootstrap_payload(),
         }
 
         return self.render_template(
-            'solar/billing.html',
+            'solar/basic.html',
             entry=entry_point,
             title='Billing - SolarBI',
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),

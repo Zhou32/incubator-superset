@@ -50,7 +50,7 @@ const store = createStore(
 
 const App = () => (
   <Provider store={store}>
-    <div>
+    <div style={{ width: '100%' }}>
       <Billing />
       <ToastPresenter />
     </div>
