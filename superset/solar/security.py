@@ -564,7 +564,12 @@ class CustomSecurityManager(SupersetSecurityManager):
             return False
 
 
-    # TODO need to seperate to another file.
-    # Business logic should not be included in security manager
-    def change_plan(self,team_id, plan_id):
-        pass
+    def get_subscription(self, team_id=None, sub_id=None):
+        if team_id:
+            subscription = self.get_session.query(TeamSubscription).filter(TeamSubscription.team==team_id).first()
+            return subscription
+        elif sub_id:
+            subscription = self.get_session.query(TeamSubscription).filter(TeamSubscription.stripe_sub_id == sub_id).first()
+            return subscription
+        else:
+            return None

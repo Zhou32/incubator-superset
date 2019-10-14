@@ -604,7 +604,8 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
     def add(self):
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
-
+        team = self.appbuilder.sm.find_team(user_id=g.user.id)
+        subscription = self.appbuilder.sm.get_subscription(team_id=team.id)
         entry_point = 'solarBI'
 
         datasource_id = self.get_solar_datasource()
@@ -614,7 +615,7 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
             'common': BaseSupersetView().common_bootstrap_payload(),
             'datasource_id': datasource_id,
             'datasource_type': 'table',
-            'entry': 'add',
+            'remain_count': subscription.remain_count,
         }
 
         return self.render_template(
