@@ -23,7 +23,7 @@ function Plan() {
   const classes = useStyles();
   const [openCC, setOpenCC] = useState(false);
   const [openACC, setOpenACC] = useState(false);
-  const [planId, setPlanId] = useState(1);
+  const [planId, setPlanId] = useState('00');
   const [creditCard, setCreditCard] = useState(null);
 
   const handleCloseCC = () => {
@@ -57,21 +57,21 @@ function Plan() {
           <div className="option-name"><i className="fas fa-hotel" /><span>Starter</span></div>
           <div className="option-description">$100 Increases for upto 3 new download data sets</div>
           <div className="option-submit">
-            <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('2')}>Choose</Button>
+            <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('01')}>Choose</Button>
           </div>
         </div>
         <div className="plan-option-pane">
           <div className="option-name"><i className="fas fa-project-diagram" /><span>Medium</span></div>
           <div className="option-description">$1000 month flat fee for all the downloads you can do !</div>
           <div className="option-submit">
-            <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('3')}>Choose</Button>
+            <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('02')}>Choose</Button>
           </div>
         </div>
         <div className="plan-option-pane">
           <div className="option-name"><i className="fas fa-project-diagram" /><span>Advance</span></div>
           <div className="option-description">$1000 month flat fee for all the downloads you can do !</div>
           <div className="option-submit">
-            <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('4')}>Choose</Button>
+            <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('03')}>Choose</Button>
           </div>
         </div>
       </div>
