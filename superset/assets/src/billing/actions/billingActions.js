@@ -19,10 +19,10 @@
 /* eslint camelcase: 0 */
 import { SupersetClient } from '@superset-ui/connection';
 import { t } from '@superset-ui/translation';
-import URI from 'urijs';
-import { logEvent } from '../../logger/actions';
-import { Logger, LOG_ACTIONS_LOAD_CHART } from '../../logger/LogUtils';
-import getClientErrorObject from '../../utils/getClientErrorObject';
+// import URI from 'urijs';
+// import { logEvent } from '../../logger/actions';
+// import { Logger, LOG_ACTIONS_LOAD_CHART } from '../../logger/LogUtils';
+// import getClientErrorObject from '../../utils/getClientErrorObject';
 import {
   addSuccessToast as addSuccessToastAction,
   addDangerToast as addDangerToastAction,
@@ -39,8 +39,8 @@ export function changePlanStarted() {
 }
 
 export const CHANGE_PLAN_SUCCEEDED = 'CHANGE_PLAN_SUCCEEDED';
-export function changePlanSucceeded(data) {
-  return { type: CHANGE_PLAN_SUCCEEDED, data };
+export function changePlanSucceeded(res) {
+  return { type: CHANGE_PLAN_SUCCEEDED, res };
 }
 
 export const CHANGE_PLAN_FAILED = 'CHANGE_PLAN_FAILED';
@@ -61,8 +61,10 @@ export function changePlan(planId, payload, timeout = 60) {
       signal,
       timeout: timeout * 1000,
     })
-      .then(({ json }) => dispatch(changePlanSucceeded(json)))
-      // dispatch(addSuccessToast(t('Request confirmed! An email has been sent to you.')));
+      .then(({ json }) => {
+        dispatch(changePlanSucceeded(json));
+        dispatch(addSuccessToast(t(json.msg)));
+      })
       .catch(() => {
         dispatch(addDangerToast(t('Request failed.')));
       });

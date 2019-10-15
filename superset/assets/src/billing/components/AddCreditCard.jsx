@@ -24,6 +24,11 @@ const useStyles = makeStyles(theme => ({
   contentText: {
     fontSize: '1.2em',
   },
+  loading: {
+    width: 60,
+    margin: 0,
+    float: 'right',
+  },
   title: {
     '& h2': {
       fontSize: '1.6em',
@@ -37,7 +42,7 @@ const useStyles = makeStyles(theme => ({
 const createOptions = () => ({
   style: {
     base: {
-      fontSize: '14px',
+      fontSize: '18px',
       color: '#424770',
       letterSpacing: '0.025em',
       fontFamily: 'Source Code Pro, monospace',
@@ -47,12 +52,12 @@ const createOptions = () => ({
       // padding: 0,
     },
     invalid: {
-      color: '#9e2146',
+      color: '#dc3545',
     },
   },
 });
 
-function AddCreditCard({ planId, stripe, openACC, handleCloseACC, changePlanConnect }) {
+function AddCreditCard({ planId, stripe, openACC, handleCloseACC, changePlanConnect, billing }) {
   const classes = useStyles();
   const [showError, setShowError] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -65,7 +70,9 @@ function AddCreditCard({ planId, stripe, openACC, handleCloseACC, changePlanConn
           setErrorMsg(payload.error.message);
           setShowError(true);
         } else {
-          changePlanConnect(planId, payload);
+          changePlanConnect(planId, payload).then(() => {
+            handleCloseACC();
+          });
         }
 
       });
@@ -108,9 +115,10 @@ function AddCreditCard({ planId, stripe, openACC, handleCloseACC, changePlanConn
           </div>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleSubmit} color="primary" className={classes.button}>
-            Submit
-          </Button>
+          {billing.plan_change === 'changing' ?
+            (<img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />) :
+            (<Button onClick={handleSubmit} color="primary" className={classes.button}>Submit</Button>)
+          }
           <Button onClick={handleCloseACC} color="primary" className={classes.button}>
             Cancel
           </Button>
@@ -121,7 +129,7 @@ function AddCreditCard({ planId, stripe, openACC, handleCloseACC, changePlanConn
 }
 
 AddCreditCard.propTypes = {
-  planId: PropTypes.number.isRequired,
+  planId: PropTypes.string.isRequired,
   openACC: PropTypes.bool.isRequired,
   handleCloseACC: PropTypes.func.isRequired,
 };

@@ -22,19 +22,25 @@ import * as actions from '../actions/billingActions';
 
 export default function (state = {}, action) {
   const actionHandlers = {
-    // [actions.SOLAR_UPDATE_STARTED]() {
-    //   return {
-    //     ...state,
-    //     solarStatus: 'loading',
-    //     solarStackTrace: null,
-    //     solarAlert: null,
-    //     solarUpdateEndTime: null,
-    //     solarUpdateStartTime: now(),
-    //     can_save: false,
-    //     can_export: false,
-    //     queryController: action.queryController,
-    //   };
-    // },
+    [actions.CHANG_PLAN_STARTED]() {
+      return {
+        ...state,
+        plan_change: 'changing',
+      };
+    },
+    [actions.CHANGE_PLAN_SUCCEEDED]() {
+      return {
+        ...state,
+        plan_change: 'success',
+        plan_id: action.res.plan_id,
+      };
+    },
+    [actions.CHANGE_PLAN_FAILED]() {
+      return {
+        ...state,
+        plan_change: 'fail',
+      };
+    },
   };
 
   if (action.type in actionHandlers) {

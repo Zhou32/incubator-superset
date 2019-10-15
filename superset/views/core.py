@@ -817,7 +817,7 @@ class SolarBIBillingView(ModelView):
                                        items=[{'id':subscription['items']['data'][0].id, 'plan':plan_id}])
             self.update_plan(team.id, plan_id, change_pm=change_pm, pm_id=pm_id)
 
-            return json_success(json.dumps({'msg':'Change successful', 'plan_id':plan_id}))
+            return json_success(json.dumps({'msg': 'Change plan success!', 'plan_id': plan_id}))
         except Exception as e:
             logging.error(e)
 

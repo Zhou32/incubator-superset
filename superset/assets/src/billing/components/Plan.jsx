@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import { StripeProvider, Elements } from 'react-stripe-elements';
@@ -20,12 +21,11 @@ const useStyles = makeStyles(tm => ({
   },
 }));
 
-function Plan() {
+function Plan({ billing }) {
   const classes = useStyles();
   const [openCC, setOpenCC] = useState(false);
   const [openACC, setOpenACC] = useState(false);
   const [planId, setPlanId] = useState('00');
-  const [creditCard, setCreditCard] = useState(null);
 
   const handleCloseCC = () => {
     setOpenCC(false);
@@ -36,7 +36,7 @@ function Plan() {
   };
 
   const handlePlanClick = (id) => {
-    if (creditCard === null) {
+    if (billing.pm_id === null) {
       setPlanId(id);
       setOpenACC(true);
     } else {
@@ -48,7 +48,7 @@ function Plan() {
   return (
     <React.Fragment>
       <div className="tab-pane" id="plan">
-        <h1>Change Plan</h1>
+        <h1 id="select-plan">Select Plan</h1>
         <div className="plan-option-pane">
           <div className="option-name"><i className="fas fa-list-ul" /><span>Free</span></div>
           <div className="option-description">On demand you will be charge every new downloadable data set</div>
@@ -88,4 +88,13 @@ function Plan() {
   );
 }
 
-export default Plan;
+function mapStateToProps({ billing }) {
+  return {
+    billing,
+  };
+}
+
+export default connect(
+  mapStateToProps,
+  {},
+)(Plan);

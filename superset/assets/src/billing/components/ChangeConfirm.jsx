@@ -32,7 +32,7 @@ function ChangeConfirm({ openCC, handleCloseCC }) {
   return (
     <div>
       <Dialog open={openCC} onClose={handleCloseCC} aria-labelledby="form-dialog-title">
-        <DialogTitle className={classes.title}>Change Plan</DialogTitle>
+        <DialogTitle className={classes.title}>Ready to Change Plan?</DialogTitle>
         <DialogContent>
           <DialogContentText className={classes.contentText}>
             Are you sure to change your current plan to the new one?
