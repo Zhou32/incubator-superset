@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import { StripeProvider, Elements } from 'react-stripe-elements';
@@ -40,7 +41,7 @@ function Plan({ billing }) {
       setPlanId(id);
       setOpenACC(true);
     } else {
-      setOpenCC(false);
+      setOpenCC(true);
     }
   };
 
@@ -52,27 +53,37 @@ function Plan({ billing }) {
         <div className="plan-option-pane">
           <div className="option-name"><i className="fas fa-list-ul" /><span>Free</span></div>
           <div className="option-description">On demand you will be charge every new downloadable data set</div>
-          <div className="option-submit"><button className="btn btn-default" disabled>Current</button></div>
+          <div className="option-submit">
+            <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('01')} disabled={billing.plan_id === '00'}>
+              {billing.plan_id === '00' ? 'Current' : 'Chooose'}
+            </Button>
+          </div>
         </div>
         <div className="plan-option-pane">
           <div className="option-name"><i className="fas fa-hotel" /><span>Starter</span></div>
           <div className="option-description">$100 Increases for upto 3 new download data sets</div>
           <div className="option-submit">
-            <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('01')}>Choose</Button>
+            <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('01')} disabled={billing.plan_id === '01'}>
+              {billing.plan_id === '01' ? 'Current' : 'Chooose'}
+            </Button>
           </div>
         </div>
         <div className="plan-option-pane">
           <div className="option-name"><i className="fas fa-project-diagram" /><span>Medium</span></div>
           <div className="option-description">$1000 month flat fee for all the downloads you can do !</div>
           <div className="option-submit">
-            <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('02')}>Choose</Button>
+            <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('02')} disabled={billing.plan_id === '02'}>
+              {billing.plan_id === '02' ? 'Current' : 'Chooose'}
+            </Button>
           </div>
         </div>
         <div className="plan-option-pane">
           <div className="option-name"><i className="fas fa-project-diagram" /><span>Advance</span></div>
           <div className="option-description">$1000 month flat fee for all the downloads you can do !</div>
           <div className="option-submit">
-            <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('03')}>Choose</Button>
+            <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('03')} disabled={billing.plan_id === '03'}>
+              {billing.plan_id === '03' ? 'Current' : 'Chooose'}
+            </Button>
           </div>
         </div>
       </div>
@@ -87,6 +98,10 @@ function Plan({ billing }) {
     </React.Fragment>
   );
 }
+
+Plan.propTypes = {
+  billing: PropTypes.object.isRequired,
+};
 
 function mapStateToProps({ billing }) {
   return {

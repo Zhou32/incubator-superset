@@ -774,7 +774,7 @@ class SolarBIBillingView(ModelView):
             return redirect(appbuilder.get_url_for_login)
         team = self.appbuilder.sm.find_team(user_id=g.user.id)
         team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(team=team.id).first()
-        plan = self.appbuilder.get_session.query(Plan).filter_by(id=team_sub.plan)
+        plan = self.appbuilder.get_session.query(Plan).filter_by(id=team_sub.plan).first()
         entry_point = 'billing'
 
         payload = {
@@ -818,7 +818,7 @@ class SolarBIBillingView(ModelView):
                                        items=[{'id':subscription['items']['data'][0].id, 'plan':plan_id}])
             self.update_plan(team.id, plan_id, change_pm=change_pm, pm_id=pm_id)
 
-            return json_success(json.dumps({'msg': 'Change plan success!', 'plan_id': plan_id}))
+            return json_success(json.dumps({'msg': 'Change plan success!', 'plan_id': plan_id, 'pm_id': pm_id}))
         except Exception as e:
             logging.error(e)
 

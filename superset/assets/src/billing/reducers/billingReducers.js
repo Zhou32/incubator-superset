@@ -33,6 +33,7 @@ export default function (state = {}, action) {
         ...state,
         plan_change: 'success',
         plan_id: action.res.plan_id,
+        pm_id: action.res.pm_id,
       };
     },
     [actions.CHANGE_PLAN_FAILED]() {
