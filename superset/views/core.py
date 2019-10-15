@@ -54,7 +54,7 @@ import simplejson as json
 from sqlalchemy import and_, or_, select
 from werkzeug.routing import BaseConverter
 from ..solar.forms import SolarBIListWidget
-from ..solar.models import Plan
+from ..solar.models import Plan, TeamSubscription, Team
 
 from superset import (
     app,
@@ -773,11 +773,15 @@ class SolarBIBillingView(ModelView):
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
         team = self.appbuilder.sm.find_team(user_id=g.user.id)
+        plans = self.appbuilder.get_session.query(Plan).all()
         entry_point = 'billing'
 
         payload = {
             'user': bootstrap_user_data(g.user),
             'common': BaseSupersetView().common_bootstrap_payload(),
+            'cus_id': team.stripe_user_id,
+            'pm_id': team.stripe_pm_id,
+            'plan_list': list(plan.stripe_id for plan in plans)
         }
 
         return self.render_template(
@@ -797,15 +801,45 @@ class SolarBIBillingView(ModelView):
             return json_error_response('Incorrect call to endpoint')
         team = self.appbuilder.sm.find_team(user_id=g.user.id)
         logging.info(team.stripe_user_id)
-        stripe_customer = stripe.Customer.retrieve(id=team.stripe_user_id)
-        form_data = get_form_data()[0]
-        # strip_pmIntent = stripe.PaymentIntent.create()
-        pass
+        try:
+            stripe_customer = stripe.Customer.retrieve(id=team.stripe_user_id)
+            form_data = get_form_data()[0]['token']
 
-    #TODO endpoint for adding payment
-    @expose('/addpm/<pm_id>')
-    def add_paymen_method(self):
-        pass
+            change_pm = False
+            pm_id = None
+            if stripe_customer.default_source is None:
+                stripe.Customer.modify(stripe_customer.stripe_id, source=form_data['id'])
+                pm_id = form_data['card']['id']
+                change_pm = True
+
+            subscription = stripe_customer['subscriptions']['data'][0]
+            new_sub = stripe.Subscription.modify(subscription.stripe_id, cancel_at_period_end=False,
+                                       items=[{'id':subscription['items']['data'][0].id, 'plan':plan_id}])
+            self.update_plan(team.id, plan_id, change_pm=change_pm, pm_id=pm_id)
+
+            return json_success(json.dumps({'msg':'Change successful', 'plan_id':plan_id}))
+        except Exception as e:
+            logging.error(e)
+
+    def update_plan(self, team_id, plan_stripe_id, change_pm=False, pm_id=None):
+        try:
+            '''Update payment methond ID, aka card id, if needed'''
+            team = db.session.query(Team).filter_by(id=team_id).first()
+            if change_pm:
+                team.stripe_pm_id = pm_id
+
+            '''Update team subscription, and reduce used '''
+            team_sub = db.session.query(TeamSubscription).filter_by(team=team.id)
+            old_plan = db.session.query(Plan).filter_by(stripe_id=team_sub.plan).first()
+            new_plan = db.session.query(Plan).filter_by(stripe_id=plan_stripe_id).first()
+            old_count = team_sub.remain_count
+            new_count = old_plan - old_count + new_plan.remain_count
+            team_sub.remain_count = new_count if new_count >= 0 else 0
+            team_sub.plan = new_plan.id
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            logging.error(e)
 
     #TODO for future, endpoint for on demmand payment
     def on_demand_pay(self):
@@ -1509,6 +1543,7 @@ class Superset(BaseSupersetView):
 
         form_data = get_form_data()[0]
 
+
         try:
             datasource_id, datasource_type = get_datasource_info(
                 datasource_id, datasource_type, form_data
@@ -1576,6 +1611,15 @@ class Superset(BaseSupersetView):
         # samples = request.args.get('samples') == 'true'
         # force = request.args.get('force') == 'true'
         self.send_email(g.user, address_name)
+
+        team = self.appbuilder.sm.find_team(user_id=g.user.id)
+        subscription = self.appbuilder.get_session.query(TeamSubscription).filter(TeamSubscription.team==team.id).first()
+
+        # if subscription.remain_count <= 0:
+        #     return json_error_response("You cannot request any more data.")
+        # else:
+        #     subscription.remain_count = subscription.remain_count - 1
+        #     self.appbuilder.get_session.commit()
 
         start_year, start_month, start_day = start_date.split('-')
         end_year, end_month, end_day = end_date.split('-')
