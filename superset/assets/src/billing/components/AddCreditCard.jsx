@@ -1,4 +1,6 @@
+/* eslint-disable jsx-a11y/label-has-for */
 import React from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -7,6 +9,13 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { makeStyles } from '@material-ui/core/styles';
+import {
+  injectStripe,
+  CardNumberElement,
+  CardExpiryElement,
+  CardCVCElement,
+} from 'react-stripe-elements';
+import { changePlan } from '../actions/billingActions';
 
 const useStyles = makeStyles(theme => ({
   button: {
@@ -25,21 +34,64 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function AddCreditCard({ openACC, handleCloseACC }) {
+const createOptions = () => ({
+  style: {
+    base: {
+      fontSize: '14px',
+      color: '#424770',
+      letterSpacing: '0.025em',
+      fontFamily: 'Source Code Pro, monospace',
+      '::placeholder': {
+        color: '#aab7c4',
+      },
+      padding: 0,
+    },
+    invalid: {
+      color: '#9e2146',
+    },
+  },
+});
+
+function AddCreditCard({ planId, stripe, openACC, handleCloseACC, changePlanConnect }) {
   const classes = useStyles();
+
+  const handleSubmit = (ev) => {
+    ev.preventDefault();
+    if (stripe) {
+      stripe.createToken().then((payload) => {
+        changePlanConnect(planId, payload).then(console.log('succsss'));
+      });
+    } else {
+      console.log("Stripe.js hasn't loaded yet.");
+    }
+  };
 
   return (
     <div>
       <Dialog open={openACC} onClose={handleCloseACC} aria-labelledby="form-dialog-title">
-        <DialogTitle className={classes.title}>Change Plan</DialogTitle>
+        <DialogTitle className={classes.title}>Add Credit Card</DialogTitle>
         <DialogContent>
           <DialogContentText className={classes.contentText}>
-            Are you sure to change your current plan to the new one?
+            Seems like you have not added a credit card yet.
           </DialogContentText>
+          <div>
+            <label className="card-elm-label">
+              Card number
+              <CardNumberElement {...createOptions()} />
+            </label>
+            <label className="card-elm-label">
+              Expiration date
+              <CardExpiryElement {...createOptions()} />
+            </label>
+            <label className="card-elm-label">
+              CVC
+              <CardCVCElement {...createOptions()} />
+            </label>
+          </div>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseACC} color="primary" className={classes.button}>
-            Confirm
+          <Button onClick={handleSubmit} color="primary" className={classes.button}>
+            Submit
           </Button>
           <Button onClick={handleCloseACC} color="primary" className={classes.button}>
             Cancel
@@ -50,4 +102,19 @@ function AddCreditCard({ openACC, handleCloseACC }) {
   );
 }
 
-export default AddCreditCard;
+AddCreditCard.propTypes = {
+  planId: PropTypes.number.isRequired,
+  openACC: PropTypes.bool.isRequired,
+  handleCloseACC: PropTypes.func.isRequired,
+};
+
+function mapStateToProps({ billing }) {
+  return {
+    billing,
+  };
+}
+
+export default injectStripe(connect(
+  mapStateToProps,
+  { changePlanConnect: changePlan },
+)(AddCreditCard));
