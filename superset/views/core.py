@@ -774,7 +774,7 @@ class SolarBIBillingView(ModelView):
             return redirect(appbuilder.get_url_for_login)
         team = self.appbuilder.sm.find_team(user_id=g.user.id)
         team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(team=team.id).first()
-        plan = self.appbuilder.get_session.query(Plan).filter_by(id=team_sub.plan)
+        plan = self.appbuilder.get_session.query(Plan).filter_by(id=team_sub.plan).first()
         entry_point = 'billing'
 
         payload = {
@@ -1618,11 +1618,11 @@ class Superset(BaseSupersetView):
         team = self.appbuilder.sm.find_team(user_id=g.user.id)
         subscription = self.appbuilder.get_session.query(TeamSubscription).filter(TeamSubscription.team==team.id).first()
 
-        # if subscription.remain_count <= 0:
-        #     return json_error_response("You cannot request any more data.")
-        # else:
-        #     subscription.remain_count = subscription.remain_count - 1
-        #     self.appbuilder.get_session.commit()
+        if subscription.remain_count <= 0:
+            return json_error_response("You cannot request any more data.")
+        else:
+            subscription.remain_count = subscription.remain_count - 1
+            self.appbuilder.get_session.commit()
 
         start_year, start_month, start_day = start_date.split('-')
         end_year, end_month, end_day = end_date.split('-')
