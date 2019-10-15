@@ -813,7 +813,7 @@ class SolarBIBillingView(ModelView):
                 change_pm = True
 
             subscription = stripe_customer['subscriptions']['data'][0]
-            new_sub = stripe.Subscription.modify(subscription.stripe_id, cancel_at_period_end=False,
+            new_sub = stripe.Subscription.modify(subscription.stripe_id, cancel_at_period_end=True,
                                        items=[{'id':subscription['items']['data'][0].id, 'plan':plan_id}])
             self.update_plan(team.id, plan_id, change_pm=change_pm, pm_id=pm_id)
 
@@ -829,16 +829,18 @@ class SolarBIBillingView(ModelView):
                 team.stripe_pm_id = pm_id
 
             '''Update team subscription, and reduce used '''
-            team_sub = db.session.query(TeamSubscription).filter_by(team=team.id)
-            old_plan = db.session.query(Plan).filter_by(stripe_id=team_sub.plan).first()
-            new_plan = db.session.query(Plan).filter_by(stripe_id=plan_stripe_id).first()
+            team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(team=team.id).first()
+            print(team_sub.id)
+            old_plan = self.appbuilder.get_session.query(Plan).filter_by(id=team_sub.plan).first()
+            new_plan = self.appbuilder.get_session.query(Plan).filter_by(stripe_id=plan_stripe_id).first()
+            print(new_plan.id)
             old_count = team_sub.remain_count
-            new_count = old_plan - old_count + new_plan.remain_count
+            new_count = old_plan.num_request - old_count + new_plan.num_request
             team_sub.remain_count = new_count if new_count >= 0 else 0
             team_sub.plan = new_plan.id
-            db.session.commit()
+            self.appbuilder.get_session.commit()
         except Exception as e:
-            db.session.rollback()
+            self.appbuilder.get_session.rollback()
             logging.error(e)
 
     #TODO for future, endpoint for on demmand payment
