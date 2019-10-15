@@ -65,7 +65,6 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
         user = self.appbuilder.get_session.query(SolarBIUser).filter_by(email=reg.email).first()
         user.email_confirm = True
 
-
         team_reg = self.appbuilder.sm.add_team(reg, user)
         # self.handle_aws_info(org_reg, user)
         self.appbuilder.sm.del_register_user(reg)
@@ -73,7 +72,6 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
         #     is_first_login = True
         # else:
         #     is_first_login = False
-
 
         # Register stripe user for the team using user's email
         self.appbuilder.sm.create_stripe_user_and_sub(user, team_reg)

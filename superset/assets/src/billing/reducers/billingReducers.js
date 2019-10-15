@@ -16,13 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import getToastsFromPyFlashMessages from '../../messageToasts/utils/getToastsFromPyFlashMessages';
+import { t } from '@superset-ui/translation';
+import { now } from '../../modules/dates';
+import * as actions from '../actions/billingActions';
 
-export default function getInitialState(bootstrapData) {
-  return {
-    billing: {
-      ...bootstrapData,
-    },
-    messageToasts: getToastsFromPyFlashMessages({}.flash_messages || []),
+export default function (state = {}, action) {
+  const actionHandlers = {
+    // [actions.SOLAR_UPDATE_STARTED]() {
+    //   return {
+    //     ...state,
+    //     solarStatus: 'loading',
+    //     solarStackTrace: null,
+    //     solarAlert: null,
+    //     solarUpdateEndTime: null,
+    //     solarUpdateStartTime: now(),
+    //     can_save: false,
+    //     can_export: false,
+    //     queryController: action.queryController,
+    //   };
+    // },
   };
+
+  if (action.type in actionHandlers) {
+    return actionHandlers[action.type]();
+  }
+
+  return state;
 }

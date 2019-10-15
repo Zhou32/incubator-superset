@@ -1,11 +1,24 @@
 import React from 'react';
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import BillingDetails from './BillingDetails';
 import Plan from './Plan';
 
 
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#0063B0',
+    },
+    secondary: {
+      main: '#0063B0',
+    },
+  },
+});
+
+
 function Billing() {
   return (
-    <div>
+    <ThemeProvider theme={theme}>
       <div className="billing-content">
         <ul className="nav nav-pills">
           <li className="active">
@@ -13,14 +26,14 @@ function Billing() {
           </li>
           <li><a href="#plan" data-toggle="tab"><i className="far fa-list-alt" />Plan</a></li>
         </ul>
-        <div className="billing-wrapper" >
+        <div className="container">
           <div className="tab-content clearfix">
             <BillingDetails />
             <Plan />
           </div>
         </div>
       </div>
-    </div>
+    </ThemeProvider>
   );
 }
 

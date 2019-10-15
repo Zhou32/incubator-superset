@@ -775,35 +775,30 @@ class SolarBIBillingView(ModelView):
         team = self.appbuilder.sm.find_team(user_id=g.user.id)
         entry_point = 'billing'
 
-        # welcome_dashboard_id = (
-        #     db.session
-        #     .query(UserAttribute.welcome_dashboard_id)
-        #     .filter_by(user_id=g.user.get_id())
-        #     .scalar()
-        # )
-        # if welcome_dashboard_id:
-        #     return self.dashboard(str(welcome_dashboard_id))
-
         payload = {
             'user': bootstrap_user_data(g.user),
             'common': BaseSupersetView().common_bootstrap_payload(),
         }
 
         return self.render_template(
-            'solar/billing.html',
+            'solar/basic.html',
             entry=entry_point,
             title='Billing - SolarBI',
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
         )
 
     #TODO endpoint for changing plan
-    @expose('/changeplan/<plan_id>', methods=['GET','POST'])
-    def change_plan(self, plan_id, user_id):
+    @event_logger.log_this
+    @api
+    @handle_api_exception
+    @expose('/change_plan/<plan_id>/', methods=['GET', 'POST'])
+    def change_plan(self, plan_id=None):
         if not g.user or not g.user.get_id():
             return json_error_response('Incorrect call to endpoint')
         team = self.appbuilder.sm.find_team(user_id=g.user.id)
         logging.info(team.stripe_user_id)
         stripe_customer = stripe.Customer.retrieve(id=team.stripe_user_id)
+        form_data = get_form_data()[0]
         # strip_pmIntent = stripe.PaymentIntent.create()
         pass
 

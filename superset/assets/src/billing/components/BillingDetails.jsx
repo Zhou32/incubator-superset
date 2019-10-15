@@ -1,9 +1,11 @@
 import React from 'react';
+import TeamCreditCard from './TeamCreditCard';
 
 function BillingDetails() {
   return (
     <React.Fragment>
       <div className="tab-pane active" id="billing">
+        <TeamCreditCard />
         <div className="panel panel-primary">
           <div className="panel-heading">Billing Details</div>
           <div className="panel-body">

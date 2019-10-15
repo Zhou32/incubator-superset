@@ -563,7 +563,6 @@ class CustomSecurityManager(SupersetSecurityManager):
             logging.error(e)
             return False
 
-
     def get_subscription(self, team_id=None, sub_id=None):
         if team_id:
             subscription = self.get_session.query(TeamSubscription).filter(TeamSubscription.team==team_id).first()

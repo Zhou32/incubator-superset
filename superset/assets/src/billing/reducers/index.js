@@ -18,8 +18,10 @@
  */
 import { combineReducers } from 'redux';
 
+import billing from './billingReducers';
 import messageToasts from '../../messageToasts/reducers/index';
 
 export default combineReducers({
+  billing,
   messageToasts,
 });

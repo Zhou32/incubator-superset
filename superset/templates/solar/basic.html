@@ -114,6 +114,7 @@
     </div>
     {% block tail_js %}
 {#        <script src="https://kit.fontawesome.com/ace8403ae5.js"></script>#}
+        <script src="https://js.stripe.com/v3/"></script>
         <script src="{{url_for('appbuilder.static',filename='js/bootstrap.min.js')}}"></script>
         {% if entry %}
             {% with filename=entry %}
