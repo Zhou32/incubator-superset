@@ -773,7 +773,8 @@ class SolarBIBillingView(ModelView):
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
         team = self.appbuilder.sm.find_team(user_id=g.user.id)
-        plans = self.appbuilder.get_session.query(Plan).all()
+        team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(team=team.id).first()
+        plan = self.appbuilder.get_session.query(Plan).filter_by(id=team_sub.plan)
         entry_point = 'billing'
 
         payload = {
@@ -781,7 +782,7 @@ class SolarBIBillingView(ModelView):
             'common': BaseSupersetView().common_bootstrap_payload(),
             'cus_id': team.stripe_user_id,
             'pm_id': team.stripe_pm_id,
-            'plan_list': list(plan.stripe_id for plan in plans)
+            'plan_id': plan.stripe_id,
         }
 
         return self.render_template(
