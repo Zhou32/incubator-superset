@@ -314,10 +314,10 @@ class ExportModal extends React.Component {
       cost: (16).toFixed(2),
     };
 
-    // this.handleTypeChange = this.handleTypeChange.bind(this);
-    // this.handleStartDateChange = this.handleStartDateChange.bind(this);
-    // this.handleEndDateChange = this.handleEndDateChange.bind(this);
-    // this.handleResolutionChange = this.handleResolutionChange.bind(this);
+    this.handleTypeChange = this.handleTypeChange.bind(this);
+    this.handleStartDateChange = this.handleStartDateChange.bind(this);
+    this.handleEndDateChange = this.handleEndDateChange.bind(this);
+    this.handleResolutionChange = this.handleResolutionChange.bind(this);
     this.handleRequestData = this.handleRequestData.bind(this);
     this.handleQuestionClick = this.handleQuestionClick.bind(this);
     this.handleQuestionClose = this.handleQuestionClose.bind(this);
@@ -467,30 +467,22 @@ class ExportModal extends React.Component {
   //   return ret;
   // }
 
-  // handleTypeChange(event) {
-  //   this.setState({ type: event.target.value }, () => {
-  //     this.calculateCost();
-  //   });
-  // }
+  handleTypeChange(event) {
+    this.setState({ type: event.target.value });
+  }
 
-  // handleStartDateChange(event) {
-  //   this.setState({ startDate: event.target.value }, () => {
-  //     this.calculateCost();
-  //   });
-  // }
+  handleStartDateChange(event) {
+    this.setState({ startDate: event.target.value });
+  }
 
-  // handleEndDateChange(event) {
-  //   this.setState({ endDate: event.target.value }, () => {
-  //     this.calculateCost();
-  //   });
-  // }
+  handleEndDateChange(event) {
+    this.setState({ endDate: event.target.value });
+  }
 
-  // handleResolutionChange(event) {
-  //   this.setState({ resolution: event.target.value }, () => {
-  //     this.calculateCost();
-  //   });
+  handleResolutionChange(event) {
+    this.setState({ resolution: event.target.value });
 
-  // }
+  }
 
   handleQuestionClick(event) {
     this.setState({ anchorEl: event.currentTarget });
