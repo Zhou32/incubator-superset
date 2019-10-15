@@ -13,6 +13,7 @@ const useStyles = makeStyles(tm => ({
     color: '#024067',
     borderColor: '#024067',
     borderRadius: 10,
+    fontSize: '1.2em',
   },
   notUse: {
     margin: tm.spacing(1),
@@ -47,7 +48,7 @@ function Plan() {
   return (
     <React.Fragment>
       <div className="tab-pane" id="plan">
-        <h1>Add a plan</h1>
+        <h1>Change Plan</h1>
         <div className="plan-option-pane">
           <div className="option-name"><i className="fas fa-list-ul" /><span>Free</span></div>
           <div className="option-description">On demand you will be charge every new downloadable data set</div>

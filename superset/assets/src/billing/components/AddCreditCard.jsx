@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/label-has-for */
-import React from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Button from '@material-ui/core/Button';
@@ -44,7 +44,7 @@ const createOptions = () => ({
       '::placeholder': {
         color: '#aab7c4',
       },
-      padding: 0,
+      // padding: 0,
     },
     invalid: {
       color: '#9e2146',
@@ -54,16 +54,30 @@ const createOptions = () => ({
 
 function AddCreditCard({ planId, stripe, openACC, handleCloseACC, changePlanConnect }) {
   const classes = useStyles();
+  const [showError, setShowError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleSubmit = (ev) => {
     ev.preventDefault();
     if (stripe) {
       stripe.createToken().then((payload) => {
-        changePlanConnect(planId, payload).then(console.log('succsss'));
+        if (payload.error) {
+          setErrorMsg(payload.error.message);
+          setShowError(true);
+        } else {
+          changePlanConnect(planId, payload);
+        }
+
       });
     } else {
-      console.log("Stripe.js hasn't loaded yet.");
+      // eslint-disable-next-line no-alert
+      alert("Stripe.js hasn't loaded yet.");
     }
+  };
+
+  const closeErrorMsg = () => {
+    setErrorMsg('');
+    setShowError(false);
   };
 
   return (
@@ -75,6 +89,10 @@ function AddCreditCard({ planId, stripe, openACC, handleCloseACC, changePlanConn
             Seems like you have not added a credit card yet.
           </DialogContentText>
           <div>
+            {showError && <div className="error-message">
+              {errorMsg}
+              <button onClick={closeErrorMsg}><span>&times;</span></button>
+            </div>}
             <label className="card-elm-label">
               Card number
               <CardNumberElement {...createOptions()} />
