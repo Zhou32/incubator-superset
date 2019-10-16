@@ -7,7 +7,22 @@ import ChangeAddress from './ChangeAddress';
 
 function BillingDetails({ billing }) {
   const { cus_name, cus_email, cus_address } = billing.cus_info;
-  const { city, country, line1, line2, postal_code, state } = cus_address;
+  let country = '';
+  let city = '';
+  let line1 = '';
+  let line2 = '';
+  let state = '';
+  let postal_code = '';
+  if (cus_address != null) {
+    const cus_city = cus_address.city;
+    const cus_country = cus_address.country;
+    const cus_line1 = cus_address.line1;
+    const cus_line2 = cus_address.line2;
+    const cus_postal_code = cus_address.postal_code;
+    const cus_state = cus_address.state;
+    country = cus_country; city = cus_city; line1 = cus_line1; line2 = cus_line2;
+    state = cus_state; postal_code = cus_postal_code;
+  }
   const [changeAddressOpen, setChangeAddressOpen] = useState(false);
   const [billingValues, setBillingValues] = useState({
     name: cus_name,
@@ -57,7 +72,7 @@ function BillingDetails({ billing }) {
                   className="form-control billing-details"
                 >
                   {billingValues.line1} {billingValues.line2}<br />
-                  {billingValues.city}, {billingValues.state} {billingValues.postal_code}<br />
+                  {billingValues.city === '' ? '' : billingValues.city + ','} {billingValues.state} {billingValues.postal_code}<br />
                   {country}
                 </div>
               </div>
