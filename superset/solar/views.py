@@ -25,6 +25,9 @@ from flask_login import login_user
 
 from flask_appbuilder.views import expose, PublicFormView, ModelView
 from flask_appbuilder.security.forms import ResetPasswordForm
+from .models import SolarBIUser, TeamRegisterUser, Plan
+
+
 
 from .forms import (
     SolarBILoginForm_db,
@@ -46,6 +49,7 @@ log = logging.getLogger(__name__)
 
 class SolarBIAuthDBView(AuthDBView):
     invalid_login_message = lazy_gettext("Email/Username or password incorrect. Please try again.")
+    inactivated_login_message = lazy_gettext("Your account has not been activated yet. Please check your email.")
     login_template = "appbuilder/general/security/solarbi_login_db.html"
     @expose("/login/", methods=["GET", "POST"])
     def login(self):
@@ -53,11 +57,29 @@ class SolarBIAuthDBView(AuthDBView):
             return redirect(self.appbuilder.get_url_for_index)
         form = SolarBILoginForm_db()
         if form.validate_on_submit():
-            user = self.appbuilder.sm.auth_user_db(
+            user = self.appbuilder.sm.auth_solarbi_user_db(
                 form.username.data, form.password.data
             )
             if not user:
+                # For team member, check if they have activated their accounts yet
+                reg_user = self.appbuilder.get_session.query(TeamRegisterUser).\
+                    filter_by(username=form.username.data).first()
+                if not reg_user:
+                    reg_user = self.appbuilder.get_session.query(TeamRegisterUser).\
+                        filter_by(email=form.username.data).first()
+                if reg_user:
+                    flash(as_unicode(self.inactivated_login_message), "warning")
+                    return redirect(self.appbuilder.get_url_for_login)
+
                 flash(as_unicode(self.invalid_login_message), "warning")
+                return redirect(self.appbuilder.get_url_for_login)
+
+            # For team admin, check if they have activated their accounts
+            curr_user = self.appbuilder.get_session.query(SolarBIUser).filter_by(username=form.username.data).first()
+            if not curr_user:
+                curr_user = self.appbuilder.get_session.query(SolarBIUser).filter_by(email=form.username.data).first()
+            if curr_user and not curr_user.email_confirm:
+                flash(as_unicode(self.inactivated_login_message), "warning")
                 return redirect(self.appbuilder.get_url_for_login)
 
             remember = form.remember_me.data
@@ -97,7 +119,7 @@ class SolarBIPasswordRecoverView(PublicFormView):
         """
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
-        msg.sender = 'SolarBI', 'chenyang.wang@zawee.work'
+        msg.sender = 'SolarBI', 'no-reply@solarbi.com.au'
         msg.subject = self.email_subject
         url = url_for('.reset', _external=True, reset_hash=hash_val)
         msg.html = self.render_template(self.email_template,
@@ -225,5 +247,3 @@ class SolarBIResetMyPasswordView(ResetMyPasswordView):
 #     # route_base = '/solar'
 #     show_template = 'appbuilder/general/security/my_profile.html'
 #     show_widget = SolarBIShowWidget
-
-

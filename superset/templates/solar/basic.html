@@ -19,7 +19,6 @@
 {% import 'appbuilder/general/lib.html' as lib %}
 <html>
   <head>
-  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAc65tB0eu0jqft4ip7De7VcD56BpYlgio&libraries=places"></script>
     <title>
       {% block title %}
         {% if title %}
@@ -114,6 +113,7 @@
     </div>
     {% block tail_js %}
 {#        <script src="https://kit.fontawesome.com/ace8403ae5.js"></script>#}
+        <script src="https://js.stripe.com/v3/"></script>
         <script src="{{url_for('appbuilder.static',filename='js/bootstrap.min.js')}}"></script>
         {% if entry %}
             {% with filename=entry %}

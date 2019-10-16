@@ -26,6 +26,7 @@ import traceback
 import boto3
 from typing import Dict, List  # noqa: F401
 from urllib import parse
+import stripe
 
 from flask import (
     abort,
@@ -45,6 +46,7 @@ from flask_appbuilder.models.sqla.filters import FilterEqual, \
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder.security.decorators import has_access, has_access_api
 from flask_appbuilder.security.sqla import models as ab_models
+from flask_appbuilder.views import ModelView
 from flask_babel import gettext as __
 from flask_babel import lazy_gettext as _
 import pandas as pd
@@ -52,6 +54,7 @@ import simplejson as json
 from sqlalchemy import and_, or_, select
 from werkzeug.routing import BaseConverter
 from ..solar.forms import SolarBIListWidget
+from ..solar.models import Plan, TeamSubscription, Team
 
 from superset import (
     app,
@@ -121,6 +124,8 @@ ALL_DATASOURCE_ACCESS_ERR = __(
 DATASOURCE_MISSING_ERR = __("The data source seems to have been deleted")
 ACCESS_REQUEST_MISSING_ERR = __("The access requests seem to have been deleted")
 USER_MISSING_ERR = __("The user seems to have been deleted")
+
+stripe.api_key = os.getenv('STRIPE_SK')
 
 FORM_DATA_KEY_BLACKLIST: List[str] = []
 if not config.get("ENABLE_JAVASCRIPT_CONTROLS"):
@@ -401,6 +406,10 @@ def get_user():
     return g.user
 
 
+def get_team_id():
+    return g.user.team[0].id
+
+
 # class SolarBIModelView(SliceModelView):  # noqa
 #     pass
 
@@ -414,7 +423,8 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
     # datamodel = SQLAInterface(models.Slice)
     datamodel = SQLAInterface(models.SolarBISlice)
     base_filters = [['viz_type', FilterEqual, 'solarBI'],
-                    ['created_by', FilterEqualFunction, get_user]]
+                    ['team_id', FilterEqualFunction, get_team_id]]
+                    # ['created_by', FilterEqualFunction, get_user]]
     base_permissions = ['can_list', 'can_show', 'can_add', 'can_delete', 'can_edit']
 
     search_columns = (
@@ -487,11 +497,19 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
         # serialize composite pks
         pks = [self._serialize_pk_if_composite(pk) for pk in pks]
 
-        # get all object keys in s3 under the user sub folder
-        try:
-            all_object_keys = self.list_object_key('colin-query-test', g.user.email + '/')
-        except Exception:
-            all_object_keys = []
+        # get all object keys in s3 under all team users' sub folders
+        team_members_email_role = appbuilder.sm.get_team_members(g.user.id)
+        team_member_emails = []
+        for email, _ in team_members_email_role:
+            team_member_emails.append(email)
+
+        all_object_keys = []
+        for me in team_member_emails:
+            try:
+                all_object_keys += self.list_object_key('colin-query-test', me + '/')
+            except Exception:
+                continue
+
         obj_keys = []
         if all_object_keys:
             avail_object_keys = [key for key in all_object_keys if key.endswith('.csv')]
@@ -586,7 +604,8 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
     def add(self):
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
-
+        team = self.appbuilder.sm.find_team(user_id=g.user.id)
+        subscription = self.appbuilder.sm.get_subscription(team_id=team.id)
         entry_point = 'solarBI'
 
         datasource_id = self.get_solar_datasource()
@@ -596,7 +615,7 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
             'common': BaseSupersetView().common_bootstrap_payload(),
             'datasource_id': datasource_id,
             'datasource_type': 'table',
-            'entry': 'add',
+            'remain_count': subscription.remain_count,
         }
 
         return self.render_template(
@@ -680,7 +699,8 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
     def billing(self):
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
-
+        team = self.appbuilder.sm.find_team(user_id=g.user.id)
+        logging.info(team.stripe_user_id)
         entry_point = 'solarBI'
 
         datasource_id = self.get_solar_datasource()
@@ -708,6 +728,7 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
             title='Billing - SolarBI',
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
         )
+
 
 
 # appbuilder.add_view(
@@ -739,6 +760,108 @@ appbuilder.add_view(
     icon='fa-save',
     category='SolarBI',
     category_label=__('SolarBI'),
+    category_icon='fa-sun-o',
+)
+
+
+class SolarBIBillingView(ModelView):
+    route_base = '/billing'
+    datamodel = SQLAInterface(Plan)
+
+    @expose('/', methods=['GET', 'POST'])
+    def billing(self):
+        if not g.user or not g.user.get_id():
+            return redirect(appbuilder.get_url_for_login)
+        team = self.appbuilder.sm.find_team(user_id=g.user.id)
+        team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(team=team.id).first()
+        plan = self.appbuilder.get_session.query(Plan).filter_by(id=team_sub.plan).first()
+        # Retrieve customer basic information
+        cus_obj = stripe.Customer.retrieve(team.stripe_user_id)
+        cus_name = cus_obj.name
+        cus_email = cus_obj.email
+        cus_address = cus_obj.address
+
+        entry_point = 'billing'
+        payload = {
+            'user': bootstrap_user_data(g.user),
+            'common': BaseSupersetView().common_bootstrap_payload(),
+            'cus_id': team.stripe_user_id,
+            'cus_info': {'cus_name': cus_name, 'cus_email': cus_email, 'cus_address': cus_address},
+            'pm_id': team.stripe_pm_id,
+            'plan_id': plan.stripe_id,
+        }
+
+        return self.render_template(
+            'solar/basic.html',
+            entry=entry_point,
+            title='Billing - SolarBI',
+            bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
+        )
+
+    #TODO endpoint for changing plan
+    @event_logger.log_this
+    @api
+    @handle_api_exception
+    @expose('/change_plan/<plan_id>/', methods=['GET', 'POST'])
+    def change_plan(self, plan_id=None):
+        if not g.user or not g.user.get_id():
+            return json_error_response('Incorrect call to endpoint')
+        team = self.appbuilder.sm.find_team(user_id=g.user.id)
+        logging.info(team.stripe_user_id)
+        try:
+            stripe_customer = stripe.Customer.retrieve(id=team.stripe_user_id)
+
+            change_pm = False
+            pm_id = None
+            if stripe_customer.default_source is None:
+                form_data = get_form_data()[0]['token']
+                stripe.Customer.modify(stripe_customer.stripe_id, source=form_data['id'])
+                pm_id = form_data['card']['id']
+                change_pm = True
+
+            subscription = stripe_customer['subscriptions']['data'][0]
+            new_sub = stripe.Subscription.modify(subscription.stripe_id, cancel_at_period_end=True,
+                                       items=[{'id':subscription['items']['data'][0].id, 'plan':plan_id}])
+            self.update_plan(team.id, plan_id, change_pm=change_pm, pm_id=pm_id)
+
+            return json_success(json.dumps({'msg': 'Change plan success!', 'plan_id': plan_id, 'pm_id': pm_id}))
+        except Exception as e:
+            logging.error(e)
+
+    def update_plan(self, team_id, plan_stripe_id, change_pm=False, pm_id=None):
+        try:
+            '''Update payment methond ID, aka card id, if needed'''
+            team = db.session.query(Team).filter_by(id=team_id).first()
+            if change_pm:
+                team.stripe_pm_id = pm_id
+
+            '''Update team subscription, and reduce used '''
+            team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(team=team.id).first()
+            print(team_sub.id)
+            old_plan = self.appbuilder.get_session.query(Plan).filter_by(id=team_sub.plan).first()
+            new_plan = self.appbuilder.get_session.query(Plan).filter_by(stripe_id=plan_stripe_id).first()
+            print(new_plan.id)
+            old_count = team_sub.remain_count
+            new_count = old_plan.num_request - old_count + new_plan.num_request
+            team_sub.remain_count = new_count if new_count >= 0 else 0
+            team_sub.plan = new_plan.id
+            self.appbuilder.get_session.commit()
+        except Exception as e:
+            self.appbuilder.get_session.rollback()
+            logging.error(e)
+
+    #TODO for future, endpoint for on demmand payment
+    def on_demand_pay(self):
+        pass
+
+
+appbuilder.add_view(
+    SolarBIBillingView,
+    'Billing',
+    label=__('Billing'),
+    icon='fa-save',
+    category='Billing',
+    category_label=__('Billing'),
     category_icon='fa-sun-o',
 )
 
@@ -1429,6 +1552,7 @@ class Superset(BaseSupersetView):
 
         form_data = get_form_data()[0]
 
+
         try:
             datasource_id, datasource_type = get_datasource_info(
                 datasource_id, datasource_type, form_data
@@ -1461,7 +1585,7 @@ class Superset(BaseSupersetView):
             return False
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
-        msg.sender = 'SolarBI', 'chenyang.wang@zawee.work'
+        msg.sender = 'SolarBI', 'no-reply@solarbi.com.au'
         msg.subject = "SolarBI - Your data request is received"
         msg.html = self.render_template(email_template,
                                         username=user.username,
@@ -1497,6 +1621,15 @@ class Superset(BaseSupersetView):
         # force = request.args.get('force') == 'true'
         self.send_email(g.user, address_name)
 
+        team = self.appbuilder.sm.find_team(user_id=g.user.id)
+        subscription = self.appbuilder.get_session.query(TeamSubscription).filter(TeamSubscription.team==team.id).first()
+
+        if subscription.remain_count <= 0:
+            return json_error_response("You cannot request any more data.")
+        else:
+            subscription.remain_count = subscription.remain_count - 1
+            self.appbuilder.get_session.commit()
+
         start_year, start_month, start_day = start_date.split('-')
         end_year, end_month, end_day = end_date.split('-')
         select_str = ""
@@ -1531,7 +1664,7 @@ class Superset(BaseSupersetView):
 
         if type != 'both':
             athena_query = select_str \
-                + " FROM \"solar_radiation_solarbi\".\"gzip_lat_temp\"" \
+                + " FROM \"solar_radiation_hill\".\"lat_partition_v2\"" \
                 + " WHERE (CAST(year AS BIGINT)*10000" \
                 + " + CAST(month AS BIGINT)*100 + day)" \
                 + " BETWEEN " + start_year + start_month + start_day \
@@ -1540,23 +1673,14 @@ class Superset(BaseSupersetView):
                 + "' AND radiationtype = '" + type + "' AND radiation != -999 " \
                 + group_str + " " + order_str
         else:
-            athena_query = "(" + select_str \
-                + " FROM \"solar_radiation_solarbi\".\"gzip_lat_temp\"" \
+            athena_query = select_str \
+                + " FROM \"solar_radiation_hill\".\"lat_partition_v2\"" \
                 + " WHERE (CAST(year AS BIGINT)*10000" \
                 + " + CAST(month AS BIGINT)*100 + day)" \
                 + " BETWEEN " + start_year + start_month + start_day \
                 + " AND " + end_year + end_month + end_day \
                 + " AND latitude = '" + lat + "' AND longitude = '" + lng \
-                + "' AND radiationtype = 'dni' AND radiation != -999 " \
-                + group_str + " " + order_str + ") UNION ALL (" \
-                + select_str + " FROM \"solar_radiation_solarbi\".\"gzip_lat_temp\"" \
-                + " WHERE (CAST(year AS BIGINT)*10000" \
-                + " + CAST(month AS BIGINT)*100 + day)" \
-                + " BETWEEN " + start_year + start_month + start_day \
-                + " AND " + end_year + end_month + end_day \
-                + " AND latitude = '" + lat + "' AND longitude = '" + lng \
-                + "' AND radiationtype = 'ghi' AND radiation != -999 " \
-                + group_str + " " + order_str + ")"
+                + "' AND radiation != -999 " + group_str + " " + order_str
 
         AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
         AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
@@ -1565,9 +1689,9 @@ class Superset(BaseSupersetView):
         client = session.client('athena', region_name='ap-southeast-2')
         response = client.start_query_execution(
             QueryString=athena_query,
-            ClientRequestToken=g.user.email+'_'+str(time.time()),
+            # ClientRequestToken=g.user.email+'_'+str(time.time()),
             QueryExecutionContext={
-                'Database': 'solar_radiation_solarbi'
+                'Database': 'solar_radiation_hill'
             },
             ResultConfiguration={
                 'OutputLocation': 's3://colin-query-test/' + g.user.email,
@@ -1578,6 +1702,7 @@ class Superset(BaseSupersetView):
             },
         )
 
+        # self.send_email(g.user, address_name)
         # print(response['QueryExecutionId'])
         form_data = get_form_data()[0]
         args = {'action': 'saveas',
@@ -3403,6 +3528,7 @@ class Superset(BaseSupersetView):
                 form_data.pop("slice_id")  # don't save old slice_id
             slc = models.SolarBISlice(owners=[g.user] if g.user else [])
 
+        slc.team_id = g.user.team[0].id
         slc.params = json.dumps(form_data, indent=2, sort_keys=True)
         slc.datasource_name = datasource_name
         slc.viz_type = form_data["viz_type"]

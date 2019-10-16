@@ -18,6 +18,7 @@
 import json
 import time
 import logging
+import stripe
 
 from flask import flash, redirect, url_for, g, request, make_response, jsonify
 from flask_babel import lazy_gettext
@@ -63,7 +64,6 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
         # Automatically confirm the user email
         user = self.appbuilder.get_session.query(SolarBIUser).filter_by(email=reg.email).first()
         user.email_confirm = True
-        self.appbuilder.get_session.commit()
 
         team_reg = self.appbuilder.sm.add_team(reg, user)
         # self.handle_aws_info(org_reg, user)
@@ -73,9 +73,13 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
         # else:
         #     is_first_login = False
 
+        # Register stripe user for the team using user's email
+        self.appbuilder.sm.create_stripe_user_and_sub(user, team_reg)
+
         self.appbuilder.sm.update_user_auth_stat(user, True)
         login_user(user)
 
+        self.appbuilder.get_session.commit()
         flash(as_unicode('Your account has been successfully activated!'), 'success')
         return redirect(self.appbuilder.get_url_for_index)
 
@@ -135,7 +139,7 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
             self.appbuilder.get_session.commit()
 
             if self.send_email(register_user):
-                flash(as_unicode(self.message), 'info')
+                flash(as_unicode(lazy_gettext("Register success! An activation email has been sent to you.")), 'info')
                 return register_user
             else:
                 flash(as_unicode(self.error_message), 'danger')
@@ -169,7 +173,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
         """
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
-        msg.sender = 'SolarBI', 'chenyang.wang@zawee.work'
+        msg.sender = 'SolarBI', 'no-reply@solarbi.com.au'
         msg.subject = self.email_subject
         url = self.appbuilder.sm.get_url_for_invitation(register_user.registration_hash)
         # team_owner = self.appbuilder.session.query(SolarBIUser).filter_by(id=g.user.id).first()
@@ -239,6 +243,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
                         flash(as_unicode('Invitation sent to %s' % form.email.data), 'info')
                         return redirect('/solar/my-team')
                     else:
+                        self.appbuilder.sm.delete_invited_user(user_email=form.email.data)
                         flash(as_unicode('Cannot send invitation to user'), 'danger')
                         return redirect('/solar/my-team')
             except Exception as e:
@@ -311,7 +316,7 @@ class SolarBIRegisterInvitationView(BaseRegisterUser):
         """
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
-        msg.sender = 'SolarBI', 'chenyang.wang@zawee.work'
+        msg.sender = 'SolarBI', 'no-reply@solarbi.com.au'
         msg.subject = self.email_subject
         url = url_for('.activate', _external=True, invitation_hash=register_user.registration_hash)
         msg.html = self.render_template(self.email_template,

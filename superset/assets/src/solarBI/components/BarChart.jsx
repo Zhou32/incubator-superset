@@ -37,6 +37,7 @@ const styles = theme => ({
     '& span': {
       display: 'none',
       fontSize: 12,
+      transform: 'translateY(3px)',
     },
     '&:hover span': {
       top: 0,
@@ -68,8 +69,8 @@ class BarChart extends React.Component {
 
   getBarchartOption(data) {
     if (data) {
-      const data1 = data[1];
-      const xAxisData = data[0];
+      const data1 = data[1].slice(18, 30);
+      const xAxisData = data[0].slice(18, 30);
 
       const option = {
         // title: {
@@ -128,7 +129,7 @@ class BarChart extends React.Component {
     // const { queryData, width } = this.props;
     const { queryData, classes } = this.props;
     const mergedData = [];
-    for (let i = 0; i < queryData[0].length; i++) {
+    for (let i = 18; i < 30; i++) {
       mergedData.push({ date: queryData[0][i], solar_data: queryData[1][i] });
     }
 

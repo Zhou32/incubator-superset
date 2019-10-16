@@ -40,7 +40,7 @@ export default function Loading({ size }) {
         margin: 'auto',
         marginTop: 200,
         position: 'absolute',
-        left: '50%',
+        left: '47%',
         top: '50%',
         transform: 'translate(-50%, -50%)',
       }}

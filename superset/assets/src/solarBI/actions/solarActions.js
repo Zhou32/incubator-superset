@@ -98,7 +98,7 @@ export function fetchSolarData(formData, force = false, timeout = 60, key) {
             formData.extra_filters && formData.extra_filters.length > 0,
           viz_type: formData.viz_type,
         }));
-        dispatch(addSuccessToastAction(t('Successfully fetch data')));
+        dispatch(addSuccessToastAction(t('Fetch data success!')));
         return dispatch(solarUpdateSucceeded(json, key));
       })
       .catch((response) => {

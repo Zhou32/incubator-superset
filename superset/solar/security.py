@@ -19,6 +19,8 @@ import datetime
 import logging
 import random
 import string
+import stripe
+import os
 import uuid
 
 from flask import url_for
@@ -32,8 +34,10 @@ from superset.solar.registerviews import (
     SolarBIRegisterUserDBView, SolarBIRegisterInvitationView,
     SolarBIRegisterInvitationUserDBView
 )
-from superset.solar.models import ResetRequest, Team, TeamRegisterUser, SolarBIUser
+from superset.solar.models import Plan, ResetRequest, Team, TeamRegisterUser, TeamSubscription, SolarBIUser
 from superset.security import SupersetSecurityManager
+
+stripe.api_key = os.getenv('STRIPE_SK')
 
 PERMISSION_COMMON = {
     'can_add', 'can_list', 'can_show', 'can_edit', 'can_invitation', 'can_invitation_post'
@@ -139,6 +143,8 @@ class CustomSecurityManager(SupersetSecurityManager):
     resetRequest_model = ResetRequest
     team_model = Team
     user_model = SolarBIUser
+
+    subscription_model = TeamSubscription
 
     def __init__(self, appbuilder):
         super(CustomSecurityManager, self).__init__(appbuilder)
@@ -274,7 +280,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         new_team.users.append(user)
         try:
             self.get_session.add(new_team)
-            self.get_session.commit()
+            # self.get_session.commit()
             self.get_session.merge(user)
             self.get_session.commit()
             return new_team
@@ -494,3 +500,75 @@ class CustomSecurityManager(SupersetSecurityManager):
         except Exception:
             self.get_session.rollback()
             return False
+
+    def auth_solarbi_user_db(self, username, password):
+        """
+            Method for authenticating SolarBI user, auth db style
+
+            :param username:
+                The username or registered email address
+            :param password:
+                The password, will be tested against hashed password on db
+        """
+        if username is None or username == "":
+            return None
+        user = self.find_solarbi_user(username=username)
+        if user is None:
+            user = self.find_solarbi_user(email=username)
+        if user is None or (not user.is_active):
+            # log.info(LOGMSG_WAR_SEC_LOGIN_FAILED.format(username))
+            return None
+        elif check_password_hash(user.password, password):
+            self.update_user_auth_stat(user, True)
+            return user
+        else:
+            self.update_user_auth_stat(user, False)
+            # log.info(LOGMSG_WAR_SEC_LOGIN_FAILED.format(username))
+            return None
+
+    def find_solarbi_user(self, username=None, email=None):
+        if username:
+            return (
+                self.get_session.query(self.user_model).filter(self.user_model.username == username)
+                .first()
+            )
+        elif email:
+            return (
+                self.get_session.query(self.user_model).filter_by(email=email).first()
+            )
+
+    def create_stripe_user_and_sub(self, user, team):
+        try:
+            resp = stripe.Customer.create(email=user.email, name=f'{user.first_name} {user.last_name}',
+                                          description=team.team_name)
+            logging.info(resp)
+            team.stripe_user_id = resp['id']
+
+            # TODO add subscription to free tier
+            free_plan = self.get_session.query(Plan).filter_by(id=1).first()
+            sub_resp = stripe.Subscription.create(customer=team.stripe_user_id, items=[{
+                'plan': free_plan.stripe_id,
+                'quantity': '1'
+            }])
+            team_subscription = self.subscription_model()
+            team_subscription.team = team.id
+            team_subscription.plan = free_plan.id
+            team_subscription.stripe_sub_id = sub_resp['id']
+            team_subscription.remain_count = free_plan.num_request
+            self.get_session.add(team_subscription)
+            self.get_session.commit()
+            return True
+        except Exception as e:
+            self.get_session.rollback()
+            logging.error(e)
+            return False
+
+    def get_subscription(self, team_id=None, sub_id=None):
+        if team_id:
+            subscription = self.get_session.query(TeamSubscription).filter(TeamSubscription.team==team_id).first()
+            return subscription
+        elif sub_id:
+            subscription = self.get_session.query(TeamSubscription).filter(TeamSubscription.stripe_sub_id == sub_id).first()
+            return subscription
+        else:
+            return None

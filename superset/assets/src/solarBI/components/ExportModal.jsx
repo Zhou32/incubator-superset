@@ -24,21 +24,22 @@ import { createMuiTheme } from '@material-ui/core/styles';
 import { withStyles, ThemeProvider } from '@material-ui/styles';
 import Slide from '@material-ui/core/Slide';
 import Button from '@material-ui/core/Button';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
 import Dialog from '@material-ui/core/Dialog';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import Popover from '@material-ui/core/Popover';
 import HelpIcon from '@material-ui/icons/Help';
-import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import TextField from '@material-ui/core/TextField';
-import DialogTitle from '@material-ui/core/DialogTitle';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
-import InputAdornment from '@material-ui/core/InputAdornment';
+// import InputAdornment from '@material-ui/core/InputAdornment';
+import Container from '@material-ui/core/Container';
 import SolarStepper from './SolarStepper';
 import { requestSolarData } from '../actions/solarActions';
 
@@ -49,6 +50,7 @@ const propTypes = {
   open: PropTypes.bool.isRequired,
   onHide: PropTypes.func.isRequired,
   requestSolarData: PropTypes.func.isRequired,
+  solar_new: PropTypes.bool.isRequired,
 };
 
 const theme = createMuiTheme({
@@ -92,10 +94,13 @@ const styles = tm => ({
       color: 'white',
       backgroundColor: '#034980',
     },
+    '&:disabled': {
+      backgroundColor: 'lightgray',
+    },
   },
   buttons: {
-    width: '55%',
-    margin: '0 auto',
+    width: '80%',
+    marginLeft: '50',
     display: 'inline-block',
   },
   requestBtn: {
@@ -141,6 +146,7 @@ const styles = tm => ({
     fontFamily: 'Montserrat',
     fontWeight: 'bold',
     marginLeft: '15em',
+    backgroundColor: '#f5f5f5',
   },
   dollar: {
     '& p': {
@@ -152,6 +158,11 @@ const styles = tm => ({
     '& fieldset': {
       borderRadius: 12,
     },
+  },
+  exportCard: {
+    margin: '40px auto',
+    width: '75%',
+    // height: 680,
   },
   lengthLabel: {
     fontSize: '1.6rem',
@@ -211,6 +222,9 @@ const styles = tm => ({
     borderBottom: 'none',
     marginTop: '35px',
     marginRight: '45px',
+  },
+  remainCount: {
+    float: 'right',
   },
   costLabel: {
     fontSize: '1.6rem',
@@ -307,8 +321,8 @@ class ExportModal extends React.Component {
     this.handleRequestData = this.handleRequestData.bind(this);
     this.handleQuestionClick = this.handleQuestionClick.bind(this);
     this.handleQuestionClose = this.handleQuestionClose.bind(this);
-    this.calculateCost = this.calculateCost.bind(this);
-    this.dateDiff = this.dateDiff.bind(this);
+    // this.calculateCost = this.calculateCost.bind(this);
+    // this.dateDiff = this.dateDiff.bind(this);
     this.onUnload = this.onUnload.bind(this);
   }
 
@@ -322,157 +336,151 @@ class ExportModal extends React.Component {
 
   onUnload(event) { // the method that will be used for both add and remove event
     // console.log("hellooww")
-    if (!(this.props.solarBI.requestStatus === 'success' || this.props.solarBI.saveStatus === 'success')) {
+    if (!(this.props.solarBI.requestStatus === 'success' ||
+      this.props.solarBI.saveStatus === 'success' ||
+      this.props.solar_new === false)) {
       // eslint-disable-next-line no-param-reassign
       event.returnValue = 'This will go back to search page, are you sure?';
     }
   }
 
 
-  calculateCost() {
-    const timeCost = {
-      years: 5,
-      months: 0.42,
-      days: 0.01,
-    };
-    const gran = {
-      monthly: 5,
-      weekly: 7.5,
-      daily: 9,
-      hourly: 11,
-    };
-    const type = {
-      dni: 0,
-      ghi: 0,
-      both: 0,
-    };
-    const dt1 = new Date(this.state.startDate);
-    const dt2 = new Date(this.state.endDate);
-    const diff = this.dateDiff(dt1, dt2);
-    let result = diff.days * timeCost.days + diff.months * timeCost.months +
-      diff.years * timeCost.years;
-    let granularity;
-    switch (this.state.resolution) {
-      case 'hourly':
-        granularity = gran.hourly;
-        break;
-      case 'daily':
-        granularity = gran.daily;
-        break;
-      case 'weekly':
-        granularity = gran.weekly;
-        break;
-      case 'monthly':
-        granularity = gran.monthly;
-        break;
-      default:
-        granularity = 0;
-    }
-    let t;
-    switch (this.state.type) {
-      case 'dni':
-        t = type.dni;
-        break;
-      case 'ghi':
-        t = type.ghi;
-        break;
-      case 'both':
-        t = type.both;
-        break;
-      default:
-        t = 0;
-    }
-    result = result + granularity + t;
-    result = result.toFixed(2);
-    // console.log(result)
-    this.setState({ cost: result });
-  }
+  // calculateCost() {
+  //   const timeCost = {
+  //     years: 5,
+  //     months: 0.42,
+  //     days: 0.01,
+  //   };
+  //   const gran = {
+  //     monthly: 5,
+  //     weekly: 7.5,
+  //     daily: 9,
+  //     hourly: 11,
+  //   };
+  //   const type = {
+  //     dni: 0,
+  //     ghi: 0,
+  //     both: 0,
+  //   };
+  //   const dt1 = new Date(this.state.startDate);
+  //   const dt2 = new Date(this.state.endDate);
+  //   const diff = this.dateDiff(dt1, dt2);
+  //   let result = diff.days * timeCost.days + diff.months * timeCost.months +
+  //     diff.years * timeCost.years;
+  //   let granularity;
+  //   switch (this.state.resolution) {
+  //     case 'hourly':
+  //       granularity = gran.hourly;
+  //       break;
+  //     case 'daily':
+  //       granularity = gran.daily;
+  //       break;
+  //     case 'weekly':
+  //       granularity = gran.weekly;
+  //       break;
+  //     case 'monthly':
+  //       granularity = gran.monthly;
+  //       break;
+  //     default:
+  //       granularity = 0;
+  //   }
+  //   let t;
+  //   switch (this.state.type) {
+  //     case 'dni':
+  //       t = type.dni;
+  //       break;
+  //     case 'ghi':
+  //       t = type.ghi;
+  //       break;
+  //     case 'both':
+  //       t = type.both;
+  //       break;
+  //     default:
+  //       t = 0;
+  //   }
+  //   result = result + granularity + t;
+  //   result = result.toFixed(2);
+  //   // console.log(result)
+  //   this.setState({ cost: result });
+  // }
 
-  dateDiff(dt1, dt2) {
-    const ret = { days: 0, months: 0, years: 0 };
-    if (dt1 === dt2) return ret;
-    if (dt1 > dt2) {
-      const dtmp = dt2;
-      // eslint-disable-next-line no-param-reassign
-      dt2 = dt1;
-      // eslint-disable-next-line no-param-reassign
-      dt1 = dtmp;
-    }
+  // dateDiff(dt1, dt2) {
+  //   const ret = { days: 0, months: 0, years: 0 };
+  //   if (dt1 === dt2) return ret;
+  //   if (dt1 > dt2) {
+  //     const dtmp = dt2;
+  //     // eslint-disable-next-line no-param-reassign
+  //     dt2 = dt1;
+  //     // eslint-disable-next-line no-param-reassign
+  //     dt1 = dtmp;
+  //   }
 
-    /*
-     * First get the number of full years
-     */
+  //   /*
+  //    * First get the number of full years
+  //    */
 
-    const year1 = dt1.getFullYear();
-    const year2 = dt2.getFullYear();
+  //   const year1 = dt1.getFullYear();
+  //   const year2 = dt2.getFullYear();
 
-    const month1 = dt1.getMonth();
-    const month2 = dt2.getMonth();
+  //   const month1 = dt1.getMonth();
+  //   const month2 = dt2.getMonth();
 
-    const day1 = dt1.getDate();
-    const day2 = dt2.getDate();
+  //   const day1 = dt1.getDate();
+  //   const day2 = dt2.getDate();
 
-    /*
-     * Set initial values bearing in mind the months or days may be negative
-     */
-    ret.years = year2 - year1;
-    ret.months = month2 - month1;
-    ret.days = day2 - day1;
+  //   /*
+  //    * Set initial values bearing in mind the months or days may be negative
+  //    */
+  //   ret.years = year2 - year1;
+  //   ret.months = month2 - month1;
+  //   ret.days = day2 - day1;
 
-    /*
-     * Now we deal with the negatives
-     */
+  //   /*
+  //    * Now we deal with the negatives
+  //    */
 
-    /*
-     * First if the day difference is negative
-     * eg dt2 = 13 oct, dt1 = 25 sept
-     */
-    if (ret.days < 0) {
-      /*
-       * Use temporary dates to get the number of days remaining in the month
-       */
-      const dtmp1 = new Date(dt1.getFullYear(), dt1.getMonth() + 1, 1, 0, 0, -1);
+  //   /*
+  //    * First if the day difference is negative
+  //    * eg dt2 = 13 oct, dt1 = 25 sept
+  //    */
+  //   if (ret.days < 0) {
+  //     /*
+  //      * Use temporary dates to get the number of days remaining in the month
+  //      */
+  //     const dtmp1 = new Date(dt1.getFullYear(), dt1.getMonth() + 1, 1, 0, 0, -1);
 
-      const numDays = dtmp1.getDate();
+  //     const numDays = dtmp1.getDate();
 
-      ret.months -= 1;
-      ret.days += numDays;
+  //     ret.months -= 1;
+  //     ret.days += numDays;
 
-    }
+  //   }
 
-    /*
-     * Now if the month difference is negative
-     */
-    if (ret.months < 0) {
-      ret.months += 12;
-      ret.years -= 1;
-    }
+  //   /*
+  //    * Now if the month difference is negative
+  //    */
+  //   if (ret.months < 0) {
+  //     ret.months += 12;
+  //     ret.years -= 1;
+  //   }
 
-    return ret;
-  }
+  //   return ret;
+  // }
 
   handleTypeChange(event) {
-    this.setState({ type: event.target.value }, () => {
-      this.calculateCost();
-    });
+    this.setState({ type: event.target.value });
   }
 
   handleStartDateChange(event) {
-    this.setState({ startDate: event.target.value }, () => {
-      this.calculateCost();
-    });
+    this.setState({ startDate: event.target.value });
   }
 
   handleEndDateChange(event) {
-    this.setState({ endDate: event.target.value }, () => {
-      this.calculateCost();
-    });
+    this.setState({ endDate: event.target.value });
   }
 
   handleResolutionChange(event) {
-    this.setState({ resolution: event.target.value }, () => {
-      this.calculateCost();
-    });
+    this.setState({ resolution: event.target.value });
 
   }
 
@@ -494,8 +502,8 @@ class ExportModal extends React.Component {
       alert('Available date: 01/01/1990 ~ 31/07/2019.'); // eslint-disable-line no-alert
     } else {
       const queryData = {
-        lat: this.props.solarBI.queryResponse.data.lat + '',
-        lng: this.props.solarBI.queryResponse.data.lng + '',
+        lat: this.props.solarBI.queryResponse.data.lat.toFixed(7) + '',
+        lng: this.props.solarBI.queryResponse.data.lng.toFixed(7) + '',
         startDate: this.state.startDate,
         endDate: this.state.endDate,
         type: this.state.type,
@@ -507,7 +515,7 @@ class ExportModal extends React.Component {
         spatial_address: { ...this.props.solarBI.queryResponse.form_data.spatial_address },
         address_name: this.props.address.slice(0, -11),
       };
-      this.props.onHide();
+      // this.props.onHide();
       this.props.requestSolarData(queryData)
         .then((json) => {
           if (json.type === 'REQEUST_SOLAR_DATA_SUCCEEDED') {
@@ -539,156 +547,164 @@ class ExportModal extends React.Component {
               },
             }}
           >
-            <div className={classes.head}>{this.props.address.slice(0, -11)}</div>
-            <div style={{ padding: 0, width: '70%', position: 'absolute', top: 30, right: 220 }}>
+            <div style={{ padding: 0, width: 800, margin: 'auto' }}>
               <SolarStepper activeStep={2} />
             </div>
-            <div className={classes.border}>
-              <DialogTitle
-                disableTypography
-                className={classes.title}
-                id="form-dialog-title"
-              >
-                Options
-              </DialogTitle>
-              <hr className={classes.titleHr} />
-              <DialogContent>
-                <FormLabel classes={{ root: classes.lengthLabel, focused: classes.labelFocused }} component="legend">Length</FormLabel>
-                <div className={classes.dates}>
-                  <div className={classes.dateWrapper}>
-                    <span className={classes.dateLabel}>Start</span>
-                    <TextField
-                      error={new Date(startDate) > new Date(endDate) || new Date(startDate) < new Date('1990-01-01')}
-                      id="date"
-                      type="date"
-                      value={startDate}
-                      placeholder="yyyy-mm-dd"
-                      variant="outlined"
-                      onChange={this.handleStartDateChange}
-                      className={classes.startText}
-                      InputProps={{
-                        classes: { input: classes.textInput },
+            <DialogContent>
+              <Card className={classes.exportCard}>
+                <CardContent>
+                  <div>
+                    <p
+                      style={{
+                        fontFamily: 'Montserrat',
+                        fontSize: 21,
+                        textAlign: 'center',
+                        color: '024067',
+                        fontWeight: 'normal',
+                        marginTop: 25,
                       }}
-                    // InputLabelProps={{
-                    //   FormLabelClasses: {
-                    //     root: classes.textLabel,
-                    //   },
-                    // }}
-                    />
+                    >
+                      {this.props.address.slice(0, -11)}
+                    </p>
+                    <hr style={{ display: 'block', width: 159, height: 1, border: 0, borderTop: '1px solid #808495', margin: '1em auto 2em', padding: 0 }} />
                   </div>
+                  <Container maxWidth="md">
+                    <FormLabel classes={{ root: classes.lengthLabel, focused: classes.labelFocused }} component="legend">Length</FormLabel>
+                    <div className={classes.dates}>
+                      <div className={classes.dateWrapper}>
+                        <span className={classes.dateLabel}>Start</span>
+                        <TextField
+                          error={new Date(startDate) > new Date(endDate) || new Date(startDate) < new Date('1990-01-01')}
+                          id="date"
+                          type="date"
+                          value={startDate}
+                          placeholder="yyyy-mm-dd"
+                          variant="outlined"
+                          onChange={this.handleStartDateChange}
+                          className={classes.startText}
+                          InputProps={{
+                            classes: { input: classes.textInput },
+                          }}
+                        />
+                      </div>
 
-                  <div className={classes.dateWrapper}>
-                    <span className={classes.dateLabel}>End</span>
-                    <TextField
-                      error={new Date(startDate) > new Date(endDate) || new Date(endDate) > new Date('2019-07-31')}
-                      id="date"
-                      type="date"
-                      value={endDate}
-                      placeholder="yyyy-mm-dd"
-                      variant="outlined"
-                      onChange={this.handleEndDateChange}
-                      className={classes.endText}
-                      InputProps={{
-                        classes: { input: classes.textInput },
-                      }}
-                    // InputLabelProps={{
-                    //   FormLabelClasses: {
-                    //     root: classes.textLabel,
-                    //   },
-                    // }}
-                    />
-                  </div>
-                  <IconButton
-                    aria-label="More"
-                    // aria-owns={openAnchor ? 'long-menu' : undefined}
-                    // aria-haspopup="true"
-                    className={classes.iconButton}
-                    onClick={this.handleQuestionClick}
-                  >
-                    <HelpIcon />
-                  </IconButton>
-                  <Popover
-                    id="heatmap-popper"
-                    open={openAnchor}
-                    anchorEl={anchorEl}
-                    onClose={this.handleQuestionClose}
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'center',
-                    }}
-                    transformOrigin={{
-                      vertical: 'top',
-                      horizontal: 'center',
-                    }}
-                  >
-                    <Typography className={classes.typography}>
-                      Available date: 01/01/1990 ~ 31/07/2019.
-                      Both Start and End date are inclusive.
-                    </Typography>
-                  </Popover>
-                </div>
-                <hr className={classes.contentHr} />
-                <FormControl component="fieldset" className={classes.formControl}>
-                  <FormLabel classes={{ root: classes.typeLabel, focused: classes.labelFocused }} component="legend">Type</FormLabel>
-                  <RadioGroup
-                    aria-label="type"
-                    name="type"
-                    className={classes.typeGroup}
-                    value={this.state.type}
-                    onChange={this.handleTypeChange}
-                  >
-                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="dni" control={<Radio color="secondary" />} label="DNI" labelPlacement="bottom" />
-                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="ghi" control={<Radio color="secondary" />} label="GHI" labelPlacement="bottom" />
-                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="both" control={<Radio color="secondary" />} label="Download both" labelPlacement="bottom" />
-                  </RadioGroup>
-                </FormControl>
-                <hr className={classes.contentHr} />
-                <FormControl component="fieldset" className={classes.formControl}>
-                  <FormLabel classes={{ root: classes.resolutionLabel, focused: classes.labelFocused }} component="legend">Resolution</FormLabel>
-                  <RadioGroup
-                    aria-label="resolution"
-                    name="resolution"
-                    className={classes.resolutionGroup}
-                    value={this.state.resolution}
-                    onChange={this.handleResolutionChange}
-                  >
-                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="hourly" control={<Radio color="secondary" />} label="Hourly" labelPlacement="bottom" />
-                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="daily" control={<Radio color="secondary" />} label="Daily" labelPlacement="bottom" />
-                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="weekly" control={<Radio color="secondary" />} label="Weekly" labelPlacement="bottom" />
-                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="monthly" control={<Radio color="secondary" />} label="Monthly" labelPlacement="bottom" />
-                    <FormControlLabel classes={{ label: classes.formControlLabel }} value="annual" control={<Radio color="secondary" />} label="Annual" labelPlacement="bottom" />
-                  </RadioGroup>
-                </FormControl>
-                <hr className={classes.contentHr} />
-                <div>
-                  <FormLabel classes={{ root: classes.costLabel, focused: classes.labelFocused }} component="legend">Cost</FormLabel>
-                  <TextField
-                    id="cost"
-                    variant="outlined"
-                    className={classes.costOutput}
-                    value={new Date(startDate) > new Date(endDate) || new Date(startDate) < new Date('1990-01-01') || new Date(endDate) > new Date('2019-07-31') ? 'NaN' : this.state.cost}
-                    InputProps={{
-                      classes: { input: classes.textInput },
-                      startAdornment: <InputAdornment className={classes.dollar} position="start">$</InputAdornment>,
-                    }}
-                  />
-                </div>
-              </DialogContent>
-            </div>
-            <DialogActions className={classes.buttons}>
-              <Button
-                className={classNames(classes.button, classes.closeBtn)}
-                disabled={solarBI.sending}
-                onClick={onHide}
-                color="primary"
-              >
-                Back
-              </Button>
-              {solarBI.sending ?
-                (<img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />) :
-                (<Button className={classNames(classes.button, classes.requestBtn)} onClick={this.handleRequestData} color="primary">Pay</Button>)
-              }
-            </DialogActions>
+                      <div className={classes.dateWrapper}>
+                        <span className={classes.dateLabel}>End</span>
+                        <TextField
+                          error={new Date(startDate) > new Date(endDate) || new Date(endDate) > new Date('2019-07-31')}
+                          id="date"
+                          type="date"
+                          value={endDate}
+                          placeholder="yyyy-mm-dd"
+                          variant="outlined"
+                          onChange={this.handleEndDateChange}
+                          className={classes.endText}
+                          InputProps={{
+                            classes: { input: classes.textInput },
+                          }}
+                        />
+                      </div>
+                      <IconButton
+                        aria-label="More"
+                        className={classes.iconButton}
+                        onClick={this.handleQuestionClick}
+                      >
+                        <HelpIcon />
+                      </IconButton>
+                      <Popover
+                        id="heatmap-popper"
+                        open={openAnchor}
+                        anchorEl={anchorEl}
+                        onClose={this.handleQuestionClose}
+                        anchorOrigin={{
+                          vertical: 'bottom',
+                          horizontal: 'center',
+                        }}
+                        transformOrigin={{
+                          vertical: 'top',
+                          horizontal: 'center',
+                        }}
+                      >
+                        <Typography className={classes.typography}>
+                          Available date: 01/01/1990 ~ 31/07/2019.
+                          Both Start and End date are inclusive.
+                        </Typography>
+                      </Popover>
+                    </div>
+                    <hr className={classes.contentHr} />
+                    <FormControl component="fieldset" className={classes.formControl}>
+                      <FormLabel classes={{ root: classes.typeLabel, focused: classes.labelFocused }} component="legend">Type</FormLabel>
+                      <RadioGroup
+                        aria-label="type"
+                        name="type"
+                        className={classes.typeGroup}
+                        value={this.state.type}
+                        onChange={this.handleTypeChange}
+                      >
+                        <FormControlLabel classes={{ label: classes.formControlLabel }} value="dni" control={<Radio color="secondary" />} label="DNI" labelPlacement="bottom" />
+                        <FormControlLabel classes={{ label: classes.formControlLabel }} value="ghi" control={<Radio color="secondary" />} label="GHI" labelPlacement="bottom" />
+                        <FormControlLabel classes={{ label: classes.formControlLabel }} value="both" control={<Radio color="secondary" />} label="Download both" labelPlacement="bottom" />
+                      </RadioGroup>
+                    </FormControl>
+                    <hr className={classes.contentHr} />
+                    <FormControl component="fieldset" className={classes.formControl}>
+                      <FormLabel classes={{ root: classes.resolutionLabel, focused: classes.labelFocused }} component="legend">Resolution</FormLabel>
+                      <RadioGroup
+                        aria-label="resolution"
+                        name="resolution"
+                        className={classes.resolutionGroup}
+                        value={this.state.resolution}
+                        onChange={this.handleResolutionChange}
+                      >
+                        <FormControlLabel classes={{ label: classes.formControlLabel }} value="hourly" control={<Radio color="secondary" />} label="Hourly" labelPlacement="bottom" />
+                        <FormControlLabel classes={{ label: classes.formControlLabel }} value="daily" control={<Radio color="secondary" />} label="Daily" labelPlacement="bottom" />
+                        <FormControlLabel classes={{ label: classes.formControlLabel }} value="weekly" control={<Radio color="secondary" />} label="Weekly" labelPlacement="bottom" />
+                        <FormControlLabel classes={{ label: classes.formControlLabel }} value="monthly" control={<Radio color="secondary" />} label="Monthly" labelPlacement="bottom" />
+                        <FormControlLabel classes={{ label: classes.formControlLabel }} value="annual" control={<Radio color="secondary" />} label="Annual" labelPlacement="bottom" />
+                      </RadioGroup>
+                    </FormControl>
+                    {/* <hr className={classes.contentHr} />
+                    <div>
+                      <FormLabel
+                        classes={{ root: classes.costLabel, focused: classes.labelFocused }}
+                        component="legend"
+                      >Cost</FormLabel>
+                      <TextField
+                        id="cost"
+                        variant="outlined"
+                        className={classes.costOutput}
+                        value={new Date(startDate) > new Date(endDate)
+                          || new Date(startDate) < new Date('1990-01-01')
+                          || new Date(endDate) > new Date('2019-07-31') ? 'NaN' : this.state.cost}
+                        InputProps={{
+                          classes: { input: classes.textInput },
+                          startAdornment: <InputAdornment
+                            className={classes.dollar}
+                            position="start">$</InputAdornment>,
+                        }}
+                      />
+                    </div> */}
+                    <div>
+                      <Button
+                        className={classNames(classes.button, classes.closeBtn)}
+                        disabled={solarBI.sending}
+                        onClick={onHide}
+                        color="primary"
+                      >
+                        Back
+                      </Button>
+                      {solarBI.sending ?
+                        (<img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />) :
+                        (<Button className={classNames(classes.button, classes.requestBtn)} onClick={this.handleRequestData} color="primary" disabled={solarBI.remain_count === 0}>Pay</Button>)
+                      }
+                    </div>
+                    <p className={classes.remainCount}>
+                      * Remaining request(s): {solarBI.remain_count}
+                    </p>
+                  </Container>
+                </CardContent>
+              </Card>
+            </DialogContent>
           </Dialog>
         </ThemeProvider>
       </div>

@@ -117,6 +117,7 @@ input {
 .list-alert-top {
   position: absolute;
   width: 70%;
+  z-index: 999;
 }
 .alert-top {
   position: absolute;
@@ -124,20 +125,22 @@ input {
 }
 .solarbi-sun {
   margin-top: 16%;
-  width: 100px;
-  height: 100px;
+  width: 20px;
+  height: 20px;
+  margin-left: 168px;
+  transform: translateY(10px);
 }
 .solarbi-text {
   font-size: 35px;
-  letter-spacing: 7px;
-  color: #0667A3;
+  letter-spacing: 3px;
+  color: #d7df23;
   margin: 10px;
   font-family: 'Montserrat';
   font-weight: bold;
 }
 .solarbi-welcome {
   text-align: center;
-  color: #CCCCCC;
+  color: #736b6b;
   font-size: 18px;
   opacity: 0.5;
   font-family: 'Montserrat';
@@ -272,9 +275,11 @@ input {
 }
 
 .signup-solarbi-sun {
-  margin-top: 20px;
-  width: 100px;
-  height: 100px;
+  margin-top: 50px;
+  margin-left: 170px;
+  width: 20px;
+  height: 20px;
+  transform: translateY(8px);
 }
 .inline-names {
   display: inline-block;
@@ -620,10 +625,6 @@ input {
   border-bottom: 1px solid #707070;
 }
 
-.billing-content .nav > li {
-  margin-right: 100px;
-}
-
 .billing-content .nav > li > a {
   font-size: 18px;
   color: #024067;
@@ -633,7 +634,9 @@ input {
 .billing-content .nav > li > a i {
   margin-right: 15px;
 }
-
+.billing-content .plan-tab {
+  margin-left: 50px;
+}
 .billing-content .nav-pills > li.active > a, .billing-content .nav-pills > li.active > a:hover, .billing-content .nav-pills > li.active > a:focus {
   color: #024067;
   background: transparent;
@@ -641,6 +644,7 @@ input {
 }
 
 .billing-content .panel {
+  margin: 50 auto;
   width: 750px;
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
@@ -659,6 +663,9 @@ input {
   justify-content: center;
 }
 
+.billing-content .panel-primary {
+  font-family: 'Montserrat';
+}
 .billing-content .panel-primary > .panel-heading {
   font-size:21px;
   color: #707070;
@@ -679,7 +686,7 @@ input {
   align-items: center;
   justify-content: center;
   box-shadow: 1px 2px 3px 1px lightgrey;
-  margin-top: 40px;
+  margin: 20 auto;
 }
 
 .billing-content .plan-option-pane .option-name {
@@ -712,6 +719,67 @@ input {
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   border-radius: 10px;
+}
+.billing-content .plan-option-pane .option-submit .btn-default:focus{
+  outline: none;
+}
+.billing-content .billing-details {
+  background: #FCFAFA 0% 0% no-repeat padding-box;
+  border: 1px solid #CCCCCC;
+  border-radius: 4px;
+}
+.update-details-btn {
+  background: #024067 0% 0% no-repeat padding-box;
+  font-family: 'Montserrat';
+  width: 185px;
+  border-radius: 30px;
+  border: 1px solid #024067;
+  box-shadow: 0px 1px 6px #000000;
+  color: #FFFFFF;
+  font-size: 18px;
+  padding: 12px 10px;
+  transition: transform 80ms ease-in;
+  margin: 20px auto;
+}
+.update-details-btn:hover {
+  text-shadow: 0px 0px 3px rgba(255, 255, 255, 1);
+  box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+  -webkit-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+  -moz-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+  transition: all 0.4s ease 0s;
+  cursor: pointer;
+}
+.update-details-btn:active {
+	transform: scale(0.95);
+}
+.update-details-btn:focus {
+	outline: none;
+}
+.billing-users th {
+  font-size: 16px;
+  line-height: 21px;
+  color: #CCCCCC;
+  border-bottom: 1px solid #CCCCCC;
+  padding: 10px 0;
+}
+.billing-users td {
+  padding: 10px 0;
+}
+#plan {
+  font-family: 'Montserrat';
+}
+#select-plan {
+  width: 950px;
+  margin: 1em auto;
+  font-family: 'Montserrat';
+  color: #707070;
+}
+#billing-address {
+  height: 110px; 
+  cursor: pointer;
+}
+#billing-address:hover {
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, 0.6);
 }
 /* Sidebar */
 .s-sidebar__trigger {
@@ -802,25 +870,28 @@ input {
   transform: translateY(-50%);
 }
 
-.s-sidebar__nav-link-disabled {
-  position: relative;
-  display: inline-block;
-  width: 100%;
-  height: 3em;
-  font-size: 16px;
-  color: white;
-}
-.s-sidebar__nav-link-disabled span {
-  position: absolute;
-  top: 50%;
-  left: 3em;
-  transform: translateY(-50%);
-}
-.s-sidebar__nav-link-disabled:hover {
-  color: white;
-}
-.s-sidebar__nav-link-disabled:focus {
-  color: white;
+// .s-sidebar__nav-link-disabled {
+//   position: relative;
+//   display: inline-block;
+//   width: 100%;
+//   height: 3em;
+//   font-size: 16px;
+//   color: white;
+// }
+// .s-sidebar__nav-link-disabled span {
+//   position: absolute;
+//   top: 50%;
+//   left: 3em;
+//   transform: translateY(-50%);
+// }
+// .s-sidebar__nav-link-disabled:hover {
+//   color: white;
+// }
+// .s-sidebar__nav-link-disabled:focus {
+//   color: white;
+// }
+.nav-link-disabled:hover {
+  color: white !important;
 }
 
 .s-sidebar__nav-link:focus {
@@ -850,21 +921,21 @@ input {
   left: 50%;
   transform: translate(-50%, -50%);
 }
-.s-sidebar__nav-link-disabled > i {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: inline-block;
-  width: 2em;
-  height: 3em;
-}
+// .s-sidebar__nav-link-disabled > i {
+//   position: absolute;
+//   top: 0;
+//   left: 0;
+//   display: inline-block;
+//   width: 2em;
+//   height: 3em;
+// }
 
-.s-sidebar__nav-link-disabled > i::before {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
+// .s-sidebar__nav-link-disabled > i::before {
+//   position: absolute;
+//   top: 50%;
+//   left: 50%;
+//   transform: translate(-50%, -50%);
+// }
 .coming-soon {
   position: absolute !important;
   display: block;
@@ -952,8 +1023,8 @@ input {
 
 .my-data-add {
   position: absolute; 
-  right: 50px; 
-  top: 70px;
+  right: 150px; 
+  top: 60px;
   text-decoration: none !important;
   width: 185;
   text-align: center;
@@ -983,7 +1054,7 @@ input {
 }
 .my-data-search-container {
   width: 40%;
-  margin: 60 auto;
+  margin: 200px auto 60px;
 }
 .my-data-search-icon {
   transform: translate(20px, 32px);
@@ -1003,7 +1074,35 @@ input {
 .my-data-search:focus {
   outline: none;
   border: 2px solid #87CEFA;
-  transition: all 0.4s ease 0s;
+  //transition: all 0.4s ease 0s;
+}
+.my-data-radio-group input[type=radio] {
+  position: absolute;
+  visibility: hidden;
+  display: none;
+}
+.my-data-radio-group label {
+  color: #0063B0;
+  display: inline-block;
+  cursor: pointer;
+  font-weight: 500;
+  padding: 5px 20px;
+  margin: 0;
+}
+.my-data-radio-group input[type=radio]:checked + label{
+  color: white;
+  background: #0063B0;
+}
+.my-data-radio-group label + input[type=radio] + label {
+  border-left: 1px solid #0063B0;
+}
+.my-data-radio-group {
+  border: 1px solid #0063B0;
+  display: inline-block;
+  margin-top: 20px;
+  margin-left: 30%;
+  border-radius: 10px;
+  overflow: hidden;
 }
 .list-cards-wrapper {
   display: flex;
@@ -1069,8 +1168,11 @@ input {
 .title-card {
   box-shadow: 0px 1px 1px #00000029;
   transition: 0.3s;
-  width: 100%;
   height: 170;
+  z-index: 500;
+  position: fixed;
+  top: 0;
+  width: 93%;
   background-color: white;
 }
 .title-card .card-container {
@@ -1113,7 +1215,7 @@ input {
 }
 .empty-saved {
   font-size: 35px;
-  width: 600px;
+  width: 680px;
   margin: 20 auto;
   color: #707070;
 }
@@ -1174,9 +1276,6 @@ input {
   margin-left: -47px;
   width: 114%;
 }
-.team-card td {
-  height: 35px;
-}
 .team-card th {
   font-size: 16px;
   line-height: 21px;
@@ -1204,6 +1303,9 @@ input {
 }
 .team-card td {
   width: 30%;
+  height: 35px;
+  max-width: 300;
+  overflow-x: scroll;
 }
 .invite-status {
   border: 1px solid #CCC;
@@ -1371,4 +1473,28 @@ input {
   left: -25px;
   top: 30px;
   transform: rotate(45deg);
+}
+.solar-stepper {
+  padding: 0;
+  margin: auto;
+  width: 800px; 
+  margin-bottom: 100px; 
+}
+.card-elm-label {
+  display: block;
+  color: #6b7c93;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  font-size: 1.5em;
+}
+.error-message {
+  background-color: #ff7272;
+  color: white;
+  padding: 1em;
+}
+.error-message button {
+  background: transparent;
+  border: none;
+  float: right;
+  font-weight: bold;
 }

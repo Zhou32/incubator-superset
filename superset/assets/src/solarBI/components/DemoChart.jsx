@@ -1,12 +1,43 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReactEcharts from 'echarts-for-react';
+import { makeStyles } from '@material-ui/core/styles';
+import { CSVLink } from 'react-csv';
 
 const propTypes = {
   ausState: PropTypes.string.isRequired,
 };
 
+const useStyles = makeStyles({
+  csvLink: {
+    position: 'absolute',
+    right: 100,
+    top: 9,
+    zIndex: 200,
+    color: '#424242',
+    fontFamily: 'Open Sans,Helvetica,Arial,sans-serif',
+    '& span': {
+      display: 'none',
+      fontSize: 12,
+      transform: 'translateY(3px)',
+    },
+    '&:hover span': {
+      top: 0,
+      left: -70,
+      width: 160,
+      margin: 10,
+      display: 'block',
+      padding: '5px 20px 5px 5px',
+      zIndex: 200,
+      position: 'absolute',
+      textDecoration: 'none',
+      color: '#4297bd',
+    },
+  },
+});
+
 function DemoChart({ ausState }) {
+  const classes = useStyles();
   const solarDataOfState = {
     VIC: {
       dni: [
@@ -344,6 +375,17 @@ function DemoChart({ ausState }) {
           left: 50,
           right: 50,
         },
+        toolbox: {
+          feature: {
+            saveAsImage: {
+              icon: 'image://https://i.ibb.co/LvGQLgf/4444.png',
+              pixelRatio: 2,
+              title: 'Save As Image',
+            },
+          },
+          right: 50,
+          top: 5,
+        },
         tooltip: {},
         xAxis: {
           data: xAxisData,
@@ -387,8 +429,30 @@ function DemoChart({ ausState }) {
     return {};
   }
 
+  const headers = [
+    { label: 'Date', key: 'date' },
+    { label: 'DNI Data', key: 'dni_data' },
+    { label: 'GHI Data', key: 'ghi_data' },
+  ];
+  const dates = [
+    '2018/01', '2018/02', '2018/03', '2018/04', '2018/05', '2018/06', '2018/07', '2018/08', '2018/09',
+    '2018/10', '2018/11', '2018/12', '2019/01',
+  ];
+  const mergedData = [];
+  for (let i = 0; i < dates.length; i++) {
+    mergedData.push({
+      date: dates[i],
+      dni_data: solarDataOfState[ausState].dni[i],
+      ghi_data: solarDataOfState[ausState].ghi[i],
+    });
+  }
+
+
   return (
-    <div>
+    <div style={{ position: 'relative' }}>
+      <CSVLink filename={`solar-data-${ausState}.csv`} className={classes.csvLink} data={mergedData} headers={headers}>
+        <i className="fas fa-download" /><span>Download As CSV</span>
+      </CSVLink>
       <ReactEcharts
         style={{ width: '100%', height: 350 }}
         option={getBarchartOption(solarDataOfState[ausState])}

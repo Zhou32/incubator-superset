@@ -495,21 +495,21 @@ ENABLE_ACCESS_REQUEST = False
 # smtp server configuration
 EMAIL_NOTIFICATIONS = True  # all the emails are sent using dryrun
 
-# MAIL_SERVER = 'email-smtp.us-west-2.amazonaws.com'
-# MAIL_USE_TLS = False
-# MAIL_USE_SSL = True
-# MAIL_USERNAME = 'AKIAISTP2VVSMYG7X62A'
-# MAIL_PORT = 465
-# MAIL_PASSWORD = 'AhDOJ0gw1xam5CCNOuDkK0g0mxrlS6yJB0DNFX6GieRI'
-# MAIL_DEFAULT_SENDER = 'noreply@solarbi.com.au'
-
-MAIL_SERVER = 'smtp.gmail.com'
-MAIL_PORT = 465
+MAIL_SERVER = 'email-smtp.us-west-2.amazonaws.com'
 MAIL_USE_TLS = False
 MAIL_USE_SSL = True
-MAIL_USERNAME = 'chenyang.wang@zawee.work'
-MAIL_PASSWORD = 'WANGcy888'
-MAIL_DEFAULT_SENDER = 'chenyang.wang@zawee.work'
+MAIL_USERNAME = os.environ['SMTP_USERNAME']
+MAIL_PORT = 465
+MAIL_PASSWORD = os.environ['SMTP_PASSWORD']
+MAIL_DEFAULT_SENDER = 'no-reply@solarbi.com.au'
+
+# MAIL_SERVER = 'smtp.gmail.com'
+# MAIL_PORT = 465
+# MAIL_USE_TLS = False
+# MAIL_USE_SSL = True
+# MAIL_USERNAME = 'zhongfan.dou@zawee.work'
+# MAIL_PASSWORD = os.environ["EMAIL_PASSWORD"]
+# MAIL_DEFAULT_SENDER = 'zhongfan.dou@zawee.work'
 
 
 if not CACHE_DEFAULT_TIMEOUT:
