@@ -804,11 +804,11 @@ class SolarBIBillingView(ModelView):
         logging.info(team.stripe_user_id)
         try:
             stripe_customer = stripe.Customer.retrieve(id=team.stripe_user_id)
-            form_data = get_form_data()[0]['token']
 
             change_pm = False
             pm_id = None
             if stripe_customer.default_source is None:
+                form_data = get_form_data()[0]['token']
                 stripe.Customer.modify(stripe_customer.stripe_id, source=form_data['id'])
                 pm_id = form_data['card']['id']
                 change_pm = True

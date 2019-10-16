@@ -1,6 +1,5 @@
 /* eslint-disable jsx-a11y/label-has-for */
 import React, { useState } from 'react';
-import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -15,7 +14,6 @@ import {
   CardExpiryElement,
   CardCVCElement,
 } from 'react-stripe-elements';
-import { changePlan } from '../actions/billingActions';
 
 const useStyles = makeStyles(theme => ({
   button: {
@@ -25,9 +23,8 @@ const useStyles = makeStyles(theme => ({
     fontSize: '1.2em',
   },
   loading: {
-    width: 60,
+    width: 40,
     margin: 0,
-    float: 'right',
   },
   title: {
     '& h2': {
@@ -57,7 +54,7 @@ const createOptions = () => ({
   },
 });
 
-function AddCreditCard({ planId, stripe, openACC, handleCloseACC, changePlanConnect, billing }) {
+function AddCreditCard({ planId, stripe, openACC, handleCloseACC, changePlan, billing }) {
   const classes = useStyles();
   const [showError, setShowError] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -70,7 +67,7 @@ function AddCreditCard({ planId, stripe, openACC, handleCloseACC, changePlanConn
           setErrorMsg(payload.error.message);
           setShowError(true);
         } else {
-          changePlanConnect(planId, payload).then(() => {
+          changePlan(planId, payload).then(() => {
             handleCloseACC();
           });
         }
@@ -129,18 +126,11 @@ function AddCreditCard({ planId, stripe, openACC, handleCloseACC, changePlanConn
 }
 
 AddCreditCard.propTypes = {
+  billing: PropTypes.object.isRequired,
   planId: PropTypes.string.isRequired,
   openACC: PropTypes.bool.isRequired,
   handleCloseACC: PropTypes.func.isRequired,
+  changePlan: PropTypes.func.isRequired,
 };
 
-function mapStateToProps({ billing }) {
-  return {
-    billing,
-  };
-}
-
-export default injectStripe(connect(
-  mapStateToProps,
-  { changePlanConnect: changePlan },
-)(AddCreditCard));
+export default injectStripe(AddCreditCard);

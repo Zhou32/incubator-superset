@@ -6,6 +6,7 @@ import Button from '@material-ui/core/Button';
 import { StripeProvider, Elements } from 'react-stripe-elements';
 import ChangeConfirm from './ChangeConfirm';
 import AddCreditCard from './AddCreditCard';
+import { changePlan } from '../actions/billingActions';
 
 const useStyles = makeStyles(tm => ({
   button: {
@@ -22,7 +23,7 @@ const useStyles = makeStyles(tm => ({
   },
 }));
 
-function Plan({ billing }) {
+function Plan({ billing, changePlanConnect }) {
   const classes = useStyles();
   const [openCC, setOpenCC] = useState(false);
   const [openACC, setOpenACC] = useState(false);
@@ -37,8 +38,8 @@ function Plan({ billing }) {
   };
 
   const handlePlanClick = (id) => {
+    setPlanId(id);
     if (billing.pm_id === null) {
-      setPlanId(id);
       setOpenACC(true);
     } else {
       setOpenCC(true);
@@ -90,17 +91,30 @@ function Plan({ billing }) {
 
       <StripeProvider apiKey="pk_test_2CT1LvA7viLp1j7yCHJ2MezU00xXxxnRdM">
         <Elements>
-          <AddCreditCard planId={planId} openACC={openACC} handleCloseACC={handleCloseACC} />
+          <AddCreditCard
+            planId={planId}
+            openACC={openACC}
+            handleCloseACC={handleCloseACC}
+            changePlan={changePlanConnect}
+            billing={billing}
+          />
         </Elements>
       </StripeProvider>
 
-      <ChangeConfirm openCC={openCC} handleCloseCC={handleCloseCC} />
+      <ChangeConfirm
+        planId={planId}
+        openCC={openCC}
+        handleCloseCC={handleCloseCC}
+        changePlan={changePlanConnect}
+        billing={billing}
+      />
     </React.Fragment>
   );
 }
 
 Plan.propTypes = {
   billing: PropTypes.object.isRequired,
+  changePlanConnect: PropTypes.func.isRequired,
 };
 
 function mapStateToProps({ billing }) {
@@ -111,5 +125,5 @@ function mapStateToProps({ billing }) {
 
 export default connect(
   mapStateToProps,
-  {},
+  { changePlanConnect: changePlan },
 )(Plan);

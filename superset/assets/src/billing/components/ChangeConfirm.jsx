@@ -16,6 +16,10 @@ const useStyles = makeStyles(theme => ({
   contentText: {
     fontSize: '1.2em',
   },
+  loading: {
+    width: 30,
+    margin: 0,
+  },
   title: {
     '& h2': {
       fontSize: '1.6em',
@@ -26,8 +30,15 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function ChangeConfirm({ openCC, handleCloseCC }) {
+function ChangeConfirm({ planId, openCC, handleCloseCC, changePlan, billing }) {
   const classes = useStyles();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    changePlan(planId).then(() => {
+      handleCloseCC();
+    });
+  };
 
   return (
     <div>
@@ -39,9 +50,10 @@ function ChangeConfirm({ openCC, handleCloseCC }) {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseCC} color="primary" className={classes.button}>
-            Confirm
-          </Button>
+          {billing.plan_change === 'changing' ?
+            (<img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />) :
+            (<Button onClick={handleSubmit} color="primary" className={classes.button}>Confirm</Button>)
+          }
           <Button onClick={handleCloseCC} color="primary" className={classes.button}>
             Cancel
           </Button>
@@ -52,8 +64,12 @@ function ChangeConfirm({ openCC, handleCloseCC }) {
 }
 
 ChangeConfirm.propTypes = {
+  billing: PropTypes.object.isRequired,
+  planId: PropTypes.string.isRequired,
   openCC: PropTypes.bool.isRequired,
   handleCloseCC: PropTypes.func.isRequired,
+  changePlan: PropTypes.func.isRequired,
 };
+
 
 export default ChangeConfirm;

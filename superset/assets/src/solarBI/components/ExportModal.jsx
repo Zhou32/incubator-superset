@@ -679,7 +679,7 @@ class ExportModal extends React.Component {
                         InputProps={{
                           classes: { input: classes.textInput },
                           startAdornment: <InputAdornment
-                            className={classes.dollar} 
+                            className={classes.dollar}
                             position="start">$</InputAdornment>,
                         }}
                       />

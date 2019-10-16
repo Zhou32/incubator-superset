@@ -66,7 +66,8 @@ export function changePlan(planId, payload, timeout = 60) {
         dispatch(addSuccessToast(t(json.msg)));
       })
       .catch(() => {
-        dispatch(addDangerToast(t('Request failed.')));
+        dispatch(changePlanFailed());
+        dispatch(addDangerToast(t('Change plan failed.')));
       });
   };
 }
