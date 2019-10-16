@@ -13,7 +13,6 @@ function ChangeAddress({
   open,
   handleChangeAddressClose,
   billingValues,
-  handleChange,
   setBillingValues,
 }) {
   const [newAddress, setNewAddress] = useState({
@@ -129,7 +128,6 @@ ChangeAddress.propTypes = {
   open: PropTypes.bool.isRequired,
   handleChangeAddressClose: PropTypes.func.isRequired,
   billingValues: PropTypes.object.isRequired,
-  handleChange: PropTypes.func.isRequired,
   setBillingValues: PropTypes.func.isRequired,
 };
 
