@@ -128,6 +128,7 @@
     "react-bootstrap-dialog": "^0.10.0",
     "react-bootstrap-slider": "2.1.5",
     "react-color": "^2.13.8",
+    "react-country-region-selector": "^1.4.5",
     "react-credit-cards": "^0.8.0",
     "react-csv": "^1.1.1",
     "react-datetime": "^2.14.0",

@@ -775,12 +775,18 @@ class SolarBIBillingView(ModelView):
         team = self.appbuilder.sm.find_team(user_id=g.user.id)
         team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(team=team.id).first()
         plan = self.appbuilder.get_session.query(Plan).filter_by(id=team_sub.plan).first()
-        entry_point = 'billing'
+        # Retrieve customer basic information
+        cus_obj = stripe.Customer.retrieve(team.stripe_user_id)
+        cus_name = cus_obj.name
+        cus_email = cus_obj.email
+        cus_address = cus_obj.address
 
+        entry_point = 'billing'
         payload = {
             'user': bootstrap_user_data(g.user),
             'common': BaseSupersetView().common_bootstrap_payload(),
             'cus_id': team.stripe_user_id,
+            'cus_info': {'cus_name': cus_name, 'cus_email': cus_email, 'cus_address': cus_address},
             'pm_id': team.stripe_pm_id,
             'plan_id': plan.stripe_id,
         }
