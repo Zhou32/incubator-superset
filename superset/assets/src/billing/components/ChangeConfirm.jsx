@@ -35,7 +35,7 @@ function ChangeConfirm({ planId, openCC, handleCloseCC, changePlan, billing }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    changePlan(planId).then(() => {
+    changePlan(planId, null).then(() => {
       handleCloseCC();
     });
   };

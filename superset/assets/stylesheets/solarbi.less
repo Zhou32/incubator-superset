@@ -663,6 +663,9 @@ input {
   justify-content: center;
 }
 
+.billing-content .panel-primary {
+  font-family: 'Montserrat';
+}
 .billing-content .panel-primary > .panel-heading {
   font-size:21px;
   color: #707070;
@@ -719,6 +722,48 @@ input {
 }
 .billing-content .plan-option-pane .option-submit .btn-default:focus{
   outline: none;
+}
+.billing-content .billing-details {
+  background: #FCFAFA 0% 0% no-repeat padding-box;
+  border: 1px solid #CCCCCC;
+  border-radius: 4px;
+}
+.update-details-btn {
+  background: #024067 0% 0% no-repeat padding-box;
+  font-family: 'Montserrat';
+  width: 185px;
+  border-radius: 30px;
+  border: 1px solid #024067;
+  box-shadow: 0px 1px 6px #000000;
+  color: #FFFFFF;
+  font-size: 18px;
+  padding: 12px 10px;
+  transition: transform 80ms ease-in;
+  margin: 20px auto;
+}
+.update-details-btn:hover {
+  text-shadow: 0px 0px 3px rgba(255, 255, 255, 1);
+  box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+  -webkit-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+  -moz-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+  transition: all 0.4s ease 0s;
+  cursor: pointer;
+}
+.update-details-btn:active {
+	transform: scale(0.95);
+}
+.update-details-btn:focus {
+	outline: none;
+}
+.billing-users th {
+  font-size: 16px;
+  line-height: 21px;
+  color: #CCCCCC;
+  border-bottom: 1px solid #CCCCCC;
+  padding: 10px 0;
+}
+.billing-users td {
+  padding: 10px 0;
 }
 #plan {
   font-family: 'Montserrat';
