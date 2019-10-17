@@ -71,3 +71,43 @@ export function changePlan(planId, payload, timeout = 60) {
       });
   };
 }
+
+
+export const CHANGE_BILLING_DETAIL_STARTED = 'CHANGE_BILLING_DETAIL_STARTED';
+export function changeBillingDetailStarted() {
+  return { type: CHANGE_BILLING_DETAIL_STARTED };
+}
+
+export const CHANGE_BILLING_DETAIL_SUCCESSDED = 'CHANGE_BILLING_DETAIL_SUCCESSDED';
+export function changeBillingDetailSuccedded(res) {
+  return { type: CHANGE_BILLING_DETAIL_SUCCESSDED, res };
+}
+
+export const CHANGE_BILLING_DETAIL_FAILED = 'CHANGE_BILLING_DETAIL_FAILED';
+export function changeBillingDetailFailed() {
+  return { type: CHANGE_BILLING_DETAIL_FAILED };
+}
+
+
+export function changeBillDetail(cus_id, payload, timeout = 60) {
+  return async (dispatch) => {
+    const url = '/billing/change_billing_detail/' + cus_id + '/';
+    const controller = new AbortController();
+    const { signal } = controller;
+    dispatch(changeBillingDetailStarted());
+
+    try {
+      const { json } = await SupersetClient.post({
+        url,
+        postPayload: { form_data: payload },
+        signal,
+        timeout: timeout * 1000,
+      });
+      dispatch(changeBillingDetailSuccedded(json));
+      dispatch(addSuccessToast(t(json.msg)));
+    } catch (e) {
+      dispatch(changeBillingDetailFailed());
+      dispatch(addDangerToast(t('Update details failed.')));
+    }
+  };
+}

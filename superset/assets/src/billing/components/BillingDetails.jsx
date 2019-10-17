@@ -3,9 +3,10 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import ChangeAddress from './ChangeAddress';
+import { changeBillDetail } from '../actions/billingActions';
 // import TeamCreditCard from './TeamCreditCard';
 
-function BillingDetails({ billing }) {
+function BillingDetails({ billing, changeBillDetailConnect }) {
   const { cus_name, cus_email, cus_address } = billing.cus_info;
   let country = '';
   let city = '';
@@ -47,6 +48,12 @@ function BillingDetails({ billing }) {
     setChangeAddressOpen(false);
   };
 
+  const handleUpdateSubmit = () => {
+    changeBillDetailConnect(billing.cus_id, billingValues).then((json) => {
+      console.log(json);
+    });
+  };
+
   return (
     <React.Fragment>
       <div className="tab-pane active" id="billing">
@@ -79,7 +86,7 @@ function BillingDetails({ billing }) {
             </form>
           </div>
           <div className="panel-footer">
-            <button className="update-details-btn">Update details</button>
+            <button className="update-details-btn" onClick={handleUpdateSubmit}>Update details</button>
           </div>
         </div>
         <div className="panel panel-primary">
@@ -127,6 +134,6 @@ function mapStateToProps({ billing }) {
 
 export default connect(
   mapStateToProps,
-  {},
+  { changeBillDetailConnect: changeBillDetail },
 )(BillingDetails);
 
