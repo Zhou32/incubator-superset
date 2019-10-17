@@ -101,7 +101,8 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
                   id="billing-address"
                   className="form-control billing-details"
                 >
-                  {billingValues.line1} {billingValues.line2}<br />
+                  {billingValues.line1}<br />
+                  {billingValues.line2 !== '' ? <p style={{ margin: 0 }}>{billingValues.line2}</p> : null}
                   {billingValues.city === '' ? '' : billingValues.city + ','} {billingValues.state} {billingValues.postal_code}<br />
                   {billingValues.country}
                 </div>
@@ -110,7 +111,7 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
           </div>
           <div className="panel-footer">
             {billing.detail_change === 'changing' ?
-              <img style={{ width: 40, margin: 0 }} alt="Loading..." src="/static/assets/images/loading.gif" /> :
+              <img style={{ width: 50, margin: 0 }} alt="Loading..." src="/static/assets/images/loading.gif" /> :
               <button className="update-details-btn" onClick={handleUpdateSubmit}>Update details</button>
             }
           </div>
