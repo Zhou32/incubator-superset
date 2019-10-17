@@ -146,15 +146,14 @@ class SaveModal extends React.Component {
       sliceParams.slice_name = this.props.slice.slice_name;
     }
 
-    this.props
-      .saveSolarData(this.props.form_data, sliceParams)
-      .then(() => {
-        // Go to new slice url or dashboard url
-        if (gotodash) {
-          // window.location = data.slice.slice_url;
-          window.location = '/solar/list';
-        }
-      });
+    this.props.saveSolarData(this.props.form_data, sliceParams);
+    // .then(() => {
+    //   // Go to new slice url or dashboard url
+    //   if (gotodash) {
+    //     // window.location = data.slice.slice_url;
+    //     window.location = '/solar/list';
+    //   }
+    // });
     this.props.onHide();
   }
 
@@ -184,7 +183,7 @@ class SaveModal extends React.Component {
             </DialogTitle>
             <DialogContent>
               <DialogContentText style={{ fontSize: '1.2em' }}>
-                To save the chart, please enter a name here.
+                Save the current search into My Data.
               </DialogContentText>
               <TextField
                 error={this.state.alert}

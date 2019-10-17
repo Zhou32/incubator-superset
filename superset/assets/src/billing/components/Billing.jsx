@@ -24,7 +24,7 @@ function Billing() {
           <li className="active">
             <a href="#billing" data-toggle="tab"><i className="fas fa-credit-card" />Billing</a>
           </li>
-          <li><a href="#plan" data-toggle="tab"><i className="far fa-list-alt" />Plan</a></li>
+          <li className="plan-tab"><a href="#plan" data-toggle="tab"><i className="far fa-list-alt" />Plan</a></li>
         </ul>
         <div className="container">
           <div className="tab-content clearfix">

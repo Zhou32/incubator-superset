@@ -19,13 +19,95 @@
 /* eslint camelcase: 0 */
 import { SupersetClient } from '@superset-ui/connection';
 import { t } from '@superset-ui/translation';
-import URI from 'urijs';
-import { logEvent } from '../../logger/actions';
-import { Logger, LOG_ACTIONS_LOAD_CHART } from '../../logger/LogUtils';
-import getClientErrorObject from '../../utils/getClientErrorObject';
+// import URI from 'urijs';
+// import { logEvent } from '../../logger/actions';
+// import { Logger, LOG_ACTIONS_LOAD_CHART } from '../../logger/LogUtils';
+// import getClientErrorObject from '../../utils/getClientErrorObject';
 import {
   addSuccessToast as addSuccessToastAction,
   addDangerToast as addDangerToastAction,
   addInfoToast as addInfoToastAction,
 } from '../../messageToasts/actions/index';
 
+export const addInfoToast = addInfoToastAction;
+export const addSuccessToast = addSuccessToastAction;
+export const addDangerToast = addDangerToastAction;
+
+export const CHANG_PLAN_STARTED = 'CHANG_PLAN_STARTED';
+export function changePlanStarted() {
+  return { type: CHANG_PLAN_STARTED };
+}
+
+export const CHANGE_PLAN_SUCCEEDED = 'CHANGE_PLAN_SUCCEEDED';
+export function changePlanSucceeded(res) {
+  return { type: CHANGE_PLAN_SUCCEEDED, res };
+}
+
+export const CHANGE_PLAN_FAILED = 'CHANGE_PLAN_FAILED';
+export function changePlanFailed() {
+  return { type: CHANGE_PLAN_FAILED };
+}
+
+export function changePlan(planId, payload, timeout = 60) {
+  return (dispatch) => {
+    const url = '/billing/change_plan/' + planId + '/';
+    const controller = new AbortController();
+    const { signal } = controller;
+    dispatch(changePlanStarted());
+
+    return SupersetClient.post({
+      url,
+      postPayload: { form_data: payload },
+      signal,
+      timeout: timeout * 1000,
+    })
+      .then(({ json }) => {
+        dispatch(changePlanSucceeded(json));
+        dispatch(addSuccessToast(t(json.msg)));
+      })
+      .catch(() => {
+        dispatch(changePlanFailed());
+        dispatch(addDangerToast(t('Change plan failed.')));
+      });
+  };
+}
+
+
+export const CHANGE_BILLING_DETAIL_STARTED = 'CHANGE_BILLING_DETAIL_STARTED';
+export function changeBillingDetailStarted() {
+  return { type: CHANGE_BILLING_DETAIL_STARTED };
+}
+
+export const CHANGE_BILLING_DETAIL_SUCCESSDED = 'CHANGE_BILLING_DETAIL_SUCCESSDED';
+export function changeBillingDetailSuccedded(res) {
+  return { type: CHANGE_BILLING_DETAIL_SUCCESSDED, res };
+}
+
+export const CHANGE_BILLING_DETAIL_FAILED = 'CHANGE_BILLING_DETAIL_FAILED';
+export function changeBillingDetailFailed() {
+  return { type: CHANGE_BILLING_DETAIL_FAILED };
+}
+
+
+export function changeBillDetail(cus_id, payload, timeout = 60) {
+  return async (dispatch) => {
+    const url = '/billing/change_billing_detail/' + cus_id + '/';
+    const controller = new AbortController();
+    const { signal } = controller;
+    dispatch(changeBillingDetailStarted());
+
+    try {
+      const { json } = await SupersetClient.post({
+        url,
+        postPayload: { form_data: payload },
+        signal,
+        timeout: timeout * 1000,
+      });
+      dispatch(changeBillingDetailSuccedded(json));
+      dispatch(addSuccessToast(t(json.msg)));
+    } catch (e) {
+      dispatch(changeBillingDetailFailed());
+      dispatch(addDangerToast(t('Update details failed.')));
+    }
+  };
+}

@@ -54,7 +54,7 @@ import simplejson as json
 from sqlalchemy import and_, or_, select
 from werkzeug.routing import BaseConverter
 from ..solar.forms import SolarBIListWidget
-from ..solar.models import Plan
+from ..solar.models import Plan, TeamSubscription, Team
 
 from superset import (
     app,
@@ -773,11 +773,22 @@ class SolarBIBillingView(ModelView):
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
         team = self.appbuilder.sm.find_team(user_id=g.user.id)
-        entry_point = 'billing'
+        team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(team=team.id).first()
+        plan = self.appbuilder.get_session.query(Plan).filter_by(id=team_sub.plan).first()
+        # Retrieve customer basic information
+        cus_obj = stripe.Customer.retrieve(team.stripe_user_id)
+        cus_name = cus_obj.name
+        cus_email = cus_obj.email
+        cus_address = cus_obj.address
 
+        entry_point = 'billing'
         payload = {
             'user': bootstrap_user_data(g.user),
             'common': BaseSupersetView().common_bootstrap_payload(),
+            'cus_id': team.stripe_user_id,
+            'cus_info': {'cus_name': cus_name, 'cus_email': cus_email, 'cus_address': cus_address},
+            'pm_id': team.stripe_pm_id,
+            'plan_id': plan.stripe_id,
         }
 
         return self.render_template(
@@ -788,20 +799,68 @@ class SolarBIBillingView(ModelView):
         )
 
     #TODO endpoint for changing plan
-    @expose('/changeplan/<plan_id>', methods=['GET','POST'])
-    def change_plan(self, plan_id, user_id):
+    @api
+    @handle_api_exception
+    @expose('/change_plan/<plan_id>/', methods=['GET', 'POST'])
+    def change_plan(self, plan_id=None):
         if not g.user or not g.user.get_id():
             return json_error_response('Incorrect call to endpoint')
         team = self.appbuilder.sm.find_team(user_id=g.user.id)
         logging.info(team.stripe_user_id)
-        stripe_customer = stripe.Customer.retrieve(id=team.stripe_user_id)
-        # strip_pmIntent = stripe.PaymentIntent.create()
-        pass
+        try:
+            stripe_customer = stripe.Customer.retrieve(id=team.stripe_user_id)
 
-    #TODO endpoint for adding payment
-    @expose('/addpm/<pm_id>')
-    def add_paymen_method(self):
-        pass
+            change_pm = False
+            pm_id = None
+            if stripe_customer.default_source is None:
+                form_data = get_form_data()[0]['token']
+                stripe.Customer.modify(stripe_customer.stripe_id, source=form_data['id'])
+                pm_id = form_data['card']['id']
+                change_pm = True
+
+            subscription = stripe_customer['subscriptions']['data'][0]
+            new_sub = stripe.Subscription.modify(subscription.stripe_id, cancel_at_period_end=False,
+                                       items=[{'id':subscription['items']['data'][0].id, 'plan':plan_id}])
+            self.update_plan(team.id, plan_id, change_pm=change_pm, pm_id=pm_id)
+
+            return json_success(json.dumps({'msg': 'Change plan success!', 'plan_id': plan_id, 'pm_id': pm_id}))
+        except Exception as e:
+            logging.error(e)
+            return json_error_response('Cannot change plan')
+
+    @api
+    @handle_api_exception
+    @expose('/change_billing_detail/<cus_id>/', methods=['GET', 'POST'])
+    def change_billing_detail(self, cus_id):
+        if not g.user or not g.user.get_id():
+            return json_error_response('Incorrect call to endpoint')
+        form_data = get_form_data()[0]
+        _ = stripe.Customer.modify(cus_id, address={'country': form_data['country'], 'state': form_data['state'],
+                                                    'postal_code': form_data['postal_code'], 'city': form_data['city'],
+                                                    'line1': form_data['line1'], 'line2': form_data['line2']})
+        return json_success(json.dumps({'msg': 'Successfully changed billing detail!'}))
+
+    def update_plan(self, team_id, plan_stripe_id, change_pm=False, pm_id=None):
+        try:
+            '''Update payment methond ID, aka card id, if needed'''
+            team = db.session.query(Team).filter_by(id=team_id).first()
+            if change_pm:
+                team.stripe_pm_id = pm_id
+
+            '''Update team subscription, and reduce used '''
+            team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(team=team.id).first()
+            print(team_sub.id)
+            old_plan = self.appbuilder.get_session.query(Plan).filter_by(id=team_sub.plan).first()
+            new_plan = self.appbuilder.get_session.query(Plan).filter_by(stripe_id=plan_stripe_id).first()
+            print(new_plan.id)
+            old_count = team_sub.remain_count
+            new_count = old_plan.num_request - old_count + new_plan.num_request
+            team_sub.remain_count = new_count if new_count >= 0 else 0
+            team_sub.plan = new_plan.id
+            self.appbuilder.get_session.commit()
+        except Exception as e:
+            self.appbuilder.get_session.rollback()
+            logging.error(e)
 
     #TODO for future, endpoint for on demmand payment
     def on_demand_pay(self):
@@ -1505,6 +1564,7 @@ class Superset(BaseSupersetView):
 
         form_data = get_form_data()[0]
 
+
         try:
             datasource_id, datasource_type = get_datasource_info(
                 datasource_id, datasource_type, form_data
@@ -1572,6 +1632,15 @@ class Superset(BaseSupersetView):
         # samples = request.args.get('samples') == 'true'
         # force = request.args.get('force') == 'true'
         self.send_email(g.user, address_name)
+
+        team = self.appbuilder.sm.find_team(user_id=g.user.id)
+        subscription = self.appbuilder.get_session.query(TeamSubscription).filter(TeamSubscription.team==team.id).first()
+
+        if subscription.remain_count <= 0:
+            return json_error_response("You cannot request any more data.")
+        else:
+            subscription.remain_count = subscription.remain_count - 1
+            self.appbuilder.get_session.commit()
 
         start_year, start_month, start_day = start_date.split('-')
         end_year, end_month, end_day = end_date.split('-')
@@ -1948,13 +2017,14 @@ class Superset(BaseSupersetView):
 
     def save_slice(self, slc, paid=False):
         session = db.session()
-        if not paid:
-            msg = _("Your quick result record for [{}] has been saved.").format(slc.slice_name)
-        else:
+        # if not paid:
+        #     msg = _("Your quick result record for [{}] has been saved.").format(slc.slice_name)
+        if paid:
             msg = _("A confirmation email has been sent to you. This record is also saved below.").format(slc.slice_name)
         session.add(slc)
         session.commit()
-        flash(msg, "info")
+        if paid:
+            flash(msg, "info")
 
     def overwrite_slice(self, slc):
         session = db.session()

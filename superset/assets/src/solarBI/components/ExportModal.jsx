@@ -38,7 +38,7 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
-import InputAdornment from '@material-ui/core/InputAdornment';
+// import InputAdornment from '@material-ui/core/InputAdornment';
 import Container from '@material-ui/core/Container';
 import SolarStepper from './SolarStepper';
 import { requestSolarData } from '../actions/solarActions';
@@ -93,6 +93,9 @@ const styles = tm => ({
     '&:hover': {
       color: 'white',
       backgroundColor: '#034980',
+    },
+    '&:disabled': {
+      backgroundColor: 'lightgray',
     },
   },
   buttons: {
@@ -220,6 +223,9 @@ const styles = tm => ({
     marginTop: '35px',
     marginRight: '45px',
   },
+  remainCount: {
+    float: 'right',
+  },
   costLabel: {
     fontSize: '1.6rem',
     color: '#0063B0',
@@ -315,8 +321,8 @@ class ExportModal extends React.Component {
     this.handleRequestData = this.handleRequestData.bind(this);
     this.handleQuestionClick = this.handleQuestionClick.bind(this);
     this.handleQuestionClose = this.handleQuestionClose.bind(this);
-    this.calculateCost = this.calculateCost.bind(this);
-    this.dateDiff = this.dateDiff.bind(this);
+    // this.calculateCost = this.calculateCost.bind(this);
+    // this.dateDiff = this.dateDiff.bind(this);
     this.onUnload = this.onUnload.bind(this);
   }
 
@@ -339,150 +345,142 @@ class ExportModal extends React.Component {
   }
 
 
-  calculateCost() {
-    const timeCost = {
-      years: 5,
-      months: 0.42,
-      days: 0.01,
-    };
-    const gran = {
-      monthly: 5,
-      weekly: 7.5,
-      daily: 9,
-      hourly: 11,
-    };
-    const type = {
-      dni: 0,
-      ghi: 0,
-      both: 0,
-    };
-    const dt1 = new Date(this.state.startDate);
-    const dt2 = new Date(this.state.endDate);
-    const diff = this.dateDiff(dt1, dt2);
-    let result = diff.days * timeCost.days + diff.months * timeCost.months +
-      diff.years * timeCost.years;
-    let granularity;
-    switch (this.state.resolution) {
-      case 'hourly':
-        granularity = gran.hourly;
-        break;
-      case 'daily':
-        granularity = gran.daily;
-        break;
-      case 'weekly':
-        granularity = gran.weekly;
-        break;
-      case 'monthly':
-        granularity = gran.monthly;
-        break;
-      default:
-        granularity = 0;
-    }
-    let t;
-    switch (this.state.type) {
-      case 'dni':
-        t = type.dni;
-        break;
-      case 'ghi':
-        t = type.ghi;
-        break;
-      case 'both':
-        t = type.both;
-        break;
-      default:
-        t = 0;
-    }
-    result = result + granularity + t;
-    result = result.toFixed(2);
-    // console.log(result)
-    this.setState({ cost: result });
-  }
+  // calculateCost() {
+  //   const timeCost = {
+  //     years: 5,
+  //     months: 0.42,
+  //     days: 0.01,
+  //   };
+  //   const gran = {
+  //     monthly: 5,
+  //     weekly: 7.5,
+  //     daily: 9,
+  //     hourly: 11,
+  //   };
+  //   const type = {
+  //     dni: 0,
+  //     ghi: 0,
+  //     both: 0,
+  //   };
+  //   const dt1 = new Date(this.state.startDate);
+  //   const dt2 = new Date(this.state.endDate);
+  //   const diff = this.dateDiff(dt1, dt2);
+  //   let result = diff.days * timeCost.days + diff.months * timeCost.months +
+  //     diff.years * timeCost.years;
+  //   let granularity;
+  //   switch (this.state.resolution) {
+  //     case 'hourly':
+  //       granularity = gran.hourly;
+  //       break;
+  //     case 'daily':
+  //       granularity = gran.daily;
+  //       break;
+  //     case 'weekly':
+  //       granularity = gran.weekly;
+  //       break;
+  //     case 'monthly':
+  //       granularity = gran.monthly;
+  //       break;
+  //     default:
+  //       granularity = 0;
+  //   }
+  //   let t;
+  //   switch (this.state.type) {
+  //     case 'dni':
+  //       t = type.dni;
+  //       break;
+  //     case 'ghi':
+  //       t = type.ghi;
+  //       break;
+  //     case 'both':
+  //       t = type.both;
+  //       break;
+  //     default:
+  //       t = 0;
+  //   }
+  //   result = result + granularity + t;
+  //   result = result.toFixed(2);
+  //   // console.log(result)
+  //   this.setState({ cost: result });
+  // }
 
-  dateDiff(dt1, dt2) {
-    const ret = { days: 0, months: 0, years: 0 };
-    if (dt1 === dt2) return ret;
-    if (dt1 > dt2) {
-      const dtmp = dt2;
-      // eslint-disable-next-line no-param-reassign
-      dt2 = dt1;
-      // eslint-disable-next-line no-param-reassign
-      dt1 = dtmp;
-    }
+  // dateDiff(dt1, dt2) {
+  //   const ret = { days: 0, months: 0, years: 0 };
+  //   if (dt1 === dt2) return ret;
+  //   if (dt1 > dt2) {
+  //     const dtmp = dt2;
+  //     // eslint-disable-next-line no-param-reassign
+  //     dt2 = dt1;
+  //     // eslint-disable-next-line no-param-reassign
+  //     dt1 = dtmp;
+  //   }
 
-    /*
-     * First get the number of full years
-     */
+  //   /*
+  //    * First get the number of full years
+  //    */
 
-    const year1 = dt1.getFullYear();
-    const year2 = dt2.getFullYear();
+  //   const year1 = dt1.getFullYear();
+  //   const year2 = dt2.getFullYear();
 
-    const month1 = dt1.getMonth();
-    const month2 = dt2.getMonth();
+  //   const month1 = dt1.getMonth();
+  //   const month2 = dt2.getMonth();
 
-    const day1 = dt1.getDate();
-    const day2 = dt2.getDate();
+  //   const day1 = dt1.getDate();
+  //   const day2 = dt2.getDate();
 
-    /*
-     * Set initial values bearing in mind the months or days may be negative
-     */
-    ret.years = year2 - year1;
-    ret.months = month2 - month1;
-    ret.days = day2 - day1;
+  //   /*
+  //    * Set initial values bearing in mind the months or days may be negative
+  //    */
+  //   ret.years = year2 - year1;
+  //   ret.months = month2 - month1;
+  //   ret.days = day2 - day1;
 
-    /*
-     * Now we deal with the negatives
-     */
+  //   /*
+  //    * Now we deal with the negatives
+  //    */
 
-    /*
-     * First if the day difference is negative
-     * eg dt2 = 13 oct, dt1 = 25 sept
-     */
-    if (ret.days < 0) {
-      /*
-       * Use temporary dates to get the number of days remaining in the month
-       */
-      const dtmp1 = new Date(dt1.getFullYear(), dt1.getMonth() + 1, 1, 0, 0, -1);
+  //   /*
+  //    * First if the day difference is negative
+  //    * eg dt2 = 13 oct, dt1 = 25 sept
+  //    */
+  //   if (ret.days < 0) {
+  //     /*
+  //      * Use temporary dates to get the number of days remaining in the month
+  //      */
+  //     const dtmp1 = new Date(dt1.getFullYear(), dt1.getMonth() + 1, 1, 0, 0, -1);
 
-      const numDays = dtmp1.getDate();
+  //     const numDays = dtmp1.getDate();
 
-      ret.months -= 1;
-      ret.days += numDays;
+  //     ret.months -= 1;
+  //     ret.days += numDays;
 
-    }
+  //   }
 
-    /*
-     * Now if the month difference is negative
-     */
-    if (ret.months < 0) {
-      ret.months += 12;
-      ret.years -= 1;
-    }
+  //   /*
+  //    * Now if the month difference is negative
+  //    */
+  //   if (ret.months < 0) {
+  //     ret.months += 12;
+  //     ret.years -= 1;
+  //   }
 
-    return ret;
-  }
+  //   return ret;
+  // }
 
   handleTypeChange(event) {
-    this.setState({ type: event.target.value }, () => {
-      this.calculateCost();
-    });
+    this.setState({ type: event.target.value });
   }
 
   handleStartDateChange(event) {
-    this.setState({ startDate: event.target.value }, () => {
-      this.calculateCost();
-    });
+    this.setState({ startDate: event.target.value });
   }
 
   handleEndDateChange(event) {
-    this.setState({ endDate: event.target.value }, () => {
-      this.calculateCost();
-    });
+    this.setState({ endDate: event.target.value });
   }
 
   handleResolutionChange(event) {
-    this.setState({ resolution: event.target.value }, () => {
-      this.calculateCost();
-    });
+    this.setState({ resolution: event.target.value });
 
   }
 
@@ -665,21 +663,28 @@ class ExportModal extends React.Component {
                         <FormControlLabel classes={{ label: classes.formControlLabel }} value="annual" control={<Radio color="secondary" />} label="Annual" labelPlacement="bottom" />
                       </RadioGroup>
                     </FormControl>
-                    <hr className={classes.contentHr} />
+                    {/* <hr className={classes.contentHr} />
                     <div>
-                      <FormLabel classes={{ root: classes.costLabel, focused: classes.labelFocused }} component="legend">Cost</FormLabel>
+                      <FormLabel
+                        classes={{ root: classes.costLabel, focused: classes.labelFocused }}
+                        component="legend"
+                      >Cost</FormLabel>
                       <TextField
                         id="cost"
                         variant="outlined"
                         className={classes.costOutput}
-                        value={new Date(startDate) > new Date(endDate) || new Date(startDate) < new Date('1990-01-01') || new Date(endDate) > new Date('2019-07-31') ? 'NaN' : this.state.cost}
+                        value={new Date(startDate) > new Date(endDate)
+                          || new Date(startDate) < new Date('1990-01-01')
+                          || new Date(endDate) > new Date('2019-07-31') ? 'NaN' : this.state.cost}
                         InputProps={{
                           classes: { input: classes.textInput },
-                          startAdornment: <InputAdornment className={classes.dollar} position="start">$</InputAdornment>,
+                          startAdornment: <InputAdornment
+                            className={classes.dollar}
+                            position="start">$</InputAdornment>,
                         }}
                       />
-                    </div>
-                    <React.Fragment>
+                    </div> */}
+                    <div>
                       <Button
                         className={classNames(classes.button, classes.closeBtn)}
                         disabled={solarBI.sending}
@@ -690,9 +695,12 @@ class ExportModal extends React.Component {
                       </Button>
                       {solarBI.sending ?
                         (<img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />) :
-                        (<Button className={classNames(classes.button, classes.requestBtn)} onClick={this.handleRequestData} color="primary">Pay</Button>)
+                        (<Button className={classNames(classes.button, classes.requestBtn)} onClick={this.handleRequestData} color="primary" disabled={solarBI.remain_count === 0}>Pay</Button>)
                       }
-                    </React.Fragment>
+                    </div>
+                    <p className={classes.remainCount}>
+                      * Remaining request(s): {solarBI.remain_count}
+                    </p>
                   </Container>
                 </CardContent>
               </Card>

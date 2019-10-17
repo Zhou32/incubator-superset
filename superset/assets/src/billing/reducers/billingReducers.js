@@ -16,25 +16,50 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t } from '@superset-ui/translation';
-import { now } from '../../modules/dates';
+// import { t } from '@superset-ui/translation';
+// import { now } from '../../modules/dates';
 import * as actions from '../actions/billingActions';
 
 export default function (state = {}, action) {
   const actionHandlers = {
-    // [actions.SOLAR_UPDATE_STARTED]() {
-    //   return {
-    //     ...state,
-    //     solarStatus: 'loading',
-    //     solarStackTrace: null,
-    //     solarAlert: null,
-    //     solarUpdateEndTime: null,
-    //     solarUpdateStartTime: now(),
-    //     can_save: false,
-    //     can_export: false,
-    //     queryController: action.queryController,
-    //   };
-    // },
+    [actions.CHANG_PLAN_STARTED]() {
+      return {
+        ...state,
+        plan_change: 'changing',
+      };
+    },
+    [actions.CHANGE_PLAN_SUCCEEDED]() {
+      return {
+        ...state,
+        plan_change: 'success',
+        plan_id: action.res.plan_id,
+        pm_id: action.res.pm_id,
+      };
+    },
+    [actions.CHANGE_PLAN_FAILED]() {
+      return {
+        ...state,
+        plan_change: 'fail',
+      };
+    },
+    [actions.CHANGE_BILLING_DETAIL_STARTED]() {
+      return {
+        ...state,
+        detail_change: 'changing',
+      };
+    },
+    [actions.CHANGE_BILLING_DETAIL_SUCCESSDED]() {
+      return {
+        ...state,
+        detail_change: 'success',
+      };
+    },
+    [actions.CHANGE_BILLING_DETAIL_FAILED]() {
+      return {
+        ...state,
+        detail_change: 'fail',
+      };
+    },
   };
 
   if (action.type in actionHandlers) {
