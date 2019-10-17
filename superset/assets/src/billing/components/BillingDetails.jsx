@@ -73,7 +73,7 @@ function BillingDetails({ billing }) {
                 >
                   {billingValues.line1} {billingValues.line2}<br />
                   {billingValues.city === '' ? '' : billingValues.city + ','} {billingValues.state} {billingValues.postal_code}<br />
-                  {country}
+                  {billingValues.country}
                 </div>
               </div>
             </form>
