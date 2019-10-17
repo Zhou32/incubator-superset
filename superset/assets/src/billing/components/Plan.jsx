@@ -55,8 +55,8 @@ function Plan({ billing, changePlanConnect }) {
           <div className="option-name"><i className="fas fa-list-ul" /><span>Free</span></div>
           <div className="option-description">On demand you will be charge every new downloadable data set</div>
           <div className="option-submit">
-            <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('01')} disabled={billing.plan_id === '00'}>
-              {billing.plan_id === '00' ? 'Current' : 'Chooose'}
+            <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('00')} disabled={billing.plan_id === '00'}>
+              {billing.plan_id === '00' ? 'Current' : 'Choose'}
             </Button>
           </div>
         </div>
@@ -65,7 +65,7 @@ function Plan({ billing, changePlanConnect }) {
           <div className="option-description">$100 Increases for upto 3 new download data sets</div>
           <div className="option-submit">
             <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('01')} disabled={billing.plan_id === '01'}>
-              {billing.plan_id === '01' ? 'Current' : 'Chooose'}
+              {billing.plan_id === '01' ? 'Current' : 'Choose'}
             </Button>
           </div>
         </div>
@@ -74,7 +74,7 @@ function Plan({ billing, changePlanConnect }) {
           <div className="option-description">$1000 month flat fee for all the downloads you can do !</div>
           <div className="option-submit">
             <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('02')} disabled={billing.plan_id === '02'}>
-              {billing.plan_id === '02' ? 'Current' : 'Chooose'}
+              {billing.plan_id === '02' ? 'Current' : 'Choose'}
             </Button>
           </div>
         </div>
@@ -83,7 +83,7 @@ function Plan({ billing, changePlanConnect }) {
           <div className="option-description">$1000 month flat fee for all the downloads you can do !</div>
           <div className="option-submit">
             <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('03')} disabled={billing.plan_id === '03'}>
-              {billing.plan_id === '03' ? 'Current' : 'Chooose'}
+              {billing.plan_id === '03' ? 'Current' : 'Choose'}
             </Button>
           </div>
         </div>

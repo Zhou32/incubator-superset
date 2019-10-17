@@ -799,7 +799,6 @@ class SolarBIBillingView(ModelView):
         )
 
     #TODO endpoint for changing plan
-    @event_logger.log_this
     @api
     @handle_api_exception
     @expose('/change_plan/<plan_id>/', methods=['GET', 'POST'])
