@@ -35,6 +35,9 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
     state,
     postal_code,
   });
+  const [nameError, setNameError] = useState(false);
+  const [emailEmptyError, setEmailEmptyError] = useState(false);
+  const [emailInvalidError, setEmailInvalidError] = useState(false);
 
   const handleChange = name => (event) => {
     setBillingValues({ ...billingValues, [name]: event.target.value });
@@ -48,10 +51,29 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
     setChangeAddressOpen(false);
   };
 
+  const validateEmail = (email) => {
+    // eslint-disable-next-line no-useless-escape
+    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+  };
+
   const handleUpdateSubmit = () => {
-    changeBillDetailConnect(billing.cus_id, billingValues).then((json) => {
-      console.log(json);
-    });
+    setNameError(false);
+    setEmailEmptyError(false);
+    setEmailInvalidError(false);
+    if (billingValues.name === '') {
+      setNameError(true);
+    }
+    if (billingValues.email === '') {
+      setEmailEmptyError(true);
+    } else if (!validateEmail(billingValues.email)) {
+      setEmailInvalidError(true);
+    }
+    if (billingValues.name !== '' && billingValues.email !== '' && validateEmail(billingValues.email)) {
+      changeBillDetailConnect(billing.cus_id, billingValues).then((json) => {
+        console.log(json);
+      });
+    }
   };
 
   return (
@@ -62,14 +84,17 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
           <div className="panel-heading">Billing Details</div>
           <div className="panel-body">
             <p>Please let us know how you’d like your invoices to be addressed.</p>
-            <form method="post" action="">
+            <div>
               <div className="form-group">
                 <label htmlFor="name">Name</label>
                 <input id="name" className="form-control billing-details" value={billingValues.name} onChange={handleChange('name')} />
+                {nameError ? <p className="invalid-message">* Name cannot be empty</p> : null}
               </div>
               <div className="form-group">
                 <label htmlFor="email">Billing email</label>
                 <input type="email" id="email" className="form-control billing-details" value={billingValues.email} onChange={handleChange('email')} />
+                {emailEmptyError ? <p className="invalid-message">* Email cannot be empty</p> : null}
+                {emailInvalidError ? <p className="invalid-message">* Email is invalid</p> : null}
               </div>
               <div className="form-group">
                 <label htmlFor="address">Address</label>
@@ -83,7 +108,7 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
                   {billingValues.country}
                 </div>
               </div>
-            </form>
+            </div>
           </div>
           <div className="panel-footer">
             <button className="update-details-btn" onClick={handleUpdateSubmit}>Update details</button>
@@ -124,6 +149,7 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
 
 BillingDetails.propTypes = {
   billing: PropTypes.object.isRequired,
+  changeBillDetailConnect: PropTypes.func.isRequired,
 };
 
 function mapStateToProps({ billing }) {
