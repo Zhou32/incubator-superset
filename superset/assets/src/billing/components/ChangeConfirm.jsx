@@ -50,13 +50,13 @@ function ChangeConfirm({ planId, openCC, handleCloseCC, changePlan, billing }) {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
+          <Button onClick={handleCloseCC} color="primary" className={classes.button}>
+            Cancel
+          </Button>
           {billing.plan_change === 'changing' ?
             (<img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />) :
             (<Button onClick={handleSubmit} color="primary" className={classes.button}>Confirm</Button>)
           }
-          <Button onClick={handleCloseCC} color="primary" className={classes.button}>
-            Cancel
-          </Button>
         </DialogActions>
       </Dialog>
     </div>

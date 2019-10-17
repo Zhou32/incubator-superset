@@ -432,7 +432,7 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
     )
     list_columns = [
         'slice_link', 'creator', 'modified', 'view_slice_name', 'view_slice_link', 'slice_query_id',
-        'slice_download_link'
+        'slice_download_link', 'slice_id'
     ]
     edit_columns = [
         "slice_name",

@@ -111,17 +111,17 @@ class GoBackModal extends React.Component {
             <DialogActions>
               <Button
                 className={classes.button}
-                onClick={onBackClick}
-                color="primary"
-              >
-                Yes
-              </Button>
-              <Button
-                className={classes.button}
                 onClick={onClose}
                 color="primary"
               >
                 No
+              </Button>
+              <Button
+                className={classes.button}
+                onClick={onBackClick}
+                color="primary"
+              >
+                Yes
               </Button>
             </DialogActions>
           </Dialog>

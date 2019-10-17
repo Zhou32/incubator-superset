@@ -1117,6 +1117,7 @@ input {
   background-color: white;
   margin: 30px;
   border-radius: 10px;
+  position: relative;
 }
 .list-card:hover {
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
@@ -1127,6 +1128,23 @@ input {
 }
 .list-container a {
   font-size: 22px;
+}
+.list-card .delete-btn {
+  position: absolute;
+  top: 10px;
+  left: 5px;
+  font-size: 20px;
+  color: #bbbbbb;
+  z-index: 500;
+  background: transparent;
+  border: none;
+}
+.list-card .delete-btn:hover {
+  cursor: pointer;
+  color:#999999;
+}
+.list-card .delete-btn:focus {
+  outline: none;
 }
 .list-card table {
   border-collapse: collapse;
@@ -1218,6 +1236,18 @@ input {
   width: 680px;
   margin: 20 auto;
   color: #707070;
+}
+#deleteDataTitle {
+  display: inline-block;
+  font-weight: bold;
+  font-size: 18px;
+}
+.delete-close-btn {
+  color: #0667A3;
+  border-color: #0667A3;
+}
+.delete-close-btn:hover {
+  background-color: lightgrey;
 }
 .invite-btn {
   background-color: #024067; 

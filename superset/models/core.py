@@ -601,6 +601,11 @@ class SolarBISlice(Model, AuditMixinNullable, ImportMixin):
         return Markup(f'<a href="{url}">{name}</a>')
 
     @property
+    def slice_id(self):
+        id = self.id
+        return Markup(f'{id}')
+
+    @property
     def view_slice_name(self):
         name = escape(self.chart)
         return Markup(f'<p>{name}</p>')
