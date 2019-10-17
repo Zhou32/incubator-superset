@@ -819,13 +819,28 @@ class SolarBIBillingView(ModelView):
                 change_pm = True
 
             subscription = stripe_customer['subscriptions']['data'][0]
-            new_sub = stripe.Subscription.modify(subscription.stripe_id, cancel_at_period_end=True,
+            new_sub = stripe.Subscription.modify(subscription.stripe_id, cancel_at_period_end=False,
                                        items=[{'id':subscription['items']['data'][0].id, 'plan':plan_id}])
             self.update_plan(team.id, plan_id, change_pm=change_pm, pm_id=pm_id)
 
             return json_success(json.dumps({'msg': 'Change plan success!', 'plan_id': plan_id, 'pm_id': pm_id}))
         except Exception as e:
             logging.error(e)
+            return json_error_response('Cannot change plan')
+
+
+    @api
+    @handle_api_exception
+    @expose('/change_billing_detail/<cus_id>/', methods=['GET', 'POST'])
+    def change_billing_detail(self, cus_id):
+        if not g.user or not g.user.get_id():
+            return json_error_response('Incorrect call to endpoint')
+        form_data = get_form_data()[0]
+        new_cust = stripe.Customer.modify(cus_id, address={'country':form_data['country'], 'state':form_data['state'],
+                                                           'postal_code':form_data['postal_code'], 'city':form_data['city'],
+                                                           'line1':form_data['line1'], 'line2':form_data['line2']})
+        return json_success(json.dumps({'msg': 'Successfully changed detail!'}))
+
 
     def update_plan(self, team_id, plan_stripe_id, change_pm=False, pm_id=None):
         try:
