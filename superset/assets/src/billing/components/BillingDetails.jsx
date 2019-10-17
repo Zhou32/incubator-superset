@@ -70,9 +70,7 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
       setEmailInvalidError(true);
     }
     if (billingValues.name !== '' && billingValues.email !== '' && validateEmail(billingValues.email)) {
-      changeBillDetailConnect(billing.cus_id, billingValues).then((json) => {
-        console.log(json);
-      });
+      changeBillDetailConnect(billing.cus_id, billingValues);
     }
   };
 
@@ -111,7 +109,10 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
             </div>
           </div>
           <div className="panel-footer">
-            <button className="update-details-btn" onClick={handleUpdateSubmit}>Update details</button>
+            {billing.detail_change === 'changing' ?
+              <img style={{ width: 40, margin: 0 }} alt="Loading..." src="/static/assets/images/loading.gif" /> :
+              <button className="update-details-btn" onClick={handleUpdateSubmit}>Update details</button>
+            }
           </div>
         </div>
         <div className="panel panel-primary">

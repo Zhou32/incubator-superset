@@ -828,7 +828,6 @@ class SolarBIBillingView(ModelView):
             logging.error(e)
             return json_error_response('Cannot change plan')
 
-
     @api
     @handle_api_exception
     @expose('/change_billing_detail/<cus_id>/', methods=['GET', 'POST'])
@@ -836,11 +835,10 @@ class SolarBIBillingView(ModelView):
         if not g.user or not g.user.get_id():
             return json_error_response('Incorrect call to endpoint')
         form_data = get_form_data()[0]
-        new_cust = stripe.Customer.modify(cus_id, address={'country':form_data['country'], 'state':form_data['state'],
-                                                           'postal_code':form_data['postal_code'], 'city':form_data['city'],
-                                                           'line1':form_data['line1'], 'line2':form_data['line2']})
-        return json_success(json.dumps({'msg': 'Successfully changed detail!'}))
-
+        _ = stripe.Customer.modify(cus_id, address={'country': form_data['country'], 'state': form_data['state'],
+                                                    'postal_code': form_data['postal_code'], 'city': form_data['city'],
+                                                    'line1': form_data['line1'], 'line2': form_data['line2']})
+        return json_success(json.dumps({'msg': 'Successfully changed billing detail!'}))
 
     def update_plan(self, team_id, plan_stripe_id, change_pm=False, pm_id=None):
         try:
@@ -2019,13 +2017,14 @@ class Superset(BaseSupersetView):
 
     def save_slice(self, slc, paid=False):
         session = db.session()
-        if not paid:
-            msg = _("Your quick result record for [{}] has been saved.").format(slc.slice_name)
-        else:
+        # if not paid:
+        #     msg = _("Your quick result record for [{}] has been saved.").format(slc.slice_name)
+        if paid:
             msg = _("A confirmation email has been sent to you. This record is also saved below.").format(slc.slice_name)
         session.add(slc)
         session.commit()
-        flash(msg, "info")
+        if paid:
+            flash(msg, "info")
 
     def overwrite_slice(self, slc):
         session = db.session()
