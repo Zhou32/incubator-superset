@@ -126,7 +126,7 @@ class SaveModal extends React.Component {
     this.setState({ addToDash: dash });
   }
 
-  saveOrOverwrite(gotodash) {
+  saveOrOverwrite() {
     this.setState({ alert: false });
     const sliceParams = {};
 
@@ -208,17 +208,17 @@ class SaveModal extends React.Component {
             <DialogActions>
               <Button
                 className={classes.button}
-                onClick={() => this.saveOrOverwrite(true)}
-                color="primary"
-              >
-                Save
-              </Button>
-              <Button
-                className={classes.button}
                 onClick={this.handleClose}
                 color="primary"
               >
                 Cancel
+              </Button>
+              <Button
+                className={classes.button}
+                onClick={() => this.saveOrOverwrite()}
+                color="primary"
+              >
+                Save
               </Button>
             </DialogActions>
           </Dialog>

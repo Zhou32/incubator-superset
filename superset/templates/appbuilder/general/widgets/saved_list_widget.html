@@ -88,6 +88,8 @@
         <div class="list-card">
             {% set formatter = formatters_columns.get(value) %}
             {% if 'None' in item['slice_query_id'] %}
+{#                href={{ "/solar/delete/"+item['slice_id'] }}#}
+                <a data-href={{ "/solar/delete/"+item['slice_id'] }} type="button" class="delete-btn" data-toggle="modal" data-target="#deleteData"><i class="far fa-trash-alt"></i></a>
                 <div class="list-container">
                     <div class="ribbon saved-ribbon-top-right"><span>saved</span></div>
                     {% if formatter %}
@@ -144,35 +146,36 @@
         </div>
     {% endfor %}
 
-{#    {% for item in value_columns %}#}
-{#        {% set pk = pks[loop.index-1] %}#}
-{#        <tr>#}
-{#            {% if actions %}#}
-{#            <td>#}
-{#                <input id="{{pk}}" class="action_check" name="rowid" value="{{pk}}" type="checkbox">#}
-{#            </td>#}
-{#            {% endif %}#}
-{#            {% if can_show or can_edit or can_delete %}#}
-{#                <td><center>#}
-{#                {{ lib.btn_crud(can_show, can_edit, can_delete, pk, modelview_name, filters) }}#}
-{#                </center></td>#}
-{#            {% endif %}#}
-{#            {% for value in include_columns %}#}
-{#                {% set formatter = formatters_columns.get(value) %}#}
-{#                {% if formatter %}#}
-{#                    <td>{{ formatter(item[value]) }}</td>#}
-{#                {% else %}#}
-{#                    <td>{{ item[value] }}</td>#}
-{#                {% endif %}#}
-{#            {% endfor %}#}
-{#        </tr>#}
-{#    {% endfor %}#}
+    <div class="modal fade" id="deleteData" tabindex="-1" role="dialog" aria-labelledby="deleteDataTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteDataTitle">Delete Saved Data</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Are you sure to delete this saved data?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn delete-close-btn" data-dismiss="modal">Close</button>
+            <a id="deleteButton" type="button" class="btn btn-danger">Delete</a>
+          </div>
+        </div>
+      </div>
+    </div>
 {% endblock %}
 
+
 {% block tail_js %}
-{#    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>#}
     <script>
         $(document).ready(function(){
+            $('#deleteData').on('shown.bs.modal',function(e){
+                $(this).find('#deleteButton').attr('href', ($(e.relatedTarget).attr("data-href")));
+            });
+
+
             $("#searchInput").on("keyup", function() {
                 var value = $(this).val().toLowerCase();
                 if ($('input:radio[name="selector"]:checked').val() === 'all') {
