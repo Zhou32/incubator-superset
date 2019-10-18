@@ -50,7 +50,7 @@ const propTypes = {
   open: PropTypes.bool.isRequired,
   onHide: PropTypes.func.isRequired,
   requestSolarData: PropTypes.func.isRequired,
-  startTial: PropTypes.func.isRequired,
+  startTrial: PropTypes.func.isRequired,
   solar_new: PropTypes.bool.isRequired,
 };
 
@@ -326,6 +326,7 @@ class ExportModal extends React.Component {
     this.handleRequestData = this.handleRequestData.bind(this);
     this.handleQuestionClick = this.handleQuestionClick.bind(this);
     this.handleQuestionClose = this.handleQuestionClose.bind(this);
+    this.handleTrialClick = this.handleTrialClick.bind(this);
     // this.calculateCost = this.calculateCost.bind(this);
     // this.dateDiff = this.dateDiff.bind(this);
     this.onUnload = this.onUnload.bind(this);
@@ -498,7 +499,7 @@ class ExportModal extends React.Component {
   }
 
   handleTrialClick() {
-    this.props.startTial();
+    this.props.startTrial();
   }
 
   handleRequestData() {
@@ -709,7 +710,14 @@ class ExportModal extends React.Component {
                     </div>
                     <p className={classes.remainCount}>
                       * Remaining request(s): {solarBI.remain_count}
-                      {solarBI.can_trial ? <a className={classes.trialLink}>Start trial</a> : null}
+                      {solarBI.can_trial ?
+                        <a
+                          onClick={this.handleTrialClick}
+                          className={classes.trialLink}
+                        >
+                          Start trial
+                        </a> : null
+                      }
                     </p>
                   </Container>
                 </CardContent>

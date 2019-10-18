@@ -932,25 +932,25 @@ class SolarBIBillingView(ModelView):
         if flag:
             try:
                 team = self.appbuilder.sm.find_team(user_id=g.user.id)
-                team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(team=team.id)
+                team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(team=team.id).first()
                 if team_sub.trial_used:
                     raise ValueError('Already used trial.')
                 stripe_sub = stripe.Subscription.retrieve(team_sub.stripe_sub_id)
-                starter_plan = self.appbuilder.get_session.query(Plan).filter_by(id=2)
+                starter_plan = self.appbuilder.get_session.query(Plan).filter_by(id=2).first()
 
                 #TODO modify trial_end to trial_period_days=14 in live
-                utc_trial_end_ts = (datetime.datetime.now() - datetime.timedelta(hours=11)).timestamp()
-                subscription = stripe.Subscription.modify(stripe_sub.stripe_id, trial_end=utc_trial_end_ts+300, items=[{
+                utc_trial_end_ts = datetime.now().timestamp()
+                subscription = stripe.Subscription.modify(stripe_sub.stripe_id, trial_end=int(utc_trial_end_ts)+180, items=[{
                     'id': stripe_sub['items']['data'][0].id,
                     'plan': starter_plan.stripe_id,
                 }])
                 team_sub.trial_used = True
-                team_sub.remain_count = starter_plan.num_search
+                team_sub.remain_count = starter_plan.num_request
                 team_sub.plan = starter_plan.id
                 team_sub.end_time = subscription['current_period_end']
                 self.appbuilder.get_session.commit()
                 return json_success({'msg':'Start trial successfully! You have 14 days to use 7 advance searches.',
-                                     'remain_count': starter_plan.num_search})
+                                     'remain_count': starter_plan.num_request})
             except ValueError as e:
                 return json_error_response(e)
             except Exception as e:

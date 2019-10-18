@@ -236,7 +236,6 @@ export function startTrialFail() {
 export function startTrial(timeout = 60) {
   return (dispatch) => {
     const url = '/billing/start_trial/';
-    // const logStart = Logger.getTimestamp();
     const controller = new AbortController();
     const { signal } = controller;
     dispatch(startTrialStart());
@@ -249,7 +248,7 @@ export function startTrial(timeout = 60) {
     })
       .then(({ json }) => {
         dispatch(startTrialSuccess(json));
-        dispatch(addSuccessToastAction(t('Start trial success!')));
+        dispatch(addSuccessToastAction(t(json.msg)));
       })
       // dispatch(addSuccessToast(t('Request confirmed! An email has been sent to you.')));
       .catch(() => {
