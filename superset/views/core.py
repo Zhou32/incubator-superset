@@ -1825,7 +1825,7 @@ class Superset(BaseSupersetView):
             # session = boto3.session.Session(aws_access_key_id=AWS_ACCESS_KEY_ID,
             #                                 aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
             # client = session.client('athena', region_name='ap-southeast-2')
-            client = boto3.client('athena')
+            client = boto3.client('athena', region_name='ap-southeast-2')
             response = client.start_query_execution(
                 QueryString=athena_query,
                 # ClientRequestToken=g.user.email+'_'+str(time.time()),
