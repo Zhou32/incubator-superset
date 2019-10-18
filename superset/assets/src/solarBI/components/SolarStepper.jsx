@@ -35,7 +35,7 @@ function SolarStepper({ activeStep }) {
   const classes = useStyles();
   return (
     <Stepper className={classes.stepper} activeStep={activeStep}>
-      {['Search a location', 'View quick result', 'Pay to get more data'].map((label, index) => {
+      {['Search a location', 'View quick result', 'Get more data'].map((label, index) => {
         const labelProps = {};
         if (index === 2) {
           labelProps.optional = <Typography variant="caption">Optional</Typography>;
