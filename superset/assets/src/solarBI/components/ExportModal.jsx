@@ -41,7 +41,7 @@ import FormLabel from '@material-ui/core/FormLabel';
 // import InputAdornment from '@material-ui/core/InputAdornment';
 import Container from '@material-ui/core/Container';
 import SolarStepper from './SolarStepper';
-import { requestSolarData } from '../actions/solarActions';
+import { requestSolarData, startTrial } from '../actions/solarActions';
 
 const propTypes = {
   address: PropTypes.string.isRequired,
@@ -50,6 +50,7 @@ const propTypes = {
   open: PropTypes.bool.isRequired,
   onHide: PropTypes.func.isRequired,
   requestSolarData: PropTypes.func.isRequired,
+  startTial: PropTypes.func.isRequired,
   solar_new: PropTypes.bool.isRequired,
 };
 
@@ -267,6 +268,10 @@ const styles = tm => ({
     borderRadius: 12,
     lineHeight: '18px',
     textAlign: 'center',
+  },
+  trialLink: {
+    marginLeft: 20,
+    color: '#0063B0',
   },
   typeGroup: {
     flexDirection: 'row',
@@ -492,6 +497,10 @@ class ExportModal extends React.Component {
     this.setState({ anchorEl: null });
   }
 
+  handleTrialClick() {
+    this.props.startTial();
+  }
+
   handleRequestData() {
     const sDate = new Date(this.state.startDate);
     const eDate = new Date(this.state.endDate);
@@ -700,7 +709,7 @@ class ExportModal extends React.Component {
                     </div>
                     <p className={classes.remainCount}>
                       * Remaining request(s): {solarBI.remain_count}
-                      <a>Start trial</a>
+                      {solarBI.can_trial ? <a className={classes.trialLink}>Start trial</a> : null}
                     </p>
                   </Container>
                 </CardContent>
@@ -722,6 +731,6 @@ const mapStateToProps = state => ({
 export default withStyles(styles)(
   connect(
     mapStateToProps,
-    { requestSolarData },
+    { requestSolarData, startTrial },
   )(ExportModal),
 );

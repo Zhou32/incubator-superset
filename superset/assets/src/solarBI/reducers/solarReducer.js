@@ -130,7 +130,8 @@ export default function (state = {}, action) {
       return {
         ...state,
         start_trial: 'success',
-        // count: action.res.count,
+        can_trial: false,
+        remain_count: action.res.remain_count,
       };
     },
     [actions.START_TRIAL_FAIL]() {

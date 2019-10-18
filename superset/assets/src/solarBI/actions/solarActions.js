@@ -224,8 +224,8 @@ export function startTrialStart() {
 }
 
 export const START_TRIAL_SUCCESS = 'START_TRIAL_SUCCESS';
-export function startTrialSuccess(data) {
-  return { type: START_TRIAL_SUCCESS, data };
+export function startTrialSuccess(res) {
+  return { type: START_TRIAL_SUCCESS, res };
 }
 
 export const START_TRIAL_FAIL = 'START_TRIAL_FAIL';
@@ -233,11 +233,9 @@ export function startTrialFail() {
   return { type: START_TRIAL_FAIL };
 }
 
-export function startTrial(queryData, timeout = 60) {
+export function startTrial(timeout = 60) {
   return (dispatch) => {
-    const url =
-      '/billing/start_trial/' +
-      queryData.lat + '/';
+    const url = '/billing/start_trial/';
     // const logStart = Logger.getTimestamp();
     const controller = new AbortController();
     const { signal } = controller;
@@ -245,7 +243,7 @@ export function startTrial(queryData, timeout = 60) {
 
     return SupersetClient.post({
       url,
-      postPayload: { form_data: queryData },
+      postPayload: {},
       signal,
       timeout: timeout * 1000,
     })
