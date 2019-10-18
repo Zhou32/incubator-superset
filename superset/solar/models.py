@@ -94,6 +94,7 @@ class TeamSubscription(Model):
     remain_count = Column(Integer, default=0)
     stripe_sub_id = Column(String(64))
     end_time = Column(Integer)
+    # trial_used = Column(Boolean, default=False)
 
 
 class SolarBIUser(User):

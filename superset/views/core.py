@@ -901,12 +901,14 @@ class SolarBIBillingView(ModelView):
                     for sub in sub_list['data']:
                         if sub['id'] != current_subscription.stripe_id:
                             stripe.Subscription.delete(sub['id'])
-                # Create new plan with trail end at beginning of next period
+                # Create new plan with trial end at beginning of next period
                 new_sub = stripe.Subscription.create(customer=team.stripe_user_id, trial_end=period_end, items=[{
                     'plan':new_plan.stripe_id,
                     'quantity':'1',
                 }])
                 return_subscription_id = old_plan.stripe_id
+            else:
+                return_subscription_id = None
             self.appbuilder.get_session.commit()
             return True, return_subscription_id
         except Exception as e:
@@ -917,6 +919,33 @@ class SolarBIBillingView(ModelView):
     #TODO for future, endpoint for on demmand payment
     def on_demand_pay(self):
         pass
+
+    @expose('/trial/<usr_id>/', method=['POST'])
+    def start_trial(self):
+        try:
+            team = self.appbuilder.sm.find_team(user_id=g.user.id)
+            team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(team=team.id)
+            if team_sub.trial_used:
+                raise ValueError('Already used trial.')
+            stripe_sub = stripe.Subscription.retrieve(team_sub.stripe_sub_id)
+            starter_plan = self.appbuilder.get_session.query(Plan).filter_by(id=2)
+
+            #TODO modify trial_end to trial_period_days=14 in live
+            utc_trial_end_ts = (datetime.datetime.now() - datetime.timedelta(hours=11)).timestamp()
+            subscription = stripe.Subscription.modify(stripe_sub.stripe_id, trial_end=utc_trial_end_ts+300, items=[{
+                'id': stripe_sub['items']['data'][0].id,
+                'plan': starter_plan.stripe_id,
+            }])
+            
+            team_sub.remain_count = starter_plan.num_search
+            team_sub.plan = starter_plan.id
+            team_sub.end_time = subscription['current_period_end']
+            self.appbuilder.get_session.commit()
+            return json_success({'msg':'Start trial successfully! You have 14 days to use 7 advance searches.'})
+        except ValueError as e:
+            return json_error_response(e)
+        except Exception as e:
+            return json_error_response('Cannot start trial.')
 
     #TODO handle invoice.payment_succeeded event, update remain counts accordingly
     def renew(self, event_object):
@@ -946,6 +975,9 @@ class SolarBIBillingView(ModelView):
             self.appbuilder.get_session.rollback()
             logging.error(e)
 
+    def revert_to_free(self, event_object):
+        print(event_object)
+
     @api
     @expose('/webhook', methods=['POST'])
     def webhook(self):
@@ -974,7 +1006,8 @@ class SolarBIBillingView(ModelView):
             if event.type == 'invoice.payment_succeeded':
                 # print(event)
                 self.renew(event['data']['object'])
-            # elif event.type ==
+            elif event.type == 'invoice.payment_failed':
+                self.revert_to_free(event['data']['object'])
         return Response(status=200)
 
 appbuilder.add_view(
