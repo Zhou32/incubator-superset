@@ -609,13 +609,17 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
         entry_point = 'solarBI'
 
         datasource_id = self.get_solar_datasource()
-
+        for role in g.user.roles:
+            if 'team_owner' in role.name:
+                can_trial = True
+        can_trial = can_trial and not subscription.trial_used
         payload = {
             'user': bootstrap_user_data(g.user),
             'common': BaseSupersetView().common_bootstrap_payload(),
             'datasource_id': datasource_id,
             'datasource_type': 'table',
             'remain_count': subscription.remain_count,
+            'can_trial': can_trial,
         }
 
         return self.render_template(
@@ -920,32 +924,39 @@ class SolarBIBillingView(ModelView):
     def on_demand_pay(self):
         pass
 
-    @expose('/start_trial/<usr_id>/', methods=['POST'])
+    @expose('/start_trial/', methods=['POST'])
     def start_trial(self):
-        try:
-            team = self.appbuilder.sm.find_team(user_id=g.user.id)
-            team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(team=team.id)
-            if team_sub.trial_used:
-                raise ValueError('Already used trial.')
-            stripe_sub = stripe.Subscription.retrieve(team_sub.stripe_sub_id)
-            starter_plan = self.appbuilder.get_session.query(Plan).filter_by(id=2)
+        for role in g.user.roles:
+            if 'team_owner' in role.name:
+                flag = True
+        if flag:
+            try:
+                team = self.appbuilder.sm.find_team(user_id=g.user.id)
+                team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(team=team.id)
+                if team_sub.trial_used:
+                    raise ValueError('Already used trial.')
+                stripe_sub = stripe.Subscription.retrieve(team_sub.stripe_sub_id)
+                starter_plan = self.appbuilder.get_session.query(Plan).filter_by(id=2)
 
-            #TODO modify trial_end to trial_period_days=14 in live
-            utc_trial_end_ts = (datetime.datetime.now() - datetime.timedelta(hours=11)).timestamp()
-            subscription = stripe.Subscription.modify(stripe_sub.stripe_id, trial_end=utc_trial_end_ts+300, items=[{
-                'id': stripe_sub['items']['data'][0].id,
-                'plan': starter_plan.stripe_id,
-            }])
-            
-            team_sub.remain_count = starter_plan.num_search
-            team_sub.plan = starter_plan.id
-            team_sub.end_time = subscription['current_period_end']
-            self.appbuilder.get_session.commit()
-            return json_success({'msg': 'Start trial successfully! You have 14 days to use 7 advance searches.'})
-        except ValueError as e:
-            return json_error_response(e)
-        except Exception as e:
-            return json_error_response('Cannot start trial.')
+                #TODO modify trial_end to trial_period_days=14 in live
+                utc_trial_end_ts = (datetime.datetime.now() - datetime.timedelta(hours=11)).timestamp()
+                subscription = stripe.Subscription.modify(stripe_sub.stripe_id, trial_end=utc_trial_end_ts+300, items=[{
+                    'id': stripe_sub['items']['data'][0].id,
+                    'plan': starter_plan.stripe_id,
+                }])
+                team_sub.trial_used = True
+                team_sub.remain_count = starter_plan.num_search
+                team_sub.plan = starter_plan.id
+                team_sub.end_time = subscription['current_period_end']
+                self.appbuilder.get_session.commit()
+                return json_success({'msg':'Start trial successfully! You have 14 days to use 7 advance searches.',
+                                     'remain_count': starter_plan.num_search})
+            except ValueError as e:
+                return json_error_response(e)
+            except Exception as e:
+                return json_error_response('Cannot start trial.')
+        else:
+            return json_error_response('Cannot start trial for non-owner role.')
 
     #TODO handle invoice.payment_succeeded event, update remain counts accordingly
     def renew(self, event_object):
