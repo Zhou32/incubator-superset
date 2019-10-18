@@ -1730,114 +1730,106 @@ class Superset(BaseSupersetView):
         """Serves all request that GET or POST form_data
 
         This endpoint evolved to be the entry point of many different
-        requests that GETs or POSTs a form_data.
+        requests that GETs or POSTs a form_data."""
+        try:
+            self.send_email(g.user, address_name)
 
-        `self.generate_json` receives this input and returns different
-        payloads based on the request args in the first block
+            start_year, start_month, start_day = start_date.split('-')
+            end_year, end_month, end_day = end_date.split('-')
+            select_str = ""
+            group_str = ""
+            order_str = ""
+            if resolution == 'hourly':
+                select_str = "SELECT year, month, day, hour, radiationtype, radiation"
+                group_str = "GROUP BY year, month, day, hour, radiationtype, radiation"
+                order_str = "ORDER BY year ASC, month ASC, day ASC, hour ASC"
+            elif resolution == 'daily':
+                select_str = \
+                    "SELECT year, month, day, radiationtype, avg(radiation) AS radiation"
+                group_str = "GROUP BY year, month, day, radiationtype"
+                order_str = "ORDER BY year ASC, month ASC, day ASC"
+            elif resolution == 'weekly':
+                select_str = \
+                    "SELECT CAST(date_trunc('week', r_date) AS date) AS Monday_of_week, " + \
+                    "radiationtype, avg(radiation) AS week_avg_radiation FROM " + \
+                    "(SELECT cast(date AS timestamp) AS r_date, year, month, day, " + \
+                    "radiationtype, radiation"
+                group_str = "GROUP BY  date, year, month, day, radiationtype, radiation"
+                order_str = "ORDER BY  date) GROUP BY date_trunc('week', r_date), " + \
+                            "radiationtype ORDER BY 1"
+            elif resolution == 'monthly':
+                select_str = "SELECT year, month, radiationtype, avg(radiation) AS radiation"
+                group_str = "GROUP BY year, month, radiationtype"
+                order_str = "ORDER BY year ASC, month ASC"
+            elif resolution == 'annual':
+                select_str = "SELECT year, radiationtype, avg(radiation) AS radiation"
+                group_str = "GROUP BY year, radiationtype"
+                order_str = "ORDER BY year ASC"
 
-        TODO: break into one endpoint for each return shape"""
-        # csv = request.args.get('csv') == 'true'
-        # query = request.args.get('query') == 'true'
-        # results = request.args.get('results') == 'true'
-        # samples = request.args.get('samples') == 'true'
-        # force = request.args.get('force') == 'true'
-        self.send_email(g.user, address_name)
+            if type != 'both':
+                athena_query = select_str \
+                    + " FROM \"solar_radiation_hill\".\"lat_partition_v2\"" \
+                    + " WHERE (CAST(year AS BIGINT)*10000" \
+                    + " + CAST(month AS BIGINT)*100 + day)" \
+                    + " BETWEEN " + start_year + start_month + start_day \
+                    + " AND " + end_year + end_month + end_day \
+                    + " AND latitude = '" + lat + "' AND longitude = '" + lng \
+                    + "' AND radiationtype = '" + type + "' AND radiation != -999 " \
+                    + group_str + " " + order_str
+            else:
+                athena_query = select_str \
+                    + " FROM \"solar_radiation_hill\".\"lat_partition_v2\"" \
+                    + " WHERE (CAST(year AS BIGINT)*10000" \
+                    + " + CAST(month AS BIGINT)*100 + day)" \
+                    + " BETWEEN " + start_year + start_month + start_day \
+                    + " AND " + end_year + end_month + end_day \
+                    + " AND latitude = '" + lat + "' AND longitude = '" + lng \
+                    + "' AND radiation != -999 " + group_str + " " + order_str
 
-        team = self.appbuilder.sm.find_team(user_id=g.user.id)
-        subscription = self.appbuilder.get_session.query(TeamSubscription).filter(TeamSubscription.team==team.id).first()
+            AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
+            AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
+            session = boto3.session.Session(aws_access_key_id=AWS_ACCESS_KEY_ID,
+                                            aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
+            client = session.client('athena', region_name='ap-southeast-2')
+            response = client.start_query_execution(
+                QueryString=athena_query,
+                # ClientRequestToken=g.user.email+'_'+str(time.time()),
+                QueryExecutionContext={
+                    'Database': 'solar_radiation_hill'
+                },
+                ResultConfiguration={
+                    'OutputLocation': 's3://colin-query-test/' + g.user.email,
+                    # 'EncryptionConfiguration': {
+                    #     'EncryptionOption': 'SSE_S3',
+                    #     'KmsKey': 'string'
+                    # }
+                },
+            )
 
-        if subscription.remain_count <= 0:
-            return json_error_response("You cannot request any more data.")
-        else:
-            subscription.remain_count = subscription.remain_count - 1
-            self.appbuilder.get_session.commit()
+            # self.send_email(g.user, address_name)
+            # print(response['QueryExecutionId'])
+            form_data = get_form_data()[0]
+            args = {'action': 'saveas',
+                    'slice_name': address_name + '_' + form_data['startDate'] + '_' +
+                                  form_data['endDate'] + '_' + type + '_' + resolution}
+            datasource = ConnectorRegistry.get_datasource(
+                form_data['datasource_type'], form_data['datasource_id'], db.session)
+            self.save_or_overwrite_solarbislice(args, None, True, None, False, form_data['datasource_id'],
+                                             form_data['datasource_type'], datasource.name,
+                                             query_id=response['QueryExecutionId'], start_date=form_data['startDate'],
+                                             end_date=form_data['endDate'], data_type=type, resolution=resolution)
+            team = self.appbuilder.sm.find_team(user_id=g.user.id)
+            subscription = self.appbuilder.get_session.query(TeamSubscription).filter(
+                TeamSubscription.team == team.id).first()
 
-        start_year, start_month, start_day = start_date.split('-')
-        end_year, end_month, end_day = end_date.split('-')
-        select_str = ""
-        group_str = ""
-        order_str = ""
-        if resolution == 'hourly':
-            select_str = "SELECT year, month, day, hour, radiationtype, radiation"
-            group_str = "GROUP BY year, month, day, hour, radiationtype, radiation"
-            order_str = "ORDER BY year ASC, month ASC, day ASC, hour ASC"
-        elif resolution == 'daily':
-            select_str = \
-                "SELECT year, month, day, radiationtype, avg(radiation) AS radiation"
-            group_str = "GROUP BY year, month, day, radiationtype"
-            order_str = "ORDER BY year ASC, month ASC, day ASC"
-        elif resolution == 'weekly':
-            select_str = \
-                "SELECT CAST(date_trunc('week', r_date) AS date) AS Monday_of_week, " + \
-                "radiationtype, avg(radiation) AS week_avg_radiation FROM " + \
-                "(SELECT cast(date AS timestamp) AS r_date, year, month, day, " + \
-                "radiationtype, radiation"
-            group_str = "GROUP BY  date, year, month, day, radiationtype, radiation"
-            order_str = "ORDER BY  date) GROUP BY date_trunc('week', r_date), " + \
-                        "radiationtype ORDER BY 1"
-        elif resolution == 'monthly':
-            select_str = "SELECT year, month, radiationtype, avg(radiation) AS radiation"
-            group_str = "GROUP BY year, month, radiationtype"
-            order_str = "ORDER BY year ASC, month ASC"
-        elif resolution == 'annual':
-            select_str = "SELECT year, radiationtype, avg(radiation) AS radiation"
-            group_str = "GROUP BY year, radiationtype"
-            order_str = "ORDER BY year ASC"
-
-        if type != 'both':
-            athena_query = select_str \
-                + " FROM \"solar_radiation_hill\".\"lat_partition_v2\"" \
-                + " WHERE (CAST(year AS BIGINT)*10000" \
-                + " + CAST(month AS BIGINT)*100 + day)" \
-                + " BETWEEN " + start_year + start_month + start_day \
-                + " AND " + end_year + end_month + end_day \
-                + " AND latitude = '" + lat + "' AND longitude = '" + lng \
-                + "' AND radiationtype = '" + type + "' AND radiation != -999 " \
-                + group_str + " " + order_str
-        else:
-            athena_query = select_str \
-                + " FROM \"solar_radiation_hill\".\"lat_partition_v2\"" \
-                + " WHERE (CAST(year AS BIGINT)*10000" \
-                + " + CAST(month AS BIGINT)*100 + day)" \
-                + " BETWEEN " + start_year + start_month + start_day \
-                + " AND " + end_year + end_month + end_day \
-                + " AND latitude = '" + lat + "' AND longitude = '" + lng \
-                + "' AND radiation != -999 " + group_str + " " + order_str
-
-        AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
-        AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
-        session = boto3.session.Session(aws_access_key_id=AWS_ACCESS_KEY_ID,
-                                        aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
-        client = session.client('athena', region_name='ap-southeast-2')
-        response = client.start_query_execution(
-            QueryString=athena_query,
-            # ClientRequestToken=g.user.email+'_'+str(time.time()),
-            QueryExecutionContext={
-                'Database': 'solar_radiation_hill'
-            },
-            ResultConfiguration={
-                'OutputLocation': 's3://colin-query-test/' + g.user.email,
-                # 'EncryptionConfiguration': {
-                #     'EncryptionOption': 'SSE_S3',
-                #     'KmsKey': 'string'
-                # }
-            },
-        )
-
-        # self.send_email(g.user, address_name)
-        # print(response['QueryExecutionId'])
-        form_data = get_form_data()[0]
-        args = {'action': 'saveas',
-                'slice_name': address_name + '_' + form_data['startDate'] + '_' +
-                              form_data['endDate'] + '_' + type + '_' + resolution}
-        datasource = ConnectorRegistry.get_datasource(
-            form_data['datasource_type'], form_data['datasource_id'], db.session)
-        self.save_or_overwrite_solarbislice(args, None, True, None, False, form_data['datasource_id'],
-                                         form_data['datasource_type'], datasource.name,
-                                         query_id=response['QueryExecutionId'], start_date=form_data['startDate'],
-                                         end_date=form_data['endDate'], data_type=type, resolution=resolution)
-
-        return json_success(json.dumps({'query_id': response['QueryExecutionId']}))
+            if subscription.remain_count <= 0:
+                return json_error_response("You cannot request any more data.")
+            else:
+                subscription.remain_count = subscription.remain_count - 1
+                self.appbuilder.get_session.commit()
+            return json_success(json.dumps({'query_id': response['QueryExecutionId']}))
+        except Exception:
+            return json_error_response("Request failed.")
 
     @event_logger.log_this
     @has_access
