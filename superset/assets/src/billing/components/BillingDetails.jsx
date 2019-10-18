@@ -123,16 +123,22 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
               <thead>
                 <tr>
                   <th>INVOICE #</th>
-                  <th>DATE</th>
+                  <th>UTC DATE</th>
                   <th />
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>19290839</td>
-                  <td>24/03/2019</td>
-                  <td><i style={{ color: '#024067' }} className="fas fa-cloud-download-alt" /></td>
-                </tr>
+                {billing.invoice_list.map(item => (
+                  <tr>
+                    <td>{item.invoice_id}</td>
+                    <td>{item.date}</td>
+                    <td>
+                      <a href={item.link}>
+                        <i style={{ color: '#024067' }} className="fas fa-cloud-download-alt" />
+                      </a>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

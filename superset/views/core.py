@@ -782,7 +782,8 @@ class SolarBIBillingView(ModelView):
         cus_address = cus_obj.address
 
         cus_invoices = stripe.Invoice.list(customer=cus_obj['id'])
-        cus_invoices = list( {'invoice_id':invoice['id'], 'date':datetime.utcfromtimestamp(invoice['created']),
+        cus_invoices = list( {'invoice_id':invoice['id'],
+                              'date': datetime.utcfromtimestamp(invoice['created']).strftime("%d/%m/%Y"),
                               'link': invoice['invoice_pdf']} for invoice in cus_invoices)
 
         entry_point = 'billing'

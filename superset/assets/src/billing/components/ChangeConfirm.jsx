@@ -54,7 +54,7 @@ function ChangeConfirm({ planId, openCC, handleCloseCC, changePlan, billing }) {
             Cancel
           </Button>
           {billing.plan_change === 'changing' ?
-            (<img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />) :
+            (<div style={{ width: 70 }}><img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" /></div>) :
             (<Button onClick={handleSubmit} color="primary" className={classes.button}>Confirm</Button>)
           }
         </DialogActions>
