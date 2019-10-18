@@ -129,7 +129,7 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
               </thead>
               <tbody>
                 {billing.invoice_list.map(item => (
-                  <tr>
+                  <tr key={item.invoice_id}>
                     <td>{item.invoice_id}</td>
                     <td>{item.date}</td>
                     <td>

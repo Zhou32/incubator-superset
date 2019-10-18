@@ -973,8 +973,8 @@ class SolarBIBillingView(ModelView):
             self.appbuilder.get_session.commit()
             if event.type == 'invoice.payment_succeeded':
                 # print(event)
-                self.renew(event['data']['object']
-            elif event.type ==
+                self.renew(event['data']['object'])
+            # elif event.type ==
         return Response(status=200)
 
 appbuilder.add_view(
@@ -2130,7 +2130,7 @@ class Superset(BaseSupersetView):
         # if not paid:
         #     msg = _("Your quick result record for [{}] has been saved.").format(slc.slice_name)
         if paid:
-            msg = _("A confirmation email has been sent to you. This record is also saved below.").format(slc.slice_name)
+            msg = _("Success! A confirmation email has been sent to you. This record is also saved below.").format(slc.slice_name)
         session.add(slc)
         session.commit()
         if paid:
