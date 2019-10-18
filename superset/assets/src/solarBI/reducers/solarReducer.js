@@ -120,6 +120,25 @@ export default function (state = {}, action) {
         sending: false,
       };
     },
+    [actions.START_TRIAL_START]() {
+      return {
+        ...state,
+        start_trial: 'starting',
+      };
+    },
+    [actions.START_TRIAL_SUCCESS]() {
+      return {
+        ...state,
+        start_trial: 'success',
+        // count: action.res.count,
+      };
+    },
+    [actions.START_TRIAL_FAIL]() {
+      return {
+        ...state,
+        start_trial: 'fail',
+      };
+    },
   };
 
   if (action.type in actionHandlers) {

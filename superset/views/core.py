@@ -941,7 +941,7 @@ class SolarBIBillingView(ModelView):
             team_sub.plan = starter_plan.id
             team_sub.end_time = subscription['current_period_end']
             self.appbuilder.get_session.commit()
-            return json_success({'msg':'Start trial successfully! You have 14 days to use 7 advance searches.'})
+            return json_success({'msg': 'Start trial successfully! You have 14 days to use 7 advance searches.'})
         except ValueError as e:
             return json_error_response(e)
         except Exception as e:

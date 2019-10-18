@@ -223,9 +223,9 @@ export function startTrialStart() {
   return { type: START_TRIAL_START };
 }
 
-export const START_TRIAL_SUCESS = 'START_TRIAL_SUCESS';
+export const START_TRIAL_SUCCESS = 'START_TRIAL_SUCCESS';
 export function startTrialSuccess(data) {
-  return { type: START_TRIAL_SUCESS, data };
+  return { type: START_TRIAL_SUCCESS, data };
 }
 
 export const START_TRIAL_FAIL = 'START_TRIAL_FAIL';

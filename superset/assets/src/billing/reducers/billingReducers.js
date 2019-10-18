@@ -48,7 +48,7 @@ export default function (state = {}, action) {
         detail_change: 'changing',
       };
     },
-    [actions.CHANGE_BILLING_DETAIL_SUCCESSDED]() {
+    [actions.CHANGE_BILLING_DETAIL_SUCCEDED]() {
       return {
         ...state,
         detail_change: 'success',
