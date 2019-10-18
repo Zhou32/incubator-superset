@@ -35,7 +35,7 @@ const theme = createMuiTheme({
   },
   palette: {
     primary: {
-      main: '#489795',
+      main: '#0063B0',
     },
   },
 });
@@ -101,7 +101,7 @@ class GoBackModal extends React.Component {
               className={classes.title}
               id="form-dialog-title"
             >
-              Not Save Warning
+              Data Not Saved
             </DialogTitle>
             <DialogContent>
               <DialogContentText style={{ fontSize: '1.2em' }}>

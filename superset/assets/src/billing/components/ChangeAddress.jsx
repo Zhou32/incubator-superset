@@ -201,11 +201,11 @@ function ChangeAddress({
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClick} color="primary" className={classes.button}>
-            Change
-          </Button>
           <Button onClick={handleChangeAddressClose} color="primary" className={classes.button}>
             Cancel
+          </Button>
+          <Button onClick={handleClick} color="primary" className={classes.button}>
+            Change
           </Button>
         </DialogActions>
       </Dialog>

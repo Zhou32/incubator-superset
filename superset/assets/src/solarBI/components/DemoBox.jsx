@@ -41,7 +41,7 @@ const styles = tm => ({
     border: 'none',
     backgroundColor: '#EDEEEF',
     borderRadius: 10,
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#0063B0',
     '&:hover': {
@@ -88,7 +88,7 @@ const styles = tm => ({
   introLarge: {
     width: 260,
     marginTop: 30,
-    fontSize: 14,
+    fontSize: 16,
     color: '#0063B0',
   },
   introSmall: {
@@ -132,34 +132,38 @@ class DemoBox extends React.Component {
         >
           <div className={classes.demo}>
             <Button className={classes.button}>
-              NSW
+             Search
+            </Button>
+            <p className={isSmallScreen ? classes.introSmall : classes.introLarge} >
+              Search for any address, <br /> suburb or region
+               in Australia
+            </p>
+          </div>
+
+          {isSmallScreen ? null : <div className={classes.vl} />}
+          <div className={classes.demo}>
+            <Button className={classes.button}>
+             Quick Result
+
             </Button>
             <p className={isSmallScreen ? classes.introSmall : classes.introLarge}>
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s.
+             We look for the closest point <br />
+             to your seach and give you <br />
+             12 months of data
             </p>
           </div>
           {isSmallScreen ? null : <div className={classes.vl} />}
           <div className={classes.demo}>
             <Button className={classes.button}>
-              VIC
+              Get More Data
             </Button>
             <p className={isSmallScreen ? classes.introSmall : classes.introLarge}>
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s.
-            </p>
-          </div>
-          {isSmallScreen ? null : <div className={classes.vl} />}
-          <div className={classes.demo}>
-            <Button className={classes.button}>
-              QLD
-            </Button>
-            <p className={isSmallScreen ? classes.introSmall : classes.introLarge}>
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s.
+             Go deeper and define type, <br />
+             timeframe and resolution <br />
+             Your .CSV export will wait on <br />
+             <br />
+              <a className={classes.saved} href="/solar/list">My Data</a>
+
             </p>
           </div>
         </CardContent>

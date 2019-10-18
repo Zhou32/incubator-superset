@@ -179,7 +179,7 @@ class SaveModal extends React.Component {
               className={classes.title}
               id="form-dialog-title"
             >
-              Save Chart
+              Save Search
             </DialogTitle>
             <DialogContent>
               <DialogContentText style={{ fontSize: '1.2em' }}>
