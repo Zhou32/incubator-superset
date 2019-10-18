@@ -54,7 +54,7 @@ import simplejson as json
 from sqlalchemy import and_, or_, select
 from werkzeug.routing import BaseConverter
 from ..solar.forms import SolarBIListWidget
-from ..solar.models import Plan, TeamSubscription, Team
+from ..solar.models import Plan, TeamSubscription, Team, StripeEvent
 
 from superset import (
     app,
@@ -432,7 +432,7 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
     )
     list_columns = [
         'slice_link', 'creator', 'modified', 'view_slice_name', 'view_slice_link', 'slice_query_id',
-        'slice_download_link'
+        'slice_download_link', 'slice_id'
     ]
     edit_columns = [
         "slice_name",
@@ -782,6 +782,11 @@ class SolarBIBillingView(ModelView):
         cus_email = cus_obj.email
         cus_address = cus_obj.address
 
+        cus_invoices = stripe.Invoice.list(customer=cus_obj['id'])
+        cus_invoices = list( {'invoice_id':invoice['id'],
+                              'date': datetime.utcfromtimestamp(invoice['created']).strftime("%d/%m/%Y"),
+                              'link': invoice['invoice_pdf']} for invoice in cus_invoices)
+
         entry_point = 'billing'
         payload = {
             'user': bootstrap_user_data(g.user),
@@ -790,6 +795,7 @@ class SolarBIBillingView(ModelView):
             'cus_info': {'cus_name': cus_name, 'cus_email': cus_email, 'cus_address': cus_address},
             'pm_id': team.stripe_pm_id,
             'plan_id': plan.stripe_id,
+            'invoice_list':cus_invoices,
         }
 
         return self.render_template(
@@ -799,8 +805,6 @@ class SolarBIBillingView(ModelView):
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
         )
 
-    #TODO endpoint for changing plan
-    @event_logger.log_this
     @api
     @handle_api_exception
     @expose('/change_plan/<plan_id>/', methods=['GET', 'POST'])
@@ -813,21 +817,34 @@ class SolarBIBillingView(ModelView):
             stripe_customer = stripe.Customer.retrieve(id=team.stripe_user_id)
 
             change_pm = False
-            pm_id = None
+            pm_id = team.stripe_pm_id
             if stripe_customer.default_source is None:
                 form_data = get_form_data()[0]['token']
                 stripe.Customer.modify(stripe_customer.stripe_id, source=form_data['id'])
                 pm_id = form_data['card']['id']
                 change_pm = True
 
-            subscription = stripe_customer['subscriptions']['data'][0]
-            new_sub = stripe.Subscription.modify(subscription.stripe_id, cancel_at_period_end=True,
-                                       items=[{'id':subscription['items']['data'][0].id, 'plan':plan_id}])
-            self.update_plan(team.id, plan_id, change_pm=change_pm, pm_id=pm_id)
+            (result, id) = self.update_plan(team.id, plan_id, change_pm=change_pm, pm_id=pm_id)
 
-            return json_success(json.dumps({'msg': 'Change plan success!', 'plan_id': plan_id, 'pm_id': pm_id}))
+            if result:
+                return json_success(json.dumps({'msg': 'Change plan success!', 'plan_id': id, 'pm_id': pm_id}))
+            else:
+                raise Exception('Update plan unsuccessful')
         except Exception as e:
             logging.error(e)
+            return json_error_response('Cannot change plan')
+
+    @api
+    @handle_api_exception
+    @expose('/change_billing_detail/<cus_id>/', methods=['POST'])
+    def change_billing_detail(self, cus_id):
+        if not g.user or not g.user.get_id():
+            return json_error_response('Incorrect call to endpoint')
+        form_data = get_form_data()[0]
+        _ = stripe.Customer.modify(cus_id, address={'country': form_data['country'], 'state': form_data['state'],
+                                                    'postal_code': form_data['postal_code'], 'city': form_data['city'],
+                                                    'line1': form_data['line1'], 'line2': form_data['line2']})
+        return json_success(json.dumps({'msg': 'Successfully changed billing detail!'}))
 
     def update_plan(self, team_id, plan_stripe_id, change_pm=False, pm_id=None):
         try:
@@ -838,23 +855,128 @@ class SolarBIBillingView(ModelView):
 
             '''Update team subscription, and reduce used '''
             team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(team=team.id).first()
-            print(team_sub.id)
+
             old_plan = self.appbuilder.get_session.query(Plan).filter_by(id=team_sub.plan).first()
             new_plan = self.appbuilder.get_session.query(Plan).filter_by(stripe_id=plan_stripe_id).first()
-            print(new_plan.id)
-            old_count = team_sub.remain_count
-            new_count = old_plan.num_request - old_count + new_plan.num_request
-            team_sub.remain_count = new_count if new_count >= 0 else 0
-            team_sub.plan = new_plan.id
+
+            current_subscription = stripe.Subscription.retrieve(team_sub.stripe_sub_id)
+            #If upgrade plan, take effect immediately
+            if new_plan.id > old_plan.id:
+                logging.info(f'Upgrading team {team.team_name} from {old_plan.stripe_id} to {new_plan.stripe_id}')
+                old_count = team_sub.remain_count
+
+                # If upgrading from paid plan to higher paid plan, cannot trigger payment succeeded event as it will be
+                # on next billing cycle. Since the customer has successfully paid before, assume the card is still valid,
+                # upgrade plan immediately
+                if old_plan.id != 1:
+                    logging.info('Customer paid before, upgrade immediately, prorate to next billing cycle')
+                    team_sub.remain_count = old_count + new_plan.num_request - old_plan.num_request
+                    team_sub.plan = new_plan.id
+
+                # Otherwise if upgrade from free to paid, then will trigger payment event, wait for event and let webhook
+                # upgrade the plan
+                else:
+                    logging.info('Customer new to paid plan, will upgrade after payment succeeded')
+
+
+                sub_list = stripe.Subscription.list(customer=team.stripe_user_id)
+                if len(sub_list['data']) ==2:
+                    logging.info(f'Team {team.team_name} has downgraded before')
+                    for sub in sub_list['data']:
+                        if sub['id'] != current_subscription.stripe_id:
+                            stripe.Subscription.delete(sub['id'])
+
+                new_sub = stripe.Subscription.modify(current_subscription.stripe_id, cancel_at_period_end=False,
+                                                     items=[{'id': current_subscription['items']['data'][0].id, 'plan': plan_stripe_id}])
+                return_subscription_id = new_plan.stripe_id
+            elif new_plan.id < old_plan.id:
+                # get subscribe list for the team
+                sub_list = stripe.Subscription.list(customer=team.stripe_user_id)
+                # Set current subscribe to cancel at period end
+                old_sub = stripe.Subscription.modify(current_subscription.stripe_id, cancel_at_period_end=True)
+                # Record current period end and will be used as start for next plan
+                period_end = old_sub['current_period_end']
+                # Delete other plan if has more than one plan, which means downgraded before
+                if len(sub_list['data']) ==2:
+                    logging.info(f'Team {team.team_name} has downgraded before')
+                    for sub in sub_list['data']:
+                        if sub['id'] != current_subscription.stripe_id:
+                            stripe.Subscription.delete(sub['id'])
+                # Create new plan with trail end at beginning of next period
+                new_sub = stripe.Subscription.create(customer=team.stripe_user_id, trial_end=period_end, items=[{
+                    'plan':new_plan.stripe_id,
+                    'quantity':'1',
+                }])
+                return_subscription_id = old_plan.stripe_id
             self.appbuilder.get_session.commit()
+            return True, return_subscription_id
         except Exception as e:
             self.appbuilder.get_session.rollback()
             logging.error(e)
+            return False, None
 
     #TODO for future, endpoint for on demmand payment
     def on_demand_pay(self):
         pass
 
+    #TODO handle invoice.payment_succeeded event, update remain counts accordingly
+    def renew(self, event_object):
+        paid_list = event_object['lines']['data']
+
+        # Check lines on the paid list
+        if len(paid_list) > 1:
+            logging.info('Contains more than one items in the invoice')
+            for item in paid_list:
+                logging.info(f'Customer {event_object["customer_name"]} Item {item["plan"]["nickname"]}')
+
+        try:
+            stripe_plan = paid_list[0]
+            local_plan = self.appbuilder.get_session.query(Plan).filter_by(stripe_id=stripe_plan["plan"]['id']).first()
+
+            # Fetch team_subscription by the subscription on invoice
+            team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(stripe_sub_id=stripe_plan['subscription']).first()
+
+            # Set subscribed plan to the plan on the invoice, and reset remain count
+            # This event should happen only when customer upgrade to paid from free for the first time and paid upfront,
+            # or at the start of new billing cycle. So it is safe to reset.
+            team_sub.plan = local_plan.id
+            team_sub.remain_count = local_plan.num_search
+            team_sub.end_time = stripe_plan['period']['end']
+            self.appbuilder.get_session.commit()
+        except Exception as e:
+            self.appbuilder.get_session.rollback()
+            logging.error(e)
+
+    @api
+    @expose('/webhook', methods=['POST'])
+    def webhook(self):
+        body = request.data
+        try:
+            event = stripe.Event.construct_from(
+                json.loads(body), stripe.api_key
+            )
+        except ValueError as e:
+            logging.warning(e)
+            return Response(status=400)
+        print(event.type)
+
+        log = self.appbuilder.get_session.query(StripeEvent).filter_by(id=event['id']).first()
+        if log is not None:
+            logging.info('Duplicate event received: {}'.format(log.id))
+        else:
+            #need to log events by id
+            log = StripeEvent()
+            log.id = event.id
+            log.Date = datetime.utcfromtimestamp(event['created'])
+            log.Type = event.type
+            log.Object = str(event['data']['object'])
+            self.appbuilder.get_session.add(log)
+            self.appbuilder.get_session.commit()
+            if event.type == 'invoice.payment_succeeded':
+                # print(event)
+                self.renew(event['data']['object'])
+            # elif event.type ==
+        return Response(status=200)
 
 appbuilder.add_view(
     SolarBIBillingView,
@@ -2007,13 +2129,14 @@ class Superset(BaseSupersetView):
 
     def save_slice(self, slc, paid=False):
         session = db.session()
-        if not paid:
-            msg = _("Your quick result record for [{}] has been saved.").format(slc.slice_name)
-        else:
-            msg = _("A confirmation email has been sent to you. This record is also saved below.").format(slc.slice_name)
+        # if not paid:
+        #     msg = _("Your quick result record for [{}] has been saved.").format(slc.slice_name)
+        if paid:
+            msg = _("Success! A confirmation email has been sent to you. This record is also saved below.").format(slc.slice_name)
         session.add(slc)
         session.commit()
-        flash(msg, "info")
+        if paid:
+            flash(msg, "info")
 
     def overwrite_slice(self, slc):
         session = db.session()

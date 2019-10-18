@@ -42,6 +42,24 @@ export default function (state = {}, action) {
         plan_change: 'fail',
       };
     },
+    [actions.CHANGE_BILLING_DETAIL_STARTED]() {
+      return {
+        ...state,
+        detail_change: 'changing',
+      };
+    },
+    [actions.CHANGE_BILLING_DETAIL_SUCCESSDED]() {
+      return {
+        ...state,
+        detail_change: 'success',
+      };
+    },
+    [actions.CHANGE_BILLING_DETAIL_FAILED]() {
+      return {
+        ...state,
+        detail_change: 'fail',
+      };
+    },
   };
 
   if (action.type in actionHandlers) {

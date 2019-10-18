@@ -53,37 +53,37 @@ function Plan({ billing, changePlanConnect }) {
         <h1 id="select-plan">Select Plan</h1>
         <div className="plan-option-pane">
           <div className="option-name"><i className="fas fa-list-ul" /><span>Free</span></div>
-          <div className="option-description">On demand you will be charge every new downloadable data set</div>
+          <div className="option-description">You can have unlimited search but cannot request any dataset.</div>
           <div className="option-submit">
-            <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('01')} disabled={billing.plan_id === '00'}>
-              {billing.plan_id === '00' ? 'Current' : 'Chooose'}
+            <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('00')} disabled={billing.plan_id === '00'}>
+              {billing.plan_id === '00' ? 'Current' : 'Choose'}
             </Button>
           </div>
         </div>
         <div className="plan-option-pane">
           <div className="option-name"><i className="fas fa-hotel" /><span>Starter</span></div>
-          <div className="option-description">$100 Increases for upto 3 new download data sets</div>
+          <div className="option-description">$19 You can have unlimited search plus 7 requested dataset.</div>
           <div className="option-submit">
             <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('01')} disabled={billing.plan_id === '01'}>
-              {billing.plan_id === '01' ? 'Current' : 'Chooose'}
+              {billing.plan_id === '01' ? 'Current' : 'Choose'}
             </Button>
           </div>
         </div>
         <div className="plan-option-pane">
           <div className="option-name"><i className="fas fa-project-diagram" /><span>Medium</span></div>
-          <div className="option-description">$1000 month flat fee for all the downloads you can do !</div>
+          <div className="option-description">$29 You can have unlimited search plus 15 requested dataset.</div>
           <div className="option-submit">
             <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('02')} disabled={billing.plan_id === '02'}>
-              {billing.plan_id === '02' ? 'Current' : 'Chooose'}
+              {billing.plan_id === '02' ? 'Current' : 'Choose'}
             </Button>
           </div>
         </div>
         <div className="plan-option-pane">
           <div className="option-name"><i className="fas fa-project-diagram" /><span>Advance</span></div>
-          <div className="option-description">$1000 month flat fee for all the downloads you can do !</div>
+          <div className="option-description">$49 You can have unlimited search plus 30 requested dataset.</div>
           <div className="option-submit">
             <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('03')} disabled={billing.plan_id === '03'}>
-              {billing.plan_id === '03' ? 'Current' : 'Chooose'}
+              {billing.plan_id === '03' ? 'Current' : 'Choose'}
             </Button>
           </div>
         </div>

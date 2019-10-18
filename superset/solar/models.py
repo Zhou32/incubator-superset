@@ -93,9 +93,17 @@ class TeamSubscription(Model):
     plan = Column('plan_id', Integer, ForeignKey('ab_plan.id'), nullable=False)
     remain_count = Column(Integer, default=0)
     stripe_sub_id = Column(String(64))
+    end_time = Column(Integer)
 
 
 class SolarBIUser(User):
     __tablename__ = 'ab_user'
     email_confirm = Column(Boolean, default=False)
     __table_args__ = {'extend_existing': True}
+
+class StripeEvent(Model):
+    __tablename__ = 'stripe_event'
+    id = Column(String(64), primary_key=True)
+    Type = Column(String(64))
+    Date = Column(DateTime)
+    Object = Column(String(10000))

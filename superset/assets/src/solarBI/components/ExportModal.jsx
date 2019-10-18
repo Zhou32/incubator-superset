@@ -684,7 +684,7 @@ class ExportModal extends React.Component {
                         }}
                       />
                     </div> */}
-                    <div>
+                    <div style={{ marginTop: 50 }}>
                       <Button
                         className={classNames(classes.button, classes.closeBtn)}
                         disabled={solarBI.sending}
@@ -695,7 +695,7 @@ class ExportModal extends React.Component {
                       </Button>
                       {solarBI.sending ?
                         (<img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />) :
-                        (<Button className={classNames(classes.button, classes.requestBtn)} onClick={this.handleRequestData} color="primary" disabled={solarBI.remain_count === 0}>Pay</Button>)
+                        (<Button className={classNames(classes.button, classes.requestBtn)} onClick={this.handleRequestData} color="primary" disabled={solarBI.remain_count === 0}>REQUEST</Button>)
                       }
                     </div>
                     <p className={classes.remainCount}>

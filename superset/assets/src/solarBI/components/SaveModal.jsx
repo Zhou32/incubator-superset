@@ -126,7 +126,7 @@ class SaveModal extends React.Component {
     this.setState({ addToDash: dash });
   }
 
-  saveOrOverwrite(gotodash) {
+  saveOrOverwrite() {
     this.setState({ alert: false });
     const sliceParams = {};
 
@@ -146,15 +146,14 @@ class SaveModal extends React.Component {
       sliceParams.slice_name = this.props.slice.slice_name;
     }
 
-    this.props
-      .saveSolarData(this.props.form_data, sliceParams)
-      .then(() => {
-        // Go to new slice url or dashboard url
-        if (gotodash) {
-          // window.location = data.slice.slice_url;
-          window.location = '/solar/list';
-        }
-      });
+    this.props.saveSolarData(this.props.form_data, sliceParams);
+    // .then(() => {
+    //   // Go to new slice url or dashboard url
+    //   if (gotodash) {
+    //     // window.location = data.slice.slice_url;
+    //     window.location = '/solar/list';
+    //   }
+    // });
     this.props.onHide();
   }
 
@@ -180,11 +179,11 @@ class SaveModal extends React.Component {
               className={classes.title}
               id="form-dialog-title"
             >
-              Save Chart
+              Save Search
             </DialogTitle>
             <DialogContent>
               <DialogContentText style={{ fontSize: '1.2em' }}>
-                To save the chart, please enter a name here.
+                Save the current search into My Data.
               </DialogContentText>
               <TextField
                 error={this.state.alert}
@@ -209,17 +208,17 @@ class SaveModal extends React.Component {
             <DialogActions>
               <Button
                 className={classes.button}
-                onClick={() => this.saveOrOverwrite(true)}
-                color="primary"
-              >
-                Save
-              </Button>
-              <Button
-                className={classes.button}
                 onClick={this.handleClose}
                 color="primary"
               >
                 Cancel
+              </Button>
+              <Button
+                className={classes.button}
+                onClick={() => this.saveOrOverwrite()}
+                color="primary"
+              >
+                Save
               </Button>
             </DialogActions>
           </Dialog>

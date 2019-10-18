@@ -22,7 +22,7 @@
 Contributions are welcome and are greatly appreciated! Every
 little bit helps, and credit will always be given.
 
-## Table of Contents
+## Table of Contentscd  
 
 - [Types of Contributions](#types-of-contributions)
   - [Report Bugs](#report-bugs)
