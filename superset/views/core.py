@@ -54,7 +54,7 @@ import simplejson as json
 from sqlalchemy import and_, or_, select
 from werkzeug.routing import BaseConverter
 from ..solar.forms import SolarBIListWidget
-from ..solar.models import Plan, TeamSubscription, Team
+from ..solar.models import Plan, TeamSubscription, Team, StripeEvent
 
 from superset import (
     app,
@@ -834,7 +834,7 @@ class SolarBIBillingView(ModelView):
 
     @api
     @handle_api_exception
-    @expose('/change_billing_detail/<cus_id>/', methods=['GET', 'POST'])
+    @expose('/change_billing_detail/<cus_id>/', methods=['POST'])
     def change_billing_detail(self, cus_id):
         if not g.user or not g.user.get_id():
             return json_error_response('Incorrect call to endpoint')
@@ -887,7 +887,7 @@ class SolarBIBillingView(ModelView):
                 new_sub = stripe.Subscription.modify(current_subscription.stripe_id, cancel_at_period_end=False,
                                                      items=[{'id': current_subscription['items']['data'][0].id, 'plan': plan_stripe_id}])
                 return_subscription_id = new_plan.stripe_id
-            else:
+            elif new_plan.id < old_plan.id:
                 # get subscribe list for the team
                 sub_list = stripe.Subscription.list(customer=team.stripe_user_id)
                 # Set current subscribe to cancel at period end
@@ -929,17 +929,17 @@ class SolarBIBillingView(ModelView):
 
         try:
             stripe_plan = paid_list[0]
-            local_plan = self.appbuilder.get_session.query(Plan).filter_by(stripe_id=stripe_plan["plan"]['id'])
+            local_plan = self.appbuilder.get_session.query(Plan).filter_by(stripe_id=stripe_plan["plan"]['id']).first()
 
             # Fetch team_subscription by the subscription on invoice
-            team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(stripe_sub_id=stripe_plan['subscription'])
+            team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(stripe_sub_id=stripe_plan['subscription']).first()
 
             # Set subscribed plan to the plan on the invoice, and reset remain count
             # This event should happen only when customer upgrade to paid from free for the first time and paid upfront,
             # or at the start of new billing cycle. So it is safe to reset.
             team_sub.plan = local_plan.id
             team_sub.remain_count = local_plan.num_search
-
+            team_sub.end_time = stripe_plan['period']['end']
             self.appbuilder.get_session.commit()
         except Exception as e:
             self.appbuilder.get_session.rollback()
@@ -958,10 +958,22 @@ class SolarBIBillingView(ModelView):
             return Response(status=400)
         print(event.type)
 
-        # TODO need to log events by id, and request id
-        if event.type == 'invoice.payment_succeeded':
-            # print(event)
-            self.renew(event['data']['object'])
+        log = self.appbuilder.get_session.query(StripeEvent).filter_by(id=event['id']).first()
+        if log is not None:
+            logging.info('Duplicate event received: {}'.format(log.id))
+        else:
+            #need to log events by id
+            log = StripeEvent()
+            log.id = event.id
+            log.Date = datetime.utcfromtimestamp(event['created'])
+            log.Type = event.type
+            log.Object = str(event['data']['object'])
+            self.appbuilder.get_session.add(log)
+            self.appbuilder.get_session.commit()
+            if event.type == 'invoice.payment_succeeded':
+                # print(event)
+                self.renew(event['data']['object']
+            elif event.type ==
         return Response(status=200)
 
 appbuilder.add_view(
