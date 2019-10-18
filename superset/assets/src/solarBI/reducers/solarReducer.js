@@ -117,6 +117,7 @@ export default function (state = {}, action) {
       return {
         ...state,
         requestStatus: 'failed',
+        sending: false,
       };
     },
   };
