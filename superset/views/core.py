@@ -920,7 +920,7 @@ class SolarBIBillingView(ModelView):
     def on_demand_pay(self):
         pass
 
-    @expose('/trial/<usr_id>/', method=['POST'])
+    @expose('/start_trial/<usr_id>/', methods=['POST'])
     def start_trial(self):
         try:
             team = self.appbuilder.sm.find_team(user_id=g.user.id)

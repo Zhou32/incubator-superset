@@ -700,6 +700,7 @@ class ExportModal extends React.Component {
                     </div>
                     <p className={classes.remainCount}>
                       * Remaining request(s): {solarBI.remain_count}
+                      <a>Start trial</a>
                     </p>
                   </Container>
                 </CardContent>
