@@ -926,6 +926,7 @@ class SolarBIBillingView(ModelView):
 
     @expose('/start_trial/', methods=['POST'])
     def start_trial(self):
+        flag = False
         for role in g.user.roles:
             if 'team_owner' in role.name:
                 flag = True
@@ -949,12 +950,12 @@ class SolarBIBillingView(ModelView):
                 team_sub.plan = starter_plan.id
                 team_sub.end_time = subscription['current_period_end']
                 self.appbuilder.get_session.commit()
-                return json_success({'msg':'Start trial successfully! You have 14 days to use 7 advance searches.',
+                return json_success({'msg': 'Start trial successfully! You have 14 days to use 7 advance searches.',
                                      'remain_count': starter_plan.num_request})
             except ValueError as e:
                 return json_error_response(e)
             except Exception as e:
-                return json_error_response('Cannot start trial.')
+                return json_error_response('Cannot start trial. Error: ' + str(e))
         else:
             return json_error_response('Cannot start trial for non-owner role.')
 
@@ -979,7 +980,7 @@ class SolarBIBillingView(ModelView):
             # This event should happen only when customer upgrade to paid from free for the first time and paid upfront,
             # or at the start of new billing cycle. So it is safe to reset.
             team_sub.plan = local_plan.id
-            team_sub.remain_count = local_plan.num_search
+            team_sub.remain_count = local_plan.num_request
             team_sub.end_time = stripe_plan['period']['end']
             self.appbuilder.get_session.commit()
         except Exception as e:

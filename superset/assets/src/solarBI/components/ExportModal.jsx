@@ -538,6 +538,18 @@ class ExportModal extends React.Component {
   render() {
     const { classes, open, onHide, solarBI } = this.props;
     const { startDate, endDate, anchorEl } = this.state;
+    let remainCount = null;
+    if (solarBI.can_trial && solarBI.start_trial === 'starting') {
+      remainCount = <img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />;
+    } else if (solarBI.can_trial && solarBI.start_trial !== 'starting') {
+      remainCount = (<a
+        onClick={this.handleTrialClick}
+        className={classes.trialLink}
+      >
+        Start trial
+      </a>);
+    }
+
     const openAnchor = Boolean(anchorEl);
 
     return (
@@ -710,14 +722,7 @@ class ExportModal extends React.Component {
                     </div>
                     <p className={classes.remainCount}>
                       * Remaining request(s): {solarBI.remain_count}
-                      {solarBI.can_trial ?
-                        <a
-                          onClick={this.handleTrialClick}
-                          className={classes.trialLink}
-                        >
-                          Start trial
-                        </a> : null
-                      }
+                      {remainCount}
                     </p>
                   </Container>
                 </CardContent>
