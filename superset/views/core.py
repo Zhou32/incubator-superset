@@ -734,6 +734,10 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
         )
 
+    @app.errorhandler(404)
+    def page_not_found(e):
+        # note that we set the 404 status explicitly
+        return redirect("/")
 
 
 # appbuilder.add_view(
@@ -773,6 +777,7 @@ class SolarBIBillingView(ModelView):
     route_base = '/billing'
     datamodel = SQLAInterface(Plan)
 
+    @has_access
     @expose('/', methods=['GET', 'POST'])
     def billing(self):
         if not g.user or not g.user.get_id():

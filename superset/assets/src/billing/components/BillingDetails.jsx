@@ -106,6 +106,10 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
                   {billingValues.city === '' ? '' : billingValues.city + ','} {billingValues.state} {billingValues.postal_code}<br />
                   {billingValues.country}
                 </div>
+                <p style={{ marginTop: 10, fontSize: 13 }}>
+                  * Everytime you update your billing details,
+                  remember to click the Update details button below to effect.
+                </p>
               </div>
             </div>
           </div>
