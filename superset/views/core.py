@@ -941,7 +941,7 @@ class SolarBIBillingView(ModelView):
 
                 #TODO modify trial_end to trial_period_days=14 in live
                 utc_trial_end_ts = datetime.now().timestamp()
-                subscription = stripe.Subscription.modify(stripe_sub.stripe_id, trial_end=int(utc_trial_end_ts)+180, items=[{
+                subscription = stripe.Subscription.modify(stripe_sub.stripe_id, trial_end=int(utc_trial_end_ts)+300, items=[{
                     'id': stripe_sub['items']['data'][0].id,
                     'plan': starter_plan.stripe_id,
                 }])
@@ -950,8 +950,8 @@ class SolarBIBillingView(ModelView):
                 team_sub.plan = starter_plan.id
                 team_sub.end_time = subscription['current_period_end']
                 self.appbuilder.get_session.commit()
-                return json_success({'msg': 'Start trial successfully! You have 14 days to use 7 advance searches.',
-                                     'remain_count': starter_plan.num_request})
+                return json_success(json.dumps({'msg': 'Start trial successfully! You have 14 days to use 7 advance searches.',
+                                     'remain_count': starter_plan.num_request}))
             except ValueError as e:
                 return json_error_response(e)
             except Exception as e:
@@ -988,7 +988,27 @@ class SolarBIBillingView(ModelView):
             logging.error(e)
 
     def revert_to_free(self, event_object):
-        print(event_object)
+        try:
+            logging.info(event_object)
+            paid_list = event_object['lines']['data']
+            stripe_plan = paid_list[0]
+            free_plan = self.appbuilder.get_session.query(Plan).filter_by(id=1).first()
+            team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(stripe_sub_id=stripe_plan['subscription']).first()
+            logging.info('Downgrading stripe plan to free.')
+            stripe_sub = stripe.Subscription.retrieve(team_sub.stripe_sub_id)
+            stripe_sub = stripe.Subscription.modify(stripe_sub.stripe_id, items=[{
+                'id': stripe_sub['items']['data'][0].id,
+                'plan': free_plan.stripe_id,
+            }])
+            team_sub.plan = free_plan.id
+            team_sub.end_time = -1
+            team_sub.remain_count = 0
+            self.appbuilder.get_session.commit()
+        except Exception as e:
+            self.appbuilder.get_session.rollback()
+            logging.error(e)
+
+
 
     @api
     @expose('/webhook', methods=['POST'])
