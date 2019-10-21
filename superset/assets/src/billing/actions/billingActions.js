@@ -78,9 +78,9 @@ export function changeBillingDetailStarted() {
   return { type: CHANGE_BILLING_DETAIL_STARTED };
 }
 
-export const CHANGE_BILLING_DETAIL_SUCCESSDED = 'CHANGE_BILLING_DETAIL_SUCCESSDED';
+export const CHANGE_BILLING_DETAIL_SUCCEDED = 'CHANGE_BILLING_DETAIL_SUCCEDED';
 export function changeBillingDetailSuccedded(res) {
-  return { type: CHANGE_BILLING_DETAIL_SUCCESSDED, res };
+  return { type: CHANGE_BILLING_DETAIL_SUCCEDED, res };
 }
 
 export const CHANGE_BILLING_DETAIL_FAILED = 'CHANGE_BILLING_DETAIL_FAILED';

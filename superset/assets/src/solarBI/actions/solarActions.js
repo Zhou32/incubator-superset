@@ -217,3 +217,42 @@ export function requestSolarData(queryData, timeout = 60) {
       });
   };
 }
+
+export const START_TRIAL_START = 'START_TRIAL_START';
+export function startTrialStart() {
+  return { type: START_TRIAL_START };
+}
+
+export const START_TRIAL_SUCCESS = 'START_TRIAL_SUCCESS';
+export function startTrialSuccess(res) {
+  return { type: START_TRIAL_SUCCESS, res };
+}
+
+export const START_TRIAL_FAIL = 'START_TRIAL_FAIL';
+export function startTrialFail() {
+  return { type: START_TRIAL_FAIL };
+}
+
+export function startTrial(timeout = 60) {
+  return (dispatch) => {
+    const url = '/billing/start_trial/';
+    const controller = new AbortController();
+    const { signal } = controller;
+    dispatch(startTrialStart());
+
+    return SupersetClient.post({
+      url,
+      postPayload: {},
+      signal,
+      timeout: timeout * 1000,
+    })
+      .then(({ json }) => {
+        dispatch(startTrialSuccess(json));
+        dispatch(addSuccessToastAction(t(json.msg)));
+      })
+      .catch(() => {
+        dispatch(startTrialFail());
+        dispatch(addDangerToast(t('Start trial failed.')));
+      });
+  };
+}

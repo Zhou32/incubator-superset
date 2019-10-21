@@ -610,13 +610,18 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
         entry_point = 'solarBI'
 
         datasource_id = self.get_solar_datasource()
-
+        can_trial = False
+        for role in g.user.roles:
+            if 'team_owner' in role.name:
+                can_trial = True
+        can_trial = can_trial and not subscription.trial_used
         payload = {
             'user': bootstrap_user_data(g.user),
             'common': BaseSupersetView().common_bootstrap_payload(),
             'datasource_id': datasource_id,
             'datasource_type': 'table',
             'remain_count': subscription.remain_count,
+            'can_trial': can_trial,
         }
 
         return self.render_template(
@@ -730,6 +735,10 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
         )
 
+    @app.errorhandler(404)
+    def page_not_found(e):
+        # note that we set the 404 status explicitly
+        return redirect("/")
 
 
 # appbuilder.add_view(
@@ -769,6 +778,7 @@ class SolarBIBillingView(ModelView):
     route_base = '/billing'
     datamodel = SQLAInterface(Plan)
 
+    @has_access
     @expose('/', methods=['GET', 'POST'])
     def billing(self):
         if not g.user or not g.user.get_id():
@@ -921,32 +931,40 @@ class SolarBIBillingView(ModelView):
     def on_demand_pay(self):
         pass
 
-    @expose('/trial/<usr_id>/', methods=['POST'])
+    @expose('/start_trial/', methods=['POST'])
     def start_trial(self):
-        try:
-            team = self.appbuilder.sm.find_team(user_id=g.user.id)
-            team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(team=team.id)
-            if team_sub.trial_used:
-                raise ValueError('Already used trial.')
-            stripe_sub = stripe.Subscription.retrieve(team_sub.stripe_sub_id)
-            starter_plan = self.appbuilder.get_session.query(Plan).filter_by(id=2)
+        flag = False
+        for role in g.user.roles:
+            if 'team_owner' in role.name:
+                flag = True
+        if flag:
+            try:
+                team = self.appbuilder.sm.find_team(user_id=g.user.id)
+                team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(team=team.id).first()
+                if team_sub.trial_used:
+                    raise ValueError('Already used trial.')
+                stripe_sub = stripe.Subscription.retrieve(team_sub.stripe_sub_id)
+                starter_plan = self.appbuilder.get_session.query(Plan).filter_by(id=2).first()
 
-            #TODO modify trial_end to trial_period_days=14 in live
-            utc_trial_end_ts = (datetime.datetime.now() - datetime.timedelta(hours=11)).timestamp()
-            subscription = stripe.Subscription.modify(stripe_sub.stripe_id, trial_end=utc_trial_end_ts+300, items=[{
-                'id': stripe_sub['items']['data'][0].id,
-                'plan': starter_plan.stripe_id,
-            }])
-            
-            team_sub.remain_count = starter_plan.num_search
-            team_sub.plan = starter_plan.id
-            team_sub.end_time = subscription['current_period_end']
-            self.appbuilder.get_session.commit()
-            return json_success({'msg':'Start trial successfully! You have 14 days to use 7 advance searches.'})
-        except ValueError as e:
-            return json_error_response(e)
-        except Exception as e:
-            return json_error_response('Cannot start trial.')
+                #TODO modify trial_end to trial_period_days=14 in live
+                utc_trial_end_ts = datetime.now().timestamp()
+                subscription = stripe.Subscription.modify(stripe_sub.stripe_id, trial_end=int(utc_trial_end_ts)+300, items=[{
+                    'id': stripe_sub['items']['data'][0].id,
+                    'plan': starter_plan.stripe_id,
+                }])
+                team_sub.trial_used = True
+                team_sub.remain_count = starter_plan.num_request
+                team_sub.plan = starter_plan.id
+                team_sub.end_time = subscription['current_period_end']
+                self.appbuilder.get_session.commit()
+                return json_success(json.dumps({'msg': 'Start trial successfully! You have 14 days to use 7 advance searches.',
+                                     'remain_count': starter_plan.num_request}))
+            except ValueError as e:
+                return json_error_response(e)
+            except Exception as e:
+                return json_error_response('Cannot start trial. Error: ' + str(e))
+        else:
+            return json_error_response('Cannot start trial for non-owner role.')
 
     #TODO handle invoice.payment_succeeded event, update remain counts accordingly
     def renew(self, event_object):
@@ -969,7 +987,7 @@ class SolarBIBillingView(ModelView):
             # This event should happen only when customer upgrade to paid from free for the first time and paid upfront,
             # or at the start of new billing cycle. So it is safe to reset.
             team_sub.plan = local_plan.id
-            team_sub.remain_count = local_plan.num_search
+            team_sub.remain_count = local_plan.num_request
             team_sub.end_time = stripe_plan['period']['end']
             self.appbuilder.get_session.commit()
         except Exception as e:
@@ -977,7 +995,27 @@ class SolarBIBillingView(ModelView):
             logging.error(e)
 
     def revert_to_free(self, event_object):
-        print(event_object)
+        try:
+            logging.info(event_object)
+            paid_list = event_object['lines']['data']
+            stripe_plan = paid_list[0]
+            free_plan = self.appbuilder.get_session.query(Plan).filter_by(id=1).first()
+            team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(stripe_sub_id=stripe_plan['subscription']).first()
+            logging.info('Downgrading stripe plan to free.')
+            stripe_sub = stripe.Subscription.retrieve(team_sub.stripe_sub_id)
+            stripe_sub = stripe.Subscription.modify(stripe_sub.stripe_id, items=[{
+                'id': stripe_sub['items']['data'][0].id,
+                'plan': free_plan.stripe_id,
+            }])
+            team_sub.plan = free_plan.id
+            team_sub.end_time = -1
+            team_sub.remain_count = 0
+            self.appbuilder.get_session.commit()
+        except Exception as e:
+            self.appbuilder.get_session.rollback()
+            logging.error(e)
+
+
 
     @api
     @expose('/webhook', methods=['POST'])
@@ -3797,6 +3835,13 @@ class Superset(BaseSupersetView):
                 datasource.name)
 
         standalone = request.args.get('standalone') == 'true'
+        team = self.appbuilder.sm.find_team(user_id=g.user.id)
+        subscription = self.appbuilder.sm.get_subscription(team_id=team.id)
+        can_trial = False
+        for role in g.user.roles:
+            if 'team_owner' in role.name:
+                can_trial = True
+        can_trial = can_trial and not subscription.trial_used
         bootstrap_data = {
             'can_add': slice_add_perm,
             'can_download': slice_download_perm,
@@ -3809,6 +3854,8 @@ class Superset(BaseSupersetView):
             'user_id': user_id,
             'forced_height': request.args.get('height'),
             'common': self.common_bootstrap_payload(),
+            'remain_count': subscription.remain_count,
+            'can_trial': can_trial,
         }
         table_name = datasource.table_name \
             if datasource_type == 'table' \

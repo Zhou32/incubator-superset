@@ -41,7 +41,7 @@ import FormLabel from '@material-ui/core/FormLabel';
 // import InputAdornment from '@material-ui/core/InputAdornment';
 import Container from '@material-ui/core/Container';
 import SolarStepper from './SolarStepper';
-import { requestSolarData } from '../actions/solarActions';
+import { requestSolarData, startTrial } from '../actions/solarActions';
 
 const propTypes = {
   address: PropTypes.string.isRequired,
@@ -50,6 +50,7 @@ const propTypes = {
   open: PropTypes.bool.isRequired,
   onHide: PropTypes.func.isRequired,
   requestSolarData: PropTypes.func.isRequired,
+  startTrial: PropTypes.func.isRequired,
   solar_new: PropTypes.bool.isRequired,
 };
 
@@ -268,6 +269,10 @@ const styles = tm => ({
     lineHeight: '18px',
     textAlign: 'center',
   },
+  trialLink: {
+    marginLeft: 20,
+    color: '#0063B0',
+  },
   typeGroup: {
     flexDirection: 'row',
     width: '70%',
@@ -321,6 +326,7 @@ class ExportModal extends React.Component {
     this.handleRequestData = this.handleRequestData.bind(this);
     this.handleQuestionClick = this.handleQuestionClick.bind(this);
     this.handleQuestionClose = this.handleQuestionClose.bind(this);
+    this.handleTrialClick = this.handleTrialClick.bind(this);
     // this.calculateCost = this.calculateCost.bind(this);
     // this.dateDiff = this.dateDiff.bind(this);
     this.onUnload = this.onUnload.bind(this);
@@ -492,6 +498,10 @@ class ExportModal extends React.Component {
     this.setState({ anchorEl: null });
   }
 
+  handleTrialClick() {
+    this.props.startTrial();
+  }
+
   handleRequestData() {
     const sDate = new Date(this.state.startDate);
     const eDate = new Date(this.state.endDate);
@@ -528,6 +538,18 @@ class ExportModal extends React.Component {
   render() {
     const { classes, open, onHide, solarBI } = this.props;
     const { startDate, endDate, anchorEl } = this.state;
+    let remainCount = null;
+    if (solarBI.can_trial && solarBI.start_trial === 'starting') {
+      remainCount = <img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />;
+    } else if (solarBI.can_trial && solarBI.start_trial !== 'starting') {
+      remainCount = (<a
+        onClick={this.handleTrialClick}
+        className={classes.trialLink}
+      >
+        Start trial
+      </a>);
+    }
+
     const openAnchor = Boolean(anchorEl);
 
     return (
@@ -700,6 +722,7 @@ class ExportModal extends React.Component {
                     </div>
                     <p className={classes.remainCount}>
                       * Remaining request(s): {solarBI.remain_count}
+                      {remainCount}
                     </p>
                   </Container>
                 </CardContent>
@@ -721,6 +744,6 @@ const mapStateToProps = state => ({
 export default withStyles(styles)(
   connect(
     mapStateToProps,
-    { requestSolarData },
+    { requestSolarData, startTrial },
   )(ExportModal),
 );
