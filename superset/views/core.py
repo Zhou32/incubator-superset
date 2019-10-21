@@ -609,6 +609,7 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
         entry_point = 'solarBI'
 
         datasource_id = self.get_solar_datasource()
+        can_trial = False
         for role in g.user.roles:
             if 'team_owner' in role.name:
                 can_trial = True
@@ -3827,6 +3828,13 @@ class Superset(BaseSupersetView):
                 datasource.name)
 
         standalone = request.args.get('standalone') == 'true'
+        team = self.appbuilder.sm.find_team(user_id=g.user.id)
+        subscription = self.appbuilder.sm.get_subscription(team_id=team.id)
+        can_trial = False
+        for role in g.user.roles:
+            if 'team_owner' in role.name:
+                can_trial = True
+        can_trial = can_trial and not subscription.trial_used
         bootstrap_data = {
             'can_add': slice_add_perm,
             'can_download': slice_download_perm,
@@ -3839,6 +3847,8 @@ class Superset(BaseSupersetView):
             'user_id': user_id,
             'forced_height': request.args.get('height'),
             'common': self.common_bootstrap_payload(),
+            'remain_count': subscription.remain_count,
+            'can_trial': can_trial,
         }
         table_name = datasource.table_name \
             if datasource_type == 'table' \

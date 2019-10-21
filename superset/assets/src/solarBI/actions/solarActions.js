@@ -250,9 +250,7 @@ export function startTrial(timeout = 60) {
         dispatch(startTrialSuccess(json));
         dispatch(addSuccessToastAction(t(json.msg)));
       })
-      // dispatch(addSuccessToast(t('Request confirmed! An email has been sent to you.')));
-      .catch(({ json }) => {
-        console.log(json);
+      .catch(() => {
         dispatch(startTrialFail());
         dispatch(addDangerToast(t('Start trial failed.')));
       });
