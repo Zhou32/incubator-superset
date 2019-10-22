@@ -137,9 +137,11 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
                     <td>{item.invoice_id}</td>
                     <td>{item.date}</td>
                     <td>
-                      <a href={item.link}>
-                        <i style={{ color: '#024067' }} className="fas fa-cloud-download-alt" />
-                      </a>
+                      {item.link !== null ?
+                        <a href={item.link}>
+                          <i style={{ color: '#024067' }} className="fas fa-cloud-download-alt" />
+                        </a> : 'Scheduled'
+                      }
                     </td>
                   </tr>
                 ))}
