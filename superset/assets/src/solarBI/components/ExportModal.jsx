@@ -540,7 +540,7 @@ class ExportModal extends React.Component {
     const { startDate, endDate, anchorEl } = this.state;
     let remainCount = null;
     if (solarBI.can_trial && solarBI.start_trial === 'starting') {
-      remainCount = <img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />;
+      remainCount = <img style={{ width: 30, marginLeft: 20 }} alt="Loading..." src="/static/assets/images/loading.gif" />;
     } else if (solarBI.can_trial && solarBI.start_trial !== 'starting') {
       remainCount = (<a
         onClick={this.handleTrialClick}
