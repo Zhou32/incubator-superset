@@ -19,6 +19,9 @@
 {% extends 'appbuilder/general/widgets/saved_base_list.html' %}
 {% import 'appbuilder/general/lib.html' as lib %}
 
+{% set is_team_owner = g.user.roles[0].name == 'team_owner' %}
+
+
 <link href="{{url_for('static',filename='assets/stylesheets/solarbi.less')}}?v=1.0" rel="stylesheet">
 
 {% block begin_title %}
@@ -97,7 +100,10 @@
                     {% else %}
                         {{ item['view_slice_name'] }}
                     {% endif %}
-                    <hr style="border-bottom: 1px solid #C7C9CB; width: 80px; margin: -10px auto 20px;">
+                    <hr style="border-bottom: 1px solid #C7C9CB; width: 80px; margin: -10px auto 10px;">
+                    {% if is_team_owner %}
+                        <h6>Saved by: {{ item['changed_by_name'] }}</h6>
+                    {% endif %}
                     <i class="fas fa-chart-pie my-data-pie"></i>
                     {{ item['view_slice_link'] }}
                 </div>

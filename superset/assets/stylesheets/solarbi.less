@@ -1132,6 +1132,13 @@ input {
 .list-container a {
   font-size: 22px;
 }
+.list-container h6 {
+  color: #0063B0 !important;
+  font-weight: bold;
+  font-size: 1.0em;
+  margin-bottom: 0;
+  font-family: 'Montserrat';
+}
 .list-card .delete-btn {
   position: absolute;
   top: 10px;
@@ -1290,7 +1297,7 @@ input {
 .team-card {
   font-family: 'Montserrat';
   padding: 25 50;
-  max-height: 400;
+  max-height: 480;
   overflow-y: auto;
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
   transition: 0.3s;
@@ -1340,6 +1347,26 @@ input {
   max-width: 300;
   overflow-x: scroll;
 }
+.search-invite {
+  width: 300px;
+  height: 30px; 
+  margin: auto;
+  padding-left: 25px
+}
+.search-invite-icon {
+  position: absolute;
+  left: 180px;
+  top: 7px;
+  color: grey;
+}
+.search-invite:focus + .search-invite-icon {
+  color: #0667A3;
+}
+.invites-table {
+  overflow-y: scroll;
+  max-height: 180px;
+  display: block;
+}
 .invite-status {
   border: 1px solid #CCC;
   border-radius: 20px;
@@ -1362,7 +1389,6 @@ input {
   border-radius: 10px;
   border: 1px solid #F65060;;
   color: #F65060;;
-
 }
 .user-info-card {
   font-family: 'Montserrat';
