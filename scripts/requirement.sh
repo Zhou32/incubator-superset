@@ -1,9 +1,9 @@
 upgrade_db=$1
 init_ss=$2
 
-cd ~/incubator-superset
+cd /home/ubuntu/incubator-superset
 
-. ~/incubator-superset/venv/bin/activate
+. /home/ubuntu/incubator-superset/venv/bin/activate
 python --version
 
 pip install -r requirements.txt
