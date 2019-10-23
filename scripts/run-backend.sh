@@ -7,6 +7,4 @@ export SMTP_PASSWORD=$2
 export STRIPE_SK=$3
 export STRIPE_PK=$4
 
-export FLASK_ENV=development
-nohup superset run -p 8088 --host 0.0.0.0 --with-threads --reload --debugger >> logs.txt 2>&1 &
-ps -aux
+celery worker --app=superset.sql_lab:celery_app --pool=gevent -Ofair & gunicorn --bind  0.0.0.0:8088 --workers $((2 * $(getconf _NPROCESSORS_ONLN) + 1))  --timeout 60 --limit-request-line 0 --limit-request-field_size 0 superset:app --log-level info --log-file logs.txt --capture-output
