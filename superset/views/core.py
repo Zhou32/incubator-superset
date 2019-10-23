@@ -896,7 +896,7 @@ class SolarBIBillingView(ModelView):
                         if sub['id'] != current_subscription.stripe_id:
                             stripe.Subscription.delete(sub['id'])
 
-                new_sub = stripe.Subscription.modify(current_subscription.stripe_id, cancel_at_period_end=False,
+                new_sub = stripe.Subscription.modify(current_subscription.stripe_id, cancel_at_period_end=False, trial_end='now',
                                                      items=[{'id': current_subscription['items']['data'][0].id, 'plan': plan_stripe_id}])
                 return_subscription_id = new_plan.stripe_id
             elif new_plan.id < old_plan.id:
