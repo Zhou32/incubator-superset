@@ -74,6 +74,10 @@
                 <div class="team-card">
                     <h3>Invites</h3>
                     <hr>
+                    <div style="position: relative; margin: 20px 0px;">
+                        <input class="form-control search-invite" id="searchEmail" name="search" placeholder="Search a invite" type="text" value="">
+                        <i class="fas fa-search search-invite-icon"></i>
+                    </div>
                     <div class="invites">
                         <table class="invites-table">
                             <thead>
@@ -85,7 +89,7 @@
                             </thead>
                             <tbody>
                                 {% for email, valid in awaiting_emails %}
-                                    <tr>
+                                    <tr class="invite-info">
                                         <td>{{ email }}</td>
                                         {% if valid %}
                                             <td><p class="invite-status">Awaiting Response</p></td>
@@ -111,14 +115,13 @@
 {% block tail_js %}
     <script src="{{url_for('appbuilder.static',filename='js/bootstrap.min.js')}}"></script>
     <script>
-        {#$(".edit-team-info").click(function() {#}
-        {#    $("input[name='team_name']")#}
-        {#        .prop('disabled', false)#}
-        {#        .css("background-color", "yellow")#}
-        {#        .focus();});#}
+        $("#searchEmail").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $(".invite-info").filter(function() {
+                $(this).toggle($(this).find("td:first").text().toLowerCase().indexOf(value) > -1)
+            });
+        });
 
-        {#$("input[name='team_name']").change(function() {#}
-        {#    $("#update_team").prop('disabled', false);});#}
 
         $('#update_team').click(function() {
             let new_team_name = $('#team_name_input').val();
