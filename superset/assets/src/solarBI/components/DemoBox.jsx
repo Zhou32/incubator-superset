@@ -126,48 +126,51 @@ class DemoBox extends React.Component {
     const isSmallScreen = /xs|sm|md/.test(width);
 
     return (
-      <Card className={isSmallScreen ? classes.cardInitial : classes.cardFlex}>
-        <CardContent
-          className={isSmallScreen ? classes.contentInital : classes.contentFlex}
-        >
-          <div className={classes.demo}>
-            <Button className={classes.button}>
-             Search
-            </Button>
-            <p className={isSmallScreen ? classes.introSmall : classes.introLarge} >
-              Search for any address, <br /> suburb or region
-               in Australia
-            </p>
-          </div>
+      <div>
+        {!isSmallScreen ?
+          <Card className={isSmallScreen ? classes.cardInitial : classes.cardFlex}>
+            <CardContent
+              className={isSmallScreen ? classes.contentInital : classes.contentFlex}
+            >
+              <div className={classes.demo}>
+                <Button className={classes.button}>
+                  Search
+                </Button>
+                <p className={isSmallScreen ? classes.introSmall : classes.introLarge} >
+                  Search for any address, <br /> suburb or region
+                   in Australia
+                </p>
+              </div>
 
-          {isSmallScreen ? null : <div className={classes.vl} />}
-          <div className={classes.demo}>
-            <Button className={classes.button}>
-             Quick Result
-
-            </Button>
-            <p className={isSmallScreen ? classes.introSmall : classes.introLarge}>
-             We look for the closest point <br />
-             to your seach and give you <br />
-             12 months of data
-            </p>
-          </div>
-          {isSmallScreen ? null : <div className={classes.vl} />}
-          <div className={classes.demo}>
-            <Button className={classes.button}>
-              Get More Data
-            </Button>
-            <p className={isSmallScreen ? classes.introSmall : classes.introLarge}>
-             Go deeper and define type, <br />
-             timeframe and resolution <br />
-             Your .CSV export will wait on <br />
-             <br />
-              <a className={classes.saved} href="/solar/list">My Data</a>
-
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+              {isSmallScreen ? null : <div className={classes.vl} />}
+              <div className={classes.demo}>
+                <Button className={classes.button}>
+                  Quick Result
+                </Button>
+                <p className={isSmallScreen ? classes.introSmall : classes.introLarge}>
+                  We look for the closest point <br />
+                  to your seach and give you <br />
+                  12 months of data
+                </p>
+              </div>
+              {isSmallScreen ? null : <div className={classes.vl} />}
+              <div className={classes.demo}>
+                <Button className={classes.button}>
+                  Get More Data
+                </Button>
+                <p className={isSmallScreen ? classes.introSmall : classes.introLarge}>
+                  Go deeper and define type, <br />
+                  timeframe and resolution <br />
+                  Your .CSV export will wait on <br />
+                  <br />
+                  <a className={classes.saved} href="/solar/list">My Data</a>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          : null
+        }
+      </div>
     );
   }
 }
