@@ -351,7 +351,7 @@ class SolarBIRegisterInvitationView(BaseRegisterUser):
                                         widgets=widgets,
                                         appbuilder=self.appbuilder)
         else:
-            flash('Unable to find a valid invitation.', 'danger')
+            flash('This link has been used or expired. Please contact your team admin', 'danger')
 
         return redirect(self.appbuilder.get_url_for_index)
 

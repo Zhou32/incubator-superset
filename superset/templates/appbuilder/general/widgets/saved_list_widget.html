@@ -108,12 +108,12 @@
                     {{ item['view_slice_link'] }}
                 </div>
             {% else %}
+                <div class="ribbon ribbon-top-right"><span>paid</span></div>
                 <div class="download-container">
                 {% if formatter %}
                     {{ formatter(item['view_slice_name']) }}
                 {% else %}
                    {% set info = item['view_slice_name'].split('_') %}
-                   <div class="ribbon ribbon-top-right"><span>paid</span></div>
                    <table>
                       {% if not is_team_owner %}
                           <div style="margin-top: 20px"></div>
