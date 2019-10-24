@@ -22,7 +22,7 @@
 {% set is_team_owner = g.user.roles[0].name == 'team_owner' %}
 
 
-<link href="{{url_for('static',filename='assets/stylesheets/solarbi.less')}}?v=1.1" rel="stylesheet">
+{#<link href="{{url_for('static',filename='assets/stylesheets/solarbi.less')}}?v=1.1" rel="stylesheet">#}
 
 {% block begin_title %}
     <div class="title-card">
@@ -102,7 +102,7 @@
                     {% endif %}
                     <hr style="border-bottom: 1px solid #C7C9CB; width: 80px; margin: -10px auto 10px;">
                     {% if is_team_owner %}
-                        <h6>Saved by: {{ item['changed_by_name'] }}</h6>
+                        <h6>Owner: {{ item['changed_by_name'] }}</h6>
                     {% endif %}
                     <i class="fas fa-chart-pie my-data-pie"></i>
                     {{ item['view_slice_link'] }}
@@ -115,6 +115,9 @@
                    {% set info = item['view_slice_name'].split('_') %}
                    <div class="ribbon ribbon-top-right"><span>paid</span></div>
                    <table>
+                      {% if not is_team_owner %}
+                          <div style="margin-top: 20px"></div>
+                      {% endif %}
                       <tr>
                         <td>Address</td>
                         <td><div>{{ info[0][3:] }}</div></td>
@@ -135,6 +138,12 @@
                         <td>Resolution</td>
                         <td>{{ info[4][:-4] }}</td>
                       </tr>
+                      {% if is_team_owner %}
+                          <tr>
+                            <td>Owner</td>
+                            <td>{{ item['changed_by_name'] }}</td>
+                          </tr>
+                      {% endif %}
                       <tr>
                         <td>Status</td>
                           {% if item['slice_query_id'] in obj_keys %}

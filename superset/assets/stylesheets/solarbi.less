@@ -115,9 +115,10 @@ input {
   border-bottom-left-radius: 4px;
 }
 .list-alert-top {
-  position: absolute;
-  width: 70%;
-  z-index: 999;
+  position: fixed;
+  width: 50%;
+  z-index: 9999;
+  top: 0;
 }
 .alert-top {
   position: absolute;
@@ -1110,7 +1111,10 @@ input {
 .list-cards-wrapper {
   display: flex;
   flex-wrap: wrap;
-  margin-left: 120;
+  position: relative;
+  // justify-content: center;
+  width: 1370px;
+  margin: 0 auto;
 }
 .list-card {
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
@@ -1121,6 +1125,16 @@ input {
   margin: 30px;
   border-radius: 10px;
   position: relative;
+}
+@media screen and (max-width: 1536px) {
+  .list-cards-wrapper {
+    width: 1020px;
+  }
+}
+@media screen and (max-width: 1045px) {
+  .list-cards-wrapper {
+    width: 690px;
+  }
 }
 .list-card:hover {
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
@@ -1159,8 +1173,9 @@ input {
 .list-card table {
   border-collapse: collapse;
   width: 100%;
-  margin-top: 10;
+  margin-top: 5;
   font-size: 14; 
+  line-height: 16px;
 }
 .list-card td {
   border: 1px solid #dddddd;
@@ -1197,10 +1212,10 @@ input {
   box-shadow: 0px 1px 1px #00000029;
   transition: 0.3s;
   height: 170;
-  z-index: 500;
+  z-index: 1000;
   position: fixed;
   top: 0;
-  width: 93%;
+  width: 95%;
   background-color: white;
 }
 .title-card .card-container {
@@ -1485,7 +1500,7 @@ input {
 
 /* top right*/
 .ribbon-top-right {
-  top: -20px;
+  top: -15px;
   right: -10px;
 }
 .ribbon-top-right::before,
