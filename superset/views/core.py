@@ -795,7 +795,7 @@ class SolarBIBillingView(ModelView):
         cus_invoices = list( {'invoice_id':invoice['id'],
                               'date': datetime.utcfromtimestamp(invoice['created']).strftime("%d/%m/%Y"),
                               'link': invoice['invoice_pdf']} for invoice in cus_invoices)
-
+        card_info = stripe.PaymentMethod.list(customer=team.stripe_user_id, type='card')['data'][0]['card']
         entry_point = 'billing'
         payload = {
             'user': bootstrap_user_data(g.user),
@@ -805,6 +805,7 @@ class SolarBIBillingView(ModelView):
             'pm_id': team.stripe_pm_id,
             'plan_id': plan.stripe_id,
             'invoice_list':cus_invoices,
+            'card_info': card_info,
         }
 
         return self.render_template(
