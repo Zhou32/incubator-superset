@@ -40,6 +40,8 @@ import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 // import InputAdornment from '@material-ui/core/InputAdornment';
 import Container from '@material-ui/core/Container';
+import DateFnsUtils from '@date-io/date-fns';
+import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import SolarStepper from './SolarStepper';
 import { requestSolarData, startTrial } from '../actions/solarActions';
 
@@ -141,6 +143,7 @@ const styles = tm => ({
   dateWrapper: {
     width: 220,
     textAlign: 'center',
+    marginLeft: 20,
   },
   dialog: {
     padding: 10,
@@ -166,7 +169,7 @@ const styles = tm => ({
     // height: 680,
   },
   lengthLabel: {
-    fontSize: '1.6rem',
+    fontSize: '1.3rem',
     color: '#0063B0',
     width: '10%',
     float: 'left',
@@ -181,11 +184,11 @@ const styles = tm => ({
     display: 'inline-block',
     margin: theme.spacing(2),
     '& svg': {
-      fontSize: '1.5em',
+      fontSize: '1.2em',
     },
   },
   formControlLabel: {
-    fontSize: '1.5rem',
+    fontSize: '1rem',
     color: '#0063B0',
     fontFamily: 'Montserrat',
     fontWeight: 500,
@@ -200,6 +203,9 @@ const styles = tm => ({
     width: '105%',
     color: 'white',
     paddingTop: 15,
+  },
+  helperText: {
+    fontSize: '0.9em',
   },
   iconButton: {
     padding: '5 12',
@@ -216,7 +222,7 @@ const styles = tm => ({
     float: 'right',
   },
   resolutionLabel: {
-    fontSize: '1.6rem',
+    fontSize: '1.3rem',
     color: '#0063B0',
     width: '10%',
     float: 'left',
@@ -227,15 +233,15 @@ const styles = tm => ({
   remainCount: {
     float: 'right',
   },
-  costLabel: {
-    fontSize: '1.6rem',
-    color: '#0063B0',
-    width: '10%',
-    float: 'left',
-    borderBottom: 'none',
-    marginTop: '35px',
-    marginLeft: '15px',
-  },
+  // costLabel: {
+  //   fontSize: '1.3rem',
+  //   color: '#0063B0',
+  //   width: '10%',
+  //   float: 'left',
+  //   borderBottom: 'none',
+  //   marginTop: '35px',
+  //   marginLeft: '15px',
+  // },
   startText: {
     marginLeft: '10px',
     '& fieldset': {
@@ -264,7 +270,7 @@ const styles = tm => ({
     fontFamily: 'Montserrat',
     fontSize: '16px',
     fontWeight: 500,
-    backgroundColor: '#EEEFF0',
+    // backgroundColor: '#EEEFF0',
     borderRadius: 12,
     lineHeight: '18px',
     textAlign: 'center',
@@ -279,7 +285,7 @@ const styles = tm => ({
     float: 'left',
   },
   typeLabel: {
-    fontSize: '1.6rem',
+    fontSize: '1.3rem',
     color: '#0063B0',
     width: '10%',
     float: 'left',
@@ -313,8 +319,10 @@ class ExportModal extends React.Component {
     this.state = {
       anchorEl: null,
       type: 'dni',
+      pickerStart: new Date('2017-01-01T00:00:00'),
+      pickerEnd: new Date('2019-01-01T00:00:00'),
       startDate: '2017-01-01',
-      endDate: '2018-01-01',
+      endDate: '2019-01-01',
       resolution: 'hourly',
       cost: (16).toFixed(2),
     };
@@ -477,12 +485,39 @@ class ExportModal extends React.Component {
     this.setState({ type: event.target.value });
   }
 
-  handleStartDateChange(event) {
-    this.setState({ startDate: event.target.value });
+  // handleStartDateChange(event) {
+  //   this.setState({ startDate: event.target.value });
+  // }
+
+  handleStartDateChange(date) {
+    // console.log(typeof (date));
+    // console.log(typeof (new Date(Date.parse(date))));
+    this.setState({ pickerStart: date });
+    try {
+      const tzoffset = (new Date()).getTimezoneOffset() * 60000;
+      this.setState({
+        startDate: new Date(Date.parse(date) - tzoffset).toISOString().slice(0, 10),
+      });
+    } catch (e) {
+      this.setState({ startDate: '' });
+    }
   }
 
-  handleEndDateChange(event) {
-    this.setState({ endDate: event.target.value });
+  // handleEndDateChange(event) {
+  //   this.setState({ endDate: event.target.value });
+  // }
+  handleEndDateChange(date) {
+    // console.log(typeof (date));
+    // console.log(typeof (new Date(Date.parse(date))));
+    this.setState({ pickerEnd: date });
+    try {
+      const tzoffset = (new Date()).getTimezoneOffset() * 60000;
+      this.setState({
+        endDate: new Date(Date.parse(date) - tzoffset).toISOString().slice(0, 10),
+      });
+    } catch (e) {
+      this.setState({ endDate: '' });
+    }
   }
 
   handleResolutionChange(event) {
@@ -505,7 +540,11 @@ class ExportModal extends React.Component {
   handleRequestData() {
     const sDate = new Date(this.state.startDate);
     const eDate = new Date(this.state.endDate);
-    if (sDate > eDate) {
+    if (this.state.startDate === '') {
+      alert('Please provide a valid start date!'); // eslint-disable-line no-alert
+    } else if (this.state.endDate === '') {
+      alert('Please provide a valid end date!'); // eslint-disable-line no-alert
+    } else if (sDate > eDate) {
       alert('Start date cannot be later than end date!'); // eslint-disable-line no-alert
     } else if (new Date(sDate) < new Date('1990-01-01') ||
       new Date(eDate) > new Date('2019-07-31')) {
@@ -537,7 +576,8 @@ class ExportModal extends React.Component {
 
   render() {
     const { classes, open, onHide, solarBI } = this.props;
-    const { startDate, endDate, anchorEl } = this.state;
+    // const { startDate, endDate, anchorEl, pickerStart, pickerEnd } = this.state;
+    const { anchorEl, pickerStart, pickerEnd } = this.state;
     let remainCount = null;
     if (solarBI.can_trial && solarBI.start_trial === 'starting') {
       remainCount = <img style={{ width: 30, marginLeft: 20 }} alt="Loading..." src="/static/assets/images/loading.gif" />;
@@ -595,7 +635,28 @@ class ExportModal extends React.Component {
                     <div className={classes.dates}>
                       <div className={classes.dateWrapper}>
                         <span className={classes.dateLabel}>Start</span>
-                        <TextField
+                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                          <KeyboardDatePicker
+                            disableToolbar
+                            variant="inline"
+                            format="dd/MM/yyyy"
+                            id="date-picker-inline"
+                            inputVariant="outlined"
+                            value={pickerStart}
+                            minDate={new Date('1990-01-01')}
+                            maxDate={new Date(pickerEnd)}
+                            maxDateMessage="Date should not be after maximal date or End date"
+                            onChange={this.handleStartDateChange}
+                            InputProps={{
+                              classes: { input: classes.textInput },
+                            }}
+                            FormHelperTextProps={{ classes: { root: classes.helperText } }}
+                            KeyboardButtonProps={{
+                              'aria-label': 'change date',
+                            }}
+                          />
+                        </MuiPickersUtilsProvider>
+                        {/* <TextField
                           error={new Date(startDate) > new Date(endDate) || new Date(startDate) < new Date('1990-01-01')}
                           id="date"
                           type="date"
@@ -607,12 +668,33 @@ class ExportModal extends React.Component {
                           InputProps={{
                             classes: { input: classes.textInput },
                           }}
-                        />
+                        /> */}
                       </div>
 
                       <div className={classes.dateWrapper}>
                         <span className={classes.dateLabel}>End</span>
-                        <TextField
+                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                          <KeyboardDatePicker
+                            disableToolbar
+                            variant="inline"
+                            format="dd/MM/yyyy"
+                            id="date-picker-inline"
+                            inputVariant="outlined"
+                            value={pickerEnd}
+                            minDate={new Date(pickerStart)}
+                            minDateMessage="Date should not be before minimal date or Start date"
+                            maxDate={new Date('2019-07-31')}
+                            onChange={this.handleEndDateChange}
+                            InputProps={{
+                              classes: { input: classes.textInput },
+                            }}
+                            FormHelperTextProps={{ classes: { root: classes.helperText } }}
+                            KeyboardButtonProps={{
+                              'aria-label': 'change date',
+                            }}
+                          />
+                        </MuiPickersUtilsProvider>
+                        {/* <TextField
                           error={new Date(startDate) > new Date(endDate) || new Date(endDate) > new Date('2019-07-31')}
                           id="date"
                           type="date"
@@ -624,7 +706,7 @@ class ExportModal extends React.Component {
                           InputProps={{
                             classes: { input: classes.textInput },
                           }}
-                        />
+                        /> */}
                       </div>
                       <IconButton
                         aria-label="More"
