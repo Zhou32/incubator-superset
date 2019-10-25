@@ -859,7 +859,7 @@ class SolarBIBillingView(ModelView):
     @expose('/change_card_detail/<cus_id>', methods=['POST'])
     def change_card_detail(self, pm_id):
         if self.update_ccard(pm_id, get_team_id()):
-            return json_success({'msg':'Credit card updated successful'})
+            return json_success(json.dumps({'msg':'Credit card updated successful'}))
         else:
             return json_error_response('Card update failed. Please try again later.')
 
