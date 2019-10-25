@@ -38,6 +38,7 @@ from flask import (
     request,
     Response,
     url_for,
+    session,
 )
 from flask_appbuilder import expose
 from flask_appbuilder.actions import action
@@ -604,7 +605,8 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
     def add(self):
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
-        team = self.appbuilder.sm.find_team(user_id=g.user.id)
+        # team = self.appbuilder.sm.find_team(user_id=g.user.id)
+        team = self.appbuilder.get_session.query(Team).filter_by(id=session['team_id']).first()
         subscription = self.appbuilder.sm.get_subscription(team_id=team.id)
         entry_point = 'solarBI'
 
