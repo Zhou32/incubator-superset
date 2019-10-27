@@ -31,7 +31,7 @@ const styles = theme => ({
   csvLink: {
     position: 'absolute',
     right: 180,
-    top: 403,
+    top: 8,
     zIndex: 200,
     color: '#424242',
     '& span': {
@@ -140,6 +140,7 @@ class BarChart extends React.Component {
       // display: isSmallScreen ? 'initial' : 'flex',
       marginLeft: -60,
       marginTop: -40,
+      position: 'relative',
     };
 
     return (
