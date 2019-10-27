@@ -411,7 +411,7 @@ export class MapView extends React.Component {
               <div style={{ padding: 0, width: 800, margin: 'auto' }}>
                 <SolarStepper activeStep={1} />
               </div>
-              <Card style={{ margin: '40px auto', width: '93%', height: 840 }}>
+              <Card style={{ margin: '40px auto', width: '93%', height: 850 }}>
                 <CardContent>
                   <CloseButton
                     onBackClick={this.onGoBackClick}
@@ -422,6 +422,19 @@ export class MapView extends React.Component {
                       <Col xsOffset={1} xs={10} md={12} mdOffset={0}>
                         {this.state.showingMap && (
                           <div style={{ marginRight: 75 }}>
+                            {!this.state.solar_new ?
+                              <p
+                                style={{
+                                  fontFamily: 'Montserrat',
+                                  fontSize: 23,
+                                  fontWeight: 500,
+                                  textAlign: 'center',
+                                  color: '024067',
+                                }}
+                              >
+                                {this.props.solarBI.form_data.requestParams.slice_name}
+                              </p> : null
+                            }
                             <p
                               style={{
                                 fontFamily: 'Montserrat',

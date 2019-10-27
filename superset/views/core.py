@@ -17,7 +17,7 @@
 # pylint: disable=C,R,W
 import os
 from contextlib import closing
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from dateutil.relativedelta import relativedelta
 import logging
 import re
@@ -793,9 +793,17 @@ class SolarBIBillingView(ModelView):
         cus_address = cus_obj.address
 
         cus_invoices = stripe.Invoice.list(customer=cus_obj['id'])
-        cus_invoices = list( {'invoice_id':invoice['id'],
+        cus_invoices = list({'invoice_id': invoice['id'],
                               'date': datetime.utcfromtimestamp(invoice['created']).strftime("%d/%m/%Y"),
                               'link': invoice['invoice_pdf']} for invoice in cus_invoices)
+
+        # card_expire_soon = False
+        # if stripe.PaymentMethod.list(customer=team.stripe_user_id, type='card')['data']:
+        #     card_info = stripe.PaymentMethod.list(customer=team.stripe_user_id, type='card')['data'][0]['card']
+        #     one_month_later = str(date.today() + relativedelta(months=1))[:-3]
+        #     card_expire_date = str(card_info['exp_year']) + '-' + str(card_info['exp_month'])
+        #     if one_month_later >= card_expire_date:
+        #         card_expire_soon = True
 
         entry_point = 'billing'
         payload = {
@@ -805,7 +813,8 @@ class SolarBIBillingView(ModelView):
             'cus_info': {'cus_name': cus_name, 'cus_email': cus_email, 'cus_address': cus_address},
             'pm_id': team.stripe_pm_id,
             'plan_id': plan.stripe_id,
-            'invoice_list':cus_invoices,
+            'invoice_list': cus_invoices,
+            # 'card_expire_soon': card_expire_soon
         }
 
         return self.render_template(
@@ -826,15 +835,14 @@ class SolarBIBillingView(ModelView):
         try:
             stripe_customer = stripe.Customer.retrieve(id=team.stripe_user_id)
 
-            change_pm = False
             pm_id = team.stripe_pm_id
-            if stripe_customer.default_source is None:
+            if team.stripe_pm_id is None:
                 form_data = get_form_data()[0]['token']
                 stripe.Customer.modify(stripe_customer.stripe_id, source=form_data['id'])
                 pm_id = form_data['card']['id']
-                change_pm = True
+                self.update_ccard(pm_id, team.id)
 
-            (result, id) = self.update_plan(team.id, plan_id, change_pm=change_pm, pm_id=pm_id)
+            (result, id) = self.update_plan(team.id, plan_id)
 
             if result:
                 return json_success(json.dumps({'msg': 'Change plan success!', 'plan_id': id, 'pm_id': pm_id}))
@@ -856,12 +864,32 @@ class SolarBIBillingView(ModelView):
                                                     'line1': form_data['line1'], 'line2': form_data['line2']})
         return json_success(json.dumps({'msg': 'Successfully changed billing detail!'}))
 
-    def update_plan(self, team_id, plan_stripe_id, change_pm=False, pm_id=None):
+    @api
+    @handle_api_exception
+    @expose('/change_card_detail/<cus_id>', methods=['POST'])
+    def change_card_detail(self, pm_id):
+        if self.update_ccard(pm_id, get_team_id()):
+            return json_success(json.dumps({'msg':'Credit card updated successful'}))
+        else:
+            return json_error_response('Card update failed. Please try again later.')
+
+    def update_ccard(self, pm_id, team_id):
+        try:
+            team = self.appbuilder.get_session.query(Team).filter_by(id=team_id).first()
+            stripe.Customer.modify(team.stripe_user_id, source=pm_id)
+            team.stripe_pm_id = pm_id
+            self.appbuilder.get_session.commit()
+            return True
+        except Exception as e:
+            logging.error(e)
+            self.appbuilder.get_session.rollback()
+            return False
+
+
+    def update_plan(self, team_id, plan_stripe_id):
         try:
             '''Update payment methond ID, aka card id, if needed'''
-            team = db.session.query(Team).filter_by(id=team_id).first()
-            if change_pm:
-                team.stripe_pm_id = pm_id
+            team = self.appbuilder.get_session.query(Team).filter_by(id=team_id).first()
 
             '''Update team subscription, and reduce used '''
             team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(team=team.id).first()
@@ -874,6 +902,9 @@ class SolarBIBillingView(ModelView):
             if new_plan.id > old_plan.id:
                 logging.info(f'Upgrading team {team.team_name} from {old_plan.stripe_id} to {new_plan.stripe_id}')
                 old_count = team_sub.remain_count
+
+                # Disable free trial for future
+                team_sub.trial_used = True
 
                 # If upgrading from paid plan to higher paid plan, cannot trigger payment succeeded event as it will be
                 # on next billing cycle. Since the customer has successfully paid before, assume the card is still valid,
