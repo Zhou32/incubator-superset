@@ -32,7 +32,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Popover from '@material-ui/core/Popover';
 import HelpIcon from '@material-ui/icons/Help';
 import DialogContent from '@material-ui/core/DialogContent';
-import TextField from '@material-ui/core/TextField';
+// import TextField from '@material-ui/core/TextField';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -657,7 +657,8 @@ class ExportModal extends React.Component {
                           />
                         </MuiPickersUtilsProvider>
                         {/* <TextField
-                          error={new Date(startDate) > new Date(endDate) || new Date(startDate) < new Date('1990-01-01')}
+                          error={new Date(startDate) > new Date(endDate) ||
+                            new Date(startDate) < new Date('1990-01-01')}
                           id="date"
                           type="date"
                           value={startDate}
@@ -695,7 +696,8 @@ class ExportModal extends React.Component {
                           />
                         </MuiPickersUtilsProvider>
                         {/* <TextField
-                          error={new Date(startDate) > new Date(endDate) || new Date(endDate) > new Date('2019-07-31')}
+                          error={new Date(startDate) > new Date(endDate) ||
+                            new Date(endDate) > new Date('2019-07-31')}
                           id="date"
                           type="date"
                           value={endDate}
@@ -791,13 +793,13 @@ class ExportModal extends React.Component {
                     <div style={{ marginTop: 50 }}>
                       <Button
                         className={classNames(classes.button, classes.closeBtn)}
-                        disabled={solarBI.sending}
+                        disabled={solarBI.sending || solarBI.requestStatus === 'success'}
                         onClick={onHide}
                         color="primary"
                       >
                         Back
                       </Button>
-                      {solarBI.sending ?
+                      {(solarBI.sending || solarBI.requestStatus === 'success') ?
                         (<img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />) :
                         (<Button className={classNames(classes.button, classes.requestBtn)} onClick={this.handleRequestData} color="primary" disabled={solarBI.remain_count === 0}>REQUEST</Button>)
                       }
