@@ -644,8 +644,9 @@ class ExportModal extends React.Component {
                             inputVariant="outlined"
                             value={pickerStart}
                             minDate={new Date('1990-01-01')}
+                            minDateMessage="Minimal date is 01/01/1990"
                             maxDate={new Date(pickerEnd)}
-                            maxDateMessage="Date should not be after maximal date or End date"
+                            maxDateMessage="Date should not be after End date"
                             onChange={this.handleStartDateChange}
                             InputProps={{
                               classes: { input: classes.textInput },
@@ -683,8 +684,9 @@ class ExportModal extends React.Component {
                             inputVariant="outlined"
                             value={pickerEnd}
                             minDate={new Date(pickerStart)}
-                            minDateMessage="Date should not be before minimal date or Start date"
+                            minDateMessage="Date should not be before Start date"
                             maxDate={new Date('2019-07-31')}
+                            maxDateMessage="Maximum date is 31/07/2019"
                             onChange={this.handleEndDateChange}
                             InputProps={{
                               classes: { input: classes.textInput },
