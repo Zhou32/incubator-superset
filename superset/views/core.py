@@ -612,8 +612,8 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
 
         datasource_id = self.get_solar_datasource()
         can_trial = False
-        for role in g.user.roles:
-            if 'team_owner' in role.name:
+        for team_role in g.user.team_role:
+            if team_role.team.id == team.id and team_role.role.name == 'team_owner':
                 can_trial = True
         can_trial = can_trial and not subscription.trial_used
         payload = {
@@ -735,6 +735,20 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
             title='Billing - SolarBI',
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
         )
+
+    @expose('/switch_team/<team_id>', methods=['GET'])
+    def switch_team(self, team_id):
+        if not g.user or not g.user.get_id():
+            return redirect(appbuilder.get_url_for_login)
+
+        for team_role in g.user.team_role:
+            if str(team_role.team.id) == team_id:
+                session['team_id'] = team_role.team.id
+                return redirect("/")
+
+        flash('Team Error', 'danger')
+        return redirect("/")
+
 
     @app.errorhandler(404)
     def page_not_found(e):

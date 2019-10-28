@@ -36,7 +36,7 @@ from .forms import (
     SolarBIRegisterInvitationUserDBForm, SolarBITeamFormWidget, SolarBIInvitationWidget,
 )
 from .models import SolarBIUser
-from .utils import post_request
+from .utils import post_request, get_session_team
 
 log = logging.getLogger(__name__)
 
@@ -215,15 +215,16 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
     def invitation(self):
         self._init_vars()
         form = self.form.refresh()
+        team_id = get_session_team()
+        team = self.appbuilder.sm.find_team(team_id=team_id)
         # form.role.choices = self.appbuilder.sm.find_invite_roles(g.user.id)
-        awaiting_emails = self.appbuilder.sm.get_awaiting_emails(g.user.id)
-        team_members = self.appbuilder.sm.get_team_members(g.user.id)
-        team_name = self.appbuilder.sm.find_team(user_id=g.user.id).team_name
+        awaiting_emails = self.appbuilder.sm.get_awaiting_emails(team)
+        team_members = self.appbuilder.sm.get_team_members(team)
         widgets = self._get_edit_widget(form=form)
         self.update_redirect()
         self.add_form_unique_validations(form)
         return self.render_template(self.form_template,
-                                    team_name=team_name,
+                                    team_name=team.team_name,
                                     team_members=team_members,
                                     awaiting_emails=awaiting_emails,
                                     title=self.form_title,
@@ -251,7 +252,10 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
                                                                        inviter=user_id)
                 if reg_user:
                     if self.send_email(reg_user, existed):
-                        flash(as_unicode('Invitation sent to %s' % form.email.data), 'info')
+                        if not existed:
+                            flash(as_unicode('Invitation sent to %s' % form.email.data), 'info')
+                        else:
+                            flash(as_unicode('%s is an existed user. Added to your team' % form.email.data), 'info')
                         return redirect('/solar/my-team')
                     else:
                         self.appbuilder.sm.delete_invited_user(user_email=form.email.data)
