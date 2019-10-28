@@ -22,8 +22,8 @@
 {% set app_icon_width = appbuilder.app.config.get('APP_ICON_WIDTH', 126) %}
 {% set logo_target_path = appbuilder.app.config.get('LOGO_TARGET_PATH') or '/profile/{}/'.format(current_user.username) %}
 {% set current_user_role = current_user.roles[0].name %}
-<link href="{{url_for('appbuilder.static',filename='css/bootstrap.min.css')}}" rel="stylesheet">
 <link href="{{url_for('static',filename='assets/stylesheets/solarbi.less')}}?v=1.3" rel="stylesheet">
+
 
 <!-- Sidebar -->
 <div class="s-layout__sidebar">
@@ -105,24 +105,32 @@
            </a>
         </li>
      </ul>
-     <div class="dropdown">
-       <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-         Dropdown<i class="fas fa-caret-down"></i>
-       </button>
-       <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-         <li><a href="#">Action</a></li>
-         <li><a href="#">Another action</a></li>
-         <li><a href="#">Something else here</a></li>
-         <li><a href="#">Separated link</a></li>
-       </ul>
-     </div>
+{#     <div class="team-selector">#}
+         <div class="md-select">
+             <label for="ul-id"><button type="button" class="ng-binding">State 2</button></label>
+              <ul role="listbox" id="ul-id" class="md-whiteframe-z1" aria-activedescendant="state2_AK" name="ul-id">
+                 <li role="option" id="state2_AK" class="ng-binding ng-scope active" tabindex="-1" aria-selected="true">Alaska</li>
+                 <li role="option" id="state2_AL" class="ng-binding ng-scope" tabindex="-1" aria-selected="false">Alabama</li>
+                 <li role="option" id="state2_AL" class="ng-binding ng-scope" tabindex="-1" aria-selected="false">Bdwidw</li>
+                 <li role="option" id="state2_AL" class="ng-binding ng-scope" tabindex="-1" aria-selected="false">Cdqw2</li>
+              </ul>
+        </div>
+{#     </div>#}
   </nav>
 </div>
 
-<script src="{{url_for('appbuilder.static',filename='js/bootstrap.min.js')}}"></script>
+
 <script>
-    $(".dropdown-menu a").click(function(){
-      $(this).parents(".dropdown").find('.btn').html($(this).text() + ' <i class="fas fa-caret-down"></i>');
-      $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
+    $(document).ready(function() {
+        $('.md-select').on('click', function(){
+          $(this).toggleClass('active')
+        });
+
+        $('.md-select ul li').on('click', function() {
+          var v = $(this).text();
+          $('.md-select ul li').not($(this)).removeClass('active');
+          $(this).addClass('active');
+          $('.md-select label button').text(v)
+        });
     });
 </script>
