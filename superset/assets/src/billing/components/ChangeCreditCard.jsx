@@ -54,7 +54,7 @@ const createOptions = () => ({
   },
 });
 
-function ChangeCreditCard({ stripe, openCCC, handleCloseCCC, billing }) {
+function ChangeCreditCard({ stripe, openCCC, handleCloseCCC, changeCreditCard, billing }) {
   const classes = useStyles();
   const [showError, setShowError] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -67,7 +67,10 @@ function ChangeCreditCard({ stripe, openCCC, handleCloseCCC, billing }) {
           setErrorMsg(payload.error.message);
           setShowError(true);
         } else {
-          console.log("no error");
+          changeCreditCard(payload.token.id).then(() => {
+            // handleCloseCCC();
+            window.location.reload();
+          });
         }
 
       });
@@ -113,7 +116,7 @@ function ChangeCreditCard({ stripe, openCCC, handleCloseCCC, billing }) {
           <Button onClick={handleCloseCCC} color="primary" className={classes.button}>
             Cancel
           </Button>
-          {billing.plan_change === 'changing' ?
+          {billing.change_cc === 'changing' || billing.change_cc === 'success' ?
             (<img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />) :
             (<Button onClick={handleSubmit} color="primary" className={classes.button}>Submit</Button>)
           }

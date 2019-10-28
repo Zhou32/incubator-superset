@@ -5,10 +5,10 @@ import PropTypes from 'prop-types';
 import { StripeProvider, Elements } from 'react-stripe-elements';
 import ChangeAddress from './ChangeAddress';
 import ChangeCreditCard from './ChangeCreditCard';
-import { changeBillDetail } from '../actions/billingActions';
+import { changeBillDetail, changeCreditCard } from '../actions/billingActions';
 // import TeamCreditCard from './TeamCreditCard';
 
-function BillingDetails({ billing, changeBillDetailConnect }) {
+function BillingDetails({ billing, changeBillDetailConnect, changeCreditCardConnect }) {
   const { cus_name, cus_email, cus_address } = billing.cus_info;
   let country = '';
   let city = '';
@@ -132,11 +132,20 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
           </div>
         </div>
 
-        <div className="alert alert-warning cc-expire-warning" role="alert">
-          <i className="fas fa-exclamation-circle" />&nbsp;&nbsp;
-          Looks like your credit card is about expiring, Please update it now.
-          <button type="button" className="btn update-cc-btn" onClick={handleOpenCCC}>Update</button>
-        </div>
+        {billing.card_expire_soon ? (
+          <div className="alert alert-warning cc-expire-warning" role="alert">
+            <i className="fas fa-exclamation-circle" />&nbsp;&nbsp;
+            Looks like your credit card is about expiring, Please update it now.
+            <button type="button" className="btn update-cc-btn" onClick={handleOpenCCC}>Update</button>
+          </div>
+        ) : null}
+        {billing.card_has_expired ? (
+          <div className="alert alert-danger cc-expire-warning" role="alert">
+            <i className="fas fa-exclamation-circle" />&nbsp;&nbsp;
+            Your credit card has expired. Please update it now.
+            <button type="button" className="btn update-cc-btn" onClick={handleOpenCCC}>Update</button>
+          </div>
+        ) : null}
 
         <div className="panel panel-primary">
           <div className="panel-heading">Users</div>
@@ -181,6 +190,7 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
           <ChangeCreditCard
             openCCC={openCCC}
             handleCloseCCC={handleCloseCCC}
+            changeCreditCard={changeCreditCardConnect}
             billing={billing}
           />
         </Elements>
@@ -192,6 +202,7 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
 BillingDetails.propTypes = {
   billing: PropTypes.object.isRequired,
   changeBillDetailConnect: PropTypes.func.isRequired,
+  changeCreditCardConnect: PropTypes.func.isRequired,
 };
 
 function mapStateToProps({ billing }) {
@@ -202,6 +213,6 @@ function mapStateToProps({ billing }) {
 
 export default connect(
   mapStateToProps,
-  { changeBillDetailConnect: changeBillDetail },
+  { changeBillDetailConnect: changeBillDetail, changeCreditCardConnect: changeCreditCard },
 )(BillingDetails);
 

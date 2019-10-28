@@ -796,12 +796,15 @@ class SolarBIBillingView(ModelView):
                               'date': datetime.utcfromtimestamp(invoice['created']).strftime("%d/%m/%Y"),
                               'link': invoice['invoice_pdf']} for invoice in cus_invoices)
 
+        card_has_expired = False
         card_expire_soon = False
         if stripe.PaymentMethod.list(customer=team.stripe_user_id, type='card')['data']:
             card_info = stripe.PaymentMethod.list(customer=team.stripe_user_id, type='card')['data'][0]['card']
             one_month_later = str(date.today() + relativedelta(months=1))[:-3]
             card_expire_date = str(card_info['exp_year']) + '-' + str(card_info['exp_month'])
-            if one_month_later >= card_expire_date:
+            if str(date.today())[:-3] > card_expire_date:
+                card_has_expired = True
+            elif one_month_later >= card_expire_date:
                 card_expire_soon = True
 
         entry_point = 'billing'
@@ -813,6 +816,7 @@ class SolarBIBillingView(ModelView):
             'pm_id': team.stripe_pm_id,
             'plan_id': plan.stripe_id,
             'invoice_list': cus_invoices,
+            'card_has_expired': card_has_expired,
             'card_expire_soon': card_expire_soon
         }
 
@@ -838,7 +842,7 @@ class SolarBIBillingView(ModelView):
             if team.stripe_pm_id is None:
                 form_data = get_form_data()[0]['token']
                 stripe.Customer.modify(stripe_customer.stripe_id, source=form_data['id'])
-                pm_id = form_data['card']['id']
+                pm_id = form_data['id']
                 self.update_ccard(pm_id, team.id)
 
             (result, id) = self.update_plan(team.id, plan_id)
@@ -865,10 +869,10 @@ class SolarBIBillingView(ModelView):
 
     @api
     @handle_api_exception
-    @expose('/change_card_detail/<cus_id>', methods=['POST'])
+    @expose('/change_card_detail/<pm_id>/', methods=['POST'])
     def change_card_detail(self, pm_id):
         if self.update_ccard(pm_id, get_team_id()):
-            return json_success(json.dumps({'msg':'Credit card updated successful'}))
+            return json_success(json.dumps({'msg': 'Credit card updated successful', 'pm_id': pm_id}))
         else:
             return json_error_response('Card update failed. Please try again later.')
 
@@ -883,7 +887,6 @@ class SolarBIBillingView(ModelView):
             logging.error(e)
             self.appbuilder.get_session.rollback()
             return False
-
 
     def update_plan(self, team_id, plan_stripe_id):
         try:
