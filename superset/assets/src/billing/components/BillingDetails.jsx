@@ -2,7 +2,9 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { StripeProvider, Elements } from 'react-stripe-elements';
 import ChangeAddress from './ChangeAddress';
+import ChangeCreditCard from './ChangeCreditCard';
 import { changeBillDetail } from '../actions/billingActions';
 // import TeamCreditCard from './TeamCreditCard';
 
@@ -38,6 +40,7 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
   const [nameError, setNameError] = useState(false);
   const [emailEmptyError, setEmailEmptyError] = useState(false);
   const [emailInvalidError, setEmailInvalidError] = useState(false);
+  const [openCCC, setOpenCCC] = useState(false);
 
   const handleChange = name => (event) => {
     setBillingValues({ ...billingValues, [name]: event.target.value });
@@ -49,6 +52,14 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
 
   const handleChangeAddressClose = () => {
     setChangeAddressOpen(false);
+  };
+
+  const handleCloseCCC = () => {
+    setOpenCCC(false);
+  };
+
+  const handleOpenCCC = () => {
+    setOpenCCC(true);
   };
 
   const validateEmail = (email) => {
@@ -120,6 +131,13 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
             }
           </div>
         </div>
+
+        <div className="alert alert-warning cc-expire-warning" role="alert">
+          <i className="fas fa-exclamation-circle" />&nbsp;&nbsp;
+          Looks like your credit card is about expiring, Please update it now.
+          <button type="button" className="btn update-cc-btn" onClick={handleOpenCCC}>Update</button>
+        </div>
+
         <div className="panel panel-primary">
           <div className="panel-heading">Users</div>
           <div className="panel-body billing-users">
@@ -157,6 +175,16 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
         setBillingValues={setBillingValues}
         handleChange={handleChange}
       />
+
+      <StripeProvider apiKey="pk_test_2CT1LvA7viLp1j7yCHJ2MezU00xXxxnRdM">
+        <Elements>
+          <ChangeCreditCard
+            openCCC={openCCC}
+            handleCloseCCC={handleCloseCCC}
+            billing={billing}
+          />
+        </Elements>
+      </StripeProvider>
     </React.Fragment>
   );
 }

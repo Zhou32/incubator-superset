@@ -111,3 +111,19 @@ export function changeBillDetail(cus_id, payload, timeout = 60) {
     }
   };
 }
+
+
+export const CHANGE_CREDIT_CARD_START = 'CHANGE_CREDIT_CARD_START';
+export function changeCreditCardStart() {
+  return { type: CHANGE_CREDIT_CARD_START };
+}
+
+export const CHANGE_CREDIT_CARD_SUCCESS = 'CHANGE_CREDIT_CARD_SUCCESS';
+export function changeCreditCardSuccess(res) {
+  return { type: CHANGE_CREDIT_CARD_SUCCESS, res };
+}
+
+export const CHANGE_CREDIT_CARD_FAIL = 'CHANGE_CREDIT_CARD_FAIL';
+export function changeCreditCardFail() {
+  return { type: CHANGE_CREDIT_CARD_FAIL };
+}
