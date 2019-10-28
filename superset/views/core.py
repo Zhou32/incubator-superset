@@ -840,7 +840,7 @@ class SolarBIBillingView(ModelView):
             if team.stripe_pm_id is None:
                 form_data = get_form_data()[0]['token']
                 stripe.Customer.modify(stripe_customer.stripe_id, source=form_data['id'])
-                pm_id = form_data['card']['id']
+                pm_id = form_data['id']
                 self.update_ccard(pm_id, team.id)
 
             (result, id) = self.update_plan(team.id, plan_id)
@@ -867,7 +867,7 @@ class SolarBIBillingView(ModelView):
 
     @api
     @handle_api_exception
-    @expose('/change_card_detail/<cus_id>', methods=['POST'])
+    @expose('/change_card_detail/<pm_id>', methods=['POST'])
     def change_card_detail(self, pm_id):
         if self.update_ccard(pm_id, get_team_id()):
             return json_success(json.dumps({'msg':'Credit card updated successful'}))
