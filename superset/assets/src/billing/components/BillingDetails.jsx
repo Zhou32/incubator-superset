@@ -135,7 +135,7 @@ function BillingDetails({ billing, changeBillDetailConnect, changeCreditCardConn
         {billing.card_expire_soon ? (
           <div className="alert alert-warning cc-expire-warning" role="alert">
             <i className="fas fa-exclamation-circle" />&nbsp;&nbsp;
-            Looks like your credit card is about expiring, Please update it now.
+            Your credit card is about to expire. Please update soon.
             <button type="button" className="btn update-cc-btn" onClick={handleOpenCCC}>Update</button>
           </div>
         ) : null}
