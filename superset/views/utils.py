@@ -19,7 +19,7 @@ from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 from urllib import parse
 
-from flask import request
+from flask import request, session
 import simplejson as json
 
 from superset import app, db, viz
