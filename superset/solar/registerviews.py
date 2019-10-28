@@ -167,7 +167,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
     email_template = 'appbuilder/general/security/team_member_invitation_mail.html'
     edit_widget = SolarBITeamFormWidget
 
-    def send_email(self, register_user, previous_user=False):
+    def send_email(self, register_user):
         """
             Method for sending the registration Email to the user
         """
@@ -175,11 +175,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
         msg = Message()
         msg.sender = 'SolarBI', 'no-reply@solarbi.com.au'
         msg.subject = self.email_subject
-        if not previous_user:
-            url = self.appbuilder.sm.get_url_for_invitation(register_user.registration_hash)
-        else:
-            #TODO What do we do with the url for existed user?
-            url = '/#'
+        url = self.appbuilder.sm.get_url_for_invitation(register_user.registration_hash)
         # team_owner = self.appbuilder.session.query(SolarBIUser).filter_by(id=g.user.id).first()
         # title = '{team_owner_firstname} {team_owner_lastname} inviting you to join at ' \
         #         '{workspace}'.format(team_owner_firstname=team_owner.first_name.capitalize(),
@@ -203,12 +199,6 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
         if len(form.email.validators) == 2:
             form.email.validators.append(Unique(datamodel_user, 'email'))
             form.email.validators.append(Unique(datamodel_register_user, 'email'))
-
-    def remove_email_unique_validation(self, form):
-        email_field = form.email
-        for validator in email_field.validators:
-            if type(validator).__name__ == 'Unique':
-                email_field.validators.remove(validator)
 
     @expose('/my-team', methods=['GET'])
     @has_access
@@ -235,22 +225,21 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
     @has_access
     def invitation_post(self):
         form = self.form.refresh()
-        # self.add_form_unique_validations(form)
+        self.add_form_unique_validations(form)
 
         # choices placeholder to pass validation
         # form.role.choices = self.appbuilder.sm.find_invite_roles(g.user.id)
         role_id = self.appbuilder.sm.find_solar_default_role_id().id
-        self.remove_email_unique_validation(form)
         if form.validate_on_submit():
             user_id = g.user.id
             try:
                 team = self.appbuilder.sm.find_team(user_id=user_id)
-                (reg_user, existed) = self.appbuilder.sm.add_invite_register_user(email=form.email.data,
+                reg_user = self.appbuilder.sm.add_invite_register_user(email=form.email.data,
                                                                        team=team,
                                                                        role=role_id,
                                                                        inviter=user_id)
                 if reg_user:
-                    if self.send_email(reg_user, existed):
+                    if self.send_email(reg_user):
                         flash(as_unicode('Invitation sent to %s' % form.email.data), 'info')
                         return redirect('/solar/my-team')
                     else:
