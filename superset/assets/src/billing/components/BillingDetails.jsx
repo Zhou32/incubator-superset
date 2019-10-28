@@ -2,11 +2,13 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { StripeProvider, Elements } from 'react-stripe-elements';
 import ChangeAddress from './ChangeAddress';
-import { changeBillDetail } from '../actions/billingActions';
+import ChangeCreditCard from './ChangeCreditCard';
+import { changeBillDetail, changeCreditCard } from '../actions/billingActions';
 // import TeamCreditCard from './TeamCreditCard';
 
-function BillingDetails({ billing, changeBillDetailConnect }) {
+function BillingDetails({ billing, changeBillDetailConnect, changeCreditCardConnect }) {
   const { cus_name, cus_email, cus_address } = billing.cus_info;
   let country = '';
   let city = '';
@@ -38,6 +40,7 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
   const [nameError, setNameError] = useState(false);
   const [emailEmptyError, setEmailEmptyError] = useState(false);
   const [emailInvalidError, setEmailInvalidError] = useState(false);
+  const [openCCC, setOpenCCC] = useState(false);
 
   const handleChange = name => (event) => {
     setBillingValues({ ...billingValues, [name]: event.target.value });
@@ -49,6 +52,14 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
 
   const handleChangeAddressClose = () => {
     setChangeAddressOpen(false);
+  };
+
+  const handleCloseCCC = () => {
+    setOpenCCC(false);
+  };
+
+  const handleOpenCCC = () => {
+    setOpenCCC(true);
   };
 
   const validateEmail = (email) => {
@@ -120,6 +131,22 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
             }
           </div>
         </div>
+
+        {billing.card_expire_soon ? (
+          <div className="alert alert-warning cc-expire-warning" role="alert">
+            <i className="fas fa-exclamation-circle" />&nbsp;&nbsp;
+            Looks like your credit card is about expiring, Please update it now.
+            <button type="button" className="btn update-cc-btn" onClick={handleOpenCCC}>Update</button>
+          </div>
+        ) : null}
+        {billing.card_has_expired ? (
+          <div className="alert alert-danger cc-expire-warning" role="alert">
+            <i className="fas fa-exclamation-circle" />&nbsp;&nbsp;
+            Your credit card has expired. Please update it now.
+            <button type="button" className="btn update-cc-btn" onClick={handleOpenCCC}>Update</button>
+          </div>
+        ) : null}
+
         <div className="panel panel-primary">
           <div className="panel-heading">Users</div>
           <div className="panel-body billing-users">
@@ -157,6 +184,17 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
         setBillingValues={setBillingValues}
         handleChange={handleChange}
       />
+
+      <StripeProvider apiKey="pk_test_2CT1LvA7viLp1j7yCHJ2MezU00xXxxnRdM">
+        <Elements>
+          <ChangeCreditCard
+            openCCC={openCCC}
+            handleCloseCCC={handleCloseCCC}
+            changeCreditCard={changeCreditCardConnect}
+            billing={billing}
+          />
+        </Elements>
+      </StripeProvider>
     </React.Fragment>
   );
 }
@@ -164,6 +202,7 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
 BillingDetails.propTypes = {
   billing: PropTypes.object.isRequired,
   changeBillDetailConnect: PropTypes.func.isRequired,
+  changeCreditCardConnect: PropTypes.func.isRequired,
 };
 
 function mapStateToProps({ billing }) {
@@ -174,6 +213,6 @@ function mapStateToProps({ billing }) {
 
 export default connect(
   mapStateToProps,
-  { changeBillDetailConnect: changeBillDetail },
+  { changeBillDetailConnect: changeBillDetail, changeCreditCardConnect: changeCreditCard },
 )(BillingDetails);
 

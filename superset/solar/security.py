@@ -34,11 +34,8 @@ from superset.solar.registerviews import (
     SolarBIRegisterUserDBView, SolarBIRegisterInvitationView,
     SolarBIRegisterInvitationUserDBView
 )
-from superset.solar.models import Plan, ResetRequest, Team, TeamRegisterUser, TeamSubscription, SolarBIUser, \
-    TeamRole
+from superset.solar.models import Plan, ResetRequest, Team, TeamRegisterUser, TeamSubscription, SolarBIUser
 from superset.security import SupersetSecurityManager
-
-from .utils import get_session_team, set_session_team
 
 stripe.api_key = os.getenv('STRIPE_SK')
 
@@ -147,7 +144,6 @@ class CustomSecurityManager(SupersetSecurityManager):
     resetRequest_model = ResetRequest
     team_model = Team
     user_model = SolarBIUser
-    team_role = TeamRole
 
     subscription_model = TeamSubscription
 
@@ -286,22 +282,9 @@ class CustomSecurityManager(SupersetSecurityManager):
         new_team.team_name = reg.team
         new_team.date_created = reg.registration_date
         new_team.users.append(user)
-
-        admin_role = self.find_role('team_owner')
-        admin_team_role = self.team_role()
-        admin_team_role.team = new_team
-        admin_team_role.role = admin_role
-
-        user_role = self.find_role('solar_default')
-        user_team_role = self.team_role()
-        user_team_role.team = new_team
-        user_team_role.role = user_role
-
-        user.team_role.append(admin_team_role)
         try:
             self.get_session.add(new_team)
-            self.get_session.add(admin_team_role)
-            self.get_session.add(user_team_role)
+            # self.get_session.commit()
             self.get_session.merge(user)
             self.get_session.commit()
             return new_team
@@ -457,10 +440,6 @@ class CustomSecurityManager(SupersetSecurityManager):
                         email_role.append((user.email, 'User'))
         return email_role
 
-    def get_session_team(self):
-        team = self.get_session.query(Team).filter_by(id=get_session_team()).first()
-        return team
-
     def update_team_name(self, user_id, new_team_name):
         current_team_name = self.find_team(user_id=user_id).team_name
         awaiting_users = self.get_session.query(self.registeruser_model).filter_by(
@@ -496,18 +475,18 @@ class CustomSecurityManager(SupersetSecurityManager):
             invited_user.username = 'solarbi_' + \
                 ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=8))
 
-            if first_name:
-                invited_user.first_name = first_name
-            if last_name:
-                invited_user.last_name = last_name
-            if inviter:
-                invited_user.inviter = inviter
-            if role:
-                invited_user.role_assigned = role
-            if hashed_password:
-                invited_user.password = hashed_password
-            else:
-                invited_user.password = generate_password_hash(password)
+        if first_name:
+            invited_user.first_name = first_name
+        if last_name:
+            invited_user.last_name = last_name
+        if inviter:
+            invited_user.inviter = inviter
+        if role:
+            invited_user.role_assigned = role
+        if hashed_password:
+            invited_user.password = hashed_password
+        else:
+            invited_user.password = generate_password_hash(password)
 
             invited_user.registration_hash = str(uuid.uuid1())
             try:

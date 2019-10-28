@@ -32,7 +32,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Popover from '@material-ui/core/Popover';
 import HelpIcon from '@material-ui/icons/Help';
 import DialogContent from '@material-ui/core/DialogContent';
-import TextField from '@material-ui/core/TextField';
+// import TextField from '@material-ui/core/TextField';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -644,8 +644,9 @@ class ExportModal extends React.Component {
                             inputVariant="outlined"
                             value={pickerStart}
                             minDate={new Date('1990-01-01')}
+                            minDateMessage="Minimal date is 01/01/1990"
                             maxDate={new Date(pickerEnd)}
-                            maxDateMessage="Date should not be after maximal date or End date"
+                            maxDateMessage="Date should not be after End date"
                             onChange={this.handleStartDateChange}
                             InputProps={{
                               classes: { input: classes.textInput },
@@ -657,7 +658,8 @@ class ExportModal extends React.Component {
                           />
                         </MuiPickersUtilsProvider>
                         {/* <TextField
-                          error={new Date(startDate) > new Date(endDate) || new Date(startDate) < new Date('1990-01-01')}
+                          error={new Date(startDate) > new Date(endDate) ||
+                            new Date(startDate) < new Date('1990-01-01')}
                           id="date"
                           type="date"
                           value={startDate}
@@ -682,8 +684,9 @@ class ExportModal extends React.Component {
                             inputVariant="outlined"
                             value={pickerEnd}
                             minDate={new Date(pickerStart)}
-                            minDateMessage="Date should not be before minimal date or Start date"
+                            minDateMessage="Date should not be before Start date"
                             maxDate={new Date('2019-07-31')}
+                            maxDateMessage="Maximum date is 31/07/2019"
                             onChange={this.handleEndDateChange}
                             InputProps={{
                               classes: { input: classes.textInput },
@@ -695,7 +698,8 @@ class ExportModal extends React.Component {
                           />
                         </MuiPickersUtilsProvider>
                         {/* <TextField
-                          error={new Date(startDate) > new Date(endDate) || new Date(endDate) > new Date('2019-07-31')}
+                          error={new Date(startDate) > new Date(endDate) ||
+                            new Date(endDate) > new Date('2019-07-31')}
                           id="date"
                           type="date"
                           value={endDate}
@@ -791,13 +795,13 @@ class ExportModal extends React.Component {
                     <div style={{ marginTop: 50 }}>
                       <Button
                         className={classNames(classes.button, classes.closeBtn)}
-                        disabled={solarBI.sending}
+                        disabled={solarBI.sending || solarBI.requestStatus === 'success'}
                         onClick={onHide}
                         color="primary"
                       >
                         Back
                       </Button>
-                      {solarBI.sending ?
+                      {(solarBI.sending || solarBI.requestStatus === 'success') ?
                         (<img className={classes.loading} alt="Loading..." src="/static/assets/images/loading.gif" />) :
                         (<Button className={classNames(classes.button, classes.requestBtn)} onClick={this.handleRequestData} color="primary" disabled={solarBI.remain_count === 0}>REQUEST</Button>)
                       }
