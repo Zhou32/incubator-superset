@@ -90,7 +90,7 @@ class TeamRegisterUser(Model):
     registration_date = Column(DateTime, default=datetime.datetime.now, nullable=True)
     registration_hash = Column(String(256))
     inviter = Column('inviter_id', Integer, ForeignKey('ab_user.id'), nullable=True)
-    valid_date = Column(DateTime, default=(lambda: datetime.datetime.now() + timedelta(hours=24)),
+    valid_date = Column(DateTime, default=(lambda: datetime.datetime.now() + timedelta(hours=24*5)),
                         nullable=True)
     role_assigned = Column('role_id', Integer, ForeignKey('ab_role.id'), nullable=True)
 

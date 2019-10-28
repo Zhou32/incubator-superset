@@ -17,7 +17,7 @@
 # pylint: disable=C,R,W
 import os
 from contextlib import closing
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from dateutil.relativedelta import relativedelta
 import logging
 import re
@@ -794,10 +794,18 @@ class SolarBIBillingView(ModelView):
         cus_address = cus_obj.address
 
         cus_invoices = stripe.Invoice.list(customer=cus_obj['id'])
-        cus_invoices = list( {'invoice_id':invoice['id'],
+        cus_invoices = list({'invoice_id': invoice['id'],
                               'date': datetime.utcfromtimestamp(invoice['created']).strftime("%d/%m/%Y"),
                               'link': invoice['invoice_pdf']} for invoice in cus_invoices)
-        card_info = stripe.PaymentMethod.list(customer=team.stripe_user_id, type='card')['data'][0]['card']
+
+        # card_expire_soon = False
+        # if stripe.PaymentMethod.list(customer=team.stripe_user_id, type='card')['data']:
+        #     card_info = stripe.PaymentMethod.list(customer=team.stripe_user_id, type='card')['data'][0]['card']
+        #     one_month_later = str(date.today() + relativedelta(months=1))[:-3]
+        #     card_expire_date = str(card_info['exp_year']) + '-' + str(card_info['exp_month'])
+        #     if one_month_later >= card_expire_date:
+        #         card_expire_soon = True
+
         entry_point = 'billing'
         payload = {
             'user': bootstrap_user_data(g.user),
@@ -806,8 +814,8 @@ class SolarBIBillingView(ModelView):
             'cus_info': {'cus_name': cus_name, 'cus_email': cus_email, 'cus_address': cus_address},
             'pm_id': team.stripe_pm_id,
             'plan_id': plan.stripe_id,
-            'invoice_list':cus_invoices,
-            'card_info': card_info,
+            'invoice_list': cus_invoices,
+            # 'card_expire_soon': card_expire_soon
         }
 
         return self.render_template(
@@ -862,7 +870,7 @@ class SolarBIBillingView(ModelView):
     @expose('/change_card_detail/<cus_id>', methods=['POST'])
     def change_card_detail(self, pm_id):
         if self.update_ccard(pm_id, get_team_id()):
-            return json_success({'msg':'Credit card updated successful'})
+            return json_success(json.dumps({'msg':'Credit card updated successful'}))
         else:
             return json_error_response('Card update failed. Please try again later.')
 
