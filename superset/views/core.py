@@ -796,12 +796,13 @@ class SolarBIBillingView(ModelView):
                               'date': datetime.utcfromtimestamp(invoice['created']).strftime("%d/%m/%Y"),
                               'link': invoice['invoice_pdf']} for invoice in cus_invoices)
 
+        card_info = None
         card_has_expired = False
         card_expire_soon = False
         if stripe.PaymentMethod.list(customer=team.stripe_user_id, type='card')['data']:
             card_info = stripe.PaymentMethod.list(customer=team.stripe_user_id, type='card')['data'][0]['card']
             one_month_later = str(date.today() + relativedelta(months=1))[:-3]
-            card_expire_date = str(card_info['exp_year']) + '-' + str(card_info['exp_month'])
+            card_expire_date = str(card_info['exp_year']) + '-' + ('0' + str(card_info['exp_month']))[-2:]
             if str(date.today())[:-3] > card_expire_date:
                 card_has_expired = True
             elif one_month_later >= card_expire_date:
@@ -817,7 +818,8 @@ class SolarBIBillingView(ModelView):
             'plan_id': plan.stripe_id,
             'invoice_list': cus_invoices,
             'card_has_expired': card_has_expired,
-            'card_expire_soon': card_expire_soon
+            'card_expire_soon': card_expire_soon,
+            'card_info': card_info,
         }
 
         return self.render_template(

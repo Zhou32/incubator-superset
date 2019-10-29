@@ -20,7 +20,7 @@ const useStyles = makeStyles({
   },
   textInput: {
     fontFamily: 'Montserrat',
-    fontSize: '1.5em',
+    fontSize: '1.1em',
   },
   label: {
     color: '#757575',
@@ -113,6 +113,7 @@ function ChangeAddress({
           <div>
             <label className={classes.label} htmlFor="country">Country</label>
             <CountryDropdown
+              style={{ width: 250, height: 30 }}
               valueType="short"
               value={country}
               onChange={val => selectCountry(val)}
@@ -171,7 +172,7 @@ function ChangeAddress({
           <div style={{ marginTop: 15 }}>
             <label className={classes.label} htmlFor="state">State</label>
             <RegionDropdown
-              style={{ width: 150 }}
+              style={{ width: 250, height: 30 }}
               countryValueType="short"
               valueType="short"
               blankOptionLabel="State"
