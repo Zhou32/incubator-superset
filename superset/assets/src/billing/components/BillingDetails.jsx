@@ -2,11 +2,13 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { StripeProvider, Elements } from 'react-stripe-elements';
 import ChangeAddress from './ChangeAddress';
-import { changeBillDetail } from '../actions/billingActions';
-// import TeamCreditCard from './TeamCreditCard';
+import ChangeCreditCard from './ChangeCreditCard';
+import CreditCardBrand from './CreditCardBrand';
+import { changeBillDetail, changeCreditCard } from '../actions/billingActions';
 
-function BillingDetails({ billing, changeBillDetailConnect }) {
+function BillingDetails({ billing, changeBillDetailConnect, changeCreditCardConnect }) {
   const { cus_name, cus_email, cus_address } = billing.cus_info;
   let country = '';
   let city = '';
@@ -38,6 +40,7 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
   const [nameError, setNameError] = useState(false);
   const [emailEmptyError, setEmailEmptyError] = useState(false);
   const [emailInvalidError, setEmailInvalidError] = useState(false);
+  const [openCCC, setOpenCCC] = useState(false);
 
   const handleChange = name => (event) => {
     setBillingValues({ ...billingValues, [name]: event.target.value });
@@ -49,6 +52,14 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
 
   const handleChangeAddressClose = () => {
     setChangeAddressOpen(false);
+  };
+
+  const handleCloseCCC = () => {
+    setOpenCCC(false);
+  };
+
+  const handleOpenCCC = () => {
+    setOpenCCC(true);
   };
 
   const validateEmail = (email) => {
@@ -77,14 +88,13 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
   return (
     <React.Fragment>
       <div className="tab-pane active" id="billing">
-        {/* <TeamCreditCard /> */}
         <div className="panel panel-primary">
           <div className="panel-heading">Billing Details</div>
           <div className="panel-body">
             <p>Please let us know how you’d like your invoices to be addressed.</p>
             <div>
               <div className="form-group">
-                <label htmlFor="name">Name</label>
+                <label htmlFor="name">Billing name</label>
                 <input id="name" className="form-control billing-details" value={billingValues.name} onChange={handleChange('name')} />
                 {nameError ? <p className="invalid-message">* Name cannot be empty</p> : null}
               </div>
@@ -95,7 +105,7 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
                 {emailInvalidError ? <p className="invalid-message">* Email is invalid</p> : null}
               </div>
               <div className="form-group">
-                <label htmlFor="address">Address</label>
+                <label htmlFor="address">Details</label>
                 <div
                   onClick={handleChangeAddressOpen}
                   id="billing-address"
@@ -120,8 +130,37 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
             }
           </div>
         </div>
+
+        {billing.card_info && (
+          <div className="panel panel-primary">
+            <div className="panel-heading">Credit Card</div>
+            <div className="panel-body billing-users">
+              <p>
+                <CreditCardBrand brand={billing.card_info.brand} />
+                <span style={{ marginLeft: '2em' }}>&#9679;&#9679;&#9679;&#9679; </span>
+                <span className="billing-card-info">{billing.card_info.last4}</span>
+                <span className="billing-card-info">{('0' + billing.card_info.exp_month).slice(-2)} / {billing.card_info.exp_year}</span>
+                <button type="button" className="btn update-cc-btn" onClick={handleOpenCCC}>Update</button>
+              </p>
+
+              {billing.card_expire_soon ? (
+                <div className="alert alert-warning cc-expire-warning" role="alert">
+                  <i className="fas fa-exclamation-circle" />&nbsp;&nbsp;
+                  Your credit card is about to expire. Please update soon.
+                </div>
+              ) : null}
+              {billing.card_has_expired ? (
+                <div className="alert alert-danger cc-expire-warning" role="alert">
+                  <i className="fas fa-exclamation-circle" />&nbsp;&nbsp;
+                  Your credit card has expired. Please update it now.
+                </div>
+              ) : null}
+            </div>
+          </div>
+        )}
+
         <div className="panel panel-primary">
-          <div className="panel-heading">Users</div>
+          <div className="panel-heading">Invoices</div>
           <div className="panel-body billing-users">
             <table style={{ width: '100%' }}>
               <thead>
@@ -157,6 +196,17 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
         setBillingValues={setBillingValues}
         handleChange={handleChange}
       />
+
+      <StripeProvider apiKey="pk_test_2CT1LvA7viLp1j7yCHJ2MezU00xXxxnRdM">
+        <Elements>
+          <ChangeCreditCard
+            openCCC={openCCC}
+            handleCloseCCC={handleCloseCCC}
+            changeCreditCard={changeCreditCardConnect}
+            billing={billing}
+          />
+        </Elements>
+      </StripeProvider>
     </React.Fragment>
   );
 }
@@ -164,6 +214,7 @@ function BillingDetails({ billing, changeBillDetailConnect }) {
 BillingDetails.propTypes = {
   billing: PropTypes.object.isRequired,
   changeBillDetailConnect: PropTypes.func.isRequired,
+  changeCreditCardConnect: PropTypes.func.isRequired,
 };
 
 function mapStateToProps({ billing }) {
@@ -174,6 +225,6 @@ function mapStateToProps({ billing }) {
 
 export default connect(
   mapStateToProps,
-  { changeBillDetailConnect: changeBillDetail },
+  { changeBillDetailConnect: changeBillDetail, changeCreditCardConnect: changeCreditCard },
 )(BillingDetails);
 

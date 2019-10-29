@@ -60,6 +60,25 @@ export default function (state = {}, action) {
         detail_change: 'fail',
       };
     },
+    [actions.CHANGE_CREDIT_CARD_START]() {
+      return {
+        ...state,
+        change_cc: 'changing',
+      };
+    },
+    [actions.CHANGE_CREDIT_CARD_SUCCESS]() {
+      return {
+        ...state,
+        change_cc: 'success',
+        pm_id: action.res.pm_id,
+      };
+    },
+    [actions.CHANGE_CREDIT_CARD_FAIL]() {
+      return {
+        ...state,
+        change_cc: 'fail',
+      };
+    },
   };
 
   if (action.type in actionHandlers) {

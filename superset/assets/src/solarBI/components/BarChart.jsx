@@ -31,7 +31,7 @@ const styles = theme => ({
   csvLink: {
     position: 'absolute',
     right: 180,
-    top: 8,
+    top: 9,
     zIndex: 200,
     color: '#424242',
     '& span': {

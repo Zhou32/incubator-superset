@@ -31,6 +31,7 @@ html {
 }
 body {
   margin: 0;
+  background-color: #f5f5f5 !important;
 }
 input {
   border: none;
@@ -57,6 +58,81 @@ input {
   -ms-flex-flow: column;
   flex-flow: column;
   z-index: 5;
+}
+.team-selector {
+  position: relative;
+}
+.md-select {
+  position: absolute;
+  // top: 50%;
+  left: 60%;
+  bottom: 20;
+  transform: translate(-50%, -50%);
+  display: block;
+  margin: 10px 0 8px 0;
+  padding-bottom: 2px;
+  min-width: 180px;
+}
+.md-select *, .md-select :after, .md-select :before {
+  box-sizing: border-box;
+}
+.md-select [type=button] {
+  background: #fff;
+  border-color: rgba(0, 0, 0, 0.12);
+  border-width: 0 0 1px 0;
+  color: rgba(0, 0, 0, 0.73);
+  cursor: default;
+  display: block;
+  line-height: 48px;
+  padding: 2px 0 1px 16px;
+  position: relative;
+  text-align: left;
+  text-shadow: none;
+  width: 120px;
+  z-index: 1;
+  outline: none;
+  overflow: hidden;
+}
+.md-select [type=button]:focus, .md-select [type=button]:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+.md-select [type=button]:after {
+  content: '\25be';
+  float: right;
+  padding-right: 16px;
+}
+.md-select ul[role=listbox] {
+  background-color: white;
+  cursor: default;
+  list-style: none;
+  line-height: 26px;
+  overflow: hidden;
+  margin: 0;
+  max-height: 0;
+  position: absolute;
+  padding: 0;
+  transform: translateY(-50%);
+  transition: all 0.15s cubic-bezier(0.35, 0, 0.25, 1);
+  width: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24) !important;
+}
+.md-select ul[role=listbox] li {
+  height: 48px;
+  margin: 0;
+  padding: 10px 16px;
+  outline: none;
+  overflow: hidden;
+  color: black;
+}
+.md-select ul[role=listbox] li:focus, .md-select ul[role=listbox] li:hover, .md-select ul[role=listbox] li.active {
+  background: rgba(0, 0, 0, 0.1);
+}
+.md-select.active ul {
+  max-height: 130px;
+  overflow: auto;
+  padding: 8px 0 16px 0px;
+  z-index: 2;
+  transition: all 0.2s ease;
 }
 .input-fields {
   width: 50%;
@@ -656,7 +732,7 @@ input {
 }
 
 .billing-content .panel > .panel-body {
-  padding: 25px 35px;
+  padding: 20px 35px;
 }
 
 .billing-content .panel > .panel-footer {
@@ -1577,4 +1653,37 @@ input {
 }
 .invalid-message {
   color: red;
+}
+.cc-expire-warning {
+  width: 100%; 
+  margin: 10px auto;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+  font-family: 'Montserrat';
+} 
+.update-cc-btn {
+  float: right;
+  margin-top: 10px;
+  background-color: #024067;
+  color: white;
+  border-color: #024067;
+  border-radius: 20px;
+}
+.update-cc-btn:hover {
+  color: white;
+  text-shadow: 0px 0px 3px rgba(255, 255, 255, 1);
+  box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+  -webkit-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+  -moz-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+  transition: all 0.4s ease 0s;
+  cursor: pointer;
+}
+.update-cc-btn:focus {
+  color: white;
+  outline: none;
+}
+.billing-card-info {
+  font-size: 1.2em;
+  margin-right: 1em;
 }

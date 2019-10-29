@@ -111,3 +111,42 @@ export function changeBillDetail(cus_id, payload, timeout = 60) {
     }
   };
 }
+
+
+export const CHANGE_CREDIT_CARD_START = 'CHANGE_CREDIT_CARD_START';
+export function changeCreditCardStart() {
+  return { type: CHANGE_CREDIT_CARD_START };
+}
+
+export const CHANGE_CREDIT_CARD_SUCCESS = 'CHANGE_CREDIT_CARD_SUCCESS';
+export function changeCreditCardSuccess(res) {
+  return { type: CHANGE_CREDIT_CARD_SUCCESS, res };
+}
+
+export const CHANGE_CREDIT_CARD_FAIL = 'CHANGE_CREDIT_CARD_FAIL';
+export function changeCreditCardFail() {
+  return { type: CHANGE_CREDIT_CARD_FAIL };
+}
+
+export function changeCreditCard(pm_id, timeout = 60) {
+  return async (dispatch) => {
+    const url = '/billing/change_card_detail/' + pm_id + '/';
+    const controller = new AbortController();
+    const { signal } = controller;
+    dispatch(changeCreditCardStart());
+
+    try {
+      const { json } = await SupersetClient.post({
+        url,
+        postPayload: {},
+        signal,
+        timeout: timeout * 1000,
+      });
+      dispatch(changeCreditCardSuccess(json));
+      // dispatch(addSuccessToast(t(json.msg)));
+    } catch (e) {
+      dispatch(changeCreditCardFail());
+      dispatch(addDangerToast(t('Change credit card failed.')));
+    }
+  };
+}
