@@ -34,8 +34,10 @@ from superset.solar.registerviews import (
     SolarBIRegisterUserDBView, SolarBIRegisterInvitationView,
     SolarBIRegisterInvitationUserDBView
 )
-from superset.solar.models import Plan, ResetRequest, Team, TeamRegisterUser, TeamSubscription, SolarBIUser
+from superset.solar.models import Plan, ResetRequest, Team, TeamRegisterUser, TeamSubscription, SolarBIUser, TeamRole
 from superset.security import SupersetSecurityManager
+
+from .utils import get_session_team
 
 stripe.api_key = os.getenv('STRIPE_SK')
 
@@ -145,6 +147,7 @@ class CustomSecurityManager(SupersetSecurityManager):
     team_model = Team
     user_model = SolarBIUser
 
+
     subscription_model = TeamSubscription
 
     def __init__(self, appbuilder):
@@ -180,6 +183,34 @@ class CustomSecurityManager(SupersetSecurityManager):
         # commit role and view menu updates
         self.get_session.commit()
         self.clean_perms()
+
+    def _has_view_access(
+            self, user: object, permission_name: str, view_name: str
+    ) -> bool:
+
+        team_id, team_name = get_session_team()
+        team_roles = user.team_role
+        db_role_ids = list()
+        # First check against builtin (statically configured) roles
+        # because no database query is needed
+        for team_role in team_roles:
+            if team_role.role.name in self.builtin_roles:
+                if self._has_access_builtin_roles(
+                        team_role.role,
+                        permission_name,
+                        view_name
+                ):
+                    return True
+            else:
+                if str(team_role.team.id) == str(team_id):
+                    db_role_ids.append(team_role.role.id)
+
+        # Then check against database-stored roles
+        return self.exist_permission_on_roles(
+            view_name,
+            permission_name,
+            db_role_ids,
+        )
 
     def is_owner_pvm(self, pvm):
         result = False
@@ -246,9 +277,12 @@ class CustomSecurityManager(SupersetSecurityManager):
                 self.appbuilder.get_session.rollback()
         return None
 
-    def get_url_for_invitation(self, token):
-        return url_for('%s.%s' % (self.invite_register_view.endpoint,
-                                  'invitation'), invitation_hash=token, _external=True)
+    def get_url_for_invitation(self, token, existed=False):
+        if not existed:
+            return url_for('%s.%s' % (self.invite_register_view.endpoint,
+                                      'invitation'), invitation_hash=token, _external=True)
+        else:
+            pass
 
     def find_user_by_token(self, token):
         reset_request = self.get_session.query(self.resetRequest_model)\
@@ -290,12 +324,31 @@ class CustomSecurityManager(SupersetSecurityManager):
             self.appbuilder.get_session.rollback()
             return None
 
-    def find_team(self, team_name=None, user_id=None):
+    def find_team(self, team_id=None, team_name=None, user_id=None):
         if team_name:
             return self.get_session.query(self.team_model).filter_by(team_name=team_name).first()
         elif user_id:
-            return self.get_session.query(self.team_model).\
-                filter(self.team_model.users.any(id=user_id)).scalar()
+            user = self.get_session.query(self.user_model).filter_by(id=user_id).first()
+            if len(user.team_role) > 0:
+                return user.team_role[0].team
+            else:
+                return None
+        elif team_id:
+            return self.get_session.query(self.team_model).filter_by(id=team_id).first()
+
+    def get_teams(self, user_id):
+        user = self.get_session.query(self.user_model).filter_by(id=user_id).first()
+        teams = []
+        for team_role in user.team_role:
+            teams.append((team_role.team.id, team_role.team.team_name))
+        return teams
+
+    def get_role_in_team(self, user, team_id):
+        for team_role in user.team_role:
+            if team_role.team.id == team_id:
+                return team_role.role
+        return None
+
 
     def add_team_user(self, email, first_name, last_name, username, hashed_password, team, role_id):
         try:
@@ -312,9 +365,12 @@ class CustomSecurityManager(SupersetSecurityManager):
             user.roles.append(role)
             if team is not None:
                 team.users.append(user)
+                user_role = self.get_session.query(TeamRole).filter_by(team_id=team.id, role_id=role).first()
+                user.team_role.append(user_role)
                 # db_role = self.find_role(DB_ROLE_PREFIX+team.team_name)
                 # user.roles.append(db_role)
             self.get_session.add(user)
+            self.get_session.merge(team)
             self.get_session.commit()
             return user
         except Exception as e:
@@ -416,26 +472,24 @@ class CustomSecurityManager(SupersetSecurityManager):
     def find_solar_default_role_id(self):
         return self.get_session.query(self.role_model).filter_by(name='solar_default').first()
 
-    def get_awaiting_emails(self, user_id):
-        team_name = self.find_team(user_id=user_id).team_name
-        all_waiting_users = self.get_session.query(self.registeruser_model).filter_by(team=team_name).all()
+    def get_awaiting_emails(self, team):
+        all_waiting_users = self.get_session.query(self.registeruser_model).filter_by(team=team.team_name).all()
         return self.invitation_is_valid(all_waiting_users)
 
     def get_registered_user(self, user_email):
         reg_user = self.get_session.query(self.registeruser_model).filter_by(email=user_email).first()
         return reg_user
 
-    def get_team_members(self, user_id):
-        team_name = self.find_team(user_id=user_id).team_name
-        team = self.get_session.query(self.team_model).filter_by(team_name=team_name).first()
+    def get_team_members(self, team_id):
+        team = self.find_team(team_id=team_id)
         email_role = []
         for user in team.users:
-            user_role = user.roles[0].name
-            if user_role == 'team_owner':
-                email_role.append((user.email, 'Admin'))
-            else:
-                email_role.append((user.email, 'User'))
-
+            for user_role in user.team_role:
+                if user_role.team.id == team.id:
+                    if user_role.role.name == 'team_owner':
+                        email_role.append((user.email, 'Admin'))
+                    elif user_role.role.name == 'solar_default':
+                        email_role.append((user.email, 'User'))
         return email_role
 
     def update_team_name(self, user_id, new_team_name):
@@ -462,35 +516,52 @@ class CustomSecurityManager(SupersetSecurityManager):
 
     def add_invite_register_user(self, email, team, first_name=None, last_name=None,
                                  role=None, inviter=None, password='', hashed_password=''):
-        invited_user = self.registeruser_model()
-        # email and team parameters should be always available.
-        invited_user.email = email
-        invited_user.team = team.team_name
-        invited_user.username = 'solarbi_' + \
-            ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=8))
+        invited_user = self.find_user(email=email)
+        existed = not invited_user is None
+        if not existed:
+            # Invite new user to the system
+            invited_user = self.registeruser_model()
+            # email and team parameters should be always available.
+            invited_user.email = email
+            invited_user.team = team.team_name
+            invited_user.username = 'solarbi_' + \
+                ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=8))
 
-        if first_name:
-            invited_user.first_name = first_name
-        if last_name:
-            invited_user.last_name = last_name
-        if inviter:
-            invited_user.inviter = inviter
-        if role:
-            invited_user.role_assigned = role
-        if hashed_password:
-            invited_user.password = hashed_password
+            if first_name:
+                invited_user.first_name = first_name
+            if last_name:
+                invited_user.last_name = last_name
+            if inviter:
+                invited_user.inviter = inviter
+            if role:
+                invited_user.role_assigned = role
+            if hashed_password:
+                invited_user.password = hashed_password
+            else:
+                invited_user.password = generate_password_hash(password)
+
+                invited_user.registration_hash = str(uuid.uuid1())
+                try:
+                    self.get_session.add(invited_user)
+                    self.get_session.commit()
+                except Exception as e:
+                    self.get_session.rollback()
+                    logging.error(e)
+                    raise ValueError('Invitation is failed because of database integrity error')
         else:
-            invited_user.password = generate_password_hash(password)
-
-        invited_user.registration_hash = str(uuid.uuid1())
-        try:
-            self.get_session.add(invited_user)
-            self.get_session.commit()
-        except Exception as e:
-            self.get_session.rollback()
-            logging.error(e)
-            raise ValueError('Invitation is failed because of database integrity error')
-        return invited_user
+            # add existed user to the team
+            user_role = self.get_session.query(TeamRole).filter_by(team_id=team.id, role_id=role).first()
+            invited_user.team_role.append(user_role)
+            team.users.append(invited_user)
+            try:
+                self.get_session.merge(invited_user)
+                self.get_session.merge(team)
+                self.get_session.commit()
+            except Exception as e:
+                self.get_session.rollback()
+                logging.error(e)
+                raise ValueError('Invitation is failed because of database integrity error')
+        return invited_user, existed
 
     def delete_invited_user(self, user_email):
         try:

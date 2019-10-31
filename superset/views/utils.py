@@ -19,7 +19,7 @@ from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 from urllib import parse
 
-from flask import request
+from flask import request, session
 import simplejson as json
 
 from superset import app, db, viz
@@ -197,3 +197,10 @@ def apply_display_max_row_limit(sql_results: Dict[str, Any]) -> Dict[str, Any]:
         sql_results["data"] = sql_results["data"][:display_limit]
         sql_results["displayLimitReached"] = True
     return sql_results
+
+
+def get_user_teams(user):
+    team_id_list = []
+    for team_role in user.team_role:
+        team_id_list.append(team_role.team.id)
+    return team_id_list
