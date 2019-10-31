@@ -112,18 +112,16 @@
                 </a>
             </li>
         </ul>
-        {#     <div class="team-selector">#}
         <div class="md-select">
             <label for="ul-id"><button type="button" class="ng-binding">{{ session['team_name'] }}</button></label>
             <ul role="listbox" id="ul-id" class="md-whiteframe-z1" name="ul-id">
                 {% for id, team in team_ids %}
-                <li role="option" id="{{id}}" class="ng-binding ng-scope active" tabindex="-1" aria-selected="true">
-                    {{team}}
-                </li>
+                    <li role="option" id="{{id}}" class="ng-binding ng-scope {{ 'active' if session['team_name'] == team }}" tabindex="-1" aria-selected="true">
+                        {{team}}
+                    </li>
                 {% endfor %}
             </ul>
         </div>
-        {#     </div>#}
     </nav>
 </div>
 
@@ -132,7 +130,12 @@
     $(document).ready(function () {
         $('.md-select').on('click', function () {
             $(this).toggleClass('active')
+        });
 
+        $(document).click(function(event){
+            if (!$(event.target).hasClass('ng-binding')) {
+                $(".md-select").removeClass("active");
+            }
         });
 
         $('.md-select ul li').on('click', function () {
@@ -140,9 +143,7 @@
             $('.md-select ul li').not($(this)).removeClass('active');
             $(this).addClass('active');
             $('.md-select label button').text(v);
-            id = $(this)[0].id;
-            console.log(id);
-            window.location.href = 'switch_team/' + id;
+            window.location.href = 'switch_team/' + $(this)[0].id;
         });
     });
 </script>

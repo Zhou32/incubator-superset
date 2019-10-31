@@ -37,7 +37,7 @@ from superset.solar.registerviews import (
 from superset.solar.models import Plan, ResetRequest, Team, TeamRegisterUser, TeamSubscription, SolarBIUser, TeamRole
 from superset.security import SupersetSecurityManager
 
-from .utils import get_session_team
+from .utils import get_session_team, set_session_team
 
 stripe.api_key = os.getenv('STRIPE_SK')
 
@@ -146,7 +146,7 @@ class CustomSecurityManager(SupersetSecurityManager):
     resetRequest_model = ResetRequest
     team_model = Team
     user_model = SolarBIUser
-
+    team_role = TeamRole
 
     subscription_model = TeamSubscription
 
@@ -313,9 +313,24 @@ class CustomSecurityManager(SupersetSecurityManager):
         new_team.team_name = reg.team
         new_team.date_created = reg.registration_date
         new_team.users.append(user)
+
+        admin_role = self.find_role('team_owner')
+        admin_team_role = self.team_role()
+        admin_team_role.team = new_team
+        admin_team_role.role = admin_role
+
+        user_role = self.find_role('solar_default')
+        user_team_role = self.team_role()
+        user_team_role.team = new_team
+        user_team_role.role = user_role
+
+        user.team_role.append(admin_team_role)
+
         try:
             self.get_session.add(new_team)
-            # self.get_session.commit()
+            self.get_session.add(admin_team_role)
+            self.get_session.add(user_team_role)
+
             self.get_session.merge(user)
             self.get_session.commit()
             return new_team
@@ -348,7 +363,6 @@ class CustomSecurityManager(SupersetSecurityManager):
             if team_role.team.id == team_id:
                 return team_role.role
         return None
-
 
     def add_team_user(self, email, first_name, last_name, username, hashed_password, team, role_id):
         try:
@@ -491,6 +505,10 @@ class CustomSecurityManager(SupersetSecurityManager):
                     elif user_role.role.name == 'solar_default':
                         email_role.append((user.email, 'User'))
         return email_role
+
+    def get_session_team(self):
+        team = self.get_session.query(Team).filter_by(id=get_session_team()).first()
+        return team
 
     def update_team_name(self, user_id, new_team_name):
         current_team_name = self.find_team(user_id=user_id).team_name

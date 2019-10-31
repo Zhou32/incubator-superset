@@ -36,7 +36,7 @@ from .forms import (
     SolarBIRegisterInvitationUserDBForm, SolarBITeamFormWidget, SolarBIInvitationWidget,
 )
 from .models import SolarBIUser
-from .utils import post_request, get_session_team
+from .utils import post_request, get_session_team, set_session_team
 
 log = logging.getLogger(__name__)
 
@@ -79,6 +79,7 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
         self.appbuilder.sm.update_user_auth_stat(user, True)
         login_user(user)
 
+        set_session_team(team_reg.id, team_reg.team_name)
         self.appbuilder.get_session.commit()
         flash(as_unicode('Your account has been successfully activated!'), 'success')
         return redirect(self.appbuilder.get_url_for_index)
@@ -202,6 +203,12 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
             form.email.validators.append(Unique(datamodel_user, 'email'))
             form.email.validators.append(Unique(datamodel_register_user, 'email'))
 
+    def remove_email_unique_validation(self, form):
+        email_field = form.email
+        for validator in email_field.validators:
+            if type(validator).__name__ == 'Unique':
+                email_field.validators.remove(validator)
+
     @expose('/my-team', methods=['GET'])
     @has_access
     def invitation(self):
@@ -228,7 +235,8 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
     @has_access
     def invitation_post(self):
         form = self.form.refresh()
-        self.add_form_unique_validations(form)
+        # self.add_form_unique_validations(form)
+        self.remove_email_unique_validation(form)
 
         # choices placeholder to pass validation
         # form.role.choices = self.appbuilder.sm.find_invite_roles(g.user.id)
