@@ -519,6 +519,7 @@ class CustomSecurityManager(SupersetSecurityManager):
 
         team = self.get_session.query(self.team_model).filter_by(team_name=current_team_name).first()
         team.team_name = new_team_name
+        set_session_team(team.id, team.team_name)
         self.get_session.commit()
         return True
 

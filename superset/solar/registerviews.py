@@ -168,7 +168,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
     email_template = 'appbuilder/general/security/team_member_invitation_mail.html'
     edit_widget = SolarBITeamFormWidget
 
-    def send_email(self, register_user, existed):
+    def send_email(self, register_user, existed=False):
         """
             Method for sending the registration Email to the user
         """
@@ -293,7 +293,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
                                                                role=role_id,
                                                                inviter=g.user.id)
         if reg_user:
-            if self.send_email(reg_user):
+            if self.send_email(reg_user, existed):
                 flash(as_unicode('Resend invitation to %s' % user_email), 'info')
                 return jsonify(dict(redirect='/solar/my-team'))
             else:

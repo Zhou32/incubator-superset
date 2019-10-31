@@ -128,6 +128,9 @@
             if (new_team_name === '' || new_team_name == null) {
                 return alert("Team name cannot be empty");
             }
+            if (new_team_name.length > 13) {
+                return alert("Team name length cannot be longer than 13");
+            }
             let csrf_token = "{{ csrf_token() if csrf_token else '' }}";
             $.ajaxSetup({
                 beforeSend: function(xhr, settings) {

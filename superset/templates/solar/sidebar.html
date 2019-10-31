@@ -117,6 +117,12 @@
             <ul role="listbox" id="ul-id" class="md-whiteframe-z1" name="ul-id">
                 {% for id, team in team_ids %}
                     <li role="option" id="{{id}}" class="ng-binding ng-scope {{ 'active' if session['team_name'] == team }}" tabindex="-1" aria-selected="true">
+                        {% if session['team_name'] == team %}
+                            <span class="checkmark">
+                                <div class="checkmark_stem"></div>
+                                <div class="checkmark_kick"></div>
+                            </span>
+                        {% endif %}
                         {{team}}
                     </li>
                 {% endfor %}
