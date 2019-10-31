@@ -56,7 +56,7 @@ from sqlalchemy import and_, or_, select
 from werkzeug.routing import BaseConverter
 from ..solar.forms import SolarBIListWidget
 from ..solar.models import Plan, TeamSubscription, Team, StripeEvent
-
+from ..solar.utils import set_session_team, get_session_team
 from superset import (
     app,
     appbuilder,
@@ -111,6 +111,7 @@ from .utils import (
     get_datasource_info,
     get_form_data,
     get_viz,
+    get_user_teams,
 )
 
 config = app.config
@@ -408,7 +409,7 @@ def get_user():
 
 
 def get_team_id():
-    return g.user.team[0].id
+    return session['team_id']
 
 
 # class SolarBIModelView(SliceModelView):  # noqa
@@ -456,7 +457,8 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
     @has_access
     def list(self):
 
-        for role in g.user.roles:
+        for team_role in g.user.team_role:
+            role = team_role.role
             if role.name == 'Admin':
                 self.remove_filters_for_role(role.name)
                 break
@@ -497,9 +499,9 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
 
         # serialize composite pks
         pks = [self._serialize_pk_if_composite(pk) for pk in pks]
-
+        team_id = get_team_id()
         # get all object keys in s3 under all team users' sub folders
-        team_members_email_role = appbuilder.sm.get_team_members(g.user.id)
+        team_members_email_role = appbuilder.sm.get_team_members(team_id)
         team_member_emails = []
         for email, _ in team_members_email_role:
             team_member_emails.append(email)
@@ -743,7 +745,7 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
 
         for team_role in g.user.team_role:
             if str(team_role.team.id) == team_id:
-                session['team_id'] = team_role.team.id
+                set_session_team(team_role.team.id, team_role.team.team_name)
                 return redirect("/")
 
         flash('Team Error', 'danger')

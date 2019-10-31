@@ -21,7 +21,8 @@
 {% set WARNING_MSG = appbuilder.app.config.get('WARNING_MSG') %}
 {% set app_icon_width = appbuilder.app.config.get('APP_ICON_WIDTH', 126) %}
 {% set logo_target_path = appbuilder.app.config.get('LOGO_TARGET_PATH') or '/profile/{}/'.format(current_user.username) %}
-{% set current_user_role = current_user.roles[0].name %}
+{% set current_user_role = appbuilder.sm.get_role_in_team(current_user, session['team_id']).name %}
+{% set team_ids = appbuilder.sm.get_teams(current_user.id) %}
 <link href="{{url_for('static',filename='assets/stylesheets/solarbi.less')}}?v=1.3" rel="stylesheet">
 
 
@@ -107,12 +108,11 @@
      </ul>
 {#     <div class="team-selector">#}
          <div class="md-select">
-             <label for="ul-id"><button type="button" class="ng-binding">State 2</button></label>
-              <ul role="listbox" id="ul-id" class="md-whiteframe-z1" aria-activedescendant="state2_AK" name="ul-id">
-                 <li role="option" id="state2_AK" class="ng-binding ng-scope active" tabindex="-1" aria-selected="true">Alaska</li>
-                 <li role="option" id="state2_AL" class="ng-binding ng-scope" tabindex="-1" aria-selected="false">Alabama</li>
-                 <li role="option" id="state2_AL" class="ng-binding ng-scope" tabindex="-1" aria-selected="false">Bdwidw</li>
-                 <li role="option" id="state2_AL" class="ng-binding ng-scope" tabindex="-1" aria-selected="false">Cdqw2</li>
+             <label for="ul-id"><button type="button" class="ng-binding">{{ session['team_name'] }}</button></label>
+              <ul role="listbox" id="ul-id" class="md-whiteframe-z1" name="ul-id">
+                  {% for id, team in team_ids %}
+                 <li role="option" id="{{id}}" class="ng-binding ng-scope active" tabindex="-1" aria-selected="true">{{team}}</li>
+                  {% endfor %}
               </ul>
         </div>
 {#     </div>#}
@@ -123,14 +123,18 @@
 <script>
     $(document).ready(function() {
         $('.md-select').on('click', function(){
-          $(this).toggleClass('active')
+            $(this).toggleClass('active')
+
         });
 
         $('.md-select ul li').on('click', function() {
-          var v = $(this).text();
-          $('.md-select ul li').not($(this)).removeClass('active');
-          $(this).addClass('active');
-          $('.md-select label button').text(v)
+            var v = $(this).text();
+            $('.md-select ul li').not($(this)).removeClass('active');
+            $(this).addClass('active');
+            $('.md-select label button').text(v);
+            id = $(this)[0].id;
+            console.log(id);
+            window.location.href='switch_team/'+id;
         });
     });
 </script>
