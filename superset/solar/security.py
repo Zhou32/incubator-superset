@@ -577,7 +577,7 @@ class CustomSecurityManager(SupersetSecurityManager):
     def add_invite_register_user(self, email, team, first_name=None, last_name=None,
                                  role=None, inviter=None, password='', hashed_password=''):
         invited_user = self.find_user(email=email)
-        existed = not invited_user is None
+        existed = invited_user is not None
         if not existed:
             # Invite new user to the system
             invited_user = self.registeruser_model()

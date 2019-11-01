@@ -245,10 +245,15 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
             user_id = g.user.id
             try:
                 team = self.appbuilder.sm.find_team(user_id=user_id)
-                reg_user, existed = self.appbuilder.sm.add_invite_register_user(email=form.email.data,
-                                                                       team=team,
-                                                                       role=role_id,
-                                                                       inviter=user_id)
+
+                # Check if the invited user is already in the team
+                for existed_user in team.users:
+                    if existed_user.email == form.email.data:
+                        flash(as_unicode('User already in the team'), 'danger')
+                        return redirect('/solar/my-team')
+
+                reg_user, existed = self.appbuilder.sm.add_invite_register_user(email=form.email.data, team=team,
+                                                                                role=role_id, inviter=user_id)
                 if reg_user:
                     if self.send_email(reg_user, existed):
                         if not existed:
@@ -264,8 +269,8 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
                 flash(as_unicode(e), 'danger')
                 return redirect('/solar/my-team')
         else:
-            flash(as_unicode('Email already existed'), 'danger')
-            widgets = self._get_edit_widget(form=form)
+            flash(as_unicode('Invalid email'), 'danger')
+            # widgets = self._get_edit_widget(form=form)
             # return self.render_template(self.form_template,
             #                             title=self.form_title,
             #                             widgets=widgets,

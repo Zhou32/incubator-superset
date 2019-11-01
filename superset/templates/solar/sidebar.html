@@ -63,7 +63,7 @@
             {#           </a>#}
             {#        </li>#}
             <li>
-                <a {% if request.path == '/solar/list/' or request.path[:15] == '/superset/solar' %}class="s-sidebar__nav-link current_page_item"
+                <a {% if request.path == '/solar/list' or request.path[:15] == '/superset/solar' %}class="s-sidebar__nav-link current_page_item"
                     {% else %}class="s-sidebar__nav-link" {% endif %} href="{{ url_for('SolarBIModelView.list') }}">
                     <i class="fas fa-desktop"></i><span>My Data</span>
                 </a>
@@ -78,7 +78,7 @@
             </li>
 
             <li>
-                <a {% if request.path == '/billing/' %}class="s-sidebar__nav-link current_page_item"
+                <a {% if request.path == '/billing/my-billing' %}class="s-sidebar__nav-link current_page_item"
                     {% else %}class="s-sidebar__nav-link" {% endif %}
                     href="{{ url_for('SolarBIBillingView.billing') }}">
                     <i class="fas fa-credit-card"></i><span>Billing</span>
@@ -115,16 +115,20 @@
         <div class="md-select">
             <label for="ul-id"><button type="button" class="ng-binding">{{ session['team_name'] }}</button></label>
             <ul role="listbox" id="ul-id" class="md-whiteframe-z1" name="ul-id">
+                <li role="option" id="{{ session['team_id'] }}" class="ng-binding ng-scope active" tabindex="-1" aria-selected="true">
+                    <span class="checkmark">
+                        <div class="checkmark_stem"></div>
+                        <div class="checkmark_kick"></div>
+                    </span>
+                    {{ session['team_name'] }}
+                </li>
+                <hr style="margin: 5px 0; background-color: #CCCCCC" />
                 {% for id, team in team_ids %}
-                    <li role="option" id="{{id}}" class="ng-binding ng-scope {{ 'active' if session['team_name'] == team }}" tabindex="-1" aria-selected="true">
-                        {% if session['team_name'] == team %}
-                            <span class="checkmark">
-                                <div class="checkmark_stem"></div>
-                                <div class="checkmark_kick"></div>
-                            </span>
-                        {% endif %}
+                    {% if team != session['team_name'] %}
+                    <li role="option" id="{{id}}" class="ng-binding ng-scope" tabindex="-1" aria-selected="true">
                         {{team}}
                     </li>
+                    {% endif %}
                 {% endfor %}
             </ul>
         </div>
