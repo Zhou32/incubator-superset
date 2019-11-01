@@ -51,9 +51,6 @@ def init():
     utils.get_or_create_main_db()
     utils.get_example_database()
     appbuilder.add_permissions(update_perms=True)
-
-    # TODO create team roles of existed teams for users
-
     security_manager.sync_role_definitions()
 
 

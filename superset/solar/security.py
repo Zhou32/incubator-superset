@@ -184,6 +184,9 @@ class CustomSecurityManager(SupersetSecurityManager):
         self.get_session.commit()
         self.clean_perms()
 
+        # create team roles
+        self.create_team_roles()
+
     def _has_view_access(
             self, user: object, permission_name: str, view_name: str
     ) -> bool:
@@ -211,6 +214,29 @@ class CustomSecurityManager(SupersetSecurityManager):
             permission_name,
             db_role_ids,
         )
+
+    def create_team_roles(self):
+        logging.info('Create team role for existed teams and users')
+        try:
+            teams = self.get_session.query(Team).all()
+            owner_role = self.find_role('team_owner')
+            default_role = self.find_role('solar_default')
+            for team in teams:
+                logging.info(f'Team {team.team_name}')
+                owner_team_role = self.find_team_role(team.id, owner_role.id)
+                default_team_role = self.find_team_role(team.id, default_role.id)
+
+                for user in team.users:
+                    if user.roles[0].name == 'team_owner' and owner_team_role not in user.team_role:
+                        user.team_role.append(owner_team_role)
+                    elif user.roles[0].name == 'solar_default' and default_team_role not in user.team_role:
+                        user.team_role.append(default_team_role)
+                    self.get_session.merge(user)
+
+            self.get_session.commit()
+        except Exception as e:
+            logging.error(e)
+            self.get_session.rollback()
 
     def is_owner_pvm(self, pvm):
         result = False
@@ -315,21 +341,16 @@ class CustomSecurityManager(SupersetSecurityManager):
         new_team.users.append(user)
 
         admin_role = self.find_role('team_owner')
-        admin_team_role = self.team_role()
-        admin_team_role.team = new_team
-        admin_team_role.role = admin_role
+        admin_team_role = self.find_team_role(new_team.id, admin_role.id)
+
 
         user_role = self.find_role('solar_default')
-        user_team_role = self.team_role()
-        user_team_role.team = new_team
-        user_team_role.role = user_role
+        user_team_role = self.find_team_role(new_team.id, user_role.id)
 
         user.team_role.append(admin_team_role)
 
         try:
             self.get_session.add(new_team)
-            self.get_session.add(admin_team_role)
-            self.get_session.add(user_team_role)
 
             self.get_session.merge(user)
             self.get_session.commit()
@@ -351,7 +372,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         elif team_id:
             return self.get_session.query(self.team_model).filter_by(id=team_id).first()
 
-    def get_teams(self, user_id):
+    def get_teams_for_user(self, user_id):
         user = self.get_session.query(self.user_model).filter_by(id=user_id).first()
         teams = []
         for team_role in user.team_role:
@@ -363,6 +384,22 @@ class CustomSecurityManager(SupersetSecurityManager):
             if team_role.team.id == team_id:
                 return team_role.role
         return None
+
+    def find_team_role(self, team_id, role_id):
+        team_role = self.get_session.query(self.team_role).filter_by(team_id=team_id, role_id=role_id).first()
+        if team_role is None:
+            try:
+                team_role = self.team_role()
+                team_role.team_id = team_id
+                team_role.role_id = role_id
+                self.get_session.add(team_role)
+                self.get_session.commit()
+            except Exception as e:
+                logging.error(e)
+                self.get_session.rollback()
+        return team_role
+
+
 
     def add_team_user(self, email, first_name, last_name, username, hashed_password, team, role_id):
         try:
@@ -603,9 +640,9 @@ class CustomSecurityManager(SupersetSecurityManager):
         """
         if username is None or username == "":
             return None
-        user = self.find_solarbi_user(username=username)
+        user = self.find_user(username=username)
         if user is None:
-            user = self.find_solarbi_user(email=username)
+            user = self.find_user(email=username)
         if user is None or (not user.is_active):
             # log.info(LOGMSG_WAR_SEC_LOGIN_FAILED.format(username))
             return None
@@ -617,17 +654,6 @@ class CustomSecurityManager(SupersetSecurityManager):
             # log.info(LOGMSG_WAR_SEC_LOGIN_FAILED.format(username))
             return None
 
-    def find_solarbi_user(self, username=None, email=None):
-        if username:
-            return (
-                self.get_session.query(self.user_model).filter(self.user_model.username == username)
-                .first()
-            )
-        elif email:
-            return (
-                self.get_session.query(self.user_model).filter_by(email=email).first()
-            )
-
     def create_stripe_user_and_sub(self, user, team):
         try:
             resp = stripe.Customer.create(email=user.email, name=f'{user.first_name} {user.last_name}',
@@ -635,7 +661,7 @@ class CustomSecurityManager(SupersetSecurityManager):
             logging.info(resp)
             team.stripe_user_id = resp['id']
 
-            # TODO add subscription to free tier
+            # add subscription to free tier
             free_plan = self.get_session.query(Plan).filter_by(id=1).first()
             sub_resp = stripe.Subscription.create(customer=team.stripe_user_id, items=[{
                 'plan': free_plan.stripe_id,
