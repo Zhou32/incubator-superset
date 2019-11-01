@@ -453,7 +453,7 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
     list_title = 'My Data - SolarBI'
     list_widget = SolarBIListWidget
 
-    @expose('/list/')
+    @expose('/list')
     @has_access
     def list(self):
 
@@ -796,7 +796,7 @@ class SolarBIBillingView(ModelView):
     datamodel = SQLAInterface(Plan)
 
     @has_access
-    @expose('/', methods=['GET', 'POST'])
+    @expose('/my-billing', methods=['GET', 'POST'])
     def billing(self):
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
@@ -3829,7 +3829,7 @@ class Superset(BaseSupersetView):
             if 'datasource_type' in form_data.keys() else None,
             form_data)
 
-        error_redirect = '/solar/list/'
+        error_redirect = '/solar/list'
         datasource = ConnectorRegistry.get_datasource(
             datasource_type, datasource_id, db.session)
         if not datasource:
