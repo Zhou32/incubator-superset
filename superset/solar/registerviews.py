@@ -18,7 +18,6 @@
 import json
 import time
 import logging
-import stripe
 
 from flask import flash, redirect, url_for, g, request, make_response, jsonify
 from flask_babel import lazy_gettext
@@ -175,19 +174,20 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
         msg.sender = 'SolarBI', 'no-reply@solarbi.com.au'
-        msg.subject = self.email_subject
-        url = '#'
-        if not existed:
+        if existed:
+            msg.subject = "SolarBI - You have been added to a new team"
+            msg.html = self.render_template('appbuilder/general/security/new_team_invitation_mail.html',
+                                            username=register_user.username,
+                                            team_name=get_session_team()[1],
+                                            team_admin_first=g.user.first_name,
+                                            team_admin_last=g.user.last_name)
+        else:
+            msg.subject = self.email_subject
             url = self.appbuilder.sm.get_url_for_invitation(register_user.registration_hash)
-        # team_owner = self.appbuilder.session.query(SolarBIUser).filter_by(id=g.user.id).first()
-        # title = '{team_owner_firstname} {team_owner_lastname} inviting you to join at ' \
-        #         '{workspace}'.format(team_owner_firstname=team_owner.first_name.capitalize(),
-        #                              team_owner_lastname=team_owner.last_name.capitalize(),
-        #                              workspace=register_user.team)
-        msg.html = self.render_template(self.email_template,
-                                        url=url,
-                                        team_name=register_user.team
-                                        )
+            msg.html = self.render_template(self.email_template,
+                                            url=url,
+                                            team_name=register_user.team)
+
         msg.recipients = [register_user.email]
         try:
             mail.send(msg)

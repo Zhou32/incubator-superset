@@ -403,11 +403,9 @@ class CustomSecurityManager(SupersetSecurityManager):
                 self.get_session.rollback()
         return team_role
 
-
-
     def add_team_user(self, email, first_name, last_name, username, hashed_password, team, role_id):
         try:
-            team = self.find_team(team)
+            team = self.find_team(team_name=team)
             user = self.user_model()
             user.email = email
             user.username = username
@@ -420,7 +418,7 @@ class CustomSecurityManager(SupersetSecurityManager):
             user.roles.append(role)
             if team is not None:
                 team.users.append(user)
-                user_role = self.get_session.query(TeamRole).filter_by(team_id=team.id, role_id=role).first()
+                user_role = self.get_session.query(TeamRole).filter_by(team_id=team.id, role_id=role.id).first()
                 user.team_role.append(user_role)
                 # db_role = self.find_role(DB_ROLE_PREFIX+team.team_name)
                 # user.roles.append(db_role)
