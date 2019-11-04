@@ -29,7 +29,7 @@ export default () => describe('Search page test', () => {
   })
 
   it('Data page', function () {
-    cy.visit('localhost:8088/solar/list/')
+    cy.visit('localhost:8088/solar/list')
     cy.contains('My Data').click()
     cy.wait(3000)
     cy.contains('Search Data Sets')

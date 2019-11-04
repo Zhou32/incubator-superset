@@ -38,6 +38,7 @@ from flask import (
     request,
     Response,
     url_for,
+    session,
 )
 from flask_appbuilder import expose
 from flask_appbuilder.actions import action
@@ -55,7 +56,7 @@ from sqlalchemy import and_, or_, select
 from werkzeug.routing import BaseConverter
 from ..solar.forms import SolarBIListWidget
 from ..solar.models import Plan, TeamSubscription, Team, StripeEvent
-
+from ..solar.utils import set_session_team, get_session_team
 from superset import (
     app,
     appbuilder,
@@ -110,6 +111,7 @@ from .utils import (
     get_datasource_info,
     get_form_data,
     get_viz,
+    get_user_teams,
 )
 
 config = app.config
@@ -407,7 +409,7 @@ def get_user():
 
 
 def get_team_id():
-    return g.user.team[0].id
+    return session['team_id']
 
 
 # class SolarBIModelView(SliceModelView):  # noqa
@@ -451,11 +453,12 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
     list_title = 'My Data - SolarBI'
     list_widget = SolarBIListWidget
 
-    @expose('/list/')
+    @expose('/list')
     @has_access
     def list(self):
 
-        for role in g.user.roles:
+        for team_role in g.user.team_role:
+            role = team_role.role
             if role.name == 'Admin':
                 self.remove_filters_for_role(role.name)
                 break
@@ -496,9 +499,9 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
 
         # serialize composite pks
         pks = [self._serialize_pk_if_composite(pk) for pk in pks]
-
+        team_id = get_team_id()
         # get all object keys in s3 under all team users' sub folders
-        team_members_email_role = appbuilder.sm.get_team_members(g.user.id)
+        team_members_email_role = appbuilder.sm.get_team_members(team_id)
         team_member_emails = []
         for email, _ in team_members_email_role:
             team_member_emails.append(email)
@@ -518,6 +521,8 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
         #     obj_keys.append(key.split('/')[1].replace('.csv', ''))
 
         widgets["list"] = self.list_widget(
+            appbuilder=self.appbuilder,
+            get_session_team=get_session_team(),
             obj_keys=obj_keys,
             label_columns=self.label_columns,
             include_columns=self.list_columns,
@@ -605,14 +610,15 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
     def add(self):
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
-        team = self.appbuilder.sm.find_team(user_id=g.user.id)
+        # team = self.appbuilder.sm.find_team(user_id=g.user.id)
+        team = self.appbuilder.get_session.query(Team).filter_by(id=session['team_id']).first()
         subscription = self.appbuilder.sm.get_subscription(team_id=team.id)
         entry_point = 'solarBI'
 
         datasource_id = self.get_solar_datasource()
         can_trial = False
-        for role in g.user.roles:
-            if 'team_owner' in role.name:
+        for team_role in g.user.team_role:
+            if team_role.team.id == team.id and team_role.role.name == 'team_owner':
                 can_trial = True
         can_trial = can_trial and not subscription.trial_used
         payload = {
@@ -735,6 +741,20 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
         )
 
+    @expose('/switch_team/<team_id>', methods=['GET'])
+    def switch_team(self, team_id):
+        if not g.user or not g.user.get_id():
+            return redirect(appbuilder.get_url_for_login)
+
+        for team_role in g.user.team_role:
+            if str(team_role.team.id) == team_id:
+                set_session_team(team_role.team.id, team_role.team.team_name)
+                return redirect("/")
+
+        flash('Team Error', 'danger')
+        return redirect("/")
+
+
     @app.errorhandler(404)
     def page_not_found(e):
         # note that we set the 404 status explicitly
@@ -779,7 +799,7 @@ class SolarBIBillingView(ModelView):
     datamodel = SQLAInterface(Plan)
 
     @has_access
-    @expose('/', methods=['GET', 'POST'])
+    @expose('/my-billing', methods=['GET', 'POST'])
     def billing(self):
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
@@ -924,7 +944,6 @@ class SolarBIBillingView(ModelView):
                 else:
                     logging.info('Customer new to paid plan, will upgrade after payment succeeded')
 
-
                 sub_list = stripe.Subscription.list(customer=team.stripe_user_id)
                 if len(sub_list['data']) ==2:
                     logging.info(f'Team {team.team_name} has downgraded before')
@@ -932,8 +951,12 @@ class SolarBIBillingView(ModelView):
                         if sub['id'] != current_subscription.stripe_id:
                             stripe.Subscription.delete(sub['id'])
 
-                new_sub = stripe.Subscription.modify(current_subscription.stripe_id, cancel_at_period_end=False, trial_end='now',
-                                                     items=[{'id': current_subscription['items']['data'][0].id, 'plan': plan_stripe_id}])
+                new_sub = stripe.Subscription.modify(current_subscription.stripe_id,
+                                                     cancel_at_period_end=False,
+                                                     trial_end='now',
+                                                     items=[{
+                                                         'id': current_subscription['items']['data'][0].id,
+                                                         'plan': plan_stripe_id}])
                 return_subscription_id = new_plan.stripe_id
             elif new_plan.id < old_plan.id:
                 # get subscribe list for the team
@@ -963,9 +986,9 @@ class SolarBIBillingView(ModelView):
             logging.error(e)
             return False, None
 
-    #TODO for future, endpoint for on demmand payment
-    def on_demand_pay(self):
-        pass
+    # #TODO for future, endpoint for on demmand payment
+    # def on_demand_pay(self):
+    #     pass
 
     @expose('/start_trial/', methods=['POST'])
     def start_trial(self):
@@ -982,19 +1005,21 @@ class SolarBIBillingView(ModelView):
                 stripe_sub = stripe.Subscription.retrieve(team_sub.stripe_sub_id)
                 starter_plan = self.appbuilder.get_session.query(Plan).filter_by(id=2).first()
 
-                #TODO modify trial_end to trial_period_days=14 in live
                 utc_trial_end_ts = datetime.now().timestamp()
-                subscription = stripe.Subscription.modify(stripe_sub.stripe_id, trial_end=int(utc_trial_end_ts)+300, items=[{
-                    'id': stripe_sub['items']['data'][0].id,
-                    'plan': starter_plan.stripe_id,
-                }])
+                subscription = stripe.Subscription.modify(stripe_sub.stripe_id,
+                                                          trial_end=int(utc_trial_end_ts)+14*24*3600,
+                                                          items=[{
+                                                                'id': stripe_sub['items']['data'][0].id,
+                                                                'plan': starter_plan.stripe_id,
+                                                            }])
                 team_sub.trial_used = True
                 team_sub.remain_count = starter_plan.num_request
                 team_sub.plan = starter_plan.id
                 team_sub.end_time = subscription['current_period_end']
                 self.appbuilder.get_session.commit()
-                return json_success(json.dumps({'msg': 'Start trial successfully! You have 14 days to use 7 advance searches.',
-                                     'remain_count': starter_plan.num_request}))
+                return json_success(json.dumps({
+                    'msg': 'Start trial successfully! You have 14 days to use 7 advance searches.',
+                    'remain_count': starter_plan.num_request}))
             except ValueError as e:
                 return json_error_response(e)
             except Exception as e:
@@ -1002,7 +1027,6 @@ class SolarBIBillingView(ModelView):
         else:
             return json_error_response('Cannot start trial for non-owner role.')
 
-    #TODO handle invoice.payment_succeeded event, update remain counts accordingly
     def renew(self, event_object):
         paid_list = event_object['lines']['data']
 
@@ -1051,8 +1075,6 @@ class SolarBIBillingView(ModelView):
             self.appbuilder.get_session.rollback()
             logging.error(e)
 
-
-
     @api
     @expose('/webhook', methods=['POST'])
     def webhook(self):
@@ -1070,7 +1092,7 @@ class SolarBIBillingView(ModelView):
         if log is not None:
             logging.info('Duplicate event received: {}'.format(log.id))
         else:
-            #need to log events by id
+            # need to log events by id
             log = StripeEvent()
             log.id = event.id
             log.Date = datetime.utcfromtimestamp(event['created'])
@@ -1084,6 +1106,7 @@ class SolarBIBillingView(ModelView):
             elif event.type == 'invoice.payment_failed':
                 self.revert_to_free(event['data']['object'])
         return Response(status=200)
+
 
 appbuilder.add_view(
     SolarBIBillingView,
@@ -1927,7 +1950,7 @@ class Superset(BaseSupersetView):
                                              form_data['datasource_type'], datasource.name,
                                              query_id=response['QueryExecutionId'], start_date=form_data['startDate'],
                                              end_date=form_data['endDate'], data_type=type, resolution=resolution)
-            team = self.appbuilder.sm.find_team(user_id=g.user.id)
+            team = self.appbuilder.sm.find_team(team_id=get_session_team()[0])
             subscription = self.appbuilder.get_session.query(TeamSubscription).filter(
                 TeamSubscription.team == team.id).first()
 
@@ -3752,7 +3775,7 @@ class Superset(BaseSupersetView):
                 form_data.pop("slice_id")  # don't save old slice_id
             slc = models.SolarBISlice(owners=[g.user] if g.user else [])
 
-        slc.team_id = g.user.team[0].id
+        slc.team_id = get_session_team()[0]
         slc.params = json.dumps(form_data, indent=2, sort_keys=True)
         slc.datasource_name = datasource_name
         slc.viz_type = form_data["viz_type"]
@@ -3812,7 +3835,7 @@ class Superset(BaseSupersetView):
             if 'datasource_type' in form_data.keys() else None,
             form_data)
 
-        error_redirect = '/solar/list/'
+        error_redirect = '/solar/list'
         datasource = ConnectorRegistry.get_datasource(
             datasource_type, datasource_id, db.session)
         if not datasource:

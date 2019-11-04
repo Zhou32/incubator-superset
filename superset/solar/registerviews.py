@@ -18,7 +18,6 @@
 import json
 import time
 import logging
-import stripe
 
 from flask import flash, redirect, url_for, g, request, make_response, jsonify
 from flask_babel import lazy_gettext
@@ -36,7 +35,7 @@ from .forms import (
     SolarBIRegisterInvitationUserDBForm, SolarBITeamFormWidget, SolarBIInvitationWidget,
 )
 from .models import SolarBIUser
-from .utils import post_request
+from .utils import post_request, get_session_team, set_session_team
 
 log = logging.getLogger(__name__)
 
@@ -79,6 +78,7 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
         self.appbuilder.sm.update_user_auth_stat(user, True)
         login_user(user)
 
+        set_session_team(team_reg.id, team_reg.team_name)
         self.appbuilder.get_session.commit()
         flash(as_unicode('Your account has been successfully activated!'), 'success')
         return redirect(self.appbuilder.get_url_for_index)
@@ -167,24 +167,27 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
     email_template = 'appbuilder/general/security/team_member_invitation_mail.html'
     edit_widget = SolarBITeamFormWidget
 
-    def send_email(self, register_user):
+    def send_email(self, register_user, existed=False):
         """
             Method for sending the registration Email to the user
         """
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
         msg.sender = 'SolarBI', 'no-reply@solarbi.com.au'
-        msg.subject = self.email_subject
-        url = self.appbuilder.sm.get_url_for_invitation(register_user.registration_hash)
-        # team_owner = self.appbuilder.session.query(SolarBIUser).filter_by(id=g.user.id).first()
-        # title = '{team_owner_firstname} {team_owner_lastname} inviting you to join at ' \
-        #         '{workspace}'.format(team_owner_firstname=team_owner.first_name.capitalize(),
-        #                              team_owner_lastname=team_owner.last_name.capitalize(),
-        #                              workspace=register_user.team)
-        msg.html = self.render_template(self.email_template,
-                                        url=url,
-                                        team_name=register_user.team
-                                        )
+        if existed:
+            msg.subject = "SolarBI - You have been added to a new team"
+            msg.html = self.render_template('appbuilder/general/security/new_team_invitation_mail.html',
+                                            username=register_user.username,
+                                            team_name=get_session_team()[1],
+                                            team_admin_first=g.user.first_name,
+                                            team_admin_last=g.user.last_name)
+        else:
+            msg.subject = self.email_subject
+            url = self.appbuilder.sm.get_url_for_invitation(register_user.registration_hash)
+            msg.html = self.render_template(self.email_template,
+                                            url=url,
+                                            team_name=register_user.team)
+
         msg.recipients = [register_user.email]
         try:
             mail.send(msg)
@@ -200,20 +203,27 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
             form.email.validators.append(Unique(datamodel_user, 'email'))
             form.email.validators.append(Unique(datamodel_register_user, 'email'))
 
+    def remove_email_unique_validation(self, form):
+        email_field = form.email
+        for validator in email_field.validators:
+            if type(validator).__name__ == 'Unique':
+                email_field.validators.remove(validator)
+
     @expose('/my-team', methods=['GET'])
     @has_access
     def invitation(self):
         self._init_vars()
         form = self.form.refresh()
+        team_id, team_name = get_session_team()
+        team = self.appbuilder.sm.find_team(team_id=team_id)
         # form.role.choices = self.appbuilder.sm.find_invite_roles(g.user.id)
-        awaiting_emails = self.appbuilder.sm.get_awaiting_emails(g.user.id)
-        team_members = self.appbuilder.sm.get_team_members(g.user.id)
-        team_name = self.appbuilder.sm.find_team(user_id=g.user.id).team_name
+        awaiting_emails = self.appbuilder.sm.get_awaiting_emails(team)
+        team_members = self.appbuilder.sm.get_team_members(team.id)
         widgets = self._get_edit_widget(form=form)
         self.update_redirect()
         self.add_form_unique_validations(form)
         return self.render_template(self.form_template,
-                                    team_name=team_name,
+                                    team_name=team.team_name,
                                     team_members=team_members,
                                     awaiting_emails=awaiting_emails,
                                     title=self.form_title,
@@ -225,7 +235,8 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
     @has_access
     def invitation_post(self):
         form = self.form.refresh()
-        self.add_form_unique_validations(form)
+        # self.add_form_unique_validations(form)
+        self.remove_email_unique_validation(form)
 
         # choices placeholder to pass validation
         # form.role.choices = self.appbuilder.sm.find_invite_roles(g.user.id)
@@ -234,13 +245,21 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
             user_id = g.user.id
             try:
                 team = self.appbuilder.sm.find_team(user_id=user_id)
-                reg_user = self.appbuilder.sm.add_invite_register_user(email=form.email.data,
-                                                                       team=team,
-                                                                       role=role_id,
-                                                                       inviter=user_id)
+
+                # Check if the invited user is already in the team
+                for existed_user in team.users:
+                    if existed_user.email == form.email.data:
+                        flash(as_unicode('User already in the team'), 'danger')
+                        return redirect('/solar/my-team')
+
+                reg_user, existed = self.appbuilder.sm.add_invite_register_user(email=form.email.data, team=team,
+                                                                                role=role_id, inviter=user_id)
                 if reg_user:
-                    if self.send_email(reg_user):
-                        flash(as_unicode('Invitation sent to %s' % form.email.data), 'info')
+                    if self.send_email(reg_user, existed):
+                        if not existed:
+                            flash(as_unicode('Invitation sent to %s' % form.email.data), 'info')
+                        else:
+                            flash(as_unicode('%s is an existed user. Added to your team' % form.email.data), 'info')
                         return redirect('/solar/my-team')
                     else:
                         self.appbuilder.sm.delete_invited_user(user_email=form.email.data)
@@ -250,8 +269,8 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
                 flash(as_unicode(e), 'danger')
                 return redirect('/solar/my-team')
         else:
-            flash(as_unicode('Email already existed'), 'danger')
-            widgets = self._get_edit_widget(form=form)
+            flash(as_unicode('Invalid email'), 'danger')
+            # widgets = self._get_edit_widget(form=form)
             # return self.render_template(self.form_template,
             #                             title=self.form_title,
             #                             widgets=widgets,
@@ -274,12 +293,12 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
         # Then send a new and updated invitation link
         role_id = self.appbuilder.sm.find_solar_default_role_id().id
         team = self.appbuilder.sm.find_team(user_id=g.user.id)
-        reg_user = self.appbuilder.sm.add_invite_register_user(email=user_email,
+        reg_user, existed = self.appbuilder.sm.add_invite_register_user(email=user_email,
                                                                team=team,
                                                                role=role_id,
                                                                inviter=g.user.id)
         if reg_user:
-            if self.send_email(reg_user):
+            if self.send_email(reg_user, existed):
                 flash(as_unicode('Resend invitation to %s' % user_email), 'info')
                 return jsonify(dict(redirect='/solar/my-team'))
             else:

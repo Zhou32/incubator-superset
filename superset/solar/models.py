@@ -58,6 +58,25 @@ class Team(Model):
         return self.team_name
 
 
+class TeamRole(Model):
+    __tablename__ = 'team_role'
+    __table_args__ = (UniqueConstraint('team_id','role_id'),)
+    id = Column(Integer, Sequence('team_role_id_seq'), primary_key=True)
+    team_id = Column(Integer, ForeignKey('team.id'))
+    team = relationship('Team')
+    role_id = Column(Integer, ForeignKey('ab_role.id'))
+    role = relationship('Role')
+
+
+assoc_teamrole_user = Table(
+    'team_role_user', metadata,
+    Column('id', Integer, primary_key=True),
+    Column('team_role_id', Integer, ForeignKey('team_role.id')),
+    Column('user_id', Integer, ForeignKey('ab_user.id')),
+    UniqueConstraint('team_role_id', 'user_id')
+)
+
+
 class TeamRegisterUser(Model):
     """ the register model for users who are invited by admin """
     __tablename__ = 'ab_register_user'
@@ -100,6 +119,7 @@ class TeamSubscription(Model):
 class SolarBIUser(User):
     __tablename__ = 'ab_user'
     email_confirm = Column(Boolean, default=False)
+    team_role = relationship('TeamRole', secondary=assoc_teamrole_user, backref='user')
     __table_args__ = {'extend_existing': True}
 
 class StripeEvent(Model):

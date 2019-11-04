@@ -17,7 +17,17 @@
 # pylint: disable=C,R,W
 import json
 
+from flask import session
+
 
 def post_request(url, params):
     import requests
     return requests.post(url, data=json.dumps(params))
+
+
+def set_session_team(id, name):
+    session['team_id'] = id
+    session['team_name'] = name
+
+def get_session_team():
+    return session['team_id'], session['team_name']

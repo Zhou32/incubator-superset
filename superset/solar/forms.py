@@ -140,7 +140,6 @@ class SolarBIRegisterInvitationForm(DynamicForm):
 
 
 class SolarBIRegisterInvitationUserDBForm(DynamicForm):
-    # role = SelectField(lazy_gettext('Invitation Role'))
     email = StringField(lazy_gettext('Email'), validators=[DataRequired(), Email()], widget=BS3TextFieldWidget())
 
 
