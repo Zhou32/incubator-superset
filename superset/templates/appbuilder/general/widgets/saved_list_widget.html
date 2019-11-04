@@ -19,10 +19,8 @@
 {% extends 'appbuilder/general/widgets/saved_base_list.html' %}
 {% import 'appbuilder/general/lib.html' as lib %}
 
-{% set is_team_owner = g.user.roles[0].name == 'team_owner' %}
-
-
-{#<link href="{{url_for('static',filename='assets/stylesheets/solarbi.less')}}?v=1.1" rel="stylesheet">#}
+{#{% set is_team_owner = g.user.roles[0].name == 'team_owner' %}#}
+{% set is_team_owner = appbuilder.sm.get_role_in_team(g.user, get_session_team[0]).name == 'team_owner' %}
 
 {% block begin_title %}
     <div class="title-card">

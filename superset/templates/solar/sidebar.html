@@ -153,7 +153,8 @@
             $('.md-select ul li').not($(this)).removeClass('active');
             $(this).addClass('active');
             $('.md-select label button').text(v);
-            window.location.href = 'switch_team/' + $(this)[0].id;
+            {#console.log('solar/switch_team/' + $(this)[0].id)#}
+            window.location.href = '/solar/switch_team/' + $(this)[0].id;
         });
     });
 </script>
