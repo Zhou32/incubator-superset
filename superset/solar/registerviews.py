@@ -177,7 +177,8 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
         if existed:
             msg.subject = "SolarBI - You have been added to a new team"
             msg.html = self.render_template('appbuilder/general/security/new_team_invitation_mail.html',
-                                            username=register_user.username,
+                                            invited_first=register_user.first_name,
+                                            invited_last=register_user.last_name,
                                             team_name=get_session_team()[1],
                                             team_admin_first=g.user.first_name,
                                             team_admin_last=g.user.last_name)

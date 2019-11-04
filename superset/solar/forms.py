@@ -17,7 +17,7 @@
 # pylint: disable=C,R,W
 from flask_appbuilder.fieldwidgets import BS3TextFieldWidget, BS3PasswordFieldWidget
 from flask_babel import lazy_gettext
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length
 from wtforms import (
     BooleanField, SelectField, StringField, PasswordField)
 from wtforms.fields.html5 import EmailField
@@ -75,7 +75,9 @@ class SolarBIRegisterUserDBForm(DynamicForm):
     )
     team = StringField(
         lazy_gettext("Team name"),
-        validators=[DataRequired(), unique_required],
+        validators=[DataRequired(),
+                    Length(max=13, message="Team name cannot be longer than 13 characters"),
+                    unique_required],
     )
     password = PasswordField(
         lazy_gettext("Password"),
