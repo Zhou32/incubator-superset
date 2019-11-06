@@ -63,15 +63,17 @@ input {
   position: relative;
 }
 .md-select {
-  position: absolute;
-  left: 50%;
-  bottom: 20;
-  transform: translate(-50%, -50%);
+  transform: translateX(20px);
   display: block;
-  margin: 10px 0 8px 0;
+  margin: 50px 0 8px 0;
   padding-bottom: 2px;
   min-width: 170px;
   font-family: 'Montserrat';
+}
+@media (max-width: 68em) {
+  .md-select {
+    transform: translate(10px, 600px);
+  }
 }
 .md-select *, .md-select :after, .md-select :before {
   box-sizing: border-box;
@@ -902,7 +904,8 @@ input {
   position: fixed;
   top: 0;
   left: -15em;
-  overflow: hidden;
+  // overflow: hidden;
+  overflow-y: scroll;
   transition: all .3s ease-in;
   width: 15em;
   height: 100%;
