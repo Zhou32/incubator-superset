@@ -245,7 +245,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
         if form.validate_on_submit():
             user_id = g.user.id
             try:
-                team = self.appbuilder.sm.find_team(user_id=user_id)
+                team = self.appbuilder.sm.find_team(team_id=get_session_team(self.appbuilder.sm, g.user.id)[0])
 
                 # Check if the invited user is already in the team
                 for existed_user in team.users:
