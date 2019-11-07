@@ -152,13 +152,13 @@
         <form>
           <div class="form-group">
             <label for="recipient-name" class="col-form-label">Team Name:</label>
-            <input type="text" class="form-control" id="recipient-name">
+            <input type="text" class="form-control" id="teamName">
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Add Team</button>
+        <button id="addTeamBtn" type="button" class="btn btn-primary">Add Team</button>
       </div>
     </div>
   </div>
@@ -185,5 +185,31 @@
             {#console.log('solar/switch_team/' + $(this)[0].id)#}
             window.location.href = '/solar/switch_team/' + $(this)[0].id;
         });
+
+
+        $('#addTeamBtn').click(function() {
+            let team_name = $('#teamName').val();
+            let csrf_token = "{{ csrf_token() if csrf_token else '' }}";
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                    }
+                }
+            });
+            $.ajax({
+                type : "POST",
+                url : "{{ url_for('SolarBIRegisterInvitationUserDBView.create_team') }}",
+                data: JSON.stringify({team_name: team_name}),
+                contentType: 'application/json;charset=UTF-8',
+                success: function(data) {
+                    if (data.redirect) {
+                        window.location.replace(data.redirect)
+                    }
+                    {#console.log('success')#}
+                }
+            });
+        });
+
     });
 </script>

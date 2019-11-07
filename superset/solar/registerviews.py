@@ -286,8 +286,9 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
             flash(as_unicode('Successfully update the team name'), 'info')
             return jsonify(dict(redirect='/solar/my-team'))
 
-    @expose('/create-team/<team_name>', methods=['POST'])
-    def create_team(self, team_name):
+    @expose('/create-team/', methods=['POST'])
+    def create_team(self):
+        team_name = request.json['team_name']
         new_team = self.appbuilder.sm.add_team(g.user, team_name)
         if new_team:
             set_session_team(new_team.id, new_team.team_name)
@@ -296,7 +297,6 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
         else:
             flash(as_unicode('Unable to create team'), 'danger')
             return jsonify(dict(redirect='/solar/my-team'))
-
 
     @expose('/resend-email', methods=['POST'])
     def resend_email(self):
