@@ -132,7 +132,7 @@
                 {% endfor %}
                 <hr style="margin: 5px 0; background-color: #CCCCCC" />
                 <li data-toggle="modal" data-target="#addNewTeam" role="option" id="{{ session['team_id'] }}" class="ng-binding ng-scope" tabindex="-1" aria-selected="true">
-                    <span><i style="margin-right: 13px" class="fas fa-plus"></i>New team</span>
+                    <span><i style="margin-right: 13px; color: #177BB9;" class="fas fa-plus"></i>New team</span>
                 </li>
             </ul>
         </div>
@@ -143,7 +143,7 @@
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div style="font-family: Montserrat,sans-serif" class="modal-content">
       <div class="modal-header">
-        <h5 style="width: 100px; display: inline-block;" class="modal-title" id="addNewTeamTitle">Add New Team</h5>
+        <h5 class="add-new-team-title modal-title" id="addNewTeamTitle">Create New Team</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -160,7 +160,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button id="addTeamBtn" type="button" class="btn btn-primary">Add Team</button>
+        <button id="addTeamBtn" type="button" class="btn create-new-team-btn">Create</button>
       </div>
     </div>
   </div>
