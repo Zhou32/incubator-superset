@@ -190,6 +190,8 @@
 
 
         $('#addTeamBtn').click(function() {
+            $('#team_name_error').hide();
+            $('#team_name_existed_error').hide();
             let team_name = $('#teamName').val();
             if (team_name.length > 13) {
                 return $('#team_name_error').show();

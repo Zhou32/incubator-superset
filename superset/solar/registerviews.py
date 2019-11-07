@@ -290,7 +290,6 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
     def create_team(self):
         team_name = request.json['team_name']
         if self.appbuilder.sm.find_team(team_name=team_name) is not None:
-            flash(as_unicode('Team name existed'), 'danger')
             return json.dumps({'msg': 'Team name existed'})
 
         new_team = self.appbuilder.sm.add_team(g.user, team_name)
