@@ -125,14 +125,43 @@
                 <hr style="margin: 5px 0; background-color: #CCCCCC" />
                 {% for id, team in team_ids %}
                     {% if team != session['team_name'] %}
-                    <li role="option" id="{{id}}" class="ng-binding ng-scope" tabindex="-1" aria-selected="true">
-                        {{team}}
-                    </li>
+                        <li role="option" id="{{id}}" class="ng-binding ng-scope" tabindex="-1" aria-selected="true">
+                            {{team}}
+                        </li>
                     {% endif %}
                 {% endfor %}
+                <hr style="margin: 5px 0; background-color: #CCCCCC" />
+                <li data-toggle="modal" data-target="#addNewTeam" role="option" id="{{ session['team_id'] }}" class="ng-binding ng-scope" tabindex="-1" aria-selected="true">
+                    <span><i style="margin-right: 13px" class="fas fa-plus"></i>New team</span>
+                </li>
             </ul>
         </div>
     </nav>
+</div>
+
+<div class="modal fade" id="addNewTeam" tabindex="-1" role="dialog" aria-labelledby="addNewTeamTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div style="font-family: Montserrat" class="modal-content">
+      <div class="modal-header">
+        <h5 style="width: 100px; display: inline-block;" class="modal-title" id="addNewTeamTitle">Add New Team</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="recipient-name" class="col-form-label">Team Name:</label>
+            <input type="text" class="form-control" id="recipient-name">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Add Team</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 
@@ -148,7 +177,7 @@
             }
         });
 
-        $('.md-select ul li').on('click', function () {
+        $('.md-select ul li').not(":last").on('click', function () {
             var v = $(this).text();
             $('.md-select ul li').not($(this)).removeClass('active');
             $(this).addClass('active');

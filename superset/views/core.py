@@ -56,7 +56,7 @@ from sqlalchemy import and_, or_, select
 from werkzeug.routing import BaseConverter
 from ..solar.forms import SolarBIListWidget
 from ..solar.models import Plan, TeamSubscription, Team, StripeEvent
-from ..solar.utils import set_session_team
+from ..solar.utils import set_session_team, get_session_team
 from superset import (
     app,
     appbuilder,
@@ -522,7 +522,7 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
 
         widgets["list"] = self.list_widget(
             appbuilder=self.appbuilder,
-            get_session_team=get_session_team(),
+            session_team=get_session_team(self.appbuilder.sm, g.user.id),
             obj_keys=obj_keys,
             label_columns=self.label_columns,
             include_columns=self.list_columns,
@@ -1948,7 +1948,7 @@ class Superset(BaseSupersetView):
                                              form_data['datasource_type'], datasource.name,
                                              query_id=response['QueryExecutionId'], start_date=form_data['startDate'],
                                              end_date=form_data['endDate'], data_type=type, resolution=resolution)
-            team = self.appbuilder.sm.find_team(team_id=get_session_team()[0])
+            team = self.appbuilder.sm.find_team(team_id=get_session_team(self.appbuilder.sm, g.user.id)[0])
             subscription = self.appbuilder.get_session.query(TeamSubscription).filter(
                 TeamSubscription.team == team.id).first()
 
@@ -3773,7 +3773,7 @@ class Superset(BaseSupersetView):
                 form_data.pop("slice_id")  # don't save old slice_id
             slc = models.SolarBISlice(owners=[g.user] if g.user else [])
 
-        slc.team_id = get_session_team()[0]
+        slc.team_id = get_session_team(self.appbuilder.sm, g.user.id)[0]
         slc.params = json.dumps(form_data, indent=2, sort_keys=True)
         slc.datasource_name = datasource_name
         slc.viz_type = form_data["viz_type"]
