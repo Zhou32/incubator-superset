@@ -338,10 +338,11 @@ class CustomSecurityManager(SupersetSecurityManager):
         except Exception as e:
             self.get_session.rollback()
 
-    def add_team(self, reg, user):
+    def add_team(self, user, team_name, date=None):
         new_team = self.team_model()
-        new_team.team_name = reg.team
-        new_team.date_created = reg.registration_date
+        new_team.team_name = team_name
+        if date:
+            new_team.date_created = date
         new_team.users.append(user)
 
         admin_role = self.find_role('team_owner')
