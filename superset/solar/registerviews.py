@@ -73,7 +73,7 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
         #     is_first_login = False
 
         # Register stripe user for the team using user's email
-        self.appbuilder.sm.create_stripe_user_and_sub(user, team_reg)
+        # self.appbuilder.sm.create_stripe_user_and_sub(user, team_reg)
 
         self.appbuilder.sm.update_user_auth_stat(user, True)
         login_user(user)
@@ -179,7 +179,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
             msg.html = self.render_template('appbuilder/general/security/new_team_invitation_mail.html',
                                             invited_first=register_user.first_name,
                                             invited_last=register_user.last_name,
-                                            team_name=get_session_team()[1],
+                                            team_name=get_session_team(self.appbuilder.sm, g.user.id)[1],
                                             team_admin_first=g.user.first_name,
                                             team_admin_last=g.user.last_name)
         else:
@@ -292,7 +292,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
         new_team = self.appbuilder.sm.add_team(g.user, team_name)
         if new_team:
             set_session_team(new_team.id, new_team.team_name)
-            flash(as_unicode('Successfully create team %s'.format(new_team.team_name)), 'info')
+            flash(as_unicode('Successfully create team {}'.format(new_team.team_name)), 'info')
             return jsonify(dict(redirect='/solar/my-team'))
         else:
             flash(as_unicode('Unable to create team'), 'danger')

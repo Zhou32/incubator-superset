@@ -359,11 +359,13 @@ class CustomSecurityManager(SupersetSecurityManager):
 
             self.get_session.merge(user)
             self.get_session.commit()
+            self.create_stripe_user_and_sub(user, new_team)
             return new_team
         except Exception as e:
             logging.error(const.LOGMSG_ERR_SEC_ADD_REGISTER_USER.format(str(e)))
             self.appbuilder.get_session.rollback()
             return None
+
 
     def find_team(self, team_id=None, team_name=None, user_id=None):
         if team_name:
@@ -681,6 +683,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         except Exception as e:
             self.get_session.rollback()
             logging.error(e)
+            raise Exception(e)
             return False
 
     def get_subscription(self, team_id=None, sub_id=None):
