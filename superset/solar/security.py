@@ -191,7 +191,7 @@ class CustomSecurityManager(SupersetSecurityManager):
             self, user: object, permission_name: str, view_name: str
     ) -> bool:
 
-        team_id, team_name = get_session_team()
+        team_id, team_name = get_session_team(self, user.id)
         team_roles = user.team_role
         db_role_ids = list()
 
@@ -547,8 +547,8 @@ class CustomSecurityManager(SupersetSecurityManager):
                         email_role.append((user.email, 'User'))
         return email_role
 
-    def get_session_team(self):
-        team = self.get_session.query(Team).filter_by(id=get_session_team()).first()
+    def get_session_team(self, user_id):
+        team = self.get_session.query(Team).filter_by(id=get_session_team(self, user_id)[0]).first()
         return team
 
     def update_team_name(self, user_id, new_team_name):

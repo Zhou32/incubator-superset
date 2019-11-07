@@ -56,7 +56,7 @@ from sqlalchemy import and_, or_, select
 from werkzeug.routing import BaseConverter
 from ..solar.forms import SolarBIListWidget
 from ..solar.models import Plan, TeamSubscription, Team, StripeEvent
-from ..solar.utils import set_session_team, get_session_team
+from ..solar.utils import set_session_team
 from superset import (
     app,
     appbuilder,

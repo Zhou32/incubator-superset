@@ -214,7 +214,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
     def invitation(self):
         self._init_vars()
         form = self.form.refresh()
-        team_id, team_name = get_session_team()
+        team_id, team_name = get_session_team(self.appbuilder.sm, g.user.id)
         team = self.appbuilder.sm.find_team(team_id=team_id)
         # form.role.choices = self.appbuilder.sm.find_invite_roles(g.user.id)
         awaiting_emails = self.appbuilder.sm.get_awaiting_emails(team)
