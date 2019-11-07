@@ -366,7 +366,6 @@ class CustomSecurityManager(SupersetSecurityManager):
             self.appbuilder.get_session.rollback()
             return None
 
-
     def find_team(self, team_id=None, team_name=None, user_id=None):
         if team_name:
             return self.get_session.query(self.team_model).filter_by(team_name=team_name).first()

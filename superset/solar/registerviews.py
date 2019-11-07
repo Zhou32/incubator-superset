@@ -289,6 +289,10 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
     @expose('/create-team/', methods=['POST'])
     def create_team(self):
         team_name = request.json['team_name']
+        if self.appbuilder.sm.find_team(team_name=team_name) is not None:
+            flash(as_unicode('Team name existed'), 'danger')
+            return json.dumps({'msg': 'Team name existed'})
+
         new_team = self.appbuilder.sm.add_team(g.user, team_name)
         if new_team:
             set_session_team(new_team.id, new_team.team_name)
@@ -307,9 +311,9 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
         role_id = self.appbuilder.sm.find_solar_default_role_id().id
         team = self.appbuilder.sm.find_team(user_id=g.user.id)
         reg_user, existed = self.appbuilder.sm.add_invite_register_user(email=user_email,
-                                                               team=team,
-                                                               role=role_id,
-                                                               inviter=g.user.id)
+                                                                        team=team,
+                                                                        role=role_id,
+                                                                        inviter=g.user.id)
         if reg_user:
             if self.send_email(reg_user, existed):
                 flash(as_unicode('Resend invitation to %s' % user_email), 'info')
