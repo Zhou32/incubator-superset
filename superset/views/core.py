@@ -992,8 +992,9 @@ class SolarBIBillingView(ModelView):
     @expose('/start_trial/', methods=['POST'])
     def start_trial(self):
         flag = False
-        for role in g.user.roles:
-            if 'team_owner' in role.name:
+        team = self.appbuilder.get_session.query(Team).filter_by(id=session['team_id']).first()
+        for team_role in g.user.team_role:
+            if team_role.team.id == team.id and team_role.role.name == 'team_owner':
                 flag = True
         if flag:
             try:
