@@ -250,9 +250,11 @@ export function startTrial(timeout = 60) {
         dispatch(startTrialSuccess(json));
         dispatch(addSuccessToastAction(t(json.msg)));
       })
-      .catch(() => {
-        dispatch(startTrialFail());
-        dispatch(addDangerToast(t('Start trial failed.')));
-      });
+      .catch(response =>
+        getClientErrorObject(response).then(({ error }) => {
+          dispatch(startTrialFail());
+          dispatch(addDangerToast(t(error)));
+        }),
+      );
   };
 }

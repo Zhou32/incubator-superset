@@ -609,17 +609,16 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
     def add(self):
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
-        # team = self.appbuilder.sm.find_team(user_id=g.user.id)
         team = self.appbuilder.get_session.query(Team).filter_by(id=session['team_id']).first()
         subscription = self.appbuilder.sm.get_subscription(team_id=team.id)
         entry_point = 'solarBI'
 
         datasource_id = self.get_solar_datasource()
-        can_trial = False
+        is_team_admin = False
         for team_role in g.user.team_role:
             if team_role.team.id == team.id and team_role.role.name == 'team_owner':
-                can_trial = True
-        can_trial = can_trial and not subscription.trial_used
+                is_team_admin = True
+        can_trial = is_team_admin and not subscription.trial_used
         payload = {
             'user': bootstrap_user_data(g.user),
             'common': BaseSupersetView().common_bootstrap_payload(),
@@ -706,39 +705,39 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
         )
 
-    @expose('/billing', methods=['GET', 'POST'])
-    def billing(self):
-        if not g.user or not g.user.get_id():
-            return redirect(appbuilder.get_url_for_login)
-        team = self.appbuilder.sm.find_team(user_id=g.user.id)
-        logging.info(team.stripe_user_id)
-        entry_point = 'solarBI'
-
-        datasource_id = self.get_solar_datasource()
-
-        # welcome_dashboard_id = (
-        #     db.session
-        #     .query(UserAttribute.welcome_dashboard_id)
-        #     .filter_by(user_id=g.user.get_id())
-        #     .scalar()
-        # )
-        # if welcome_dashboard_id:
-        #     return self.dashboard(str(welcome_dashboard_id))
-
-        payload = {
-            'user': bootstrap_user_data(g.user),
-            'common': BaseSupersetView().common_bootstrap_payload(),
-            'datasource_id': datasource_id,
-            'datasource_type': 'table',
-            'entry': 'add',
-        }
-
-        return self.render_template(
-            'solar/billing.html',
-            entry=entry_point,
-            title='Billing - SolarBI',
-            bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
-        )
+    # @expose('/billing', methods=['GET', 'POST'])
+    # def billing(self):
+    #     if not g.user or not g.user.get_id():
+    #         return redirect(appbuilder.get_url_for_login)
+    #     team = self.appbuilder.sm.find_team(user_id=g.user.id)
+    #     logging.info(team.stripe_user_id)
+    #     entry_point = 'solarBI'
+    #
+    #     datasource_id = self.get_solar_datasource()
+    #
+    #     # welcome_dashboard_id = (
+    #     #     db.session
+    #     #     .query(UserAttribute.welcome_dashboard_id)
+    #     #     .filter_by(user_id=g.user.get_id())
+    #     #     .scalar()
+    #     # )
+    #     # if welcome_dashboard_id:
+    #     #     return self.dashboard(str(welcome_dashboard_id))
+    #
+    #     payload = {
+    #         'user': bootstrap_user_data(g.user),
+    #         'common': BaseSupersetView().common_bootstrap_payload(),
+    #         'datasource_id': datasource_id,
+    #         'datasource_type': 'table',
+    #         'entry': 'add',
+    #     }
+    #
+    #     return self.render_template(
+    #         'solar/billing.html',
+    #         entry=entry_point,
+    #         title='Billing - SolarBI',
+    #         bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
+    #     )
 
     @expose('/switch_team/<team_id>', methods=['GET'])
     def switch_team(self, team_id):
@@ -802,8 +801,9 @@ class SolarBIBillingView(ModelView):
     def billing(self):
         if not g.user or not g.user.get_id():
             return redirect(appbuilder.get_url_for_login)
-        team = self.appbuilder.sm.find_team(user_id=g.user.id)
-        team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(team=team.id).first()
+
+        team = self.appbuilder.get_session.query(Team).filter_by(id=session['team_id']).first()
+        team_sub = self.appbuilder.sm.get_subscription(team_id=team.id)
         plan = self.appbuilder.get_session.query(Plan).filter_by(id=team_sub.plan).first()
         # Retrieve customer basic information
         cus_obj = stripe.Customer.retrieve(team.stripe_user_id)
@@ -855,7 +855,7 @@ class SolarBIBillingView(ModelView):
     def change_plan(self, plan_id=None):
         if not g.user or not g.user.get_id():
             return json_error_response('Incorrect call to endpoint')
-        team = self.appbuilder.sm.find_team(user_id=g.user.id)
+        team = self.appbuilder.get_session.query(Team).filter_by(id=session['team_id']).first()
         logging.info(team.stripe_user_id)
         try:
             stripe_customer = stripe.Customer.retrieve(id=team.stripe_user_id)
@@ -916,7 +916,7 @@ class SolarBIBillingView(ModelView):
             team = self.appbuilder.get_session.query(Team).filter_by(id=team_id).first()
 
             '''Update team subscription, and reduce used '''
-            team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(team=team.id).first()
+            team_sub = self.appbuilder.sm.get_subscription(team_id=team.id)
 
             old_plan = self.appbuilder.get_session.query(Plan).filter_by(id=team_sub.plan).first()
             new_plan = self.appbuilder.get_session.query(Plan).filter_by(stripe_id=plan_stripe_id).first()
@@ -996,12 +996,14 @@ class SolarBIBillingView(ModelView):
         for team_role in g.user.team_role:
             if team_role.team.id == team.id and team_role.role.name == 'team_owner':
                 flag = True
+                break
+
         if flag:
             try:
-                team = self.appbuilder.sm.find_team(user_id=g.user.id)
-                team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(team=team.id).first()
+                # team = self.appbuilder.sm.find_team(user_id=g.user.id)
+                team_sub = self.appbuilder.sm.get_subscription(team_id=team.id)
                 if team_sub.trial_used:
-                    raise ValueError('Already used trial.')
+                    raise json_error_response('Already used trial.')
                 stripe_sub = stripe.Subscription.retrieve(team_sub.stripe_sub_id)
                 starter_plan = self.appbuilder.get_session.query(Plan).filter_by(id=2).first()
 
@@ -1950,8 +1952,7 @@ class Superset(BaseSupersetView):
                                              query_id=response['QueryExecutionId'], start_date=form_data['startDate'],
                                              end_date=form_data['endDate'], data_type=type, resolution=resolution)
             team = self.appbuilder.sm.find_team(team_id=get_session_team(self.appbuilder.sm, g.user.id)[0])
-            subscription = self.appbuilder.get_session.query(TeamSubscription).filter(
-                TeamSubscription.team == team.id).first()
+            subscription = self.appbuilder.sm.get_subscription(team_id=team.id)
 
             if subscription.remain_count <= 0:
                 return json_error_response("You cannot request any more data.")
@@ -3893,11 +3894,11 @@ class Superset(BaseSupersetView):
                 datasource.name)
 
         standalone = request.args.get('standalone') == 'true'
-        team = self.appbuilder.sm.find_team(user_id=g.user.id)
+        team = self.appbuilder.get_session.query(Team).filter_by(id=session['team_id']).first()
         subscription = self.appbuilder.sm.get_subscription(team_id=team.id)
         can_trial = False
-        for role in g.user.roles:
-            if 'team_owner' in role.name:
+        for team_role in g.user.team_role:
+            if team_role.team.id == team.id and team_role.role.name == 'team_owner':
                 can_trial = True
         can_trial = can_trial and not subscription.trial_used
         bootstrap_data = {

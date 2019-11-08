@@ -18,8 +18,9 @@
 import json
 import time
 import logging
+import stripe
 
-from flask import flash, redirect, url_for, g, request, make_response, jsonify
+from flask import flash, redirect, url_for, g, request, make_response, jsonify, session
 from flask_babel import lazy_gettext
 from flask_mail import Mail, Message
 
@@ -283,6 +284,9 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
     def update_team_name(self):
         new_team_name = request.json['new_team_name']
         if self.appbuilder.sm.update_team_name(g.user.id, new_team_name):
+            team = self.appbuilder.sm.find_team(team_id=get_session_team(self.appbuilder.sm, g.user.id)[0])
+            stripe.Customer.modify(team.stripe_user_id, description=new_team_name)
+
             flash(as_unicode('Successfully update the team name'), 'info')
             return jsonify(dict(redirect='/solar/my-team'))
 
@@ -308,7 +312,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
         self.appbuilder.sm.delete_invited_user(user_email=user_email)
         # Then send a new and updated invitation link
         role_id = self.appbuilder.sm.find_solar_default_role_id().id
-        team = self.appbuilder.sm.find_team(user_id=g.user.id)
+        team = self.appbuilder.sm.find_team(team_id=get_session_team(self.appbuilder.sm, g.user.id)[0])
         reg_user, existed = self.appbuilder.sm.add_invite_register_user(email=user_email,
                                                                         team=team,
                                                                         role=role_id,
