@@ -151,6 +151,9 @@ const styles = tm => ({
     fontWeight: 'bold',
     marginLeft: '15em',
     backgroundColor: '#f5f5f5',
+    ['@media (max-width:68em)']: { // eslint-disable-line no-useless-computed-key
+      marginLeft: '4em',
+    },
   },
   dollar: {
     '& p': {
