@@ -340,7 +340,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
 
 class SolarBIRegisterInvitationView(BaseRegisterUser):
     activation_message = lazy_gettext("Register successfully! An activation email has been sent to you")
-    error_message = lazy_gettext("Username already existed")
+    error_message = lazy_gettext("Username or Email already existed")
     form = SolarBIRegisterInvitationForm
     form_template = 'appbuilder/general/security/invitation_registration.html'
     activation_template = 'appbuilder/general/security/activation.html'

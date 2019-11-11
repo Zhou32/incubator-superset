@@ -17,7 +17,7 @@
 # pylint: disable=C,R,W
 import logging
 
-from flask import flash, redirect, url_for, g, request, make_response
+from flask import flash, redirect, url_for, g, request, make_response, Markup
 from flask_appbuilder import has_access
 from flask_babel import lazy_gettext
 from flask_mail import Mail, Message
@@ -50,7 +50,11 @@ log = logging.getLogger(__name__)
 
 class SolarBIAuthDBView(AuthDBView):
     invalid_login_message = lazy_gettext("Email/Username or password incorrect. Please try again.")
-    inactivated_login_message = lazy_gettext("Your account has not been activated yet. Please check your email.")
+    # inactivated_login_message = lazy_gettext("Your account has not been activated yet. Please check your email.")
+    inactivated_login_message = Markup("<span>Your account has not been activated yet. Please check your email.</span>"
+                                       "<span class='resend-activation'>Not received the email?"
+                                       "<a data-placement='bottom' data-toggle='popover' data-title='' "
+                                       "data-container='body' type='button' data-html='true' id='login'>Resend</a>")
     login_template = "appbuilder/general/security/solarbi_login_db.html"
     @expose("/login/", methods=["GET", "POST"])
     def login(self):
@@ -69,7 +73,7 @@ class SolarBIAuthDBView(AuthDBView):
                     reg_user = self.appbuilder.get_session.query(TeamRegisterUser).\
                         filter_by(email=form.username.data).first()
                 if reg_user:
-                    flash(as_unicode(self.inactivated_login_message), "warning")
+                    flash(self.inactivated_login_message, "warning")
                     return redirect(self.appbuilder.get_url_for_login)
 
                 flash(as_unicode(self.invalid_login_message), "warning")
@@ -80,7 +84,7 @@ class SolarBIAuthDBView(AuthDBView):
             if not curr_user:
                 curr_user = self.appbuilder.get_session.query(SolarBIUser).filter_by(email=form.username.data).first()
             if curr_user and not curr_user.email_confirm:
-                flash(as_unicode(self.inactivated_login_message), "warning")
+                flash(self.inactivated_login_message, "warning")
                 return redirect(self.appbuilder.get_url_for_login)
 
             remember = form.remember_me.data
