@@ -63,15 +63,17 @@ input {
   position: relative;
 }
 .md-select {
-  position: absolute;
-  left: 50%;
-  bottom: 20;
-  transform: translate(-50%, -50%);
+  transform: translateX(20px);
   display: block;
-  margin: 10px 0 8px 0;
+  margin: 50px 0 8px 0;
   padding-bottom: 2px;
-  min-width: 170px;
+  max-width: 180px;
   font-family: 'Montserrat';
+}
+@media (max-width: 68em) {
+  .md-select {
+    transform: translate(10px, 600px);
+  }
 }
 .md-select *, .md-select :after, .md-select :before {
   box-sizing: border-box;
@@ -129,11 +131,13 @@ input {
 }
 .md-select.active ul {
   max-height: 140px;
+  width: 185px;
   overflow: auto;
-  padding: 8px 0 16px 0px;
+  padding: 8px 0;
   z-index: 2;
   transition: all 0.2s ease;
   font-family: 'Montserrat';
+  margin-bottom: 20px;
 }
 .input-fields {
   width: 50%;
@@ -902,7 +906,8 @@ input {
   position: fixed;
   top: 0;
   left: -15em;
-  overflow: hidden;
+  // overflow: hidden;
+  overflow-y: scroll;
   transition: all .3s ease-in;
   width: 15em;
   height: 100%;
@@ -1291,7 +1296,7 @@ input {
   box-shadow: 0px 1px 1px #00000029;
   transition: 0.3s;
   height: 170;
-  z-index: 1000;
+  z-index: 900;
   position: fixed;
   top: 0;
   width: 95%;
@@ -1712,4 +1717,20 @@ input {
   background-color:#177BB9;
   left:8px;
   top:12px;
+}
+.add-new-team-title {
+  width: 300px; 
+  display: inline-block; 
+  font-weight: bold; 
+  font-size: 1.5em;
+}
+.create-new-team-btn {
+  color: #fff;
+  background-color: #0667A3;
+  border-color: #0667A3;
+}
+.create-new-team-btn:hover {
+  color: #fff;
+  background-color: #02324f;
+  border-color: #02324f;
 }

@@ -18,8 +18,9 @@
 import json
 import time
 import logging
+import stripe
 
-from flask import flash, redirect, url_for, g, request, make_response, jsonify
+from flask import flash, redirect, url_for, g, request, make_response, jsonify, session
 from flask_babel import lazy_gettext
 from flask_mail import Mail, Message
 
@@ -64,7 +65,7 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
         user = self.appbuilder.get_session.query(SolarBIUser).filter_by(email=reg.email).first()
         user.email_confirm = True
 
-        team_reg = self.appbuilder.sm.add_team(reg, user)
+        team_reg = self.appbuilder.sm.add_team(user, reg.team, reg.registration_date)
         # self.handle_aws_info(org_reg, user)
         self.appbuilder.sm.del_register_user(reg)
         # if user.login_count is None or user.login_count == 0:
@@ -73,7 +74,7 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
         #     is_first_login = False
 
         # Register stripe user for the team using user's email
-        self.appbuilder.sm.create_stripe_user_and_sub(user, team_reg)
+        # self.appbuilder.sm.create_stripe_user_and_sub(user, team_reg)
 
         self.appbuilder.sm.update_user_auth_stat(user, True)
         login_user(user)
@@ -179,7 +180,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
             msg.html = self.render_template('appbuilder/general/security/new_team_invitation_mail.html',
                                             invited_first=register_user.first_name,
                                             invited_last=register_user.last_name,
-                                            team_name=get_session_team()[1],
+                                            team_name=get_session_team(self.appbuilder.sm, g.user.id)[1],
                                             team_admin_first=g.user.first_name,
                                             team_admin_last=g.user.last_name)
         else:
@@ -215,7 +216,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
     def invitation(self):
         self._init_vars()
         form = self.form.refresh()
-        team_id, team_name = get_session_team()
+        team_id, team_name = get_session_team(self.appbuilder.sm, g.user.id)
         team = self.appbuilder.sm.find_team(team_id=team_id)
         # form.role.choices = self.appbuilder.sm.find_invite_roles(g.user.id)
         awaiting_emails = self.appbuilder.sm.get_awaiting_emails(team)
@@ -245,7 +246,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
         if form.validate_on_submit():
             user_id = g.user.id
             try:
-                team = self.appbuilder.sm.find_team(user_id=user_id)
+                team = self.appbuilder.sm.find_team(team_id=get_session_team(self.appbuilder.sm, g.user.id)[0])
 
                 # Check if the invited user is already in the team
                 for existed_user in team.users:
@@ -283,7 +284,25 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
     def update_team_name(self):
         new_team_name = request.json['new_team_name']
         if self.appbuilder.sm.update_team_name(g.user.id, new_team_name):
+            team = self.appbuilder.sm.find_team(team_id=get_session_team(self.appbuilder.sm, g.user.id)[0])
+            stripe.Customer.modify(team.stripe_user_id, description=new_team_name)
+
             flash(as_unicode('Successfully update the team name'), 'info')
+            return jsonify(dict(redirect='/solar/my-team'))
+
+    @expose('/create-team/', methods=['POST'])
+    def create_team(self):
+        team_name = request.json['team_name']
+        if self.appbuilder.sm.find_team(team_name=team_name) is not None:
+            return json.dumps({'msg': 'Team name existed'})
+
+        new_team = self.appbuilder.sm.add_team(g.user, team_name)
+        if new_team:
+            set_session_team(new_team.id, new_team.team_name)
+            flash(as_unicode('Successfully create team {}'.format(new_team.team_name)), 'info')
+            return jsonify(dict(redirect='/solar/my-team'))
+        else:
+            flash(as_unicode('Unable to create team'), 'danger')
             return jsonify(dict(redirect='/solar/my-team'))
 
     @expose('/resend-email', methods=['POST'])
@@ -293,11 +312,11 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
         self.appbuilder.sm.delete_invited_user(user_email=user_email)
         # Then send a new and updated invitation link
         role_id = self.appbuilder.sm.find_solar_default_role_id().id
-        team = self.appbuilder.sm.find_team(user_id=g.user.id)
+        team = self.appbuilder.sm.find_team(team_id=get_session_team(self.appbuilder.sm, g.user.id)[0])
         reg_user, existed = self.appbuilder.sm.add_invite_register_user(email=user_email,
-                                                               team=team,
-                                                               role=role_id,
-                                                               inviter=g.user.id)
+                                                                        team=team,
+                                                                        role=role_id,
+                                                                        inviter=g.user.id)
         if reg_user:
             if self.send_email(reg_user, existed):
                 flash(as_unicode('Resend invitation to %s' % user_email), 'info')

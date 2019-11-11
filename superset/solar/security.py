@@ -191,7 +191,7 @@ class CustomSecurityManager(SupersetSecurityManager):
             self, user: object, permission_name: str, view_name: str
     ) -> bool:
 
-        team_id, team_name = get_session_team()
+        team_id, team_name = get_session_team(self, user.id)
         team_roles = user.team_role
         db_role_ids = list()
 
@@ -338,10 +338,11 @@ class CustomSecurityManager(SupersetSecurityManager):
         except Exception as e:
             self.get_session.rollback()
 
-    def add_team(self, reg, user):
+    def add_team(self, user, team_name, date=None):
         new_team = self.team_model()
-        new_team.team_name = reg.team
-        new_team.date_created = reg.registration_date
+        new_team.team_name = team_name
+        if date:
+            new_team.date_created = date
         new_team.users.append(user)
 
         admin_role = self.find_role('team_owner')
@@ -358,6 +359,7 @@ class CustomSecurityManager(SupersetSecurityManager):
 
             self.get_session.merge(user)
             self.get_session.commit()
+            self.create_stripe_user_and_sub(user, new_team)
             return new_team
         except Exception as e:
             logging.error(const.LOGMSG_ERR_SEC_ADD_REGISTER_USER.format(str(e)))
@@ -545,8 +547,8 @@ class CustomSecurityManager(SupersetSecurityManager):
                         email_role.append((user.email, 'User'))
         return email_role
 
-    def get_session_team(self):
-        team = self.get_session.query(Team).filter_by(id=get_session_team()).first()
+    def get_session_team(self, user_id):
+        team = self.get_session.query(Team).filter_by(id=get_session_team(self, user_id)[0]).first()
         return team
 
     def update_team_name(self, user_id, new_team_name):
@@ -680,6 +682,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         except Exception as e:
             self.get_session.rollback()
             logging.error(e)
+            raise Exception(e)
             return False
 
     def get_subscription(self, team_id=None, sub_id=None):
