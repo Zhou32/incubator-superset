@@ -18,7 +18,9 @@
 import json
 
 from flask import session
+from mixpanel import Mixpanel
 
+mp = Mixpanel('8b85dcbb1c5f693a3b045b24fca1e787')
 
 def post_request(url, params):
     import requests
@@ -37,3 +39,7 @@ def get_session_team(securitymanager, user_id):
         team = securitymanager.find_teams_for_user(user_id)[0]
         set_session_team(team.id, team.team_name)
         return team.id, team.team_name
+
+
+def log_to_mp(id, action, metadata):
+    mp.track(id, action, metadata)

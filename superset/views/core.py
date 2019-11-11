@@ -56,7 +56,7 @@ from sqlalchemy import and_, or_, select
 from werkzeug.routing import BaseConverter
 from ..solar.forms import SolarBIListWidget
 from ..solar.models import Plan, TeamSubscription, Team, StripeEvent
-from ..solar.utils import set_session_team, get_session_team
+from ..solar.utils import set_session_team, get_session_team, log_to_mp
 from superset import (
     app,
     appbuilder,
@@ -887,6 +887,11 @@ class SolarBIBillingView(ModelView):
         _ = stripe.Customer.modify(cus_id, address={'country': form_data['country'], 'state': form_data['state'],
                                                     'postal_code': form_data['postal_code'], 'city': form_data['city'],
                                                     'line1': form_data['line1'], 'line2': form_data['line2']})
+
+        log_to_mp(cus_id, 'user update billing detail', {
+            'team stripe id': cus_id
+        })
+
         return json_success(json.dumps({'msg': 'Successfully changed billing detail!'}))
 
     @api
@@ -894,6 +899,11 @@ class SolarBIBillingView(ModelView):
     @expose('/change_card_detail/<pm_id>/', methods=['POST'])
     def change_card_detail(self, pm_id):
         if self.update_ccard(pm_id, get_team_id()):
+
+            log_to_mp(get_team_id(), 'update card detail', {
+                'team': self.appbuilder.find_team(team_id=get_team_id()).team_name
+            })
+
             return json_success(json.dumps({'msg': 'Credit card updated successful', 'pm_id': pm_id}))
         else:
             return json_error_response('Card update failed. Please try again later.')
@@ -979,6 +989,12 @@ class SolarBIBillingView(ModelView):
             else:
                 return_subscription_id = None
             self.appbuilder.get_session.commit()
+
+            log_to_mp(team_id, 'update plan', {
+                'old plan': old_plan.plan_name,
+                'new plan': new_plan.plan_name,
+            })
+
             return True, return_subscription_id
         except Exception as e:
             self.appbuilder.get_session.rollback()
