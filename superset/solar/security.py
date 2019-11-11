@@ -37,7 +37,7 @@ from superset.solar.registerviews import (
 from superset.solar.models import Plan, ResetRequest, Team, TeamRegisterUser, TeamSubscription, SolarBIUser, TeamRole
 from superset.security import SupersetSecurityManager
 
-from .utils import get_session_team, set_session_team
+from .utils import get_session_team, set_session_team, log_to_mp
 
 stripe.api_key = os.getenv('STRIPE_SK')
 
@@ -360,6 +360,13 @@ class CustomSecurityManager(SupersetSecurityManager):
             self.get_session.merge(user)
             self.get_session.commit()
             self.create_stripe_user_and_sub(user, new_team)
+
+            log_to_mp(user.id, 'create team', {
+                'team name': team_name,
+                'team ID': new_team.id,
+                'owner': user.username
+            })
+
             return new_team
         except Exception as e:
             logging.error(const.LOGMSG_ERR_SEC_ADD_REGISTER_USER.format(str(e)))
@@ -427,6 +434,13 @@ class CustomSecurityManager(SupersetSecurityManager):
             self.get_session.add(user)
             self.get_session.merge(team)
             self.get_session.commit()
+
+            log_to_mp(user.id, 'add user to team', {
+                'new user': user.username,
+                'team': team.team_name,
+                'role': role.name,
+            })
+
             return user
         except Exception as e:
             logging.error(e)
@@ -469,6 +483,13 @@ class CustomSecurityManager(SupersetSecurityManager):
         try:
             self.get_session.add(register_user)
             self.get_session.commit()
+
+            log_to_mp(register_user.id, 'invite to team', {
+                'invited user': register_user.username,
+                'team': register_user.team,
+                'email': register_user.email
+            })
+
             return register_user
         except Exception as e:
             logging.error(const.LOGMSG_ERR_SEC_ADD_REGISTER_USER.format(str(e)))
@@ -678,6 +699,13 @@ class CustomSecurityManager(SupersetSecurityManager):
             team_subscription.remain_count = free_plan.num_request
             self.get_session.add(team_subscription)
             self.get_session.commit()
+
+            log_to_mp(user.id, 'create team subscription', {
+                'team': team.team_name,
+                'plan': team_subscription.plan,
+                'team stripe id': team.stripe_user_id,
+                'subscription id': team_subscription.stripe_sub_id,
+            })
             return True
         except Exception as e:
             self.get_session.rollback()
