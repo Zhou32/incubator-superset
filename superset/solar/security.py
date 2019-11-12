@@ -37,7 +37,8 @@ from superset.solar.registerviews import (
 from superset.solar.models import Plan, ResetRequest, Team, TeamRegisterUser, TeamSubscription, SolarBIUser, TeamRole
 from superset.security import SupersetSecurityManager
 
-from .utils import get_session_team, set_session_team, log_to_mp
+from .utils import get_session_team, set_session_team, log_to_mp, create_mp_team, create_mp_user, mp_add_user_to_team, \
+    update_mp_team
 
 stripe.api_key = os.getenv('STRIPE_SK')
 
@@ -361,10 +362,10 @@ class CustomSecurityManager(SupersetSecurityManager):
             self.get_session.commit()
             self.create_stripe_user_and_sub(user, new_team)
 
-            log_to_mp(user.id, 'create team', {
-                'team name': team_name,
-                'team ID': new_team.id,
-                'owner': user.username
+            create_mp_team(new_team)
+            mp_add_user_to_team(user, new_team)
+            log_to_mp(user, new_team, 'create team', {
+                'team name': new_team.team_name
             })
 
             return new_team
@@ -429,17 +430,16 @@ class CustomSecurityManager(SupersetSecurityManager):
                 team.users.append(user)
                 user_role = self.get_session.query(TeamRole).filter_by(team_id=team.id, role_id=role.id).first()
                 user.team_role.append(user_role)
+
+                create_mp_user(user)
+                mp_add_user_to_team(user, team)
+
                 # db_role = self.find_role(DB_ROLE_PREFIX+team.team_name)
                 # user.roles.append(db_role)
             self.get_session.add(user)
             self.get_session.merge(team)
             self.get_session.commit()
 
-            log_to_mp(user.id, 'add user to team', {
-                'new user': user.username,
-                'team': team.team_name,
-                'role': role.name,
-            })
 
             return user
         except Exception as e:
@@ -484,11 +484,6 @@ class CustomSecurityManager(SupersetSecurityManager):
             self.get_session.add(register_user)
             self.get_session.commit()
 
-            log_to_mp(register_user.id, 'invite to team', {
-                'invited user': register_user.username,
-                'team': register_user.team,
-                'email': register_user.email
-            })
 
             return register_user
         except Exception as e:
@@ -634,6 +629,8 @@ class CustomSecurityManager(SupersetSecurityManager):
             user_role = self.get_session.query(TeamRole).filter_by(team_id=team.id, role_id=role).first()
             invited_user.team_role.append(user_role)
             team.users.append(invited_user)
+
+
             try:
                 self.get_session.merge(invited_user)
                 self.get_session.merge(team)
@@ -700,12 +697,6 @@ class CustomSecurityManager(SupersetSecurityManager):
             self.get_session.add(team_subscription)
             self.get_session.commit()
 
-            log_to_mp(user.id, 'create team subscription', {
-                'team': team.team_name,
-                'plan': team_subscription.plan,
-                'team stripe id': team.stripe_user_id,
-                'subscription id': team_subscription.stripe_sub_id,
-            })
             return True
         except Exception as e:
             self.get_session.rollback()

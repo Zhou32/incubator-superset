@@ -888,9 +888,6 @@ class SolarBIBillingView(ModelView):
                                                     'postal_code': form_data['postal_code'], 'city': form_data['city'],
                                                     'line1': form_data['line1'], 'line2': form_data['line2']})
 
-        log_to_mp(cus_id, 'user update billing detail', {
-            'team stripe id': cus_id
-        })
 
         return json_success(json.dumps({'msg': 'Successfully changed billing detail!'}))
 
@@ -900,9 +897,6 @@ class SolarBIBillingView(ModelView):
     def change_card_detail(self, pm_id):
         if self.update_ccard(pm_id, get_team_id()):
 
-            log_to_mp(get_team_id(), 'update card detail', {
-                'team': self.appbuilder.find_team(team_id=get_team_id()).team_name
-            })
 
             return json_success(json.dumps({'msg': 'Credit card updated successful', 'pm_id': pm_id}))
         else:
@@ -989,11 +983,6 @@ class SolarBIBillingView(ModelView):
             else:
                 return_subscription_id = None
             self.appbuilder.get_session.commit()
-
-            log_to_mp(team_id, 'update plan', {
-                'old plan': old_plan.plan_name,
-                'new plan': new_plan.plan_name,
-            })
 
             return True, return_subscription_id
         except Exception as e:
