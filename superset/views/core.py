@@ -1024,6 +1024,13 @@ class SolarBIBillingView(ModelView):
                 team_sub.plan = starter_plan.id
                 team_sub.end_time = subscription['current_period_end']
                 self.appbuilder.get_session.commit()
+
+                log_to_mp(g.user, team, 'start trial', {
+                    'subscription id': team_sub.id,
+                    'sub stripe id': team_sub.stripe_sub_id,
+                    'trial end': team_sub.end_time,
+                })
+
                 return json_success(json.dumps({
                     'msg': 'Start trial successfully! You have 14 days to use 7 advance searches.',
                     'remain_count': starter_plan.num_request}))
