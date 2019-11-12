@@ -17,7 +17,7 @@
 # pylint: disable=C,R,W
 import logging
 
-from flask import flash, redirect, url_for, g, request, make_response, Markup
+from flask import flash, redirect, url_for, g, request, make_response, Markup, jsonify
 from flask_appbuilder import has_access
 from flask_babel import lazy_gettext
 from flask_mail import Mail, Message
@@ -53,9 +53,10 @@ class SolarBIAuthDBView(AuthDBView):
     # inactivated_login_message = lazy_gettext("Your account has not been activated yet. Please check your email.")
     inactivated_login_message = Markup("<span>Your account has not been activated yet. Please check your email.</span>"
                                        "<span class='resend-activation'>Not received the email?"
-                                       "<a data-placement='bottom' data-toggle='popover' data-title='Resend Activation'"
-                                       "data-container='body' type='button' data-html='true' "
-                                       "id='resendActivation'>Resend</a>")
+                                       "<a class='rae-btn'>Resend</a></span>")
+                                       # "<a data-placement='bottom' data-toggle='popover' data-title='Resend Activation'"
+                                       # "data-container='body' type='button' data-html='true' "
+                                       # "id='resendActivation'>Resend</a>")
     login_template = "appbuilder/general/security/solarbi_login_db.html"
     email_template = 'appbuilder/general/security/account_activation_mail.html'
 
@@ -112,11 +113,11 @@ class SolarBIAuthDBView(AuthDBView):
         msg.sender = 'SolarBI', 'no-reply@solarbi.com.au'
 
         # is None -> team admin
-        if register_user.inviter_id is None:
+        if register_user.inviter is None:
             msg.subject = 'SolarBI - Team Created Confirmation'
             url = url_for('SolarBIRegisterUserDBView.activation',
                           _external=True,
-                          invitation_hash=register_user.registration_hash)
+                          activation_hash=register_user.registration_hash)
         else:
             msg.subject = 'SolarBI - Team Member Activation'
             url = url_for('SolarBIRegisterInvitationView.activate',
@@ -131,8 +132,8 @@ class SolarBIAuthDBView(AuthDBView):
             mail.send(msg)
         except Exception as e:
             log.error('Send email exception: {0}'.format(str(e)))
-            return False
-        return True
+            return jsonify(dict(redirect='/solar/my-team'))
+        return jsonify(dict(redirect='/solar/my-team'))
 
 
 class SolarBIPasswordRecoverView(PublicFormView):

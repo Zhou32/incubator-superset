@@ -51,15 +51,29 @@
     </div>
 {% endblock %}
 
+{% block resend_activation %}
+    <div class="ra-modal-overlay">
+        <div class="ra-modal">
+            <a class="ra-close-modal">
+              <span>&times;</span>
+            </a>
+            <div class="ra-modal-content">
+              <div class="form-group">
+                <input id="actEmailInput" placeholder="Email" class="form-control" type="email">
+                <button type="submit" class="resend-activation-email btn btn-primary" id="resendActEmail">Resend</button>
+              </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
 {% block add_tail_js %}
     <script src="{{url_for('appbuilder.static',filename='js/bootstrap.min.js')}}"></script>
     <script>
-        var elements = $('.term-modal-overlay, .term-modal');
-
+        let elements = $('.term-modal-overlay, .term-modal');
         $('.term-of-use').click(function(){
             elements.addClass('active');
         });
-
         $('.term-close-modal').click(function(){
             elements.removeClass('active');
         });
@@ -71,9 +85,18 @@
             }
         });
 
-        {#$('.resend-activation-email').click(function() {#}
-        $(document).on('click', '#resendActEmail', function () {
-            let user_email = $('#actEmailInput').prop("value");
+
+        let rae = $('.ra-modal-overlay, .ra-modal');
+        $('.rae-btn').click(function(){
+            rae.addClass('active');
+        });
+        $('.ra-close-modal').click(function(){
+            rae.removeClass('active');
+        });
+
+
+        $('#resendActEmail').click(function () {
+            let user_email = $('#actEmailInput').val();
             {#let user_email = document.getElementById("actEmailInput").value;#}
             console.log(user_email);
             let csrf_token = "{{ csrf_token() if csrf_token else '' }}";
