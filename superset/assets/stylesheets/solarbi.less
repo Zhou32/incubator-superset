@@ -594,9 +594,9 @@ input {
   position: relative;
   margin: 0 auto;
   background-color: #fff;
-  width: 600px;
+  width: 400px;
   max-width: 75rem;
-  min-height: 20rem;
+  min-height: 13rem;
   padding: 1rem;
   border-radius: 3px;
   opacity: 0;
@@ -617,11 +617,28 @@ input {
   transition: opacity 0.6s cubic-bezier(0.55, 0, 0.1, 1), transform 0.6s cubic-bezier(0.55, 0, 0.1, 1);
   transition-delay: 0.3s;
 }
+.ra-modal .ra-close-modal span {
+  font-size: 25px;
+  display: block;
+  margin-top: -10px;
+}
 .ra-modal .ra-modal-content {
   opacity: 0;
   backface-visibility: hidden;
   transition: opacity 0.6s cubic-bezier(0.55, 0, 0.1, 1);
   transition-delay: 0.3s;
+}
+.resend-activation-email {
+  margin-left: 20px;
+}
+.ra-modal .ra-modal-content p {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+.ra-modal .ra-modal-content .ra-form-group {
+  display: flex;
+  width: 300px;
 }
 .ra-modal.active {
   visibility: visible;
@@ -634,6 +651,10 @@ input {
 .ra-modal.active .ra-close-modal {
   transform: translateY(10px);
   opacity: 1;
+}
+.ra-modal .ra-error-msg {
+  display: none;
+  color: #f44336;
 }
 // Mobile style
 @media only screen and (max-width: 39.9375em) {

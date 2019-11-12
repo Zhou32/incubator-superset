@@ -108,6 +108,9 @@ class SolarBIAuthDBView(AuthDBView):
     def resend_activation(self):
         user_email = request.json['user_email']
         register_user = self.appbuilder.sm.get_registered_user(user_email)
+        if not register_user:
+            return jsonify(dict(err_msg="Sorry we cannot find the email"))
+
         mail = Mail(self.appbuilder.get_app)
         msg = Message()
         msg.sender = 'SolarBI', 'no-reply@solarbi.com.au'
@@ -132,8 +135,11 @@ class SolarBIAuthDBView(AuthDBView):
             mail.send(msg)
         except Exception as e:
             log.error('Send email exception: {0}'.format(str(e)))
-            return jsonify(dict(redirect='/solar/my-team'))
-        return jsonify(dict(redirect='/solar/my-team'))
+            flash(as_unicode("Snd email exception: " + str(e)), 'danger')
+            return jsonify(dict(redirect='/login'))
+
+        flash(as_unicode("Resend activation email success. Please check your email."), 'info')
+        return jsonify(dict(redirect='/login'))
 
 
 class SolarBIPasswordRecoverView(PublicFormView):

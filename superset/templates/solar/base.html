@@ -58,11 +58,14 @@
               <span>&times;</span>
             </a>
             <div class="ra-modal-content">
-              <div class="form-group">
+              <p>Please input your email below</p>
+              <div class="ra-form-group">
                 <input id="actEmailInput" placeholder="Email" class="form-control" type="email">
                 <button type="submit" class="resend-activation-email btn btn-primary" id="resendActEmail">Resend</button>
               </div>
             </div>
+            <p id="raInvalidEmail" class="ra-error-msg">* Email is invalid</p>
+            <p id="raWrongEmail" class="ra-error-msg">* Sorry we cannot find the email</p>
         </div>
     </div>
 {% endblock %}
@@ -116,6 +119,9 @@
                 success: function(data) {
                     if (data.redirect) {
                         window.location.replace(data.redirect)
+                    }
+                    if (data.err_msg) {
+
                     }
                     {#console.log('success')#}
                 }
