@@ -64,28 +64,40 @@
             elements.removeClass('active');
         });
 
-
         $("[data-toggle=popover]").popover({
-    html: true,
-	  content: function() {
-          return $('#popover-content').html();
-    }
-});
-$(document).ready(function(){
-  $("input[type=checkbox]").click(function() {alert('gg8');
-    if($(this).prop("checked")){
-      $('#loginOrSignupButton').html('Sign up!');
-    }else{
-      $('#loginOrSignupButton').html('Log in!');
-    }
-   });
-});
-function btnQQd(){
-   if( $('#signupCheckbox').is(':checked') ){alert('gg17');
-      /*$('#loginOrSignupButton').html('Sign up!');*/
-    }else{alert('gg19');
-      /*$('#loginOrSignupButton').html('Log in!');*/
-    }
-}
+            html: true,
+            content: function() {
+                return $('#popover-content').html();
+            }
+        });
+
+        {#$('.resend-activation-email').click(function() {#}
+        $(document).on('click', '#resendActEmail', function () {
+            let user_email = $('#actEmailInput').prop("value");
+            {#let user_email = document.getElementById("actEmailInput").value;#}
+            console.log(user_email);
+            let csrf_token = "{{ csrf_token() if csrf_token else '' }}";
+            {#$(this).replaceWith("<img src=\"/static/assets/images/loading.gif\" style=\"width: 40px; margin-right: 17px; margin-left: 20px;\">");#}
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                    }
+                }
+            });
+            $.ajax({
+                type : "POST",
+                url : "{{ url_for('SolarBIAuthDBView.resend_activation') }}",
+                data: JSON.stringify({user_email: user_email}),
+                contentType: 'application/json;charset=UTF-8',
+                success: function(data) {
+                    if (data.redirect) {
+                        window.location.replace(data.redirect)
+                    }
+                    {#console.log('success')#}
+                }
+            });
+        });
+
     </script>
 {% endblock %}
