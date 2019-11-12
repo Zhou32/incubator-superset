@@ -62,6 +62,7 @@
               <div class="ra-form-group">
                 <input id="actEmailInput" placeholder="Email" class="form-control" type="email">
                 <button type="submit" class="resend-activation-email btn btn-primary" id="resendActEmail">Resend</button>
+                <img id="raResending" src="/static/assets/images/loading.gif" style="display: none; width: 40px; margin-right: 17px; margin-left: 20px;">
               </div>
             </div>
             <p id="raInvalidEmail" class="ra-error-msg">* Email cannot be empty</p>
@@ -94,6 +95,7 @@
             rae.addClass('active');
         });
         $('.ra-close-modal').click(function(){
+            $('#actEmailInput').val('');
             $('#raInvalidEmail').hide();
             $("#raWrongEmail").hide();
             rae.removeClass('active');
@@ -101,16 +103,17 @@
 
 
         $('#resendActEmail').click(function () {
+            $('#raResending').show();
+            $(this).hide();
             $('#raInvalidEmail').hide();
             $("#raWrongEmail").hide();
             let user_email = $('#actEmailInput').val();
             {#let user_email = document.getElementById("actEmailInput").value;#}
-            console.log(user_email);
             if (user_email === '') {
                 return $('#raInvalidEmail').show();
             }
             let csrf_token = "{{ csrf_token() if csrf_token else '' }}";
-            $(this).replaceWith("<img src=\"/static/assets/images/loading.gif\" style=\"width: 40px; margin-right: 17px; margin-left: 20px;\">");
+            {#$(this).replaceWith("<img src=\"/static/assets/images/loading.gif\" style=\"width: 40px; margin-right: 17px; margin-left: 20px;\">");#}
             $.ajaxSetup({
                 beforeSend: function(xhr, settings) {
                     if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
@@ -128,9 +131,10 @@
                         window.location.replace(data.redirect)
                     }
                     if (data.err) {
+                        $('#resendActEmail').show();
                         $("#raWrongEmail").show();
+                        $('#raResending').hide();
                     }
-                    {#console.log('success')#}
                 }
             });
         });
