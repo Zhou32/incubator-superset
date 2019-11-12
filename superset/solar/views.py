@@ -109,7 +109,7 @@ class SolarBIAuthDBView(AuthDBView):
         user_email = request.json['user_email']
         register_user = self.appbuilder.sm.get_registered_user(user_email)
         if not register_user:
-            return jsonify(dict(err_msg="Sorry we cannot find the email"))
+            return jsonify(dict(err="Sorry we cannot find the email"))
 
         mail = Mail(self.appbuilder.get_app)
         msg = Message()

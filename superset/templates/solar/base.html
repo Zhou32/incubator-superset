@@ -64,8 +64,8 @@
                 <button type="submit" class="resend-activation-email btn btn-primary" id="resendActEmail">Resend</button>
               </div>
             </div>
-            <p id="raInvalidEmail" class="ra-error-msg">* Email is invalid</p>
-            <p id="raWrongEmail" class="ra-error-msg">* Sorry we cannot find the email</p>
+            <p id="raInvalidEmail" class="ra-error-msg">* Email cannot be empty</p>
+            <p id="raWrongEmail" class="ra-error-msg">* Cannot find the email</p>
         </div>
     </div>
 {% endblock %}
@@ -94,16 +94,23 @@
             rae.addClass('active');
         });
         $('.ra-close-modal').click(function(){
+            $('#raInvalidEmail').hide();
+            $("#raWrongEmail").hide();
             rae.removeClass('active');
         });
 
 
         $('#resendActEmail').click(function () {
+            $('#raInvalidEmail').hide();
+            $("#raWrongEmail").hide();
             let user_email = $('#actEmailInput').val();
             {#let user_email = document.getElementById("actEmailInput").value;#}
             console.log(user_email);
+            if (user_email === '') {
+                return $('#raInvalidEmail').show();
+            }
             let csrf_token = "{{ csrf_token() if csrf_token else '' }}";
-            {#$(this).replaceWith("<img src=\"/static/assets/images/loading.gif\" style=\"width: 40px; margin-right: 17px; margin-left: 20px;\">");#}
+            $(this).replaceWith("<img src=\"/static/assets/images/loading.gif\" style=\"width: 40px; margin-right: 17px; margin-left: 20px;\">");
             $.ajaxSetup({
                 beforeSend: function(xhr, settings) {
                     if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
@@ -120,8 +127,8 @@
                     if (data.redirect) {
                         window.location.replace(data.redirect)
                     }
-                    if (data.err_msg) {
-
+                    if (data.err) {
+                        $("#raWrongEmail").show();
                     }
                     {#console.log('success')#}
                 }
