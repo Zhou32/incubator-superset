@@ -433,6 +433,9 @@ class CustomSecurityManager(SupersetSecurityManager):
 
                 create_mp_user(user)
                 mp_add_user_to_team(user, team)
+                log_to_mp(user, team, 'added to team', {
+                    'role': role.role_name,
+                })
 
                 # db_role = self.find_role(DB_ROLE_PREFIX+team.team_name)
                 # user.roles.append(db_role)

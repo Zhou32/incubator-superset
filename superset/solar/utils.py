@@ -42,11 +42,11 @@ def get_session_team(securitymanager, user_id):
 
 
 def log_to_mp(user, team, action, metadata):
-    metadata['team'] = team.id
+    metadata['Team'] = team.team_name
     mp.track(user.id, action, metadata)
 
 def create_mp_team(team):
-    mp.group_set('Team', team.id, {
+    mp.group_set('Team', team.team_name, {
         '$name': team.team_name
     })
 
@@ -58,9 +58,9 @@ def create_mp_user(user):
     })
 
 def update_mp_team(team, metadata):
-    mp.group_set('Team', team.id, metadata)
+    mp.group_set('Team', team.team_name, metadata)
 
 def mp_add_user_to_team(user, team):
     mp.people_append(user.id, {
-        'Team': team.id
+        'Team': team.team_name
     })
