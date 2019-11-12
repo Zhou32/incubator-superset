@@ -1834,6 +1834,10 @@ class Superset(BaseSupersetView):
             force=force,
         )
 
+        log_to_mp(g.user, session['team_name'], 'explore json', {
+            'query': query,
+        })
+
         return self.generate_json(
             viz_obj, csv=csv, query=query, results=results, samples=samples
         )
@@ -1876,6 +1880,18 @@ class Superset(BaseSupersetView):
 
         This endpoint evolved to be the entry point of many different
         requests that GETs or POSTs a form_data."""
+
+        log_to_mp(g.user, session['team_name'], 'request data', {
+            'lat' : lat,
+            'lng': lng,
+            'start date': start_date,
+            'end date': end_date,
+            'resulution': resolution,
+            'type': type,
+            'address': address_name,
+        })
+
+
         try:
             self.send_email(g.user, address_name)
 
@@ -1965,6 +1981,9 @@ class Superset(BaseSupersetView):
                                              end_date=form_data['endDate'], data_type=type, resolution=resolution)
             team = self.appbuilder.sm.find_team(team_id=get_session_team(self.appbuilder.sm, g.user.id)[0])
             subscription = self.appbuilder.sm.get_subscription(team_id=team.id)
+
+
+
 
             if subscription.remain_count <= 0:
                 return json_error_response("You cannot request any more data.")
