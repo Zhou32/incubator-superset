@@ -32,6 +32,9 @@ from flask_wtf.csrf import CSRFProtect
 from werkzeug.contrib.fixers import ProxyFix
 import wtforms_json
 
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
+
 from superset import config
 from superset.connectors.connector_registry import ConnectorRegistry
 from superset.security import SupersetSecurityManager
@@ -42,6 +45,12 @@ wtforms_json.init()
 
 APP_DIR = os.path.dirname(__file__)
 CONFIG_MODULE = os.environ.get("SUPERSET_CONFIG", "superset.config")
+
+
+sentry_sdk.init(
+    dsn="https://41296b3f301c4dc89077c721ba82bfa4@sentry.io/1814979",
+    integrations=[FlaskIntegration()]
+)
 
 if not os.path.exists(config.DATA_DIR):
     os.makedirs(config.DATA_DIR)
