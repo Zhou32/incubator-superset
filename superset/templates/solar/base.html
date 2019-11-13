@@ -110,6 +110,8 @@
             let user_email = $('#actEmailInput').val();
             {#let user_email = document.getElementById("actEmailInput").value;#}
             if (user_email === '') {
+                $('#raResending').hide();
+                $('#resendActEmail').show();
                 return $('#raInvalidEmail').show();
             }
             let csrf_token = "{{ csrf_token() if csrf_token else '' }}";
