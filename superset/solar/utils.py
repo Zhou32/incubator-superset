@@ -41,8 +41,8 @@ def get_session_team(securitymanager, user_id):
         return team.id, team.team_name
 
 
-def log_to_mp(user, team, action, metadata):
-    metadata['Team'] = team.team_name
+def log_to_mp(user, team_name, action, metadata):
+    metadata['Team'] = team_name
     mp.track(user.id, action, metadata)
 
 def create_mp_team(team):

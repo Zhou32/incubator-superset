@@ -29,6 +29,7 @@ from flask_compress import Compress
 from flask_migrate import Migrate
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
+from flask_split import split
 from werkzeug.contrib.fixers import ProxyFix
 import wtforms_json
 
@@ -46,7 +47,7 @@ wtforms_json.init()
 APP_DIR = os.path.dirname(__file__)
 CONFIG_MODULE = os.environ.get("SUPERSET_CONFIG", "superset.config")
 
-
+# Sentry integration
 sentry_sdk.init(
     dsn="https://41296b3f301c4dc89077c721ba82bfa4@sentry.io/1814979",
     integrations=[FlaskIntegration()]
@@ -60,6 +61,10 @@ with open(APP_DIR + '/static/assets/backendSync.json', 'r', encoding='utf-8') as
 
 app = Flask(__name__)
 app.config.from_object(CONFIG_MODULE)
+
+# AB testing
+app.register_blueprint(split)
+
 conf = app.config
 
 #################################################################
