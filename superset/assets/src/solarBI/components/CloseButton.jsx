@@ -91,11 +91,12 @@ class CloseButton extends React.Component {
   }
 
   render() {
-    const { classes, solar_new } = this.props;
+    const { classes, solar_new, saveStatus } = this.props;
+    console.log((solar_new && saveStatus !== 'success'));
     return (
       <div className={classes.root}>
         <a
-          onClick={solar_new ? this.toggleGoBackModal : this.onBackClick}
+          onClick={(solar_new && saveStatus !== 'success') ? this.toggleGoBackModal : this.onBackClick}
           className={classes.close}
         >
           &#10005;

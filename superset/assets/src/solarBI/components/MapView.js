@@ -416,6 +416,7 @@ export class MapView extends React.Component {
                   <CloseButton
                     onBackClick={this.onGoBackClick}
                     solar_new={this.state.solar_new}
+                    saveStatus={this.props.solarBI.saveStatus}
                   />
                   <Grid>
                     <Row className="show-grid">
