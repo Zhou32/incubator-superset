@@ -857,14 +857,17 @@ class SolarBIBillingView(ModelView):
             return json_error_response('Incorrect call to endpoint')
         team = self.appbuilder.get_session.query(Team).filter_by(id=session['team_id']).first()
         logging.info(team.stripe_user_id)
+
+        logging.info('Updating plan for {}'.format(team.team_name))
         try:
             stripe_customer = stripe.Customer.retrieve(id=team.stripe_user_id)
 
             pm_id = team.stripe_pm_id
             if team.stripe_pm_id is None:
                 form_data = get_form_data()[0]['token']
-                stripe.Customer.modify(stripe_customer.stripe_id, source=form_data['id'])
+                # stripe.Customer.modify(stripe_customer.stripe_id, source=form_data['id'])
                 pm_id = form_data['id']
+                logging.info('Updating credit card')
                 self.update_ccard(pm_id, team.id)
 
             (result, id) = self.update_plan(team.id, plan_id)
