@@ -51,7 +51,7 @@ def create_mp_team(team):
     })
 
 def create_mp_user(user):
-    mp.people_set(user.id, {
+    mp.people_set(user.username, {
         '$first_name': user.first_name,
         '$last_name': user.last_name,
         '$email': user.email
@@ -61,6 +61,6 @@ def update_mp_team(team, metadata):
     mp.group_set('Team', team.team_name, metadata)
 
 def mp_add_user_to_team(user, team):
-    mp.people_append(user.id, {
+    mp.people_append(user.username, {
         'Team': team.team_name
     })

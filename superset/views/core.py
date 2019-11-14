@@ -896,8 +896,6 @@ class SolarBIBillingView(ModelView):
     @expose('/change_card_detail/<pm_id>/', methods=['POST'])
     def change_card_detail(self, pm_id):
         if self.update_ccard(pm_id, get_team_id()):
-
-
             return json_success(json.dumps({'msg': 'Credit card updated successful', 'pm_id': pm_id}))
         else:
             return json_error_response('Card update failed. Please try again later.')
@@ -983,6 +981,12 @@ class SolarBIBillingView(ModelView):
             else:
                 return_subscription_id = None
             self.appbuilder.get_session.commit()
+
+            # log to mixpanel
+            log_to_mp(g.user, team.team_name, 'change plan', {
+                'old plan': old_plan.plan_name,
+                'new plan': new_plan.plan_name,
+            })
 
             return True, return_subscription_id
         except Exception as e:
