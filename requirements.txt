@@ -86,4 +86,5 @@ wtforms-json==0.3.3
 wtforms==2.2.1            # via flask-wtf, wtforms-json
 Flask-Mail==0.9.1
 sentry-sdk==0.13.2
+flask-split==0.4.0
 

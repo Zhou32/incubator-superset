@@ -36,7 +36,7 @@ from .forms import (
     SolarBIRegisterInvitationUserDBForm, SolarBITeamFormWidget, SolarBIInvitationWidget,
 )
 from .models import SolarBIUser
-from .utils import post_request, get_session_team, set_session_team
+from .utils import post_request, get_session_team, set_session_team, log_to_mp
 
 log = logging.getLogger(__name__)
 

@@ -35,6 +35,9 @@ import wtforms_json
 
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
+from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
+from sentry_sdk.integrations.redis import RedisIntegration
+from sentry_sdk.integrations.celery import CeleryIntegration
 
 from superset import config
 from superset.connectors.connector_registry import ConnectorRegistry
@@ -51,6 +54,18 @@ CONFIG_MODULE = os.environ.get("SUPERSET_CONFIG", "superset.config")
 sentry_sdk.init(
     dsn="https://41296b3f301c4dc89077c721ba82bfa4@sentry.io/1814979",
     integrations=[FlaskIntegration()]
+)
+sentry_sdk.init(
+    dsn="https://41296b3f301c4dc89077c721ba82bfa4@sentry.io/1814979",
+    integrations=[RedisIntegration()]
+)
+sentry_sdk.init(
+    dsn="https://41296b3f301c4dc89077c721ba82bfa4@sentry.io/1814979",
+    integrations=[CeleryIntegration()]
+)
+sentry_sdk.init(
+    dsn="https://41296b3f301c4dc89077c721ba82bfa4@sentry.io/1814979",
+    integrations=[SqlalchemyIntegration()]
 )
 
 if not os.path.exists(config.DATA_DIR):

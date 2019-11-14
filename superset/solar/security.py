@@ -303,6 +303,10 @@ class CustomSecurityManager(SupersetSecurityManager):
             try:
                 self.get_session.add(reset_request)
                 self.get_session.commit()
+
+                #log to mixpanel
+                log_to_mp(user, '', 'request password reset', {})
+
                 return hash_token
             except Exception as e:
                 self.appbuilder.get_session.rollback()
@@ -364,7 +368,7 @@ class CustomSecurityManager(SupersetSecurityManager):
 
             create_mp_team(new_team)
             mp_add_user_to_team(user, new_team)
-            log_to_mp(user, new_team, 'create team', {
+            log_to_mp(user, new_team, 'activate new team', {
                 'team name': new_team.team_name
             })
 
@@ -413,6 +417,7 @@ class CustomSecurityManager(SupersetSecurityManager):
                 self.get_session.rollback()
         return team_role
 
+    '''Called when the new invited user activated its account. Create user in ab_user table and add it to the team.'''
     def add_team_user(self, email, first_name, last_name, username, hashed_password, team, role_id):
         try:
             team = self.find_team(team_name=team)
@@ -474,6 +479,7 @@ class CustomSecurityManager(SupersetSecurityManager):
     #     except Exception as e:
     #         self.get_session.rollback()
 
+    ''' Used for registering new team and admin'''
     def add_register_user_team_admin(self, **kwargs):
         register_user = self.registeruser_model()
         register_user.first_name = kwargs['first_name']
@@ -487,6 +493,8 @@ class CustomSecurityManager(SupersetSecurityManager):
             self.get_session.add(register_user)
             self.get_session.commit()
 
+            # Log register to mp
+            log_to_mp(register_user, kwargs['team'], 'register new team', {})
 
             return register_user
         except Exception as e:
@@ -512,6 +520,7 @@ class CustomSecurityManager(SupersetSecurityManager):
             logging.error(e)
             return None, None, None, None
 
+    '''Called when invited user received invitation and changed its detail'''
     def edit_invite_register_user_by_hash(self, invitation_hash, first_name=None, last_name=None, username=None,
                                           password='', hashed_password=''):
         invited_user = self.find_register_user(invitation_hash)
@@ -528,12 +537,18 @@ class CustomSecurityManager(SupersetSecurityManager):
         try:
             self.get_session.merge(invited_user)
             self.get_session.commit()
+
+            # Create the user in mixpanel
+            create_mp_user(invited_user)
+            log_to_mp(invited_user, '', 'invited user received and updated', {})
+
             return invited_user
         except Exception as e:
             self.get_session.rollback()
             logging.error(e)
             return None
 
+    '''Gives the list of roles that is allowed to be invited by the inviter'''
     def find_invite_roles(self, inviter_id):
         inviter = self.get_user_by_id(inviter_id)
         for role in inviter.roles:
@@ -593,6 +608,7 @@ class CustomSecurityManager(SupersetSecurityManager):
 
         return user_valid
 
+    '''Called when the team admin creates invitation for the email.'''
     def add_invite_register_user(self, email, team, first_name=None, last_name=None,
                                  role=None, inviter=None, password='', hashed_password=''):
         invited_user = self.find_user(email=email)
@@ -623,6 +639,13 @@ class CustomSecurityManager(SupersetSecurityManager):
                 try:
                     self.get_session.add(invited_user)
                     self.get_session.commit()
+
+                    # Log to mixpanel
+                    inviter = self.get_session.query(self.user_model).filter_by(id=inviter).first()
+                    log_to_mp(inviter, team.team_name, 'create invitation', {
+                        'invited email': email
+                    })
+
                 except Exception as e:
                     self.get_session.rollback()
                     logging.error(e)
