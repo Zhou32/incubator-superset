@@ -1029,7 +1029,7 @@ class SolarBIBillingView(ModelView):
                 team_sub.end_time = subscription['current_period_end']
                 self.appbuilder.get_session.commit()
 
-                log_to_mp(g.user, team, 'start trial', {
+                log_to_mp(g.user, team.team_name, 'start trial', {
                     'subscription id': team_sub.id,
                     'sub stripe id': team_sub.stripe_sub_id,
                     'trial end': team_sub.end_time,
