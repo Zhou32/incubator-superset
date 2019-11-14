@@ -148,7 +148,9 @@
                     if (data.redirect) {
                         window.location.replace(data.redirect)
                     }
-                    {#console.log('success')#}
+                    if (data.err) {
+                        return alert("Team name exists");
+                    }
                 }
             });
         });

@@ -92,7 +92,6 @@ class CloseButton extends React.Component {
 
   render() {
     const { classes, solar_new, saveStatus } = this.props;
-    console.log((solar_new && saveStatus !== 'success'));
     return (
       <div className={classes.root}>
         <a
@@ -115,6 +114,7 @@ CloseButton.propTypes = {
   classes: PropTypes.object.isRequired,
   onBackClick: PropTypes.func.isRequired,
   solar_new: PropTypes.bool.isRequired,
+  saveStatus: PropTypes.string,
 };
 
 export default withStyles(styles)(CloseButton);

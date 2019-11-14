@@ -236,10 +236,6 @@ DEFAULT_FEATURE_FLAGS = {
 #     return feature_flags_dict
 GET_FEATURE_FLAGS_FUNC = None
 
-
-from datetime import timedelta
-PERMANENT_SESSION_LIFETIME = timedelta(seconds=5)
-
 # ---------------------------------------------------
 # Image and file configuration
 # ---------------------------------------------------

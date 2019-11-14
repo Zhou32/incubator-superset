@@ -368,7 +368,7 @@ class CustomSecurityManager(SupersetSecurityManager):
 
             create_mp_team(new_team)
             mp_add_user_to_team(user, new_team)
-            log_to_mp(user, new_team, 'activate new team', {
+            log_to_mp(user, new_team.team_name, 'activate new team', {
                 'team name': new_team.team_name
             })
 

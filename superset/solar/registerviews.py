@@ -283,6 +283,9 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
     @expose('/update-team-name', methods=['POST'])
     def update_team_name(self):
         new_team_name = request.json['new_team_name']
+        if self.appbuilder.sm.find_team(team_name=new_team_name) is not None:
+            return jsonify(dict(err='Team name exists'))
+
         if self.appbuilder.sm.update_team_name(g.user.id, new_team_name):
             team = self.appbuilder.sm.find_team(team_id=get_session_team(self.appbuilder.sm, g.user.id)[0])
             stripe.Customer.modify(team.stripe_user_id, description=new_team_name)

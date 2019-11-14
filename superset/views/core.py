@@ -1838,9 +1838,7 @@ class Superset(BaseSupersetView):
             force=force,
         )
 
-        log_to_mp(g.user, session['team_name'], 'explore json', {
-            'query': query,
-        })
+        log_to_mp(g.user, session['team_name'], 'explore json', {})
 
         return self.generate_json(
             viz_obj, csv=csv, query=query, results=results, samples=samples
@@ -1885,15 +1883,7 @@ class Superset(BaseSupersetView):
         This endpoint evolved to be the entry point of many different
         requests that GETs or POSTs a form_data."""
 
-        log_to_mp(g.user, session['team_name'], 'request data', {
-            'lat' : lat,
-            'lng': lng,
-            'start date': start_date,
-            'end date': end_date,
-            'resulution': resolution,
-            'type': type,
-            'address': address_name,
-        })
+
 
 
         try:
@@ -1987,13 +1977,21 @@ class Superset(BaseSupersetView):
             subscription = self.appbuilder.sm.get_subscription(team_id=team.id)
 
 
-
-
             if subscription.remain_count <= 0:
                 return json_error_response("You cannot request any more data.")
             else:
                 subscription.remain_count = subscription.remain_count - 1
                 self.appbuilder.get_session.commit()
+
+            log_to_mp(g.user, team.team_name, 'request data', {
+                'lat': lat,
+                'lng': lng,
+                'start date': start_date,
+                'end date': end_date,
+                'resulution': resolution,
+                'type': type,
+                'address': address_name,
+            })
             return json_success(json.dumps({'query_id': response['QueryExecutionId']}))
         except Exception:
             return json_error_response("Request failed.")
