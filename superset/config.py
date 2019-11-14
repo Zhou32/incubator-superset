@@ -29,6 +29,7 @@ import logging
 import os
 import sys
 
+from datetime import timedelta
 from celery.schedules import crontab
 from dateutil import tz
 from flask_appbuilder.security.manager import AUTH_DB
@@ -234,7 +235,6 @@ DEFAULT_FEATURE_FLAGS = {
 #     feature_flags_dict['some_feature'] = g.user and g.user.id == 5
 #     return feature_flags_dict
 GET_FEATURE_FLAGS_FUNC = None
-
 
 # ---------------------------------------------------
 # Image and file configuration
@@ -503,14 +503,7 @@ MAIL_PORT = 465
 MAIL_PASSWORD = os.environ['SMTP_PASSWORD']
 MAIL_DEFAULT_SENDER = 'no-reply@solarbi.com.au'
 
-# MAIL_SERVER = 'smtp.gmail.com'
-# MAIL_PORT = 465
-# MAIL_USE_TLS = False
-# MAIL_USE_SSL = True
-# MAIL_USERNAME = 'zhongfan.dou@zawee.work'
-# MAIL_PASSWORD = os.environ["EMAIL_PASSWORD"]
-# MAIL_DEFAULT_SENDER = 'zhongfan.dou@zawee.work'
-
+# PERMANENT_SESSION_LIFETIME = timedelta(seconds=10)
 
 if not CACHE_DEFAULT_TIMEOUT:
     CACHE_DEFAULT_TIMEOUT = CACHE_CONFIG.get("CACHE_DEFAULT_TIMEOUT")

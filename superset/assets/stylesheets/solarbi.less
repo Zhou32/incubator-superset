@@ -229,6 +229,17 @@ input {
   opacity: 0.5;
   font-family: 'Montserrat';
 }
+.resend-activation {
+  font-size: 12px;
+  margin-left: 10px;
+  color: #337ab7;
+}
+.resend-activation a {
+  text-decoration: underline !important;
+}
+.resend-activation a:hover {
+  cursor: pointer;
+}
 .remember-me {
   float: left;
 }
@@ -550,6 +561,119 @@ input {
     padding: 0 !important;
   }
   .term-close-modal {
+    right: 20px !important;
+  }
+}
+
+@media only screen and (min-width: 40em) {
+  .ra-modal-overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    background-color: rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    visibility: hidden;
+    backface-visibility: hidden;
+    transition: opacity 0.6s cubic-bezier(0.55, 0, 0.1, 1), visibility 0.6s cubic-bezier(0.55, 0, 0.1, 1);
+  }
+  .ra-modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+  }
+}
+.ra-modal {
+  // display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin: 0 auto;
+  background-color: #fff;
+  width: 400px;
+  max-width: 75rem;
+  min-height: 13rem;
+  padding: 1rem;
+  border-radius: 3px;
+  opacity: 0;
+  overflow-y: auto;
+  visibility: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  backface-visibility: hidden;
+  transform: scale(1.2);
+  transition: all 0.6s cubic-bezier(0.55, 0, 0.1, 1);
+}
+.ra-modal .ra-close-modal {
+  position: absolute;
+  cursor: pointer;
+  top: 5px;
+  right: 15px;
+  opacity: 0;
+  backface-visibility: hidden;
+  transition: opacity 0.6s cubic-bezier(0.55, 0, 0.1, 1), transform 0.6s cubic-bezier(0.55, 0, 0.1, 1);
+  transition-delay: 0.3s;
+}
+.ra-modal .ra-close-modal span {
+  font-size: 25px;
+  display: block;
+  margin-top: -10px;
+}
+.ra-modal .ra-modal-content {
+  opacity: 0;
+  margin-top: 30px;
+  margin-left: 30px;
+  backface-visibility: hidden;
+  transition: opacity 0.6s cubic-bezier(0.55, 0, 0.1, 1);
+  transition-delay: 0.3s;
+}
+.resend-activation-email {
+  margin-left: 20px;
+}
+.ra-modal .ra-modal-content p {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+.ra-modal .ra-modal-content .ra-form-group {
+  display: flex;
+  width: 300px;
+}
+.ra-modal.active {
+  visibility: visible;
+  opacity: 1;
+  transform: scale(1);
+}
+.ra-modal.active .ra-modal-content {
+  opacity: 1;
+}
+.ra-modal.active .ra-close-modal {
+  transform: translateY(10px);
+  opacity: 1;
+}
+.ra-modal .ra-error-msg {
+  display: none;
+  color: #f44336;
+  margin-left: 30px;
+  margin-top: 5px;
+}
+// Mobile style
+@media only screen and (max-width: 39.9375em) {
+  .ra-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 0;
+    transform: scale(1.1);
+    padding: 0 !important;
+  }
+  .ra-close-modal {
     right: 20px !important;
   }
 }
@@ -1733,4 +1857,10 @@ input {
   color: #fff;
   background-color: #02324f;
   border-color: #02324f;
+}
+.create-new-team-btn:focus {
+  color: #fff;
+}
+.tn-error {
+  color: #f44336;
 }

@@ -56,7 +56,7 @@ from sqlalchemy import and_, or_, select
 from werkzeug.routing import BaseConverter
 from ..solar.forms import SolarBIListWidget
 from ..solar.models import Plan, TeamSubscription, Team, StripeEvent
-from ..solar.utils import set_session_team, get_session_team
+from ..solar.utils import set_session_team, get_session_team, log_to_mp
 from superset import (
     app,
     appbuilder,
@@ -888,6 +888,8 @@ class SolarBIBillingView(ModelView):
         _ = stripe.Customer.modify(cus_id, address={'country': form_data['country'], 'state': form_data['state'],
                                                     'postal_code': form_data['postal_code'], 'city': form_data['city'],
                                                     'line1': form_data['line1'], 'line2': form_data['line2']})
+
+
         return json_success(json.dumps({'msg': 'Successfully changed billing detail!'}))
 
     @api
@@ -980,6 +982,13 @@ class SolarBIBillingView(ModelView):
             else:
                 return_subscription_id = None
             self.appbuilder.get_session.commit()
+
+            # log to mixpanel
+            log_to_mp(g.user, team.team_name, 'change plan', {
+                'old plan': old_plan.plan_name,
+                'new plan': new_plan.plan_name,
+            })
+
             return True, return_subscription_id
         except Exception as e:
             self.appbuilder.get_session.rollback()
@@ -1020,6 +1029,13 @@ class SolarBIBillingView(ModelView):
                 team_sub.plan = starter_plan.id
                 team_sub.end_time = subscription['current_period_end']
                 self.appbuilder.get_session.commit()
+
+                log_to_mp(g.user, team.team_name, 'start trial', {
+                    'subscription id': team_sub.id,
+                    'sub stripe id': team_sub.stripe_sub_id,
+                    'trial end': team_sub.end_time,
+                })
+
                 return json_success(json.dumps({
                     'msg': 'Start trial successfully! You have 14 days to use 7 advance searches.',
                     'remain_count': starter_plan.num_request}))
@@ -1066,10 +1082,13 @@ class SolarBIBillingView(ModelView):
             team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(stripe_sub_id=stripe_plan['subscription']).first()
             logging.info('Downgrading stripe plan to free.')
             stripe_sub = stripe.Subscription.retrieve(team_sub.stripe_sub_id)
-            stripe_sub = stripe.Subscription.modify(stripe_sub.stripe_id, items=[{
-                'id': stripe_sub['items']['data'][0].id,
-                'plan': free_plan.stripe_id,
+            stripe.Subscription.delete(stripe_sub.stripe_id)
+            stripe_sub = stripe.Subscription.create(customer=stripe_sub['customer'], items=[{
+                'plan':free_plan.stripe_id,
+                'quantity': '1',
             }])
+            logging.info('Old subscription removed and free subscription created')
+            logging.info(stripe_sub)
             team_sub.plan = free_plan.id
             team_sub.end_time = -1
             team_sub.remain_count = 0
@@ -1823,6 +1842,8 @@ class Superset(BaseSupersetView):
             force=force,
         )
 
+        log_to_mp(g.user, session['team_name'], 'explore json', {})
+
         return self.generate_json(
             viz_obj, csv=csv, query=query, results=results, samples=samples
         )
@@ -1865,6 +1886,10 @@ class Superset(BaseSupersetView):
 
         This endpoint evolved to be the entry point of many different
         requests that GETs or POSTs a form_data."""
+
+
+
+
         try:
             self.send_email(g.user, address_name)
 
@@ -1956,11 +1981,22 @@ class Superset(BaseSupersetView):
             team = self.appbuilder.sm.find_team(team_id=get_session_team(self.appbuilder.sm, g.user.id)[0])
             subscription = self.appbuilder.sm.get_subscription(team_id=team.id)
 
+
             if subscription.remain_count <= 0:
                 return json_error_response("You cannot request any more data.")
             else:
                 subscription.remain_count = subscription.remain_count - 1
                 self.appbuilder.get_session.commit()
+
+            log_to_mp(g.user, team.team_name, 'request data', {
+                'lat': lat,
+                'lng': lng,
+                'start date': start_date,
+                'end date': end_date,
+                'resulution': resolution,
+                'type': type,
+                'address': address_name,
+            })
             return json_success(json.dumps({'query_id': response['QueryExecutionId']}))
         except Exception:
             return json_error_response("Request failed.")

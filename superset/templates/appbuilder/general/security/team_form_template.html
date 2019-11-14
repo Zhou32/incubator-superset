@@ -124,12 +124,15 @@
 
 
         $('#update_team').click(function() {
+            $('#emptyTn, #longTn, #existedTn').remove();
             let new_team_name = $('#team_name_input').val();
             if (new_team_name === '' || new_team_name == null) {
-                return alert("Team name cannot be empty");
+                return $( ".team-name" ).append("<p id='emptyTn' class='tn-error'>* Team name cannot be empty</p>");
+                {#return alert("Team name cannot be empty");#}
             }
             if (new_team_name.length > 13) {
-                return alert("Team name length cannot be longer than 13");
+                return $( ".team-name" ).append("<p id='longTn' class='tn-error'>* Team name length cannot be longer than 13</p>");
+                {#return alert("Team name length cannot be longer than 13");#}
             }
             let csrf_token = "{{ csrf_token() if csrf_token else '' }}";
             $.ajaxSetup({
@@ -148,7 +151,10 @@
                     if (data.redirect) {
                         window.location.replace(data.redirect)
                     }
-                    {#console.log('success')#}
+                    if (data.err) {
+                        return $( ".team-name" ).append("<p id='existedTn' class='tn-error'>* Team name already exists</p>");
+                        {#return alert("Team name exists");#}
+                    }
                 }
             });
         });

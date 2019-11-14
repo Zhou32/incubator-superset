@@ -51,17 +51,95 @@
     </div>
 {% endblock %}
 
+{% block resend_activation %}
+    <div class="ra-modal-overlay">
+        <div class="ra-modal">
+            <a class="ra-close-modal">
+              <span>&times;</span>
+            </a>
+            <div class="ra-modal-content">
+              <p>Please input your email below</p>
+              <div class="ra-form-group">
+                <input id="actEmailInput" placeholder="Email" class="form-control" type="email">
+                <button type="submit" class="resend-activation-email btn btn-primary" id="resendActEmail">Resend</button>
+                <img id="raResending" src="/static/assets/images/loading.gif" style="display: none; width: 40px; margin-right: 17px; margin-left: 20px;">
+              </div>
+            </div>
+            <p id="raInvalidEmail" class="ra-error-msg">* Email cannot be empty</p>
+            <p id="raWrongEmail" class="ra-error-msg">* Cannot find the email</p>
+        </div>
+    </div>
+{% endblock %}
+
 {% block add_tail_js %}
     <script src="{{url_for('appbuilder.static',filename='js/bootstrap.min.js')}}"></script>
     <script>
-        var elements = $('.term-modal-overlay, .term-modal');
-
+        let elements = $('.term-modal-overlay, .term-modal');
         $('.term-of-use').click(function(){
             elements.addClass('active');
         });
-
         $('.term-close-modal').click(function(){
             elements.removeClass('active');
         });
+
+        $("[data-toggle=popover]").popover({
+            html: true,
+            content: function() {
+                return $('#popover-content').html();
+            }
+        });
+
+
+        let rae = $('.ra-modal-overlay, .ra-modal');
+        $('.rae-btn').click(function(){
+            rae.addClass('active');
+        });
+        $('.ra-close-modal').click(function(){
+            $('#actEmailInput').val('');
+            $('#raInvalidEmail').hide();
+            $("#raWrongEmail").hide();
+            rae.removeClass('active');
+        });
+
+
+        $('#resendActEmail').click(function () {
+            $('#raResending').show();
+            $(this).hide();
+            $('#raInvalidEmail').hide();
+            $("#raWrongEmail").hide();
+            let user_email = $('#actEmailInput').val();
+            {#let user_email = document.getElementById("actEmailInput").value;#}
+            if (user_email === '') {
+                $('#raResending').hide();
+                $('#resendActEmail').show();
+                return $('#raInvalidEmail').show();
+            }
+            let csrf_token = "{{ csrf_token() if csrf_token else '' }}";
+            {#$(this).replaceWith("<img src=\"/static/assets/images/loading.gif\" style=\"width: 40px; margin-right: 17px; margin-left: 20px;\">");#}
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                    }
+                }
+            });
+            $.ajax({
+                type : "POST",
+                url : "{{ url_for('SolarBIAuthDBView.resend_activation') }}",
+                data: JSON.stringify({user_email: user_email}),
+                contentType: 'application/json;charset=UTF-8',
+                success: function(data) {
+                    if (data.redirect) {
+                        window.location.replace(data.redirect)
+                    }
+                    if (data.err) {
+                        $('#resendActEmail').show();
+                        $("#raWrongEmail").show();
+                        $('#raResending').hide();
+                    }
+                }
+            });
+        });
+
     </script>
 {% endblock %}

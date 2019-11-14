@@ -17,7 +17,7 @@
 # pylint: disable=C,R,W
 import logging
 
-from flask import flash, redirect, url_for, g, request, make_response
+from flask import flash, redirect, url_for, g, request, make_response, Markup, jsonify
 from flask_appbuilder import has_access
 from flask_babel import lazy_gettext
 from flask_mail import Mail, Message
@@ -50,8 +50,16 @@ log = logging.getLogger(__name__)
 
 class SolarBIAuthDBView(AuthDBView):
     invalid_login_message = lazy_gettext("Email/Username or password incorrect. Please try again.")
-    inactivated_login_message = lazy_gettext("Your account has not been activated yet. Please check your email.")
+    # inactivated_login_message = lazy_gettext("Your account has not been activated yet. Please check your email.")
+    inactivated_login_message = Markup("<span>Your account has not been activated yet. Please check your email.</span>"
+                                       "<span class='resend-activation'>Not received the email?"
+                                       "<a class='rae-btn'>Resend</a></span>")
+                                       # "<a data-placement='bottom' data-toggle='popover' data-title='Resend Activation'"
+                                       # "data-container='body' type='button' data-html='true' "
+                                       # "id='resendActivation'>Resend</a>")
     login_template = "appbuilder/general/security/solarbi_login_db.html"
+    email_template = 'appbuilder/general/security/account_activation_mail.html'
+
     @expose("/login/", methods=["GET", "POST"])
     def login(self):
         if g.user is not None and g.user.is_authenticated:
@@ -69,7 +77,7 @@ class SolarBIAuthDBView(AuthDBView):
                     reg_user = self.appbuilder.get_session.query(TeamRegisterUser).\
                         filter_by(email=form.username.data).first()
                 if reg_user:
-                    flash(as_unicode(self.inactivated_login_message), "warning")
+                    flash(self.inactivated_login_message, "warning")
                     return redirect(self.appbuilder.get_url_for_login)
 
                 flash(as_unicode(self.invalid_login_message), "warning")
@@ -80,7 +88,7 @@ class SolarBIAuthDBView(AuthDBView):
             if not curr_user:
                 curr_user = self.appbuilder.get_session.query(SolarBIUser).filter_by(email=form.username.data).first()
             if curr_user and not curr_user.email_confirm:
-                flash(as_unicode(self.inactivated_login_message), "warning")
+                flash(self.inactivated_login_message, "warning")
                 return redirect(self.appbuilder.get_url_for_login)
 
             remember = form.remember_me.data
@@ -95,6 +103,43 @@ class SolarBIAuthDBView(AuthDBView):
         return self.render_template(
             self.login_template, title=self.title, form=form, appbuilder=self.appbuilder
         )
+
+    @expose('/resend-activation', methods=['POST'])
+    def resend_activation(self):
+        user_email = request.json['user_email']
+        register_user = self.appbuilder.sm.get_registered_user(user_email)
+        if not register_user:
+            return jsonify(dict(err="Sorry we cannot find the email"))
+
+        mail = Mail(self.appbuilder.get_app)
+        msg = Message()
+        msg.sender = 'SolarBI', 'no-reply@solarbi.com.au'
+
+        # is None -> team admin
+        if register_user.inviter is None:
+            msg.subject = 'SolarBI - Team Created Confirmation'
+            url = url_for('SolarBIRegisterUserDBView.activation',
+                          _external=True,
+                          activation_hash=register_user.registration_hash)
+        else:
+            msg.subject = 'SolarBI - Team Member Activation'
+            url = url_for('SolarBIRegisterInvitationView.activate',
+                          _external=True,
+                          invitation_hash=register_user.registration_hash)
+
+        msg.html = self.render_template(self.email_template,
+                                        url=url,
+                                        username=register_user.username)
+        msg.recipients = [register_user.email]
+        try:
+            mail.send(msg)
+        except Exception as e:
+            log.error('Send email exception: {0}'.format(str(e)))
+            flash(as_unicode("Snd email exception: " + str(e)), 'danger')
+            return jsonify(dict(redirect='/login'))
+
+        flash(as_unicode("Resend activation email success. Please check your email."), 'info')
+        return jsonify(dict(redirect='/login'))
 
 
 class SolarBIPasswordRecoverView(PublicFormView):
@@ -249,8 +294,3 @@ class SolarBIUserInfoEditView(UserInfoEditView):
 class SolarBIResetMyPasswordView(ResetMyPasswordView):
     form_template = 'appbuilder/general/security/reset_my_password.html'
     edit_widget = SolarBIResetMyPasswordWidget
-# class SolarBIUserDBModelView(UserDBModelView):
-#     # pass
-#     # route_base = '/solar'
-#     show_template = 'appbuilder/general/security/my_profile.html'
-#     show_widget = SolarBIShowWidget

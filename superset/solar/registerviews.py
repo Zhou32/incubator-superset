@@ -36,7 +36,7 @@ from .forms import (
     SolarBIRegisterInvitationUserDBForm, SolarBITeamFormWidget, SolarBIInvitationWidget,
 )
 from .models import SolarBIUser
-from .utils import post_request, get_session_team, set_session_team
+from .utils import post_request, get_session_team, set_session_team, log_to_mp
 
 log = logging.getLogger(__name__)
 
@@ -283,6 +283,9 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
     @expose('/update-team-name', methods=['POST'])
     def update_team_name(self):
         new_team_name = request.json['new_team_name']
+        if self.appbuilder.sm.find_team(team_name=new_team_name) is not None:
+            return jsonify(dict(err='Team name exists'))
+
         if self.appbuilder.sm.update_team_name(g.user.id, new_team_name):
             team = self.appbuilder.sm.find_team(team_id=get_session_team(self.appbuilder.sm, g.user.id)[0])
             stripe.Customer.modify(team.stripe_user_id, description=new_team_name)
@@ -340,7 +343,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
 
 class SolarBIRegisterInvitationView(BaseRegisterUser):
     activation_message = lazy_gettext("Register successfully! An activation email has been sent to you")
-    error_message = lazy_gettext("Username already existed")
+    error_message = lazy_gettext("Username or Email already existed")
     form = SolarBIRegisterInvitationForm
     form_template = 'appbuilder/general/security/invitation_registration.html'
     activation_template = 'appbuilder/general/security/activation.html'

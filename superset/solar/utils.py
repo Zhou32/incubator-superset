@@ -18,7 +18,9 @@
 import json
 
 from flask import session
+from mixpanel import Mixpanel
 
+mp = Mixpanel('8b85dcbb1c5f693a3b045b24fca1e787')
 
 def post_request(url, params):
     import requests
@@ -37,3 +39,32 @@ def get_session_team(securitymanager, user_id):
         team = securitymanager.find_teams_for_user(user_id)[0]
         set_session_team(team.id, team.team_name)
         return team.id, team.team_name
+
+
+def log_to_mp(user, team_name, action, metadata):
+    metadata['Team'] = team_name
+    mp.track(user.username, action, metadata)
+
+
+def create_mp_team(team):
+    mp.group_set('Team', team.team_name, {
+        '$name': team.team_name
+    })
+
+
+def create_mp_user(user):
+    mp.people_set(user.username, {
+        '$first_name': user.first_name,
+        '$last_name': user.last_name,
+        '$email': user.email
+    })
+
+
+def update_mp_team(team, metadata):
+    mp.group_set('Team', team.team_name, metadata)
+
+
+def mp_add_user_to_team(user, team):
+    mp.people_append(user.username, {
+        'Team': team.team_name
+    })
