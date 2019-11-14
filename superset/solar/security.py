@@ -640,11 +640,7 @@ class CustomSecurityManager(SupersetSecurityManager):
                     self.get_session.add(invited_user)
                     self.get_session.commit()
 
-                    # Log to mixpanel
-                    inviter = self.get_session.query(self.user_model).filter_by(id=inviter).first()
-                    log_to_mp(inviter, team.team_name, 'create invitation', {
-                        'invited email': email
-                    })
+
 
                 except Exception as e:
                     self.get_session.rollback()
@@ -665,6 +661,13 @@ class CustomSecurityManager(SupersetSecurityManager):
                 self.get_session.rollback()
                 logging.error(e)
                 raise ValueError('Invitation is failed because of database integrity error')
+
+        # Log to mixpanel
+        inviter = self.get_session.query(self.user_model).filter_by(id=inviter).first()
+        log_to_mp(inviter, team.team_name, 'create invitation', {
+            'invited email': email
+        })
+
         return invited_user, existed
 
     def delete_invited_user(self, user_email):

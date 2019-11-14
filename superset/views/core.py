@@ -1081,10 +1081,13 @@ class SolarBIBillingView(ModelView):
             team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(stripe_sub_id=stripe_plan['subscription']).first()
             logging.info('Downgrading stripe plan to free.')
             stripe_sub = stripe.Subscription.retrieve(team_sub.stripe_sub_id)
-            stripe_sub = stripe.Subscription.modify(stripe_sub.stripe_id, items=[{
-                'id': stripe_sub['items']['data'][0].id,
-                'plan': free_plan.stripe_id,
+            stripe.Subscription.delete(stripe_sub.stripe_id)
+            stripe_sub = stripe.Subscription.create(customer=stripe_sub['customer'], items=[{
+                'plan':free_plan.stripe_id,
+                'quantity': '1',
             }])
+            logging.info('Old subscription removed and free subscription created')
+            logging.info(stripe_sub)
             team_sub.plan = free_plan.id
             team_sub.end_time = -1
             team_sub.remain_count = 0
