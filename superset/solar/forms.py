@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 # pylint: disable=C,R,W
+from flask import g
 from flask_appbuilder.fieldwidgets import BS3TextFieldWidget, BS3PasswordFieldWidget
 from flask_babel import lazy_gettext
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length
@@ -48,6 +49,17 @@ def unique_required(form, field):
             raise ValidationError("Team name already exists")
         if db.session.query(TeamRegisterUser).filter_by(team=field.data).first() is not None:
             raise ValidationError("Team name already exists, waiting team admin to activate")
+
+
+def non_existed_required(form, field):
+    from superset import db
+
+    if field.name == "email":
+        if g.user.email != field.data:
+            if db.session.query(User).filter_by(email=field.data).first() is not None:
+                raise ValidationError("Email already exists")
+            if db.session.query(TeamRegisterUser).filter_by(email=field.data).first() is not None:
+                raise ValidationError("Email already exists")
 
 
 class SolarBILoginForm_db(DynamicForm):
@@ -168,7 +180,7 @@ class SolarBIUserInfoEditForm(DynamicForm):
     )
     email = StringField(
         lazy_gettext("Email"),
-        validators=[DataRequired()],
+        validators=[DataRequired(), non_existed_required],
         widget=BS3TextFieldWidget(),
         description=lazy_gettext("Write the user last name"),
     )
