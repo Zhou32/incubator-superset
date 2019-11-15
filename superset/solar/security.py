@@ -37,7 +37,7 @@ from superset.solar.registerviews import (
 from superset.solar.models import Plan, ResetRequest, Team, TeamRegisterUser, TeamSubscription, SolarBIUser, TeamRole
 from superset.security import SupersetSecurityManager
 
-from .utils import get_session_team, set_session_team, log_to_mp, create_mp_team, create_mp_user, mp_add_user_to_team, \
+from .utils import get_session_team, set_session_team, log_to_mp, create_mp_team, update_mp_user, mp_add_user_to_team, \
     update_mp_team
 
 stripe.api_key = os.getenv('STRIPE_SK')
@@ -436,10 +436,10 @@ class CustomSecurityManager(SupersetSecurityManager):
                 user_role = self.get_session.query(TeamRole).filter_by(team_id=team.id, role_id=role.id).first()
                 user.team_role.append(user_role)
 
-                create_mp_user(user)
+                update_mp_user(user)
                 mp_add_user_to_team(user, team)
-                log_to_mp(user, team, 'added to team', {
-                    'role': role.role_name,
+                log_to_mp(user, team.team_name, 'added to team', {
+                    'role': role.name,
                 })
 
                 # db_role = self.find_role(DB_ROLE_PREFIX+team.team_name)
@@ -539,7 +539,7 @@ class CustomSecurityManager(SupersetSecurityManager):
             self.get_session.commit()
 
             # Create the user in mixpanel
-            create_mp_user(invited_user)
+            update_mp_user(invited_user)
             log_to_mp(invited_user, '', 'invited user received and updated', {})
 
             return invited_user

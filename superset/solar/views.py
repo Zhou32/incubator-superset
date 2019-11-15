@@ -28,7 +28,7 @@ from flask_appbuilder.views import expose, PublicFormView, ModelView
 from flask_appbuilder.security.forms import ResetPasswordForm
 from .models import SolarBIUser, TeamRegisterUser, Plan
 
-from .utils import set_session_team
+from .utils import set_session_team, update_mp_user
 
 
 from .forms import (
@@ -281,6 +281,7 @@ class SolarBIUserInfoEditView(UserInfoEditView):
             response = self.form_post(form)
             if not response:
                 return redirect("/solarbiuserinfoeditview/form")
+            update_mp_user(g.user)
             return response
         else:
             flash(as_unicode('The new email address has already been used.'), 'danger')
