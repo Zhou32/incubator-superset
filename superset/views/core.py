@@ -892,7 +892,6 @@ class SolarBIBillingView(ModelView):
                                                     'postal_code': form_data['postal_code'], 'city': form_data['city'],
                                                     'line1': form_data['line1'], 'line2': form_data['line2']})
 
-
         return json_success(json.dumps({'msg': 'Successfully changed billing detail!'}))
 
     @api
