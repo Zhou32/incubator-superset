@@ -281,7 +281,7 @@ class SolarBIUserInfoEditView(UserInfoEditView):
             response = self.form_post(form)
             if not response:
                 return redirect("/solarbiuserinfoeditview/form")
-            update_mp_user(g.user)
+            # update_mp_user(g.user)
             return response
         else:
             flash(as_unicode('The new email address has already been used.'), 'danger')
@@ -299,6 +299,7 @@ class SolarBIUserInfoEditView(UserInfoEditView):
         item = self.appbuilder.sm.get_user_by_id(g.user.id)
         form.populate_obj(item)
         self.appbuilder.sm.update_user(item)
+        update_mp_user(g.user)
         flash(as_unicode(self.message), "info")
 
 
