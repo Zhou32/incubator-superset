@@ -586,7 +586,8 @@ class CustomSecurityManager(SupersetSecurityManager):
         return team
 
     def update_team_name(self, user_id, new_team_name):
-        current_team_name = self.find_team(user_id=user_id).team_name
+        # current_team_name = self.find_team(user_id=user_id).team_name
+        current_team_name = self.get_session_team(user_id).team_name
         awaiting_users = self.get_session.query(self.registeruser_model).filter_by(
             team=current_team_name).all()
         for user in awaiting_users:
