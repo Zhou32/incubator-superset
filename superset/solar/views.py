@@ -16,6 +16,7 @@
 # under the License.
 # pylint: disable=C,R,W
 import logging
+import stripe
 
 from flask import flash, redirect, url_for, g, request, make_response, Markup, jsonify
 from flask_appbuilder import has_access
@@ -282,13 +283,22 @@ class SolarBIUserInfoEditView(UserInfoEditView):
                 return redirect("/solarbiuserinfoeditview/form")
             return response
         else:
-            widgets = self._get_edit_widget(form=form)
-            return self.render_template(
-                self.form_template,
-                title=self.form_title,
-                widgets=widgets,
-                appbuilder=self.appbuilder,
-            )
+            flash(as_unicode('The new email address has already been used.'), 'danger')
+            return redirect('/solarbiuserinfoeditview/form')
+            # widgets = self._get_edit_widget(form=form)
+            # return self.render_template(
+            #     self.form_template,
+            #     title=self.form_title,
+            #     widgets=widgets,
+            #     appbuilder=self.appbuilder,
+            # )
+
+    def form_post(self, form):
+        form = self.form.refresh(request.form)
+        item = self.appbuilder.sm.get_user_by_id(g.user.id)
+        form.populate_obj(item)
+        self.appbuilder.sm.update_user(item)
+        flash(as_unicode(self.message), "info")
 
 
 class SolarBIResetMyPasswordView(ResetMyPasswordView):
