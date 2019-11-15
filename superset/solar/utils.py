@@ -52,7 +52,7 @@ def create_mp_team(team):
     })
 
 
-def create_mp_user(user):
+def update_mp_user(user):
     mp.people_set(user.username, {
         '$first_name': user.first_name,
         '$last_name': user.last_name,
