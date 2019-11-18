@@ -36,7 +36,7 @@ def get_session_team(securitymanager, user_id):
     try:
         return session['team_id'], session['team_name']
     except Exception as e:
-        team = securitymanager.find_teams_for_user(user_id)[0]
+        team = securitymanager.find_team(user_id=user_id)[0]
         set_session_team(team.id, team.team_name)
         return team.id, team.team_name
 
