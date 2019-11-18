@@ -499,30 +499,37 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
 
         # serialize composite pks
         pks = [self._serialize_pk_if_composite(pk) for pk in pks]
-        team_id = get_team_id()
-        # get all object keys in s3 under all team users' sub folders
-        team_members_email_role = appbuilder.sm.get_team_members(team_id)
-        team_member_emails = []
-        for email, _ in team_members_email_role:
-            team_member_emails.append(email)
 
+        # team_id = get_team_id()
+        # # get all object keys in s3 under all team users' sub folders
+        # team_members_email_role = appbuilder.sm.get_team_members(team_id)
+        # team_member_emails = []
+        # for email, _ in team_members_email_role:
+        #     team_member_emails.append(email)
+
+        # all_object_keys = []
+        # for me in team_member_emails:
+        #     try:
+        #         all_object_keys += self.list_object_key('colin-query-test', me + '/')
+        #     except Exception:
+        #         continue
         all_object_keys = []
-        for me in team_member_emails:
-            try:
-                all_object_keys += self.list_object_key('colin-query-test', me + '/')
-            except Exception:
-                continue
+        try:
+            all_object_keys = self.list_object_key('colin-query-test',
+                                                   'TID' + str(get_session_team(self.appbuilder.sm, g.user.id)[0]) + '/')
+        except Exception:
+            pass
 
         obj_keys = []
+        avail_object_keys = []
         if all_object_keys:
             avail_object_keys = [key for key in all_object_keys if key.endswith('.csv')]
-            obj_keys = [key.split('/')[1].replace('.csv', '') for key in avail_object_keys]
-        # for key in avail_object_keys:
-        #     obj_keys.append(key.split('/')[1].replace('.csv', ''))
+            obj_keys = [key.split('/')[2].replace('.csv', '') for key in avail_object_keys]
 
         widgets["list"] = self.list_widget(
             appbuilder=self.appbuilder,
             session_team=get_session_team(self.appbuilder.sm, g.user.id),
+            avail_object_keys=avail_object_keys,
             obj_keys=obj_keys,
             label_columns=self.label_columns,
             include_columns=self.list_columns,
@@ -1887,10 +1894,6 @@ class Superset(BaseSupersetView):
 
         This endpoint evolved to be the entry point of many different
         requests that GETs or POSTs a form_data."""
-
-
-
-
         try:
             self.send_email(g.user, address_name)
 
@@ -1958,7 +1961,9 @@ class Superset(BaseSupersetView):
                     'Database': 'solar_radiation_hill'
                 },
                 ResultConfiguration={
-                    'OutputLocation': 's3://colin-query-test/' + g.user.email,
+                    'OutputLocation': 's3://colin-query-test/TID' +
+                                      str(get_session_team(self.appbuilder.sm, g.user.id)[0]) +
+                                      '/' + g.user.email,
                     # 'EncryptionConfiguration': {
                     #     'EncryptionOption': 'SSE_S3',
                     #     'KmsKey': 'string'
@@ -1980,7 +1985,6 @@ class Superset(BaseSupersetView):
                                              end_date=form_data['endDate'], data_type=type, resolution=resolution)
             team = self.appbuilder.sm.find_team(team_id=get_session_team(self.appbuilder.sm, g.user.id)[0])
             subscription = self.appbuilder.sm.get_subscription(team_id=team.id)
-
 
             if subscription.remain_count <= 0:
                 return json_error_response("You cannot request any more data.")
