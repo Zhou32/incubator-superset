@@ -56,7 +56,7 @@ from sqlalchemy import and_, or_, select
 from werkzeug.routing import BaseConverter
 from ..solar.forms import SolarBIListWidget
 from ..solar.models import Plan, TeamSubscription, Team, StripeEvent
-from ..solar.utils import set_session_team, get_session_team, log_to_mp
+from ..solar.utils import set_session_team, get_session_team, log_to_mp, get_athena_query
 from superset import (
     app,
     appbuilder,
@@ -510,7 +510,7 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
         # all_object_keys = []
         # for me in team_member_emails:
         #     try:
-        #         all_object_keys += self.list_object_key('colin-query-test', me + '/')
+        #         all_object_keys += self.list_object_key('', me + '/')
         #     except Exception:
         #         continue
         all_object_keys = []
@@ -1896,58 +1896,7 @@ class Superset(BaseSupersetView):
         requests that GETs or POSTs a form_data."""
         try:
             self.send_email(g.user, address_name)
-
-            start_year, start_month, start_day = start_date.split('-')
-            end_year, end_month, end_day = end_date.split('-')
-            select_str = ""
-            group_str = ""
-            order_str = ""
-            if resolution == 'hourly':
-                select_str = "SELECT year, month, day, hour, radiationtype, radiation"
-                group_str = "GROUP BY year, month, day, hour, radiationtype, radiation"
-                order_str = "ORDER BY year ASC, month ASC, day ASC, hour ASC"
-            elif resolution == 'daily':
-                select_str = \
-                    "SELECT year, month, day, radiationtype, avg(radiation) AS radiation"
-                group_str = "GROUP BY year, month, day, radiationtype"
-                order_str = "ORDER BY year ASC, month ASC, day ASC"
-            elif resolution == 'weekly':
-                select_str = \
-                    "SELECT CAST(date_trunc('week', r_date) AS date) AS Monday_of_week, " + \
-                    "radiationtype, avg(radiation) AS week_avg_radiation FROM " + \
-                    "(SELECT cast(date AS timestamp) AS r_date, year, month, day, " + \
-                    "radiationtype, radiation"
-                group_str = "GROUP BY  date, year, month, day, radiationtype, radiation"
-                order_str = "ORDER BY  date) GROUP BY date_trunc('week', r_date), " + \
-                            "radiationtype ORDER BY 1"
-            elif resolution == 'monthly':
-                select_str = "SELECT year, month, radiationtype, avg(radiation) AS radiation"
-                group_str = "GROUP BY year, month, radiationtype"
-                order_str = "ORDER BY year ASC, month ASC"
-            elif resolution == 'annual':
-                select_str = "SELECT year, radiationtype, avg(radiation) AS radiation"
-                group_str = "GROUP BY year, radiationtype"
-                order_str = "ORDER BY year ASC"
-
-            if type != 'both':
-                athena_query = select_str \
-                    + " FROM \"solar_radiation_hill\".\"lat_partition_v2\"" \
-                    + " WHERE (CAST(year AS BIGINT)*10000" \
-                    + " + CAST(month AS BIGINT)*100 + day)" \
-                    + " BETWEEN " + start_year + start_month + start_day \
-                    + " AND " + end_year + end_month + end_day \
-                    + " AND latitude = '" + lat + "' AND longitude = '" + lng \
-                    + "' AND radiationtype = '" + type + "' AND radiation != -999 " \
-                    + group_str + " " + order_str
-            else:
-                athena_query = select_str \
-                    + " FROM \"solar_radiation_hill\".\"lat_partition_v2\"" \
-                    + " WHERE (CAST(year AS BIGINT)*10000" \
-                    + " + CAST(month AS BIGINT)*100 + day)" \
-                    + " BETWEEN " + start_year + start_month + start_day \
-                    + " AND " + end_year + end_month + end_day \
-                    + " AND latitude = '" + lat + "' AND longitude = '" + lng \
-                    + "' AND radiation != -999 " + group_str + " " + order_str
+            athena_query = get_athena_query(lat, lng, start_date, end_date, type, resolution)
 
             AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
             AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
@@ -1956,7 +1905,6 @@ class Superset(BaseSupersetView):
             client = session.client('athena', region_name='ap-southeast-2')
             response = client.start_query_execution(
                 QueryString=athena_query,
-                # ClientRequestToken=g.user.email+'_'+str(time.time()),
                 QueryExecutionContext={
                     'Database': 'solar_radiation_hill'
                 },
