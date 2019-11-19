@@ -21,6 +21,7 @@
 
 {#{% set is_team_owner = g.user.roles[0].name == 'team_owner' %}#}
 {% set is_team_owner = appbuilder.sm.get_role_in_team(g.user, session_team[0]).name == 'team_owner' %}
+{% set download_prefix = "https://colin-query-test.s3-ap-southeast-2.amazonaws.com/" %}
 
 {% block begin_title %}
     <div class="title-card">
@@ -146,7 +147,14 @@
                         <td>Status</td>
                           {% if item['slice_query_id'] in obj_keys %}
                              <td>
-                                 Completed<a class="download-link" href="{{ item['slice_download_link'] }}"><i class="fas fa-arrow-circle-down"></i></a>
+                             {% for aok in avail_object_keys %}
+                                 {% if item['slice_query_id'] in aok %}
+                                    Completed
+                                    <a class="download-link" href={{ download_prefix + aok }}>
+                                      <i class="fas fa-arrow-circle-down"></i>
+                                    </a>
+                                 {% endif %}
+                             {% endfor %}
                              </td>
                           {% else %}
                               <td>Still running</td>

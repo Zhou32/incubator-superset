@@ -572,8 +572,7 @@ class SolarBISlice(Model, AuditMixinNullable, ImportMixin):
         return query_id
 
     def get_slice_download_link(self):
-        download_link = "https://colin-query-test.s3-ap-southeast-2.amazonaws.com/" + \
-                        urllib.parse.quote(self.owners[0].email, safe='') + '/' + str(self.query_id) + '.csv'
+        download_link = urllib.parse.quote(self.owners[0].email, safe='') + '/' + str(self.query_id) + '.csv'
         return download_link
 
     @property
