@@ -515,7 +515,7 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
         #         continue
         all_object_keys = []
         try:
-            all_object_keys = self.list_object_key('colin-query-test',
+            all_object_keys = self.list_object_key('solarbi-saved-radiation',
                                                    'TID' + str(get_session_team(self.appbuilder.sm, g.user.id)[0]) + '/')
         except Exception:
             pass
@@ -1911,7 +1911,7 @@ class Superset(BaseSupersetView):
                     'Database': 'solar_radiation_hill'
                 },
                 ResultConfiguration={
-                    'OutputLocation': 's3://colin-query-test/TID' +
+                    'OutputLocation': 's3://solarbi-saved-radiation/TID' +
                                       str(get_session_team(self.appbuilder.sm, g.user.id)[0]) +
                                       '/' + g.user.email,
                     # 'EncryptionConfiguration': {
