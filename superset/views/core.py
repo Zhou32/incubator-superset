@@ -1928,9 +1928,10 @@ class Superset(BaseSupersetView):
             datasource = ConnectorRegistry.get_datasource(
                 form_data['datasource_type'], form_data['datasource_id'], db.session)
             self.save_or_overwrite_solarbislice(args, None, True, None, False, form_data['datasource_id'],
-                                             form_data['datasource_type'], datasource.name,
-                                             query_id=response['QueryExecutionId'], start_date=form_data['startDate'],
-                                             end_date=form_data['endDate'], data_type=type, resolution=resolution)
+                                                 form_data['datasource_type'], datasource.name,
+                                                query_id=response['QueryExecutionId'],
+                                                start_date=form_data['startDate'],
+                                                end_date=form_data['endDate'], data_type=type, resolution=resolution)
             team = self.appbuilder.sm.find_team(team_id=get_session_team(self.appbuilder.sm, g.user.id)[0])
             subscription = self.appbuilder.sm.get_subscription(team_id=team.id)
 
