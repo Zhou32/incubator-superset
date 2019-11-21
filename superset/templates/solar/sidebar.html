@@ -123,6 +123,7 @@
                     {{ session['team_name'] }}
                 </li>
                 <hr style="margin: 5px 0; background-color: #CCCCCC" />
+            <div class="md-team-names">
                 {% for id, team in team_ids %}
                     {% if team != session['team_name'] %}
                         <li role="option" id="{{id}}" class="ng-binding ng-scope" tabindex="-1" aria-selected="true">
@@ -130,6 +131,7 @@
                         </li>
                     {% endif %}
                 {% endfor %}
+            </div>
                 <hr style="margin: 5px 0; background-color: #CCCCCC" />
                 <li data-toggle="modal" data-target="#addNewTeam" role="option" id="{{ session['team_id'] }}" class="ng-binding ng-scope" tabindex="-1" aria-selected="true">
                     <span><i style="margin-right: 13px; color: #177BB9;" class="fas fa-plus"></i>New team</span>
@@ -153,8 +155,9 @@
           <div class="form-group">
             <label for="recipient-name" class="col-form-label">Team Name:</label>
             <input type="text" class="form-control" id="teamName">
+              <p id="team_name_empty" style="display: none; color: #f44336;">* Team name cannot be empty</p>
             <p id="team_name_error" style="display: none; color: #f44336;">* Team name length cannot be longer than 13</p>
-            <p id="team_name_existed_error" style="display: none; color: #f44336;">* Team name already existed</p>
+            <p id="team_name_existed_error" style="display: none; color: #f44336;">* Team name already exists</p>
           </div>
         </form>
       </div>
@@ -191,8 +194,12 @@
 
         $('#addTeamBtn').click(function() {
             $('#team_name_error').hide();
+            $('#team_name_empty').hide();
             $('#team_name_existed_error').hide();
             let team_name = $('#teamName').val();
+            if (team_name === '') {
+                return $('#team_name_empty').show();
+            }
             if (team_name.length > 13) {
                 return $('#team_name_error').show();
             }

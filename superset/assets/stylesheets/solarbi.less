@@ -79,33 +79,38 @@ input {
   box-sizing: border-box;
 }
 .md-select [type=button] {
-  background: #fff;
-  border-color: rgba(0, 0, 0, 0.12);
-  border-width: 0 0 1px 0;
-  color: rgba(0, 0, 0, 0.73);
-  cursor: default;
+  background: transparent;
+  color: white;
+  font-size: 1.2em;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
   display: block;
   line-height: 48px;
-  padding: 2px 0 1px 16px;
+  padding: 2px 0px 1px 15px;
   position: relative;
   text-align: left;
   text-shadow: none;
-  width: 170px;
+  min-width: 160px;
+  max-width: 190px;
   z-index: 1;
   outline: none;
   overflow: hidden;
 }
 .md-select [type=button]:focus, .md-select [type=button]:hover {
-  background: rgba(0, 0, 0, 0.1);
+  // background: rgba(0, 0, 0, 0.1);
+  color: #F9ED32;
 }
 .md-select [type=button]:after {
   content: '\25be';
+  font-size: 20px;
   float: right;
-  padding-right: 16px;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 .md-select ul[role=listbox] {
   background-color: white;
-  cursor: default;
+  cursor: pointer;
   list-style: none;
   line-height: 26px;
   overflow: hidden;
@@ -121,7 +126,7 @@ input {
 .md-select ul[role=listbox] li {
   height: 48px;
   margin: 0;
-  padding: 10px 16px;
+  padding: 10px 16px 5px;
   outline: none;
   overflow: hidden;
   color: black;
@@ -130,7 +135,7 @@ input {
   background: rgba(0, 0, 0, 0.1);
 }
 .md-select.active ul {
-  max-height: 140px;
+  max-height: 240px;
   width: 185px;
   overflow: auto;
   padding: 8px 0;
@@ -138,6 +143,11 @@ input {
   transition: all 0.2s ease;
   font-family: 'Montserrat';
   margin-bottom: 20px;
+  border-radius: 10px;
+}
+.md-select .md-team-names {
+  max-height: 73px;
+  overflow: auto;
 }
 .input-fields {
   width: 50%;

@@ -863,12 +863,12 @@ class SolarBIBillingView(ModelView):
     def change_plan(self, plan_id=None):
         if not g.user or not g.user.get_id():
             return json_error_response('Incorrect call to endpoint')
-        team = self.appbuilder.get_session.query(Team).filter_by(id=session['team_id']).first()
+        team = self.appbuilder.sm.find_team(team_id=session['team_id'])
         logging.info(team.stripe_user_id)
 
         logging.info('Updating plan for {}'.format(team.team_name))
         try:
-            stripe_customer = stripe.Customer.retrieve(id=team.stripe_user_id)
+            # stripe_customer = stripe.Customer.retrieve(id=team.stripe_user_id)
 
             pm_id = team.stripe_pm_id
             if team.stripe_pm_id is None:
@@ -1069,14 +1069,21 @@ class SolarBIBillingView(ModelView):
             local_plan = self.appbuilder.get_session.query(Plan).filter_by(stripe_id=stripe_plan["plan"]['id']).first()
 
             # Fetch team_subscription by the subscription on invoice
-            team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(stripe_sub_id=stripe_plan['subscription']).first()
+            team_sub = self.appbuilder.sm.get_subscription(sub_id=stripe_plan['subscription'])
 
             # Set subscribed plan to the plan on the invoice, and reset remain count
             # This event should happen only when customer upgrade to paid from free for the first time and paid upfront,
             # or at the start of new billing cycle. So it is safe to reset.
+            if team_sub is None:
+                raise Exception('team subscription not found')
             team_sub.plan = local_plan.id
             team_sub.remain_count = local_plan.num_request
             team_sub.end_time = stripe_plan['period']['end']
+            team = self.appbuilder.sm.find_team(team_id=team_sub.team)
+
+            log_to_mp('', team.team_name, 'auto renew successful',{
+                'plan': local_plan.plan_name,
+            })
             self.appbuilder.get_session.commit()
         except Exception as e:
             self.appbuilder.get_session.rollback()
@@ -1089,6 +1096,8 @@ class SolarBIBillingView(ModelView):
             stripe_plan = paid_list[0]
             free_plan = self.appbuilder.get_session.query(Plan).filter_by(id=1).first()
             team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(stripe_sub_id=stripe_plan['subscription']).first()
+            if team_sub is None:
+                raise Exception('team subscription not found')
             logging.info('Downgrading stripe plan to free.')
             stripe_sub = stripe.Subscription.retrieve(team_sub.stripe_sub_id)
             stripe.Subscription.delete(stripe_sub.stripe_id)
@@ -1101,6 +1110,8 @@ class SolarBIBillingView(ModelView):
             team_sub.plan = free_plan.id
             team_sub.end_time = -1
             team_sub.remain_count = 0
+            team = self.appbuilder.sm.find_team(team_id=team_sub.team)
+            log_to_mp('', team.team_name, 'revert to free', {})
             self.appbuilder.get_session.commit()
         except Exception as e:
             self.appbuilder.get_session.rollback()
@@ -1930,9 +1941,10 @@ class Superset(BaseSupersetView):
             datasource = ConnectorRegistry.get_datasource(
                 form_data['datasource_type'], form_data['datasource_id'], db.session)
             self.save_or_overwrite_solarbislice(args, None, True, None, False, form_data['datasource_id'],
-                                             form_data['datasource_type'], datasource.name,
-                                             query_id=response['QueryExecutionId'], start_date=form_data['startDate'],
-                                             end_date=form_data['endDate'], data_type=type, resolution=resolution)
+                                                 form_data['datasource_type'], datasource.name,
+                                                query_id=response['QueryExecutionId'],
+                                                start_date=form_data['startDate'],
+                                                end_date=form_data['endDate'], data_type=type, resolution=resolution)
             team = self.appbuilder.sm.find_team(team_id=get_session_team(self.appbuilder.sm, g.user.id)[0])
             subscription = self.appbuilder.sm.get_subscription(team_id=team.id)
 
