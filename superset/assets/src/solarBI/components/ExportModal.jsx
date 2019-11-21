@@ -322,10 +322,10 @@ class ExportModal extends React.Component {
     this.state = {
       anchorEl: null,
       type: 'dni',
-      pickerStart: new Date('2017-01-01T00:00:00'),
-      pickerEnd: new Date('2019-01-01T00:00:00'),
-      startDate: '2017-01-01',
-      endDate: '2019-01-01',
+      pickerStart: new Date('2007-01-01T00:00:00'),
+      pickerEnd: new Date('2019-07-01T00:00:00'),
+      startDate: '2007-01-01',
+      endDate: '2019-07-01',
       resolution: 'hourly',
       cost: (16).toFixed(2),
     };
@@ -352,7 +352,6 @@ class ExportModal extends React.Component {
   }
 
   onUnload(event) { // the method that will be used for both add and remove event
-    // console.log("hellooww")
     if (!(this.props.solarBI.requestStatus === 'success' ||
       this.props.solarBI.saveStatus === 'success' ||
       this.props.solar_new === false)) {
@@ -493,8 +492,6 @@ class ExportModal extends React.Component {
   // }
 
   handleStartDateChange(date) {
-    // console.log(typeof (date));
-    // console.log(typeof (new Date(Date.parse(date))));
     this.setState({ pickerStart: date });
     try {
       const tzoffset = (new Date()).getTimezoneOffset() * 60000;
@@ -510,8 +507,6 @@ class ExportModal extends React.Component {
   //   this.setState({ endDate: event.target.value });
   // }
   handleEndDateChange(date) {
-    // console.log(typeof (date));
-    // console.log(typeof (new Date(Date.parse(date))));
     this.setState({ pickerEnd: date });
     try {
       const tzoffset = (new Date()).getTimezoneOffset() * 60000;
