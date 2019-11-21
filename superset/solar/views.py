@@ -281,7 +281,6 @@ class SolarBIUserInfoEditView(UserInfoEditView):
             response = self.form_post(form)
             if not response:
                 return redirect("/solarbiuserinfoeditview/form")
-            # update_mp_user(g.user)
             return response
         else:
             flash(as_unicode('The new email address has already been used.'), 'danger')
@@ -300,6 +299,13 @@ class SolarBIUserInfoEditView(UserInfoEditView):
         form.populate_obj(item)
         self.appbuilder.sm.update_user(item)
         update_mp_user(g.user)
+
+        # Update stripe email for the teams which the user is admin
+        for team_role in g.user.team_role:
+            if team_role.role.name == 'team_owner':
+                logging.info('Updating email for team {}'.format(team_role.team.team_name))
+                stripe.Customer.modify(team_role.team.stripe_user_id, email=g.user.email)
+
         flash(as_unicode(self.message), "info")
 
 
