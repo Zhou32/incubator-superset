@@ -17,7 +17,7 @@
 # pylint: disable=C,R,W
 import json
 
-from flask import session
+from flask import session, redirect
 from mixpanel import Mixpanel
 
 mp = Mixpanel('8b85dcbb1c5f693a3b045b24fca1e787')
@@ -36,9 +36,14 @@ def get_session_team(securitymanager, user_id):
     try:
         return session['team_id'], session['team_name']
     except Exception as e:
-        team = securitymanager.find_teams_for_user(user_id)[0]
-        set_session_team(team.id, team.team_name)
-        return team.id, team.team_name
+        team = securitymanager.find_team(user_id=user_id)
+        if team:
+            set_session_team(team.id, team.team_name)
+            return team.id, team.team_name
+        else:
+            # No team found, return None
+            # Need more handling on this
+            return None
 
 
 def log_to_mp(user, team_name, action, metadata):
