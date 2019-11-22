@@ -147,13 +147,6 @@ class SaveModal extends React.Component {
     }
 
     this.props.saveSolarData(this.props.form_data, sliceParams);
-    // .then(() => {
-    //   // Go to new slice url or dashboard url
-    //   if (gotodash) {
-    //     // window.location = data.slice.slice_url;
-    //     window.location = '/solar/list';
-    //   }
-    // });
     this.props.onHide();
   }
 

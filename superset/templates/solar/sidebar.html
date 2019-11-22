@@ -23,7 +23,7 @@
 {% set logo_target_path = appbuilder.app.config.get('LOGO_TARGET_PATH') or '/profile/{}/'.format(current_user.username) %}
 {% set current_user_role = appbuilder.sm.get_role_in_team(current_user, session['team_id']).name %}
 {% set team_ids = appbuilder.sm.get_teams_for_user(current_user.id) %}
-<link href="{{url_for('static',filename='assets/stylesheets/solarbi.less')}}?v=2.0" rel="stylesheet">
+<link href="{{url_for('static',filename='assets/stylesheets/solarbi.less')}}?v=2.1" rel="stylesheet">
 
 
 <!-- Sidebar -->
@@ -122,17 +122,17 @@
                     </span>
                     {{ session['team_name'] }}
                 </li>
-                <hr style="margin: 5px 0; background-color: #CCCCCC" />
-            <div class="md-team-names">
-                {% for id, team in team_ids %}
-                    {% if team != session['team_name'] %}
-                        <li role="option" id="{{id}}" class="ng-binding ng-scope" tabindex="-1" aria-selected="true">
-                            {{team}}
-                        </li>
-                    {% endif %}
-                {% endfor %}
-            </div>
-                <hr style="margin: 5px 0; background-color: #CCCCCC" />
+                <hr />
+                <div class="md-team-names">
+                    {% for id, team in team_ids %}
+                        {% if team != session['team_name'] %}
+                            <li role="option" id="{{id}}" class="ng-binding ng-scope" tabindex="-1" aria-selected="true">
+                                {{team}}
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <hr />
                 <li data-toggle="modal" data-target="#addNewTeam" role="option" id="{{ session['team_id'] }}" class="ng-binding ng-scope" tabindex="-1" aria-selected="true">
                     <span><i style="margin-right: 13px; color: #177BB9;" class="fas fa-plus"></i>New team</span>
                 </li>
