@@ -1097,7 +1097,7 @@ class SolarBIBillingView(ModelView):
             team_sub.end_time = stripe_plan['period']['end']
             team = self.appbuilder.sm.find_team(team_id=team_sub.team)
 
-            log_to_mp('', team.team_name, 'auto renew successful',{
+            log_to_mp(None, team.team_name, 'auto renew successful', {
                 'plan': local_plan.plan_name,
             })
             self.appbuilder.get_session.commit()
@@ -1118,7 +1118,7 @@ class SolarBIBillingView(ModelView):
             stripe_sub = stripe.Subscription.retrieve(team_sub.stripe_sub_id)
             stripe.Subscription.delete(stripe_sub.stripe_id)
             stripe_sub = stripe.Subscription.create(customer=stripe_sub['customer'], items=[{
-                'plan':free_plan.stripe_id,
+                'plan': free_plan.stripe_id,
                 'quantity': '1',
             }])
             logging.info('Old subscription removed and free subscription created')
@@ -1127,7 +1127,7 @@ class SolarBIBillingView(ModelView):
             team_sub.end_time = -1
             team_sub.remain_count = 0
             team = self.appbuilder.sm.find_team(team_id=team_sub.team)
-            log_to_mp('', team.team_name, 'revert to free', {})
+            log_to_mp(None, team.team_name, 'revert to free', {})
             self.appbuilder.get_session.commit()
         except Exception as e:
             self.appbuilder.get_session.rollback()
