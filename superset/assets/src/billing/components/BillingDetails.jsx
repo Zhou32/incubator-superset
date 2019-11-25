@@ -99,7 +99,7 @@ function BillingDetails({ billing, changeBillDetailConnect, changeCreditCardConn
                 {nameError ? <p className="invalid-message">* Name cannot be empty</p> : null}
               </div>
               <div className="form-group">
-                <label htmlFor="email">Billing email</label>
+                <label htmlFor="email">Billing email (can be different from the account email)</label>
                 <input type="email" id="email" className="form-control billing-details" value={billingValues.email} onChange={handleChange('email')} />
                 {emailEmptyError ? <p className="invalid-message">* Email cannot be empty</p> : null}
                 {emailInvalidError ? <p className="invalid-message">* Email is invalid</p> : null}

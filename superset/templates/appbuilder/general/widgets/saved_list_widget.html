@@ -150,9 +150,9 @@
                              {% for aok in avail_object_keys %}
                                  {% if item['slice_query_id'] in aok %}
                                     Completed
-                                    <a class="download-link" href={{ download_prefix + aok }}>
+                                    <span class="download-link" onclick="download1('{{ download_prefix + aok }}')">
                                       <i class="fas fa-arrow-circle-down"></i>
-                                    </a>
+                                    </span>
                                  {% endif %}
                              {% endfor %}
                              </td>
@@ -190,6 +190,16 @@
 
 
 {% block tail_js %}
+    <script>
+        function download1(link) {
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = link;
+            {#document.body.appendChild(a);#}
+            a.click();
+            a.remove();
+        }
+    </script>
     <script>
         $(document).ready(function(){
             $('#deleteData').on('shown.bs.modal',function(e){
