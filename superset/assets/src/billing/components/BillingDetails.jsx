@@ -9,7 +9,7 @@ import CreditCardBrand from './CreditCardBrand';
 import { changeBillDetail, changeCreditCard } from '../actions/billingActions';
 
 function BillingDetails({ billing, changeBillDetailConnect, changeCreditCardConnect }) {
-  const { cus_name, cus_email, cus_address } = billing.cus_info;
+  const { cus_name, cus_email, cus_address, cus_abn } = billing.cus_info;
   let country = '';
   let city = '';
   let line1 = '';
@@ -36,6 +36,7 @@ function BillingDetails({ billing, changeBillDetailConnect, changeCreditCardConn
     line2,
     state,
     postal_code,
+    abn: cus_abn,
   });
   const [nameError, setNameError] = useState(false);
   const [emailEmptyError, setEmailEmptyError] = useState(false);
@@ -114,7 +115,8 @@ function BillingDetails({ billing, changeBillDetailConnect, changeCreditCardConn
                   {billingValues.line1}<br />
                   {billingValues.line2 !== '' ? <p style={{ margin: 0 }}>{billingValues.line2}</p> : null}
                   {billingValues.city === '' ? '' : billingValues.city + ','} {billingValues.state} {billingValues.postal_code}<br />
-                  {billingValues.country}
+                  {billingValues.country}<br /><br />
+                  {billingValues.abn !== '' ? <p style={{ margin: 0 }}>ABN: {billingValues.abn}</p> : null}
                 </div>
                 <p style={{ marginTop: 10, fontSize: 13 }}>
                   * Everytime you update your billing details,

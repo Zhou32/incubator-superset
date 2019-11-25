@@ -46,6 +46,7 @@ function ChangeAddress({
     postal_code: billingValues.postal_code,
   });
 
+  const [abn, setAbn] = useState(billingValues.abn);
   const [country, setCountry] = useState(billingValues.country);
   const [region, setRegion] = useState(billingValues.state);
 
@@ -54,9 +55,14 @@ function ChangeAddress({
   const [cityError, setCityError] = useState(false);
   const [stateError, setStateError] = useState(false);
   const [postalError, setPostalError] = useState(false);
+  const [abnError, setAbnError] = useState(false);
 
   const handleNewAddressChange = name => (event) => {
     setNewAddress({ ...newAddress, [name]: event.target.value });
+  };
+
+  const handleAbnChange = (event) => {
+    setAbn(event.target.value);
   };
 
   const selectCountry = (val) => {
@@ -75,6 +81,7 @@ function ChangeAddress({
     setCityError(false);
     setStateError(false);
     setPostalError(false);
+    setAbnError(false);
     if (newAddress.country === '') {
       setCountryError(true);
     }
@@ -90,8 +97,11 @@ function ChangeAddress({
     if (newAddress.postal_code === '') {
       setPostalError(true);
     }
+    if (abn !== '' && (!/^[0-9]{11}$/.test(abn))) {
+      setAbnError(true);
+    }
     if (newAddress.country !== '' && newAddress.line1 !== '' && newAddress.city !== '' &&
-      newAddress.state !== '' && newAddress.postal_code !== '') {
+      newAddress.state !== '' && newAddress.postal_code !== '' && (abn === '' || (abn !== '' && (/^[0-9]{11}$/.test(abn))))) {
       setBillingValues({
         ...billingValues,
         country: newAddress.country,
@@ -100,6 +110,7 @@ function ChangeAddress({
         city: newAddress.city,
         state: newAddress.state,
         postal_code: newAddress.postal_code,
+        abn,
       });
       handleChangeAddressClose();
     }
@@ -140,7 +151,7 @@ function ChangeAddress({
           <TextField
             margin="normal"
             id="line2"
-            label="Address Line 2"
+            label="Address Line 2 (Optional)"
             FormHelperTextProps={{ classes: { root: classes.helperText } }}
             InputProps={{
               classes: { input: classes.textInput },
@@ -199,6 +210,23 @@ function ChangeAddress({
             fullWidth
             value={newAddress.postal_code}
             onChange={handleNewAddressChange('postal_code')}
+          />
+          <TextField
+            margin="normal"
+            id="abn"
+            label="ABN Number (Optional)"
+            error={abnError}
+            helperText={abnError ? '* ABN number must be a 11 digit number' : ''}
+            FormHelperTextProps={{ classes: { root: classes.helperText } }}
+            InputProps={{
+              classes: { input: classes.textInput },
+            }}
+            InputLabelProps={{
+              style: { fontSize: '1.1em' },
+            }}
+            fullWidth
+            value={abn}
+            onChange={handleAbnChange}
           />
         </DialogContent>
         <DialogActions>

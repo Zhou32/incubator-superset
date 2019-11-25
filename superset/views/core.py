@@ -817,11 +817,14 @@ class SolarBIBillingView(ModelView):
         cus_name = cus_obj.name
         cus_email = cus_obj.email
         cus_address = cus_obj.address
+        cus_abn = ''
+        if cus_obj['tax_ids']['data']:
+            cus_abn = cus_obj['tax_ids']['data'][0]['value']
 
         cus_invoices = stripe.Invoice.list(customer=cus_obj['id'])
         cus_invoices = list({'invoice_id': invoice['id'],
-                              'date': datetime.utcfromtimestamp(invoice['created']).strftime("%d/%m/%Y"),
-                              'link': invoice['invoice_pdf']} for invoice in cus_invoices)
+                             'date': datetime.utcfromtimestamp(invoice['created']).strftime("%d/%m/%Y"),
+                             'link': invoice['invoice_pdf']} for invoice in cus_invoices)
 
         card_info = None
         card_has_expired = False
@@ -840,7 +843,7 @@ class SolarBIBillingView(ModelView):
             'user': bootstrap_user_data(g.user),
             'common': BaseSupersetView().common_bootstrap_payload(),
             'cus_id': team.stripe_user_id,
-            'cus_info': {'cus_name': cus_name, 'cus_email': cus_email, 'cus_address': cus_address},
+            'cus_info': {'cus_name': cus_name, 'cus_email': cus_email, 'cus_address': cus_address, 'cus_abn': cus_abn},
             'pm_id': team.stripe_pm_id,
             'plan_id': plan.stripe_id,
             'invoice_list': cus_invoices,
@@ -894,6 +897,20 @@ class SolarBIBillingView(ModelView):
         if not g.user or not g.user.get_id():
             return json_error_response('Incorrect call to endpoint')
         form_data = get_form_data()[0]
+
+        # Check if we update the abn or not
+        cus_obj = stripe.Customer.retrieve(cus_id)
+        if cus_obj['tax_ids']['data']:
+            if form_data['abn']:
+                if cus_obj['tax_ids']['data'][0]['value'] != form_data['abn']:
+                    stripe.Customer.delete_tax_id(cus_id, cus_obj['tax_ids']['data'][0]['id'])
+                    stripe.Customer.create_tax_id(cus_id, type="au_abn", value=form_data['abn'])
+            else:
+                stripe.Customer.delete_tax_id(cus_id, cus_obj['tax_ids']['data'][0]['id'])
+        else:
+            if form_data['abn']:
+                stripe.Customer.create_tax_id(cus_id, type="au_abn", value=form_data['abn'])
+
         _ = stripe.Customer.modify(cus_id, address={'country': form_data['country'], 'state': form_data['state'],
                                                     'postal_code': form_data['postal_code'], 'city': form_data['city'],
                                                     'line1': form_data['line1'], 'line2': form_data['line2']})
