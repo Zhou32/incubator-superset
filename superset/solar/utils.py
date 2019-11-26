@@ -48,7 +48,10 @@ def get_session_team(securitymanager, user_id):
 
 def log_to_mp(user, team_name, action, metadata):
     metadata['Team'] = team_name
-    mp.track(user.username, action, metadata)
+    if user:
+        mp.track(user.username, action, metadata)
+    else:
+        mp.track('', action, metadata)
 
 
 def create_mp_team(team):

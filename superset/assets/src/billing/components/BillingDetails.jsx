@@ -9,7 +9,7 @@ import CreditCardBrand from './CreditCardBrand';
 import { changeBillDetail, changeCreditCard } from '../actions/billingActions';
 
 function BillingDetails({ billing, changeBillDetailConnect, changeCreditCardConnect }) {
-  const { cus_name, cus_email, cus_address } = billing.cus_info;
+  const { cus_name, cus_email, cus_address, cus_abn } = billing.cus_info;
   let country = '';
   let city = '';
   let line1 = '';
@@ -36,6 +36,7 @@ function BillingDetails({ billing, changeBillDetailConnect, changeCreditCardConn
     line2,
     state,
     postal_code,
+    abn: cus_abn,
   });
   const [nameError, setNameError] = useState(false);
   const [emailEmptyError, setEmailEmptyError] = useState(false);
@@ -94,12 +95,12 @@ function BillingDetails({ billing, changeBillDetailConnect, changeCreditCardConn
             <p>Please let us know how you’d like your invoices to be addressed.</p>
             <div>
               <div className="form-group">
-                <label htmlFor="name">Billing name</label>
+                <label htmlFor="name">Billing name (can be different from the account name)</label>
                 <input id="name" className="form-control billing-details" value={billingValues.name} onChange={handleChange('name')} />
                 {nameError ? <p className="invalid-message">* Name cannot be empty</p> : null}
               </div>
               <div className="form-group">
-                <label htmlFor="email">Billing email</label>
+                <label htmlFor="email">Billing email (can be different from the account email)</label>
                 <input type="email" id="email" className="form-control billing-details" value={billingValues.email} onChange={handleChange('email')} />
                 {emailEmptyError ? <p className="invalid-message">* Email cannot be empty</p> : null}
                 {emailInvalidError ? <p className="invalid-message">* Email is invalid</p> : null}
@@ -111,13 +112,16 @@ function BillingDetails({ billing, changeBillDetailConnect, changeCreditCardConn
                   id="billing-address"
                   className="form-control billing-details"
                 >
-                  {billingValues.line1}<br />
-                  {billingValues.line2 !== '' ? <p style={{ margin: 0 }}>{billingValues.line2}</p> : null}
-                  {billingValues.city === '' ? '' : billingValues.city + ','} {billingValues.state} {billingValues.postal_code}<br />
-                  {billingValues.country}
+                  <strong>Address line 1: </strong>{billingValues.line1}<br />
+                  <strong>Address line 2: </strong>{billingValues.line2 !== '' ? billingValues.line2 : ''}<br />
+                  <strong>City: </strong>{billingValues.city === '' ? '' : billingValues.city + ','}<br />
+                  <strong>State: </strong>{billingValues.state}<br />
+                  <strong>Postal code: </strong>{billingValues.postal_code}<br />
+                  <strong>Country: </strong>{billingValues.country}<br />
+                  <strong>ABN: </strong>{billingValues.abn !== '' ? billingValues.abn : ''}
                 </div>
                 <p style={{ marginTop: 10, fontSize: 13 }}>
-                  * Everytime you update your billing details,
+                  * Everytime you change your billing details,
                   remember to click the Update details button below to effect.
                 </p>
               </div>

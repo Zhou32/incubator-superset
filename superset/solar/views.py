@@ -296,6 +296,7 @@ class SolarBIUserInfoEditView(UserInfoEditView):
     def form_post(self, form):
         form = self.form.refresh(request.form)
         item = self.appbuilder.sm.get_user_by_id(g.user.id)
+        form.username.data = item.username
         form.populate_obj(item)
         self.appbuilder.sm.update_user(item)
         update_mp_user(g.user)
