@@ -187,7 +187,7 @@ class SolarBIUserInfoEditForm(DynamicForm):
     username = StringField(
         lazy_gettext("Username (readonly)"),
         widget=BS3TextFieldWidget(),
-        render_kw={'readonly': True},
+        render_kw={'disabled': True},
     )
 
 

@@ -95,7 +95,7 @@ function BillingDetails({ billing, changeBillDetailConnect, changeCreditCardConn
             <p>Please let us know how you’d like your invoices to be addressed.</p>
             <div>
               <div className="form-group">
-                <label htmlFor="name">Billing name</label>
+                <label htmlFor="name">Billing name (can be different from the account name)</label>
                 <input id="name" className="form-control billing-details" value={billingValues.name} onChange={handleChange('name')} />
                 {nameError ? <p className="invalid-message">* Name cannot be empty</p> : null}
               </div>
@@ -112,14 +112,16 @@ function BillingDetails({ billing, changeBillDetailConnect, changeCreditCardConn
                   id="billing-address"
                   className="form-control billing-details"
                 >
-                  {billingValues.line1}<br />
-                  {billingValues.line2 !== '' ? <p style={{ margin: 0 }}>{billingValues.line2}</p> : null}
-                  {billingValues.city === '' ? '' : billingValues.city + ','} {billingValues.state} {billingValues.postal_code}<br />
-                  {billingValues.country}<br /><br />
-                  {billingValues.abn !== '' ? <p style={{ margin: 0 }}>ABN: {billingValues.abn}</p> : null}
+                  <strong>Address line 1: </strong>{billingValues.line1}<br />
+                  <strong>Address line 2: </strong>{billingValues.line2 !== '' ? billingValues.line2 : ''}<br />
+                  <strong>City: </strong>{billingValues.city === '' ? '' : billingValues.city + ','}<br />
+                  <strong>State: </strong>{billingValues.state}<br />
+                  <strong>Postal code: </strong>{billingValues.postal_code}<br />
+                  <strong>Country: </strong>{billingValues.country}<br />
+                  <strong>ABN: </strong>{billingValues.abn !== '' ? billingValues.abn : ''}
                 </div>
                 <p style={{ marginTop: 10, fontSize: 13 }}>
-                  * Everytime you update your billing details,
+                  * Everytime you change your billing details,
                   remember to click the Update details button below to effect.
                 </p>
               </div>
