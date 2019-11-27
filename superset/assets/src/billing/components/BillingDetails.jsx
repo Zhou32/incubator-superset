@@ -114,7 +114,7 @@ function BillingDetails({ billing, changeBillDetailConnect, changeCreditCardConn
                 >
                   <strong>Address line 1: </strong>{billingValues.line1}<br />
                   <strong>Address line 2: </strong>{billingValues.line2 !== '' ? billingValues.line2 : ''}<br />
-                  <strong>City: </strong>{billingValues.city === '' ? '' : billingValues.city + ','}<br />
+                  <strong>City: </strong>{billingValues.city === '' ? '' : billingValues.city}<br />
                   <strong>State: </strong>{billingValues.state}<br />
                   <strong>Postal code: </strong>{billingValues.postal_code}<br />
                   <strong>Country: </strong>{billingValues.country}<br />
