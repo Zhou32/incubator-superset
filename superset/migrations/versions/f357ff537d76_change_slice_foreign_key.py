@@ -105,7 +105,7 @@ def upgrade():
     #            existing_type=sa.DATETIME(),
     #            nullable=True)
     op.add_column('solarbislice_user', sa.Column('team_id', sa.Integer(), nullable=True))
-    op.drop_constraint(None, 'solarbislice_user', type_='foreignkey')
+    # op.drop_constraint(None, 'solarbislice_user', type_='foreignkey')
     op.create_foreign_key(None, 'solarbislice_user', 'team', ['team_id'], ['id'])
     op.drop_column('solarbislice_user', 'user_id')
     # op.alter_column('sql_metrics', 'changed_on',
@@ -191,7 +191,7 @@ def downgrade():
     #            nullable=False)
     op.add_column('solarbislice_user', sa.Column('user_id', sa.INTEGER(), nullable=True))
     op.drop_constraint(None, 'solarbislice_user', type_='foreignkey')
-    op.create_foreign_key(None, 'solarbislice_user', 'ab_user', ['user_id'], ['id'])
+    # op.create_foreign_key(None, 'solarbislice_user', 'ab_user', ['user_id'], ['id'])
     op.drop_column('solarbislice_user', 'team_id')
     # op.alter_column('slices', 'created_on',
     #            existing_type=sa.DATETIME(),

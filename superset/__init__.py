@@ -51,22 +51,22 @@ APP_DIR = os.path.dirname(__file__)
 CONFIG_MODULE = os.environ.get("SUPERSET_CONFIG", "superset.config")
 
 # Sentry integration
-sentry_sdk.init(
-    dsn="https://41296b3f301c4dc89077c721ba82bfa4@sentry.io/1814979",
-    integrations=[FlaskIntegration()]
-)
-sentry_sdk.init(
-    dsn="https://41296b3f301c4dc89077c721ba82bfa4@sentry.io/1814979",
-    integrations=[RedisIntegration()]
-)
-sentry_sdk.init(
-    dsn="https://41296b3f301c4dc89077c721ba82bfa4@sentry.io/1814979",
-    integrations=[CeleryIntegration()]
-)
-sentry_sdk.init(
-    dsn="https://41296b3f301c4dc89077c721ba82bfa4@sentry.io/1814979",
-    integrations=[SqlalchemyIntegration()]
-)
+# sentry_sdk.init(
+#     dsn="https://41296b3f301c4dc89077c721ba82bfa4@sentry.io/1814979",
+#     integrations=[FlaskIntegration()]
+# )
+# sentry_sdk.init(
+#     dsn="https://41296b3f301c4dc89077c721ba82bfa4@sentry.io/1814979",
+#     integrations=[RedisIntegration()]
+# )
+# sentry_sdk.init(
+#     dsn="https://41296b3f301c4dc89077c721ba82bfa4@sentry.io/1814979",
+#     integrations=[CeleryIntegration()]
+# )
+# sentry_sdk.init(
+#     dsn="https://41296b3f301c4dc89077c721ba82bfa4@sentry.io/1814979",
+#     integrations=[SqlalchemyIntegration()]
+# )
 
 if not os.path.exists(config.DATA_DIR):
     os.makedirs(config.DATA_DIR)
