@@ -267,7 +267,7 @@ def downgrade():
     sa.Column('datasource_type', sa.VARCHAR(length=200), nullable=True),
     sa.Column('datasource_name', sa.VARCHAR(length=2000), nullable=True),
     sa.Column('viz_type', sa.VARCHAR(length=250), nullable=True),
-    sa.Column('query_id', sa.INTEGER(), nullable=True),
+    sa.Column('query_id', sa.VARCHAR(length=200), nullable=True),
     sa.Column('start_date', sa.DATETIME(), nullable=True),
     sa.Column('end_date', sa.DATETIME(), nullable=True),
     sa.Column('data_type', sa.VARCHAR(length=200), nullable=True),

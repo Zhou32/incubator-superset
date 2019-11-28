@@ -572,7 +572,8 @@ class CustomSecurityManager(SupersetSecurityManager):
     def get_team_members(self, team_id):
         team = self.find_team(team_id=team_id)
         email_role = []
-        for user in team.users:
+        team_users = sorted(team.users, key=lambda x: x.id)
+        for user in team_users:
             for user_role in user.team_role:
                 if user_role.team.id == team.id:
                     if user_role.role.name == 'team_owner':

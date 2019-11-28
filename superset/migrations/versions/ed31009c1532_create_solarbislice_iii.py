@@ -39,7 +39,7 @@ def upgrade():
     sa.Column('datasource_type', sa.String(length=200), nullable=True),
     sa.Column('datasource_name', sa.String(length=2000), nullable=True),
     sa.Column('viz_type', sa.String(length=250), nullable=True),
-    sa.Column('query_id', sa.Integer(), nullable=True),
+    sa.Column('query_id', sa.String(length=200), nullable=True),
     sa.Column('start_date', sa.DateTime(), nullable=True),
     sa.Column('end_date', sa.DateTime(), nullable=True),
     sa.Column('data_type', sa.String(length=200), nullable=True),
