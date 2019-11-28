@@ -380,7 +380,7 @@ class CustomSecurityManager(SupersetSecurityManager):
 
     def find_team(self, team_id=None, team_name=None, user_id=None):
         if team_name:
-            return self.get_session.query(self.team_model).filter_by(team_name=team_name).first()
+            return self.get_session.query(self.team_model).filter_by(team_name=team_name).order_by(self.team_model.id).first()
         elif user_id:
             user = self.get_session.query(self.user_model).filter_by(id=user_id).first()
             if len(user.team_role) > 0:

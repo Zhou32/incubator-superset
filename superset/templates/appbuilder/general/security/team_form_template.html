@@ -59,10 +59,20 @@
                             </thead>
                             <tbody>
                                 {% for email, role in team_members %}
-                                    <tr>
-                                        <td>{{ email }}</td>
-                                        <td>{{ role }}</td>
-                                    </tr>
+                                    {% if role == 'Admin' %}
+                                        <tr>
+                                            <td>{{ email }}</td>
+                                            <td>{{ role }}</td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                                {% for email, role in team_members %}
+                                    {% if role == 'User' %}
+                                        <tr>
+                                            <td>{{ email }}</td>
+                                            <td>{{ role }}</td>
+                                        </tr>
+                                    {% endif %}
                                 {% endfor %}
                             </tbody>
                         </table>

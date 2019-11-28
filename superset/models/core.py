@@ -428,7 +428,7 @@ class SolarBISlice(Model, AuditMixinNullable, ImportMixin):
     description = Column(Text)
     cache_timeout = Column(Integer)
     perm = Column(String(1000))
-    query_id = Column(Integer)
+    query_id = Column(String(200))
     start_date = Column(String(200))
     end_date = Column(DateTime)
     data_type = Column(String(200))
