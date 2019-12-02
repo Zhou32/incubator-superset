@@ -619,6 +619,15 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
             return redirect(appbuilder.get_url_for_login)
         team = self.appbuilder.get_session.query(Team).filter_by(id=session['team_id']).first()
         subscription = self.appbuilder.sm.get_subscription(team_id=team.id)
+
+        # Count the subscription remaining days
+        remain_days = -1
+        if subscription.end_time:
+            if subscription.end_time != -1:
+                current_datetime = datetime.utcnow()
+                end_datetime = datetime.fromtimestamp(subscription.end_time)
+                remain_days = (end_datetime - current_datetime).days
+
         entry_point = 'solarBI'
 
         datasource_id = self.get_solar_datasource()
@@ -633,6 +642,7 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
             'datasource_id': datasource_id,
             'datasource_type': 'table',
             'remain_count': subscription.remain_count,
+            'remain_days': remain_days,
             'can_trial': can_trial,
         }
 
@@ -1097,11 +1107,10 @@ class SolarBIBillingView(ModelView):
             team_sub.remain_count = local_plan.num_request
             team_sub.end_time = stripe_plan['period']['end']
             team = self.appbuilder.sm.find_team(team_id=team_sub.team)
-
+            self.appbuilder.get_session.commit()
             log_to_mp(None, team.team_name, 'auto renew successful', {
                 'plan': local_plan.plan_name,
             })
-            self.appbuilder.get_session.commit()
         except Exception as e:
             self.appbuilder.get_session.rollback()
             logging.error(e)
@@ -3917,6 +3926,16 @@ class Superset(BaseSupersetView):
         standalone = request.args.get('standalone') == 'true'
         team = self.appbuilder.get_session.query(Team).filter_by(id=session['team_id']).first()
         subscription = self.appbuilder.sm.get_subscription(team_id=team.id)
+
+        # Count the subscription remaining days
+        remain_days = -1
+        if subscription.end_time:
+            if subscription.end_time != -1:
+                current_datetime = datetime.utcnow()
+                end_datetime = datetime.fromtimestamp(subscription.end_time)
+                remain_days = (end_datetime - current_datetime).days
+
+        # Check if the team can trial
         can_trial = False
         for team_role in g.user.team_role:
             if team_role.team.id == team.id and team_role.role.name == 'team_owner':
@@ -3935,6 +3954,7 @@ class Superset(BaseSupersetView):
             'forced_height': request.args.get('height'),
             'common': self.common_bootstrap_payload(),
             'remain_count': subscription.remain_count,
+            'remain_days': remain_days,
             'can_trial': can_trial,
         }
         table_name = datasource.table_name \

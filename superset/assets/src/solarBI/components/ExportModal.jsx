@@ -32,7 +32,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Popover from '@material-ui/core/Popover';
 import HelpIcon from '@material-ui/icons/Help';
 import DialogContent from '@material-ui/core/DialogContent';
-// import TextField from '@material-ui/core/TextField';
+import Chip from '@material-ui/core/Chip';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -72,6 +72,14 @@ const theme = createMuiTheme({
 
 
 const styles = tm => ({
+  addressText: {
+    fontFamily: 'Montserrat',
+    fontSize: 21,
+    textAlign: 'center',
+    color: '024067',
+    fontWeight: 'normal',
+    marginTop: 25,
+  },
   backdrop: {
     backgroundColor: 'transparent',
   },
@@ -614,16 +622,8 @@ class ExportModal extends React.Component {
               <Card className={classes.exportCard}>
                 <CardContent>
                   <div>
-                    <p
-                      style={{
-                        fontFamily: 'Montserrat',
-                        fontSize: 21,
-                        textAlign: 'center',
-                        color: '024067',
-                        fontWeight: 'normal',
-                        marginTop: 25,
-                      }}
-                    >
+                    {solarBI.remain_days >= 0 && <Chip label={`Current subscription remains ${solarBI.remain_days} days left`} />}
+                    <p className={classes.addressText}>
                       {this.props.address.slice(0, -11)}
                     </p>
                     <hr style={{ display: 'block', width: 159, height: 1, border: 0, borderTop: '1px solid #808495', margin: '1em auto 2em', padding: 0 }} />
