@@ -641,6 +641,7 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
             'datasource_id': datasource_id,
             'datasource_type': 'table',
             'remain_count': subscription.remain_count,
+            'plan_id': subscription.plan,
             'remain_days': remain_days,
             'can_trial': can_trial,
         }
@@ -3953,6 +3954,7 @@ class Superset(BaseSupersetView):
             'common': self.common_bootstrap_payload(),
             'remain_count': subscription.remain_count,
             'remain_days': remain_days,
+            'plan_id': subscription.plan,
             'can_trial': can_trial,
         }
         table_name = datasource.table_name \
