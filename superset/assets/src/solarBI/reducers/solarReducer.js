@@ -130,6 +130,8 @@ export default function (state = {}, action) {
       return {
         ...state,
         start_trial: 'success',
+        plan_id: action.res.plan_id,
+        remain_days: action.res.remain_days,
         can_trial: false,
         remain_count: action.res.remain_count,
       };

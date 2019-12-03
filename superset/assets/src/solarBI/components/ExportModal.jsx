@@ -623,6 +623,7 @@ class ExportModal extends React.Component {
                 <CardContent>
                   <div>
                     {solarBI.remain_days >= 0 && solarBI.plan_id !== 1 && <Chip style={{ fontSize: '1.05em' }} label={`Current subscription remains ${solarBI.remain_days} days left`} />}
+                    {solarBI.remain_days === -1 && solarBI.plan_id === 1 && <Chip style={{ fontSize: '1.05em' }} label="You are in the free plan" />}
                     <p className={classes.addressText}>
                       {this.props.address.slice(0, -11)}
                     </p>
