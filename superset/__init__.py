@@ -29,7 +29,7 @@ from flask_compress import Compress
 from flask_migrate import Migrate
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
-from flask_split import split
+# from flask_split import split
 from werkzeug.contrib.fixers import ProxyFix
 import wtforms_json
 
