@@ -624,7 +624,7 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
         if subscription.end_time:
             if subscription.end_time != -1:
                 current_datetime = datetime.utcnow()
-                end_datetime = datetime.fromtimestamp(subscription.end_time)
+                end_datetime = datetime.utcfromtimestamp(subscription.end_time)
                 remain_days = (end_datetime - current_datetime).days
 
         entry_point = 'solarBI'
@@ -1074,7 +1074,10 @@ class SolarBIBillingView(ModelView):
 
                 return json_success(json.dumps({
                     'msg': 'Start trial successfully! You have 14 days to use 7 advance searches.',
-                    'remain_count': starter_plan.num_request}))
+                    'remain_count': starter_plan.num_request,
+                    'plan_id': 2,
+                    'remain_days': 13,
+                }))
             except ValueError as e:
                 return json_error_response(e)
             except Exception as e:
@@ -3931,7 +3934,7 @@ class Superset(BaseSupersetView):
         if subscription.end_time:
             if subscription.end_time != -1:
                 current_datetime = datetime.utcnow()
-                end_datetime = datetime.fromtimestamp(subscription.end_time)
+                end_datetime = datetime.utcfromtimestamp(subscription.end_time)
                 remain_days = (end_datetime - current_datetime).days
 
         # Check if the team can trial
