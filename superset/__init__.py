@@ -78,7 +78,7 @@ app = Flask(__name__)
 app.config.from_object(CONFIG_MODULE)
 
 # AB testing
-app.register_blueprint(split)
+# app.register_blueprint(split)
 
 conf = app.config
 
