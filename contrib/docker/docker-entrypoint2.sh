@@ -27,7 +27,6 @@ export POSTGRES_USER=$5
 export POSTGRES_PASSWORD=$6
 export POSTGRES_HOST=$7
 export POSTGRES_PORT=$8
-echo DEBUG INFO POSTGRES_PORT = $POSTGRES_PORT
 export POSTGRES_DB=$9
 
 celery worker --app=superset.sql_lab:celery_app --pool=gevent -Ofair &
