@@ -28,7 +28,7 @@ from flask_appbuilder.views import expose, PublicFormView, ModelView
 from flask_appbuilder.security.forms import ResetPasswordForm
 from .models import SolarBIUser, TeamRegisterUser, Plan
 
-from .utils import set_session_team, update_mp_user
+from .utils import set_session_team, update_mp_user, log_to_mp
 
 
 from .forms import (
@@ -100,6 +100,9 @@ class SolarBIAuthDBView(AuthDBView):
                 if role.name == 'Admin':
                     return redirect(self.appbuilder.get_url_for_index)
             set_session_team(team.id, team.team_name)
+
+            log_to_mp(user, team.team_name, 'login', {})
+
             return redirect(self.appbuilder.get_url_for_index)
         return self.render_template(
             self.login_template, title=self.title, form=form, appbuilder=self.appbuilder

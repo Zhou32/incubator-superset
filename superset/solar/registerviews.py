@@ -79,6 +79,8 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
         self.appbuilder.sm.update_user_auth_stat(user, True)
         login_user(user)
 
+        log_to_mp(user, team_reg.team_name, 'login', {})
+
         set_session_team(team_reg.id, team_reg.team_name)
         self.appbuilder.get_session.commit()
         flash(as_unicode('Your account has been successfully activated!'), 'success')
