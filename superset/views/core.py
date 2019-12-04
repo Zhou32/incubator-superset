@@ -996,6 +996,13 @@ class SolarBIBillingView(ModelView):
                                                          'id': current_subscription['items']['data'][0].id,
                                                          'plan': plan_stripe_id}])
                 return_subscription_id = new_plan.stripe_id
+
+                # log to mixpanel
+                log_to_mp(g.user, team.team_name, 'upgrade plan', {
+                    'old plan': old_plan.plan_name,
+                    'new plan': new_plan.plan_name,
+                })
+
             elif new_plan.id < old_plan.id:
                 # get subscribe list for the team
                 sub_list = stripe.Subscription.list(customer=team.stripe_user_id)
@@ -1015,15 +1022,17 @@ class SolarBIBillingView(ModelView):
                     'quantity':'1',
                 }])
                 return_subscription_id = old_plan.stripe_id
+
+                # log to mixpanel
+                log_to_mp(g.user, team.team_name, 'downgrade plan', {
+                    'old plan': old_plan.plan_name,
+                    'new plan': new_plan.plan_name,
+                })
+
             else:
                 return_subscription_id = None
             self.appbuilder.get_session.commit()
 
-            # log to mixpanel
-            log_to_mp(g.user, team.team_name, 'change plan', {
-                'old plan': old_plan.plan_name,
-                'new plan': new_plan.plan_name,
-            })
 
             return True, return_subscription_id
         except Exception as e:
@@ -1116,7 +1125,7 @@ class SolarBIBillingView(ModelView):
             })
         except Exception as e:
             self.appbuilder.get_session.rollback()
-            logging.error(e)
+            logging.warn(e)
 
     def revert_to_free(self, event_object):
         try:
@@ -1144,7 +1153,7 @@ class SolarBIBillingView(ModelView):
             self.appbuilder.get_session.commit()
         except Exception as e:
             self.appbuilder.get_session.rollback()
-            logging.error(e)
+            logging.warn(e)
 
     @api
     @expose('/webhook', methods=['POST'])
