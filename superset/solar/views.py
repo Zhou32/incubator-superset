@@ -55,9 +55,7 @@ class SolarBIAuthDBView(AuthDBView):
     inactivated_login_message = Markup("<span>Your account has not been activated yet. Please check your email.</span>"
                                        "<span class='resend-activation'>Not received the email?"
                                        "<a class='rae-btn'>Resend</a></span>")
-                                       # "<a data-placement='bottom' data-toggle='popover' data-title='Resend Activation'"
-                                       # "data-container='body' type='button' data-html='true' "
-                                       # "id='resendActivation'>Resend</a>")
+
     login_template = "appbuilder/general/security/solarbi_login_db.html"
     email_template = 'appbuilder/general/security/account_activation_mail.html'
 
