@@ -770,11 +770,12 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
         flash('Team Error', 'danger')
         return redirect("/")
 
-
-    @app.errorhandler(404)
-    def page_not_found(e):
-        # note that we set the 404 status explicitly
-        return redirect("/")
+    # @app.errorhandler(404)
+    # def page_not_found(self):
+    #     # note that we set the 404 status explicitly
+    #     return self.render_template(
+    #         "superset/export_dashboards.html", dashboards_url="/dashboard/list"
+    #     )
 
 
 # appbuilder.add_view(
@@ -3698,9 +3699,21 @@ class Superset(BaseSupersetView):
     @app.errorhandler(500)
     def show_traceback(self):
         return (
-            render_template("superset/traceback.html", error_msg=get_error_msg()),
+            render_template("solar/500_error.html"),
             500,
         )
+        # return (
+        #     render_template("superset/traceback.html", error_msg=get_error_msg()),
+        #     500,
+        # )
+
+    @app.errorhandler(404)
+    def page_not_found(self):
+        return (
+            render_template("solar/404_error.html"),
+            404,
+        )
+
 
     @expose("/welcome")
     def welcome(self):
