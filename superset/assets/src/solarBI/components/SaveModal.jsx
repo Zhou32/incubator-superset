@@ -56,10 +56,10 @@ const propTypes = {
 const styles = tm => ({
   modal: {
     position: 'absolute',
-    width: theme.spacing(60),
-    backgroundColor: theme.palette.background.paper,
+    width: tm.spacing(60),
+    backgroundColor: tm.palette.background.paper,
     boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
-    padding: theme.spacing(4),
+    padding: tm.spacing(4),
   },
   button: {
     fontSize: '1.2em',
@@ -75,7 +75,7 @@ const styles = tm => ({
     fontSize: 20,
   },
   notUse: {
-    margin: tm.spacing.unit,
+    margin: tm.spacing(1),
   },
 });
 

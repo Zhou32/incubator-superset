@@ -69,7 +69,7 @@ const styles = tm => ({
     fontSize: 20,
   },
   notUse: {
-    margin: tm.spacing.unit,
+    margin: tm.spacing(1),
   },
 });
 
