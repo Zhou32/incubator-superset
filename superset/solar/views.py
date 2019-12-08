@@ -28,7 +28,7 @@ from flask_appbuilder.views import expose, PublicFormView, ModelView
 from flask_appbuilder.security.forms import ResetPasswordForm
 from .models import SolarBIUser, TeamRegisterUser, Plan
 
-from .utils import set_session_team, update_mp_user
+from .utils import set_session_team, update_mp_user, log_to_mp
 
 
 from .forms import (
@@ -55,9 +55,7 @@ class SolarBIAuthDBView(AuthDBView):
     inactivated_login_message = Markup("<span>Your account has not been activated yet. Please check your email.</span>"
                                        "<span class='resend-activation'>Not received the email?"
                                        "<a class='rae-btn'>Resend</a></span>")
-                                       # "<a data-placement='bottom' data-toggle='popover' data-title='Resend Activation'"
-                                       # "data-container='body' type='button' data-html='true' "
-                                       # "id='resendActivation'>Resend</a>")
+
     login_template = "appbuilder/general/security/solarbi_login_db.html"
     email_template = 'appbuilder/general/security/account_activation_mail.html'
 
@@ -100,6 +98,9 @@ class SolarBIAuthDBView(AuthDBView):
                 if role.name == 'Admin':
                     return redirect(self.appbuilder.get_url_for_index)
             set_session_team(team.id, team.team_name)
+
+            log_to_mp(user, team.team_name, 'login', {})
+
             return redirect(self.appbuilder.get_url_for_index)
         return self.render_template(
             self.login_template, title=self.title, form=form, appbuilder=self.appbuilder

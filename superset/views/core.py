@@ -771,11 +771,12 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
         flash('Team Error', 'danger')
         return redirect("/")
 
-
-    @app.errorhandler(404)
-    def page_not_found(e):
-        # note that we set the 404 status explicitly
-        return redirect("/")
+    # @app.errorhandler(404)
+    # def page_not_found(self):
+    #     # note that we set the 404 status explicitly
+    #     return self.render_template(
+    #         "superset/export_dashboards.html", dashboards_url="/dashboard/list"
+    #     )
 
 
 # appbuilder.add_view(
@@ -997,6 +998,13 @@ class SolarBIBillingView(ModelView):
                                                          'id': current_subscription['items']['data'][0].id,
                                                          'plan': plan_stripe_id}])
                 return_subscription_id = new_plan.stripe_id
+
+                # log to mixpanel
+                log_to_mp(g.user, team.team_name, 'upgrade plan', {
+                    'old plan': old_plan.plan_name,
+                    'new plan': new_plan.plan_name,
+                })
+
             elif new_plan.id < old_plan.id:
                 # get subscribe list for the team
                 sub_list = stripe.Subscription.list(customer=team.stripe_user_id)
@@ -1016,15 +1024,17 @@ class SolarBIBillingView(ModelView):
                     'quantity':'1',
                 }])
                 return_subscription_id = old_plan.stripe_id
+
+                # log to mixpanel
+                log_to_mp(g.user, team.team_name, 'downgrade plan', {
+                    'old plan': old_plan.plan_name,
+                    'new plan': new_plan.plan_name,
+                })
+
             else:
                 return_subscription_id = None
             self.appbuilder.get_session.commit()
 
-            # log to mixpanel
-            log_to_mp(g.user, team.team_name, 'change plan', {
-                'old plan': old_plan.plan_name,
-                'new plan': new_plan.plan_name,
-            })
 
             return True, return_subscription_id
         except Exception as e:
@@ -1117,7 +1127,7 @@ class SolarBIBillingView(ModelView):
             })
         except Exception as e:
             self.appbuilder.get_session.rollback()
-            logging.error(e)
+            logging.warn(e)
 
     def revert_to_free(self, event_object):
         try:
@@ -1145,7 +1155,7 @@ class SolarBIBillingView(ModelView):
             self.appbuilder.get_session.commit()
         except Exception as e:
             self.appbuilder.get_session.rollback()
-            logging.error(e)
+            logging.warn(e)
 
     @api
     @expose('/webhook', methods=['POST'])
@@ -3691,9 +3701,21 @@ class Superset(BaseSupersetView):
     @app.errorhandler(500)
     def show_traceback(self):
         return (
-            render_template("superset/traceback.html", error_msg=get_error_msg()),
+            render_template("solar/500_error.html"),
             500,
         )
+        # return (
+        #     render_template("superset/traceback.html", error_msg=get_error_msg()),
+        #     500,
+        # )
+
+    @app.errorhandler(404)
+    def page_not_found(self):
+        return (
+            render_template("solar/404_error.html"),
+            404,
+        )
+
 
     @expose("/welcome")
     def welcome(self):

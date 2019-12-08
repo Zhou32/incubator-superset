@@ -315,7 +315,7 @@ const styles = tm => ({
     float: 'left',
   },
   notUse: {
-    margin: tm.spacing.unit,
+    margin: tm.spacing(1),
   },
 });
 

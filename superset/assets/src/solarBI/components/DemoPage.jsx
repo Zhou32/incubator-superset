@@ -152,8 +152,8 @@ const styles = tm => ({
 
   },
   textField: {
-    marginLeft: tm.spacing.unit,
-    marginRight: tm.spacing.unit,
+    marginLeft: tm.spacing(1),
+    marginRight: tm.spacing(1),
     width: 750,
   },
 });
