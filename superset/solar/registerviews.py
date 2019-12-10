@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 # pylint: disable=C,R,W
+import os
 import json
 import time
 import logging
@@ -37,11 +38,13 @@ from .forms import (
 )
 from .models import SolarBIUser
 from .utils import post_request, get_session_team, set_session_team, log_to_mp
+from mailchimp3 import MailChimp
 
 log = logging.getLogger(__name__)
 
 
 class SolarBIRegisterUserDBView(RegisterUserDBView):
+    mc_client = MailChimp(mc_api=os.environ['MC_API_KEY'], mc_user='solarbi')
     form = SolarBIRegisterUserDBForm
     edit_widget = SolarBIRegisterFormWidget
     form_template = 'appbuilder/general/security/register_form_template.html'
@@ -68,6 +71,16 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
         team_reg = self.appbuilder.sm.add_team(user, reg.team, reg.registration_date)
         # self.handle_aws_info(org_reg, user)
         self.appbuilder.sm.del_register_user(reg)
+
+        # Create user in Mailchimp
+        self.mc_client.lists.members.create(list_id='c257103535', data={
+            'email_address': user.email,
+            'status': 'subscribed',
+            'merge_fields': {
+                'FNAME': user.first_name,
+                'LNAME': user.last_name,
+            },
+        })
         # if user.login_count is None or user.login_count == 0:
         #     is_first_login = True
         # else:
@@ -344,6 +357,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
 
 
 class SolarBIRegisterInvitationView(BaseRegisterUser):
+    mc_client = MailChimp(mc_api=os.environ['MC_API_KEY'], mc_user='solarbi')
     activation_message = lazy_gettext("Register successfully! An activation email has been sent to you")
     error_message = lazy_gettext("Username or Email already existed")
     form = SolarBIRegisterInvitationForm
@@ -441,6 +455,15 @@ class SolarBIRegisterInvitationView(BaseRegisterUser):
         if not reg:
             flash(as_unicode(self.false_error_message), 'danger')
             return redirect(self.appbuilder.get_url_for_index)
+
+        self.mc_client.lists.members.create(list_id='c257103535', data={
+            'email_address': reg.email,
+            'status': 'subscribed',
+            'merge_fields': {
+                'FNAME': reg.first_name,
+                'LNAME': reg.last_name,
+            },
+        })
         if not self.appbuilder.sm.add_team_user(email=reg.email,
                                                 first_name=reg.first_name,
                                                 last_name=reg.last_name,

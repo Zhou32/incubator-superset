@@ -189,6 +189,7 @@ class SolarBIUserInfoEditForm(DynamicForm):
         widget=BS3TextFieldWidget(),
         render_kw={'disabled': True},
     )
+    subscription = BooleanField(lazy_gettext('Email product updates and news?'), default=False)
 
 
 class SolarBIIUserInfoEditWidget(RenderTemplateWidget):

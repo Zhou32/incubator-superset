@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 # pylint: disable=C,R,W
+import os
 import logging
 import stripe
 
@@ -27,6 +28,8 @@ from flask_login import login_user
 from flask_appbuilder.views import expose, PublicFormView, ModelView
 from flask_appbuilder.security.forms import ResetPasswordForm
 from .models import SolarBIUser, TeamRegisterUser, Plan
+from mailchimp3 import MailChimp
+from mailchimp3.mailchimpclient import MailChimpError
 
 from .utils import set_session_team, update_mp_user, log_to_mp
 
@@ -271,6 +274,26 @@ class SolarBIUserInfoEditView(UserInfoEditView):
     form = SolarBIUserInfoEditForm
     form_template = 'appbuilder/general/security/edit_user_info.html'
     edit_widget = SolarBIIUserInfoEditWidget
+    mc_client = MailChimp(mc_api=os.environ['MC_API_KEY'], mc_user='solarbi')
+    message = "Profile information has been successfully updated"
+
+    def form_get(self, form):
+        item = self.appbuilder.sm.get_user_by_id(g.user.id)
+        # fills the form generic solution
+        for key, value in form.data.items():
+            if key == "csrf_token":
+                continue
+
+            if key == "subscription":
+                if not self.is_in_mc():
+                    self.create_user_in_mc(g.user.email, g.user.first_name, g.user.last_name)
+
+                form_field = getattr(form, key)
+                form_field.data = self.is_subscribed()
+                continue
+
+            form_field = getattr(form, key)
+            form_field.data = getattr(item, key)
 
     @expose("/form", methods=["POST"])
     @has_access
@@ -286,29 +309,88 @@ class SolarBIUserInfoEditView(UserInfoEditView):
         else:
             flash(as_unicode('The new email address has already been used.'), 'danger')
             return redirect('/solarbiuserinfoeditview/form')
-            # widgets = self._get_edit_widget(form=form)
-            # return self.render_template(
-            #     self.form_template,
-            #     title=self.form_title,
-            #     widgets=widgets,
-            #     appbuilder=self.appbuilder,
-            # )
 
     def form_post(self, form):
         form = self.form.refresh(request.form)
         item = self.appbuilder.sm.get_user_by_id(g.user.id)
+
+        # Update Mailchimp if any user field changes
+        if form.email.data != item.email:
+            subscriber_hash = self.get_email_md5(item.email)
+            self.mc_client.lists.members.delete(list_id='c257103535', subscriber_hash=subscriber_hash)
+            self.create_user_in_mc(form.email.data, form.first_name.data, form.last_name.data)
+        if form.email.data == item.email and \
+                (form.first_name.data != item.first_name or form.last_name.data != item.last_name):
+            self.mc_client.lists.members.update(list_id='c257103535',
+                                                subscriber_hash=self.get_email_md5(form.email.data),
+                                                data={'merge_fields': {'FNAME': form.first_name.data,
+                                                                       'LNAME': form.last_name.data}})
+
         form.username.data = item.username
         form.populate_obj(item)
         self.appbuilder.sm.update_user(item)
         update_mp_user(g.user)
 
-        # Update stripe email for the teams which the user is admin
+        is_subscribed = self.is_subscribed()
+        if form.subscription.data != is_subscribed:
+            if form.subscription.data:
+                try:
+                    self.mc_client.lists.members.update(list_id='c257103535',
+                                                        subscriber_hash=self.get_email_md5(g.user.email),
+                                                        data={'status': 'subscribed'})
+                except MailChimpError as e:
+                    self.mc_client.lists.members.update(list_id='c257103535',
+                                                        subscriber_hash=self.get_email_md5(g.user.email),
+                                                        data={'status': 'pending'})
+                    self.message = "Due to compliance restriction, you have to manually accept the opt-in email"
+            else:
+                self.mc_client.lists.members.update(list_id='c257103535',
+                                                    subscriber_hash=self.get_email_md5(g.user.email),
+                                                    data={'status': 'unsubscribed'})
+
+        # If current user is team admin, update the stripe email for the team.
         for team_role in g.user.team_role:
             if team_role.role.name == 'team_owner':
                 logging.info('Updating email for team {}'.format(team_role.team.team_name))
                 stripe.Customer.modify(team_role.team.stripe_user_id, email=g.user.email)
 
         flash(as_unicode(self.message), "info")
+
+    def is_in_mc(self):
+        email_md5 = self.get_email_md5(g.user.email)
+        try:
+            _ = self.mc_client.lists.members.get(list_id='c257103535', subscriber_hash=email_md5)
+            is_in_mc = True
+        except MailChimpError as e:
+            is_in_mc = False
+
+        return is_in_mc
+
+    def is_subscribed(self):
+        email_md5 = self.get_email_md5(g.user.email)
+        try:
+            list_member = self.mc_client.lists.members.get(list_id='c257103535', subscriber_hash=email_md5)
+            is_subscribed = list_member['status'] == 'subscribed'
+        except Exception as e:
+            is_subscribed = False
+
+        return is_subscribed
+
+    def create_user_in_mc(self, email, first_name, last_name):
+        self.mc_client.lists.members.create(list_id='c257103535', data={
+            'email_address': email,
+            'status': 'subscribed',
+            'merge_fields': {
+                'FNAME': first_name,
+                'LNAME': last_name,
+            },
+        })
+
+    def get_email_md5(self, email):
+        import hashlib
+
+        email_md5 = hashlib.md5(email.encode()).hexdigest()
+        return email_md5
 
 
 class SolarBIResetMyPasswordView(ResetMyPasswordView):
