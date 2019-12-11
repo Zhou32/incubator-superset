@@ -151,10 +151,9 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
                 flash(as_unicode(self.error_message), 'danger')
                 self.appbuilder.sm.del_register_user(register_user)
                 return None
-            self.appbuilder.get_session.add(user)
-            self.appbuilder.get_session.commit()
 
             if self.send_email(register_user):
+                print('send success')
                 flash(as_unicode(lazy_gettext("Register success! An activation email has been sent to you.")), 'info')
                 return register_user
             else:
@@ -170,6 +169,51 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
                                          email=form.email.data,
                                          password=form.password.data,
                                          team=form.team.data)
+
+    def get_redirect(self):
+        return self.appbuilder.get_url_for_index
+
+class SolarBICreditRegisterView(SolarBIRegisterUserDBView):
+    route_base = '/credit-register'
+
+    @expose('/activation/<string:activation_hash>')
+    def activation(self, activation_hash):
+        """
+            Endpoint to expose an activation url, this url
+            is sent to the user by email, when accessed the user is inserted
+            and activated
+        """
+        reg = self.appbuilder.sm.find_register_user(activation_hash)
+        if not reg:
+            log.error(c.LOGMSG_ERR_SEC_NO_REGISTER_HASH.format(activation_hash))
+            flash(as_unicode(self.false_error_message), 'danger')
+            return redirect(self.appbuilder.get_url_for_index)
+
+        # Automatically confirm the user email
+        user = self.appbuilder.get_session.query(SolarBIUser).filter_by(email=reg.email).first()
+        user.email_confirm = True
+        self.appbuilder.get_session.commit()
+
+        team_reg = self.appbuilder.sm.add_team(user, reg.team, reg.registration_date, credit=100000)
+        # self.handle_aws_info(org_reg, user)
+        self.appbuilder.sm.del_register_user(reg)
+        # if user.login_count is None or user.login_count == 0:
+        #     is_first_login = True
+        # else:
+        #     is_first_login = False
+
+        # Register stripe user for the team using user's email
+        # self.appbuilder.sm.create_stripe_user_and_sub(user, team_reg)
+
+        self.appbuilder.sm.update_user_auth_stat(user, True)
+        login_user(user)
+
+        log_to_mp(user, team_reg.team_name, 'login', {})
+
+        set_session_team(team_reg.id, team_reg.team_name)
+
+        flash(as_unicode('Your account has been successfully activated!'), 'success')
+        return redirect(self.appbuilder.get_url_for_index)
 
 
 class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
