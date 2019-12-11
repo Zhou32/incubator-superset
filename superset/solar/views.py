@@ -311,6 +311,7 @@ class SolarBIUserInfoEditView(UserInfoEditView):
             return redirect('/solarbiuserinfoeditview/form')
 
     def form_post(self, form):
+        self.message = "Profile information has been successfully updated"
         form = self.form.refresh(request.form)
         item = self.appbuilder.sm.get_user_by_id(g.user.id)
 
@@ -318,7 +319,15 @@ class SolarBIUserInfoEditView(UserInfoEditView):
         if form.email.data != item.email:
             subscriber_hash = self.get_email_md5(item.email)
             self.mc_client.lists.members.delete(list_id='c257103535', subscriber_hash=subscriber_hash)
-            self.create_user_in_mc(form.email.data, form.first_name.data, form.last_name.data)
+            # Handle the case that the user changes back to the old manually-unsubscribed and archived email address
+            try:
+                self.create_user_in_mc(form.email.data, form.first_name.data, form.last_name.data)
+            except MailChimpError as e:
+                self.mc_client.lists.members.update(list_id='c257103535',
+                                                    subscriber_hash=self.get_email_md5(form.email.data),
+                                                    data={'status': 'pending'})
+                self.message = "Due to compliance restriction, you have to manually accept the opt-in " \
+                               "email we just sent to this new address."
         if form.email.data == item.email and \
                 (form.first_name.data != item.first_name or form.last_name.data != item.last_name):
             self.mc_client.lists.members.update(list_id='c257103535',
@@ -326,13 +335,8 @@ class SolarBIUserInfoEditView(UserInfoEditView):
                                                 data={'merge_fields': {'FNAME': form.first_name.data,
                                                                        'LNAME': form.last_name.data}})
 
-        form.username.data = item.username
-        form.populate_obj(item)
-        self.appbuilder.sm.update_user(item)
-        update_mp_user(g.user)
-
-        is_subscribed = self.is_subscribed()
-        if form.subscription.data != is_subscribed:
+        # If users do NOT change their email but ONLY change the subscription status
+        if form.subscription.data != self.is_subscribed() and form.email.data == item.email:
             if form.subscription.data:
                 try:
                     self.mc_client.lists.members.update(list_id='c257103535',
@@ -342,19 +346,28 @@ class SolarBIUserInfoEditView(UserInfoEditView):
                     self.mc_client.lists.members.update(list_id='c257103535',
                                                         subscriber_hash=self.get_email_md5(g.user.email),
                                                         data={'status': 'pending'})
-                    self.message = "Due to compliance restriction, you have to manually accept the opt-in email"
+                    self.message = "Due to compliance restriction, please manually accept the opt-in " \
+                                   "email we just sent to this new address."
             else:
                 self.mc_client.lists.members.update(list_id='c257103535',
                                                     subscriber_hash=self.get_email_md5(g.user.email),
                                                     data={'status': 'unsubscribed'})
 
-        # If current user is team admin, update the stripe email for the team.
+        form.username.data = item.username
+        form.populate_obj(item)
+        self.appbuilder.sm.update_user(item)
+        update_mp_user(g.user)
+
+        # If current user is team admin, update the stripe email for his/her team.
         for team_role in g.user.team_role:
             if team_role.role.name == 'team_owner':
                 logging.info('Updating email for team {}'.format(team_role.team.team_name))
                 stripe.Customer.modify(team_role.team.stripe_user_id, email=g.user.email)
 
-        flash(as_unicode(self.message), "info")
+        if 'compliance' in self.message:
+            flash(as_unicode(self.message), "warning")
+        else:
+            flash(as_unicode(self.message), "info")
 
     def is_in_mc(self):
         email_md5 = self.get_email_md5(g.user.email)
