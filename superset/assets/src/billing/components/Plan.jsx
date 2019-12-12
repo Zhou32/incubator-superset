@@ -88,6 +88,7 @@ function Plan({ billing, changePlanConnect }) {
           </div>
         </div>
       </div>
+      {/* <h3 id="select-plan">Remaining Free Credits: <strong>${billing.balance}</strong></h3> */}
 
       <StripeProvider apiKey="pk_test_2CT1LvA7viLp1j7yCHJ2MezU00xXxxnRdM">
         <Elements>

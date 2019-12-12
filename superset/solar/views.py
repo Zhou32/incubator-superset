@@ -25,7 +25,7 @@ from flask_babel import lazy_gettext
 from flask_mail import Mail, Message
 from flask_login import login_user
 
-from flask_appbuilder.views import expose, PublicFormView, ModelView
+from flask_appbuilder.views import expose, PublicFormView
 from flask_appbuilder.security.forms import ResetPasswordForm
 from .models import SolarBIUser, TeamRegisterUser, Plan
 from mailchimp3 import MailChimp
@@ -323,10 +323,8 @@ class SolarBIUserInfoEditView(UserInfoEditView):
             try:
                 self.create_user_in_mc(form.email.data, form.first_name.data, form.last_name.data)
             except MailChimpError as e:
-                self.mc_client.lists.members.update(list_id='c257103535',
-                                                    subscriber_hash=self.get_email_md5(form.email.data),
-                                                    data={'status': 'pending'})
-                self.message = "Due to compliance restriction, you have to manually accept the opt-in " \
+                self.update_user_sub_status(form.email.data, 'pending')
+                self.message = "Due to compliance restriction, please manually accept the opt-in " \
                                "email we just sent to this new address."
         if form.email.data == item.email and \
                 (form.first_name.data != item.first_name or form.last_name.data != item.last_name):
@@ -339,19 +337,13 @@ class SolarBIUserInfoEditView(UserInfoEditView):
         if form.subscription.data != self.is_subscribed() and form.email.data == item.email:
             if form.subscription.data:
                 try:
-                    self.mc_client.lists.members.update(list_id='c257103535',
-                                                        subscriber_hash=self.get_email_md5(g.user.email),
-                                                        data={'status': 'subscribed'})
+                    self.update_user_sub_status(g.user.email, 'subscribed')
                 except MailChimpError as e:
-                    self.mc_client.lists.members.update(list_id='c257103535',
-                                                        subscriber_hash=self.get_email_md5(g.user.email),
-                                                        data={'status': 'pending'})
+                    self.update_user_sub_status(g.user.email, 'pending')
                     self.message = "Due to compliance restriction, please manually accept the opt-in " \
                                    "email we just sent to this new address."
             else:
-                self.mc_client.lists.members.update(list_id='c257103535',
-                                                    subscriber_hash=self.get_email_md5(g.user.email),
-                                                    data={'status': 'unsubscribed'})
+                self.update_user_sub_status(g.user.email, 'unsubscribed')
 
         form.username.data = item.username
         form.populate_obj(item)
@@ -398,6 +390,11 @@ class SolarBIUserInfoEditView(UserInfoEditView):
                 'LNAME': last_name,
             },
         })
+
+    def update_user_sub_status(self, email, status):
+        self.mc_client.lists.members.update(list_id='c257103535',
+                                            subscriber_hash=self.get_email_md5(email),
+                                            data={'status': status})
 
     def get_email_md5(self, email):
         import hashlib
