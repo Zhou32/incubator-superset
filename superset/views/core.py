@@ -862,6 +862,7 @@ class SolarBIBillingView(ModelView):
             'card_has_expired': card_has_expired,
             'card_expire_soon': card_expire_soon,
             'card_info': card_info,
+            'balance': cus_obj['balance'],
         }
 
         return self.render_template(
@@ -882,10 +883,10 @@ class SolarBIBillingView(ModelView):
 
         logging.info('Updating plan for {}'.format(team.team_name))
         try:
-            # stripe_customer = stripe.Customer.retrieve(id=team.stripe_user_id)
+            stripe_customer = stripe.Customer.retrieve(id=team.stripe_user_id)
 
             pm_id = team.stripe_pm_id
-            if team.stripe_pm_id is None:
+            if team.stripe_pm_id is None and stripe_customer['balance'] > -5000:
                 form_data = get_form_data()[0]['token']
                 # stripe.Customer.modify(stripe_customer.stripe_id, source=form_data['id'])
                 pm_id = form_data['id']
@@ -1311,7 +1312,7 @@ class DashboardModelView(SupersetModelView, DeleteMixin):  # noqa
         obj.slug = obj.slug or None
         if obj.slug:
             obj.slug = obj.slug.strip()
-            obj.slug = obj.slug.replace(" ", "-")
+            obj.slug = obj.slug.replace(" ", "-")win
             obj.slug = re.sub(r"[^\w\-]+", "", obj.slug)
         if g.user not in obj.owners:
             obj.owners.append(g.user)
