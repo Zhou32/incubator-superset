@@ -19,8 +19,10 @@ import json
 
 from flask import session, redirect
 from mixpanel import Mixpanel
+import os
 
 mp = Mixpanel('8b85dcbb1c5f693a3b045b24fca1e787')
+mp_prefix = os.getenv('SUPERSET_ENV')
 
 def post_request(url, params):
     import requests
@@ -48,6 +50,7 @@ def get_session_team(securitymanager, user_id):
 
 def log_to_mp(user, team_name, action, metadata):
     metadata['Team'] = team_name
+    metadata['Source'] = mp_prefix
     if user:
         mp.track(user.username, action, metadata)
     else:
