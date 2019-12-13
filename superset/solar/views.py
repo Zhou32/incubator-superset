@@ -325,7 +325,7 @@ class SolarBIUserInfoEditView(UserInfoEditView):
             except MailChimpError as e:
                 self.update_user_sub_status(form.email.data, 'pending')
                 self.message = "Due to compliance restriction, please manually accept the opt-in " \
-                               "email we just sent to this new address."
+                               "email sent to " + form.email.data + "."
         if form.email.data == item.email and \
                 (form.first_name.data != item.first_name or form.last_name.data != item.last_name):
             self.mc_client.lists.members.update(list_id='c257103535',
@@ -341,7 +341,7 @@ class SolarBIUserInfoEditView(UserInfoEditView):
                 except MailChimpError as e:
                     self.update_user_sub_status(g.user.email, 'pending')
                     self.message = "Due to compliance restriction, please manually accept the opt-in " \
-                                   "email we just sent to this new address."
+                                   "email sent to " + form.email.data + "."
             else:
                 self.update_user_sub_status(g.user.email, 'unsubscribed')
 
@@ -365,18 +365,16 @@ class SolarBIUserInfoEditView(UserInfoEditView):
         email_md5 = self.get_email_md5(g.user.email)
         try:
             _ = self.mc_client.lists.members.get(list_id='c257103535', subscriber_hash=email_md5)
-            is_in_mc = True
+            return True
         except MailChimpError as e:
-            is_in_mc = False
-
-        return is_in_mc
+            return False
 
     def is_subscribed(self):
         email_md5 = self.get_email_md5(g.user.email)
         try:
             list_member = self.mc_client.lists.members.get(list_id='c257103535', subscriber_hash=email_md5)
             is_subscribed = list_member['status'] == 'subscribed'
-        except Exception as e:
+        except MailChimpError as e:
             is_subscribed = False
 
         return is_subscribed
