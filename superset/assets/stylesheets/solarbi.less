@@ -1045,7 +1045,7 @@ input {
 .s-sidebar__trigger > i {
   display: inline-block;
   margin: 1.5em 0 0 1.5em;
-  color: #f07ab0;
+  color: rgb(0, 151, 170);
 }
 
 .s-sidebar__nav {
@@ -1632,13 +1632,13 @@ input {
 .delete-invitation {
   outline: none;
   border-radius: 10px;
-  border: 1px solid #F65060;;
-  color: #F65060;;
+  border: 1px solid #F65060;
+  color: #F65060;
 }
 .user-info-card {
   font-family: 'Montserrat';
   padding: 30;
-  max-height: 430;
+  max-height: 510px;
   overflow-y: auto;
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
   transition: 0.3s;
@@ -1890,12 +1890,20 @@ input {
   color: #024067;
   margin-left: 1em;
 }
+.free-credits {
+  margin: 1em auto;
+  width: 950px;
+  display: block;
+}
 
 @media only screen and (max-width: 1300px) {
   #select-plan {
     width: 750px;
   }
   .billing-content .plan-option-pane {
+    width: 750px;
+  }
+  .free-credits {
     width: 750px;
   }
 }
