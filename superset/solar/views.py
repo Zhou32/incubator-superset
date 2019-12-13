@@ -318,7 +318,7 @@ class SolarBIUserInfoEditView(UserInfoEditView):
         # Update Mailchimp if any user field changes
         if form.email.data != item.email:
             subscriber_hash = self.get_email_md5(item.email)
-            self.mc_client.lists.members.delete(list_id='c257103535', subscriber_hash=subscriber_hash)
+            self.mc_client.lists.members.delete(list_id='0e2cd7f0f5', subscriber_hash=subscriber_hash)
             # Handle the case that the user changes back to the old manually-unsubscribed and archived email address
             try:
                 self.create_user_in_mc(form.email.data, form.first_name.data, form.last_name.data)
@@ -328,7 +328,7 @@ class SolarBIUserInfoEditView(UserInfoEditView):
                                "email sent to " + form.email.data + "."
         if form.email.data == item.email and \
                 (form.first_name.data != item.first_name or form.last_name.data != item.last_name):
-            self.mc_client.lists.members.update(list_id='c257103535',
+            self.mc_client.lists.members.update(list_id='0e2cd7f0f5',
                                                 subscriber_hash=self.get_email_md5(form.email.data),
                                                 data={'merge_fields': {'FNAME': form.first_name.data,
                                                                        'LNAME': form.last_name.data}})
@@ -364,7 +364,7 @@ class SolarBIUserInfoEditView(UserInfoEditView):
     def is_in_mc(self):
         email_md5 = self.get_email_md5(g.user.email)
         try:
-            _ = self.mc_client.lists.members.get(list_id='c257103535', subscriber_hash=email_md5)
+            _ = self.mc_client.lists.members.get(list_id='0e2cd7f0f5', subscriber_hash=email_md5)
             return True
         except MailChimpError as e:
             return False
@@ -372,7 +372,7 @@ class SolarBIUserInfoEditView(UserInfoEditView):
     def is_subscribed(self):
         email_md5 = self.get_email_md5(g.user.email)
         try:
-            list_member = self.mc_client.lists.members.get(list_id='c257103535', subscriber_hash=email_md5)
+            list_member = self.mc_client.lists.members.get(list_id='0e2cd7f0f5', subscriber_hash=email_md5)
             is_subscribed = list_member['status'] == 'subscribed'
         except MailChimpError as e:
             is_subscribed = False
@@ -380,7 +380,7 @@ class SolarBIUserInfoEditView(UserInfoEditView):
         return is_subscribed
 
     def create_user_in_mc(self, email, first_name, last_name):
-        self.mc_client.lists.members.create(list_id='c257103535', data={
+        self.mc_client.lists.members.create(list_id='0e2cd7f0f5', data={
             'email_address': email,
             'status': 'subscribed',
             'merge_fields': {
@@ -390,7 +390,7 @@ class SolarBIUserInfoEditView(UserInfoEditView):
         })
 
     def update_user_sub_status(self, email, status):
-        self.mc_client.lists.members.update(list_id='c257103535',
+        self.mc_client.lists.members.update(list_id='0e2cd7f0f5',
                                             subscriber_hash=self.get_email_md5(email),
                                             data={'status': status})
 

@@ -73,7 +73,7 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
         self.appbuilder.sm.del_register_user(reg)
 
         # Create user in Mailchimp
-        self.mc_client.lists.members.create(list_id='c257103535', data={
+        self.mc_client.lists.members.create(list_id='0e2cd7f0f5', data={
             'email_address': user.email,
             'status': 'subscribed',
             'merge_fields': {
@@ -500,7 +500,7 @@ class SolarBIRegisterInvitationView(BaseRegisterUser):
             flash(as_unicode(self.false_error_message), 'danger')
             return redirect(self.appbuilder.get_url_for_index)
 
-        self.mc_client.lists.members.create(list_id='c257103535', data={
+        self.mc_client.lists.members.create(list_id='0e2cd7f0f5', data={
             'email_address': reg.email,
             'status': 'subscribed',
             'merge_fields': {
