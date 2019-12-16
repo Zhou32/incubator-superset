@@ -37,7 +37,7 @@ from .forms import (
     SolarBIRegisterInvitationUserDBForm, SolarBITeamFormWidget, SolarBIInvitationWidget,
 )
 from .models import SolarBIUser
-from .utils import post_request, get_session_team, set_session_team, log_to_mp
+from .utils import post_request, get_session_team, set_session_team, log_to_mp, free_credit_in_dollor
 from mailchimp3 import MailChimp
 
 log = logging.getLogger(__name__)
@@ -194,7 +194,8 @@ class SolarBICreditRegisterView(SolarBIRegisterUserDBView):
         user.email_confirm = True
         self.appbuilder.get_session.commit()
 
-        team_reg = self.appbuilder.sm.add_team(user, reg.team, reg.registration_date, credit=100000)
+        team_reg = self.appbuilder.sm.add_team(user, reg.team, reg.registration_date, credit=free_credit_in_dollor *
+                                                                                             100)
         # self.handle_aws_info(org_reg, user)
         self.appbuilder.sm.del_register_user(reg)
         # if user.login_count is None or user.login_count == 0:

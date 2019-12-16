@@ -261,25 +261,6 @@ class CustomSecurityManager(SupersetSecurityManager):
         #                         pvm.permission.name == 'menu_access')
         return result
 
-    # def is_owner_pvm(self, pvm):
-    #     # print(pvm.view_menu.name)
-    #     result = self._is_gamma_pvm(pvm)
-    #
-    #     for permission in PERMISSION_COMMON:
-    #         for view in OWNER_PERMISSION_MODEL:
-    #             result = result or (pvm.view_menu.name == view and
-    #                                 pvm.permission.name == permission)
-    #     result = result or (pvm.view_menu.name not in OWNER_NOT_ALLOWED_MENU)
-    #     if pvm.view_menu.name in OWNER_NOT_ALLOWED_MENU or pvm.permission.name in NOT_ALLOWED_SQL_PERM:
-    #         return False
-    #     if self._is_user_defined_permission(pvm) or pvm.permission.name == 'all_database_access'\
-    #             or pvm.permission.name == 'all_datasource_access':
-    #         return False
-    #     if pvm.view_menu.name in OWNER_NOT_ALLOWED_PERM_MENU \
-    #             and pvm.permission.name in OWNER_NOT_ALLOWED_PERM_MENU[pvm.view_menu.name]:
-    #         return False
-    #     return result
-
     @property
     def get_url_for_recover(self):
         return url_for('%s.%s' % (self.passwordrecoverview.endpoint,
@@ -457,6 +438,21 @@ class CustomSecurityManager(SupersetSecurityManager):
         except Exception as e:
             logging.error(e)
             return False
+
+    def del_register_user(self, register_user):
+        try:
+            super(CustomSecurityManager, self).del_register_user(register_user)
+            user = self.find_user(username=register_user.username)
+            if user:
+                self.get_session.delete(user)
+                self.get_session.commit()
+            return True
+        except Exception as e:
+            logging.error(str(e))
+            self.get_session.rollback()
+            return False
+
+
 
     # def delete_team(self, team):
     #     from superset.models.core import Database

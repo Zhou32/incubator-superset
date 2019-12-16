@@ -495,7 +495,7 @@ ENABLE_ACCESS_REQUEST = False
 # smtp server configuration
 EMAIL_NOTIFICATIONS = True  # all the emails are sent using dryrun
 
-MAIL_SERVER = 'email-smtp.us-west-2.amazonaws.com'
+MAIL_SERVER = 'smtp.sendgrid.net'
 MAIL_USE_TLS = False
 MAIL_USE_SSL = True
 MAIL_USERNAME = os.environ['SMTP_USERNAME']
