@@ -17,6 +17,7 @@
 # pylint: disable=C,R,W
 import os
 import logging
+import json
 import stripe
 
 from flask import flash, redirect, url_for, g, request, make_response, Markup, jsonify
@@ -25,9 +26,10 @@ from flask_babel import lazy_gettext
 from flask_mail import Mail, Message
 from flask_login import login_user
 
-from flask_appbuilder.views import expose, PublicFormView, ModelView
+from flask_appbuilder.views import expose, PublicFormView
 from flask_appbuilder.security.forms import ResetPasswordForm
 from .models import SolarBIUser, TeamRegisterUser, Plan
+from sendgrid import SendGridAPIClient
 from mailchimp3 import MailChimp
 from mailchimp3.mailchimpclient import MailChimpError
 
@@ -275,6 +277,7 @@ class SolarBIUserInfoEditView(UserInfoEditView):
     form_template = 'appbuilder/general/security/edit_user_info.html'
     edit_widget = SolarBIIUserInfoEditWidget
     mc_client = MailChimp(mc_api=os.environ['MC_API_KEY'], mc_user='solarbi')
+    sg = SendGridAPIClient(os.environ['SG_API_KEY'])
     message = "Profile information has been successfully updated"
 
     def form_get(self, form):
@@ -285,11 +288,16 @@ class SolarBIUserInfoEditView(UserInfoEditView):
                 continue
 
             if key == "subscription":
-                if not self.is_in_mc():
-                    self.create_user_in_mc(g.user.email, g.user.first_name, g.user.last_name)
+                # response = self.sg.client.marketing.contacts.get()
+                # res = json.loads(response.body.decode("utf-8"))
+                if not self.is_in_sg():
+                    self.add_or_update_contact(g.user.email, g.user.first_name, g.user.last_name)
+
+                # if not self.is_in_mc():
+                #     self.create_user_in_mc(g.user.email, g.user.first_name, g.user.last_name)
 
                 form_field = getattr(form, key)
-                form_field.data = self.is_subscribed()
+                form_field.data = self.is_in_sg()
                 continue
 
             form_field = getattr(form, key)
@@ -323,11 +331,9 @@ class SolarBIUserInfoEditView(UserInfoEditView):
             try:
                 self.create_user_in_mc(form.email.data, form.first_name.data, form.last_name.data)
             except MailChimpError as e:
-                self.mc_client.lists.members.update(list_id='c257103535',
-                                                    subscriber_hash=self.get_email_md5(form.email.data),
-                                                    data={'status': 'pending'})
-                self.message = "Due to compliance restriction, you have to manually accept the opt-in " \
-                               "email we just sent to this new address."
+                self.update_user_sub_status(form.email.data, 'pending')
+                self.message = "Due to compliance restriction, please manually accept the opt-in " \
+                               "email sent to " + form.email.data + "."
         if form.email.data == item.email and \
                 (form.first_name.data != item.first_name or form.last_name.data != item.last_name):
             self.mc_client.lists.members.update(list_id='c257103535',
@@ -339,19 +345,13 @@ class SolarBIUserInfoEditView(UserInfoEditView):
         if form.subscription.data != self.is_subscribed() and form.email.data == item.email:
             if form.subscription.data:
                 try:
-                    self.mc_client.lists.members.update(list_id='c257103535',
-                                                        subscriber_hash=self.get_email_md5(g.user.email),
-                                                        data={'status': 'subscribed'})
+                    self.update_user_sub_status(g.user.email, 'subscribed')
                 except MailChimpError as e:
-                    self.mc_client.lists.members.update(list_id='c257103535',
-                                                        subscriber_hash=self.get_email_md5(g.user.email),
-                                                        data={'status': 'pending'})
+                    self.update_user_sub_status(g.user.email, 'pending')
                     self.message = "Due to compliance restriction, please manually accept the opt-in " \
-                                   "email we just sent to this new address."
+                                   "email sent to " + form.email.data + "."
             else:
-                self.mc_client.lists.members.update(list_id='c257103535',
-                                                    subscriber_hash=self.get_email_md5(g.user.email),
-                                                    data={'status': 'unsubscribed'})
+                self.update_user_sub_status(g.user.email, 'unsubscribed')
 
         form.username.data = item.username
         form.populate_obj(item)
@@ -369,22 +369,46 @@ class SolarBIUserInfoEditView(UserInfoEditView):
         else:
             flash(as_unicode(self.message), "info")
 
+    def is_in_sg(self):
+        # payload = "{\"query\":\"email LIKE '" + g.user.email + "'\"}"
+        # url = "https://api.sendgrid.com/v3/marketing/contacts/search"
+        # res = requests.request("POST", url, data=payload, headers=self.headers)
+        response = self.sg.client.marketing.contacts.search.post({"query": "email LIKE '" + g.user.email + "'"})
+        res = json.loads(response.body.decode("utf-8"))
+        if res['result']:
+            return True
+        else:
+            return False
+
+    def add_or_update_contact(self, email, first_name, last_name):
+        response = self.sg.client.marketing.contacts.put({
+            "list_ids": [
+                "eb9b2596-dea7-4dd4-af6f-9398f52ad43e"
+            ],
+            "contacts": [
+                {
+                    "email": email,
+                    "first_name": first_name,
+                    "last_name": last_name
+                }
+            ]
+        })
+        _ = json.loads(response.body.decode("utf-8"))
+
     def is_in_mc(self):
         email_md5 = self.get_email_md5(g.user.email)
         try:
             _ = self.mc_client.lists.members.get(list_id='c257103535', subscriber_hash=email_md5)
-            is_in_mc = True
+            return True
         except MailChimpError as e:
-            is_in_mc = False
-
-        return is_in_mc
+            return False
 
     def is_subscribed(self):
         email_md5 = self.get_email_md5(g.user.email)
         try:
             list_member = self.mc_client.lists.members.get(list_id='c257103535', subscriber_hash=email_md5)
             is_subscribed = list_member['status'] == 'subscribed'
-        except Exception as e:
+        except MailChimpError as e:
             is_subscribed = False
 
         return is_subscribed
@@ -398,6 +422,11 @@ class SolarBIUserInfoEditView(UserInfoEditView):
                 'LNAME': last_name,
             },
         })
+
+    def update_user_sub_status(self, email, status):
+        self.mc_client.lists.members.update(list_id='c257103535',
+                                            subscriber_hash=self.get_email_md5(email),
+                                            data={'status': status})
 
     def get_email_md5(self, email):
         import hashlib
