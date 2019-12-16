@@ -17,6 +17,7 @@
 # pylint: disable=C,R,W
 import os
 import logging
+import json
 import stripe
 
 from flask import flash, redirect, url_for, g, request, make_response, Markup, jsonify
@@ -28,6 +29,7 @@ from flask_login import login_user
 from flask_appbuilder.views import expose, PublicFormView
 from flask_appbuilder.security.forms import ResetPasswordForm
 from .models import SolarBIUser, TeamRegisterUser, Plan
+from sendgrid import SendGridAPIClient
 from mailchimp3 import MailChimp
 from mailchimp3.mailchimpclient import MailChimpError
 
@@ -275,6 +277,7 @@ class SolarBIUserInfoEditView(UserInfoEditView):
     form_template = 'appbuilder/general/security/edit_user_info.html'
     edit_widget = SolarBIIUserInfoEditWidget
     mc_client = MailChimp(mc_api=os.environ['MC_API_KEY'], mc_user='solarbi')
+    sg = SendGridAPIClient(os.environ['SG_API_KEY'])
     message = "Profile information has been successfully updated"
 
     def form_get(self, form):
@@ -285,11 +288,16 @@ class SolarBIUserInfoEditView(UserInfoEditView):
                 continue
 
             if key == "subscription":
-                if not self.is_in_mc():
-                    self.create_user_in_mc(g.user.email, g.user.first_name, g.user.last_name)
+                # response = self.sg.client.marketing.contacts.get()
+                # res = json.loads(response.body.decode("utf-8"))
+                if not self.is_in_sg():
+                    self.add_or_update_contact(g.user.email, g.user.first_name, g.user.last_name)
+
+                # if not self.is_in_mc():
+                #     self.create_user_in_mc(g.user.email, g.user.first_name, g.user.last_name)
 
                 form_field = getattr(form, key)
-                form_field.data = self.is_subscribed()
+                form_field.data = self.is_in_sg()
                 continue
 
             form_field = getattr(form, key)
@@ -360,6 +368,32 @@ class SolarBIUserInfoEditView(UserInfoEditView):
             flash(as_unicode(self.message), "warning")
         else:
             flash(as_unicode(self.message), "info")
+
+    def is_in_sg(self):
+        # payload = "{\"query\":\"email LIKE '" + g.user.email + "'\"}"
+        # url = "https://api.sendgrid.com/v3/marketing/contacts/search"
+        # res = requests.request("POST", url, data=payload, headers=self.headers)
+        response = self.sg.client.marketing.contacts.search.post({"query": "email LIKE '" + g.user.email + "'"})
+        res = json.loads(response.body.decode("utf-8"))
+        if res['result']:
+            return True
+        else:
+            return False
+
+    def add_or_update_contact(self, email, first_name, last_name):
+        response = self.sg.client.marketing.contacts.put({
+            "list_ids": [
+                "eb9b2596-dea7-4dd4-af6f-9398f52ad43e"
+            ],
+            "contacts": [
+                {
+                    "email": email,
+                    "first_name": first_name,
+                    "last_name": last_name
+                }
+            ]
+        })
+        _ = json.loads(response.body.decode("utf-8"))
 
     def is_in_mc(self):
         email_md5 = self.get_email_md5(g.user.email)
