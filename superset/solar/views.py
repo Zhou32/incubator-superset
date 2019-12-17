@@ -18,6 +18,7 @@
 import os
 import logging
 import json
+import requests
 import stripe
 
 from flask import flash, redirect, url_for, g, request, make_response, Markup, jsonify
@@ -288,16 +289,10 @@ class SolarBIUserInfoEditView(UserInfoEditView):
                 continue
 
             if key == "subscription":
-                # response = self.sg.client.marketing.contacts.get()
-                # res = json.loads(response.body.decode("utf-8"))
-                if not self.is_in_sg():
-                    self.add_or_update_contact(g.user.email, g.user.first_name, g.user.last_name)
-
-                # if not self.is_in_mc():
-                #     self.create_user_in_mc(g.user.email, g.user.first_name, g.user.last_name)
+                contact_id = self.is_in_sg()
 
                 form_field = getattr(form, key)
-                form_field.data = self.is_in_sg()
+                form_field.data = (contact_id != -1)
                 continue
 
             form_field = getattr(form, key)
@@ -323,35 +318,25 @@ class SolarBIUserInfoEditView(UserInfoEditView):
         form = self.form.refresh(request.form)
         item = self.appbuilder.sm.get_user_by_id(g.user.id)
 
-        # Update Mailchimp if any user field changes
         if form.email.data != item.email:
-            subscriber_hash = self.get_email_md5(item.email)
-            self.mc_client.lists.members.delete(list_id='c257103535', subscriber_hash=subscriber_hash)
-            # Handle the case that the user changes back to the old manually-unsubscribed and archived email address
-            try:
-                self.create_user_in_mc(form.email.data, form.first_name.data, form.last_name.data)
-            except MailChimpError as e:
-                self.update_user_sub_status(form.email.data, 'pending')
-                self.message = "Due to compliance restriction, please manually accept the opt-in " \
-                               "email sent to " + form.email.data + "."
-        if form.email.data == item.email and \
-                (form.first_name.data != item.first_name or form.last_name.data != item.last_name):
-            self.mc_client.lists.members.update(list_id='c257103535',
-                                                subscriber_hash=self.get_email_md5(form.email.data),
-                                                data={'merge_fields': {'FNAME': form.first_name.data,
-                                                                       'LNAME': form.last_name.data}})
+            # If the user has been in SG already, delete it first
+            contact_id = self.is_in_sg()
+            if contact_id != -1:
+                self.delete_contact(contact_id)
 
-        # If users do NOT change their email but ONLY change the subscription status
-        if form.subscription.data != self.is_subscribed() and form.email.data == item.email:
-            if form.subscription.data:
-                try:
-                    self.update_user_sub_status(g.user.email, 'subscribed')
-                except MailChimpError as e:
-                    self.update_user_sub_status(g.user.email, 'pending')
-                    self.message = "Due to compliance restriction, please manually accept the opt-in " \
-                                   "email sent to " + form.email.data + "."
-            else:
-                self.update_user_sub_status(g.user.email, 'unsubscribed')
+            self.add_or_update_contact(form.email.data, form.first_name.data, form.last_name.data)
+        else:
+            contact_id = self.is_in_sg()
+            is_in_sg = (contact_id != -1)
+            if form.first_name.data != item.first_name or form.last_name.data != item.last_name:
+                if contact_id != -1:
+                    self.add_or_update_contact(form.email.data, form.first_name.data, form.last_name.data)
+
+            if form.subscription.data != is_in_sg:
+                if form.subscription.data:
+                    self.add_or_update_contact(form.email.data, form.first_name.data, form.last_name.data)
+                else:
+                    self.delete_contact(contact_id)
 
         form.username.data = item.username
         form.populate_obj(item)
@@ -364,24 +349,25 @@ class SolarBIUserInfoEditView(UserInfoEditView):
                 logging.info('Updating email for team {}'.format(team_role.team.team_name))
                 stripe.Customer.modify(team_role.team.stripe_user_id, email=g.user.email)
 
-        if 'compliance' in self.message:
-            flash(as_unicode(self.message), "warning")
-        else:
-            flash(as_unicode(self.message), "info")
+        flash(as_unicode(self.message), "info")
+        # if 'compliance' in self.message:
+        #     flash(as_unicode(self.message), "warning")
+        # else:
+        #     flash(as_unicode(self.message), "info")
 
     def is_in_sg(self):
-        # payload = "{\"query\":\"email LIKE '" + g.user.email + "'\"}"
-        # url = "https://api.sendgrid.com/v3/marketing/contacts/search"
-        # res = requests.request("POST", url, data=payload, headers=self.headers)
-        response = self.sg.client.marketing.contacts.search.post({"query": "email LIKE '" + g.user.email + "'"})
-        res = json.loads(response.body.decode("utf-8"))
-        if res['result']:
-            return True
+        res = json.loads(self.sg.client.marketing.contacts.get().body.decode("utf-8"))
+        all_contacts = {}
+        for contact in res['result']:
+            all_contacts[contact['email']] = contact['id']
+
+        if g.user.email in all_contacts:
+            return all_contacts[g.user.email]
         else:
-            return False
+            return -1
 
     def add_or_update_contact(self, email, first_name, last_name):
-        response = self.sg.client.marketing.contacts.put({
+        response = self.sg.client.marketing.contacts.put(request_body={
             "list_ids": [
                 "eb9b2596-dea7-4dd4-af6f-9398f52ad43e"
             ],
@@ -394,6 +380,9 @@ class SolarBIUserInfoEditView(UserInfoEditView):
             ]
         })
         _ = json.loads(response.body.decode("utf-8"))
+
+    def delete_contact(self, contact_id):
+        self.sg.client.marketing.contacts.delete(query_params={"ids": contact_id})
 
     def is_in_mc(self):
         email_md5 = self.get_email_md5(g.user.email)
