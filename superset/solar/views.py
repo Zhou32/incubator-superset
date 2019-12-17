@@ -18,6 +18,7 @@
 import os
 import logging
 import json
+import requests
 import stripe
 
 from flask import flash, redirect, url_for, g, request, make_response, Markup, jsonify
@@ -278,6 +279,7 @@ class SolarBIUserInfoEditView(UserInfoEditView):
     edit_widget = SolarBIIUserInfoEditWidget
     mc_client = MailChimp(mc_api=os.environ['MC_API_KEY'], mc_user='solarbi')
     sg = SendGridAPIClient(os.environ['SG_API_KEY'])
+    headers = {'authorization': 'Bearer ' + os.environ['SG_API_KEY']}
     message = "Profile information has been successfully updated"
 
     def form_get(self, form):
@@ -289,9 +291,11 @@ class SolarBIUserInfoEditView(UserInfoEditView):
 
             if key == "subscription":
                 contact_id = self.is_in_sg()
+                user_in_sg = contact_id != -1
+                user_in_gs = self.user_in_gs(g.user.email)
 
                 form_field = getattr(form, key)
-                form_field.data = (contact_id != -1)
+                form_field.data = (user_in_sg and not user_in_gs)
                 continue
 
             form_field = getattr(form, key)
@@ -318,10 +322,11 @@ class SolarBIUserInfoEditView(UserInfoEditView):
         item = self.appbuilder.sm.get_user_by_id(g.user.id)
 
         if form.email.data != item.email:
-            # If the user has been in SG already, delete it first
+            # If the user has been in SG already, delete it from contacts and global unsubscription
             contact_id = self.is_in_sg()
             if contact_id != -1:
                 self.delete_contact(contact_id)
+                self.delete_gs(item.email)
 
             self.add_or_update_contact(form.email.data, form.first_name.data, form.last_name.data)
         else:
@@ -331,11 +336,15 @@ class SolarBIUserInfoEditView(UserInfoEditView):
                 if contact_id != -1:
                     self.add_or_update_contact(form.email.data, form.first_name.data, form.last_name.data)
 
-            if form.subscription.data != is_in_sg:
+            subscription_status = (is_in_sg and not self.user_in_gs(form.email.data))
+            if form.subscription.data != subscription_status:
                 if form.subscription.data:
-                    self.add_or_update_contact(form.email.data, form.first_name.data, form.last_name.data)
+                    if self.user_in_gs(form.email.data):
+                        self.delete_gs(form.email.data)
+                    else:
+                        self.add_or_update_contact(form.email.data, form.first_name.data, form.last_name.data)
                 else:
-                    self.delete_contact(contact_id)
+                    self.add_to_gs(form.email.data)
 
         form.username.data = item.username
         form.populate_obj(item)
@@ -382,6 +391,23 @@ class SolarBIUserInfoEditView(UserInfoEditView):
 
     def delete_contact(self, contact_id):
         self.sg.client.marketing.contacts.delete(query_params={"ids": contact_id})
+
+    def user_in_gs(self, email):
+        url = "https://api.sendgrid.com/v3/asm/suppressions/global/" + email
+        response = requests.request("GET", url, headers=self.headers)
+        if json.loads(response.text):
+            return True
+        else:
+            return False
+
+    def add_to_gs(self, email):
+        url = "https://api.sendgrid.com/v3/asm/suppressions/global"
+        payload = "{\"recipient_emails\":[\"" + email + "\"]}"
+        _ = requests.request("POST", url, data=payload, headers=self.headers)
+
+    def delete_gs(self, email):
+        url = "https://api.sendgrid.com/v3/asm/suppressions/global/" + email
+        _ = requests.request("DELETE", url, headers=self.headers)
 
     def is_in_mc(self):
         email_md5 = self.get_email_md5(g.user.email)
