@@ -18,7 +18,6 @@
 import os
 import logging
 import json
-import requests
 import stripe
 
 from flask import flash, redirect, url_for, g, request, make_response, Markup, jsonify
@@ -367,7 +366,7 @@ class SolarBIUserInfoEditView(UserInfoEditView):
             return -1
 
     def add_or_update_contact(self, email, first_name, last_name):
-        response = self.sg.client.marketing.contacts.put(request_body={
+        _ = self.sg.client.marketing.contacts.put(request_body={
             "list_ids": [
                 "eb9b2596-dea7-4dd4-af6f-9398f52ad43e"
             ],
@@ -379,7 +378,7 @@ class SolarBIUserInfoEditView(UserInfoEditView):
                 }
             ]
         })
-        _ = json.loads(response.body.decode("utf-8"))
+        # _ = json.loads(response.body.decode("utf-8"))
 
     def delete_contact(self, contact_id):
         self.sg.client.marketing.contacts.delete(query_params={"ids": contact_id})

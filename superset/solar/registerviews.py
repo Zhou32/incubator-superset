@@ -38,13 +38,15 @@ from .forms import (
 )
 from .models import SolarBIUser
 from .utils import post_request, get_session_team, set_session_team, log_to_mp, free_credit_in_dollor
+from sendgrid import SendGridAPIClient
 from mailchimp3 import MailChimp
 
 log = logging.getLogger(__name__)
 
 
 class SolarBIRegisterUserDBView(RegisterUserDBView):
-    mc_client = MailChimp(mc_api=os.environ['MC_API_KEY'], mc_user='solarbi')
+    # mc_client = MailChimp(mc_api=os.environ['MC_API_KEY'], mc_user='solarbi')
+    sg = SendGridAPIClient(os.environ['SG_API_KEY'])
     form = SolarBIRegisterUserDBForm
     edit_widget = SolarBIRegisterFormWidget
     form_template = 'appbuilder/general/security/register_form_template.html'
@@ -73,13 +75,25 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
         self.appbuilder.sm.del_register_user(reg)
 
         # Create user in Mailchimp
-        self.mc_client.lists.members.create(list_id='c257103535', data={
-            'email_address': user.email,
-            'status': 'subscribed',
-            'merge_fields': {
-                'FNAME': user.first_name,
-                'LNAME': user.last_name,
-            },
+        # self.mc_client.lists.members.create(list_id='c257103535', data={
+        #     'email_address': user.email,
+        #     'status': 'subscribed',
+        #     'merge_fields': {
+        #         'FNAME': user.first_name,
+        #         'LNAME': user.last_name,
+        #     },
+        # })
+        _ = self.sg.client.marketing.contacts.put(request_body={
+            "list_ids": [
+                "eb9b2596-dea7-4dd4-af6f-9398f52ad43e"
+            ],
+            "contacts": [
+                {
+                    "email": user.email,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name
+                }
+            ]
         })
         # if user.login_count is None or user.login_count == 0:
         #     is_first_login = True
@@ -88,7 +102,6 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
 
         # Register stripe user for the team using user's email
         # self.appbuilder.sm.create_stripe_user_and_sub(user, team_reg)
-
         self.appbuilder.sm.update_user_auth_stat(user, True)
         login_user(user)
 
@@ -173,7 +186,9 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
     def get_redirect(self):
         return self.appbuilder.get_url_for_index
 
+
 class SolarBICreditRegisterView(SolarBIRegisterUserDBView):
+    sg = SendGridAPIClient(os.environ['SG_API_KEY'])
     route_base = '/credit-register'
 
     @expose('/activation/<string:activation_hash>')
@@ -198,6 +213,19 @@ class SolarBICreditRegisterView(SolarBIRegisterUserDBView):
                                                                                              100)
         # self.handle_aws_info(org_reg, user)
         self.appbuilder.sm.del_register_user(reg)
+
+        _ = self.sg.client.marketing.contacts.put(request_body={
+            "list_ids": [
+                "eb9b2596-dea7-4dd4-af6f-9398f52ad43e"
+            ],
+            "contacts": [
+                {
+                    "email": reg.email,
+                    "first_name": reg.first_name,
+                    "last_name": reg.last_name
+                }
+            ]
+        })
         # if user.login_count is None or user.login_count == 0:
         #     is_first_login = True
         # else:
@@ -402,7 +430,8 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
 
 
 class SolarBIRegisterInvitationView(BaseRegisterUser):
-    mc_client = MailChimp(mc_api=os.environ['MC_API_KEY'], mc_user='solarbi')
+    # mc_client = MailChimp(mc_api=os.environ['MC_API_KEY'], mc_user='solarbi')
+    sg = SendGridAPIClient(os.environ['SG_API_KEY'])
     activation_message = lazy_gettext("Register successfully! An activation email has been sent to you")
     error_message = lazy_gettext("Username or Email already existed")
     form = SolarBIRegisterInvitationForm
@@ -501,13 +530,25 @@ class SolarBIRegisterInvitationView(BaseRegisterUser):
             flash(as_unicode(self.false_error_message), 'danger')
             return redirect(self.appbuilder.get_url_for_index)
 
-        self.mc_client.lists.members.create(list_id='c257103535', data={
-            'email_address': reg.email,
-            'status': 'subscribed',
-            'merge_fields': {
-                'FNAME': reg.first_name,
-                'LNAME': reg.last_name,
-            },
+        # self.mc_client.lists.members.create(list_id='c257103535', data={
+        #     'email_address': reg.email,
+        #     'status': 'subscribed',
+        #     'merge_fields': {
+        #         'FNAME': reg.first_name,
+        #         'LNAME': reg.last_name,
+        #     },
+        # })
+        _ = self.sg.client.marketing.contacts.put(request_body={
+            "list_ids": [
+                "eb9b2596-dea7-4dd4-af6f-9398f52ad43e"
+            ],
+            "contacts": [
+                {
+                    "email": reg.email,
+                    "first_name": reg.first_name,
+                    "last_name": reg.last_name
+                }
+            ]
         })
         if not self.appbuilder.sm.add_team_user(email=reg.email,
                                                 first_name=reg.first_name,
