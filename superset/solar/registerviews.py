@@ -508,11 +508,7 @@ class SolarBIRegisterInvitationView(BaseRegisterUser):
             from_email=sendgrid_email_sender,
             to_emails=register_user.email,
         )
-        url = url_for(
-            ".activation",
-            _external=True,
-            activation_hash=register_user.registration_hash,
-        )
+        url = url_for('.activate', _external=True, invitation_hash=register_user.registration_hash)
         message.dynamic_template_data = {
             'url': url,
             'first_name': register_user.first_name,
