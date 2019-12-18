@@ -34,7 +34,7 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from mailchimp3 import MailChimp
 
-from .utils import set_session_team, update_mp_user, log_to_mp
+from .utils import set_session_team, update_mp_user, log_to_mp, sendgrid_email_sender
 
 
 from .forms import (
@@ -120,7 +120,7 @@ class SolarBIAuthDBView(AuthDBView):
             return jsonify(dict(err="Sorry we cannot find the email"))
 
         message = Mail(
-            from_email='no-reply@solarbi.com.au',
+            from_email=sendgrid_email_sender,
             to_emails=register_user.email,
         )
         if register_user.inviter is None:
@@ -173,7 +173,7 @@ class SolarBIPasswordRecoverView(PublicFormView):
 
     def send_sg_email(self, email, hash_val):
         message = Mail(
-            from_email='no-reply@solarbi.com.au',
+            from_email=sendgrid_email_sender,
             to_emails=email,
         )
         url = url_for('.reset', _external=True, reset_hash=hash_val)
