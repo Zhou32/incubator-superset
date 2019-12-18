@@ -725,6 +725,7 @@ class CustomSecurityManager(SupersetSecurityManager):
 
             # add subscription to free tier
             if plan_id:
+                user.trial_used = True
                 plan = self.get_session.query(Plan).filter_by(id=plan_id).first()
             else:
                 plan = self.get_session.query(Plan).filter_by(id=1).first()
@@ -739,7 +740,6 @@ class CustomSecurityManager(SupersetSecurityManager):
             team_subscription.plan = plan.id
             team_subscription.stripe_sub_id = sub_resp['id']
             team_subscription.remain_count = plan.num_request
-            user.trial_used = True
             # team_subscription.trial_used = True
             self.get_session.add(team_subscription)
             self.get_session.merge(user)
@@ -749,7 +749,6 @@ class CustomSecurityManager(SupersetSecurityManager):
         except Exception as e:
             self.get_session.rollback()
             logging.error(e)
-            raise Exception(e)
             return False
 
     def get_subscription(self, team_id=None, sub_id=None):
