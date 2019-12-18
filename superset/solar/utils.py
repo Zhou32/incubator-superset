@@ -24,7 +24,7 @@ import os
 mp = Mixpanel('8b85dcbb1c5f693a3b045b24fca1e787')
 mp_prefix = os.getenv('SUPERSET_ENV')
 
-free_credit_in_dollor = os.getenv('FREE_CREDIT_DOLLOR')
+free_credit_in_dollar = os.getenv('FREE_CREDIT_DOLLAR')
 
 def post_request(url, params):
     import requests

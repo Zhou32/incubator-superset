@@ -634,7 +634,7 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
         for team_role in g.user.team_role:
             if team_role.team.id == team.id and team_role.role.name == 'team_owner':
                 is_team_admin = True
-        can_trial = is_team_admin and not subscription.trial_used
+        can_trial = is_team_admin and not g.user.trial_used
         payload = {
             'user': bootstrap_user_data(g.user),
             'common': BaseSupersetView().common_bootstrap_payload(),
@@ -1059,7 +1059,7 @@ class SolarBIBillingView(ModelView):
             try:
                 # team = self.appbuilder.sm.find_team(user_id=g.user.id)
                 team_sub = self.appbuilder.sm.get_subscription(team_id=team.id)
-                if team_sub.trial_used:
+                if g.user.trial_used:
                     raise json_error_response('Already used trial.')
                 stripe_sub = stripe.Subscription.retrieve(team_sub.stripe_sub_id)
                 starter_plan = self.appbuilder.get_session.query(Plan).filter_by(id=2).first()
@@ -1071,10 +1071,11 @@ class SolarBIBillingView(ModelView):
                                                                 'id': stripe_sub['items']['data'][0].id,
                                                                 'plan': starter_plan.stripe_id,
                                                             }])
-                team_sub.trial_used = True
+                g.user.trial_used = True
                 team_sub.remain_count = starter_plan.num_request
                 team_sub.plan = starter_plan.id
                 team_sub.end_time = subscription['current_period_end']
+                self.appbuilder.get_session.merge(g.user)
                 self.appbuilder.get_session.commit()
 
                 log_to_mp(g.user, team.team_name, 'start trial', {

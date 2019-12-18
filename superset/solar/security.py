@@ -33,7 +33,8 @@ from superset.solar.views import SolarBIPasswordRecoverView, SolarBIAuthDBView, 
 from superset.solar.registerviews import (
     SolarBIRegisterUserDBView, SolarBIRegisterInvitationView,
     SolarBIRegisterInvitationUserDBView,
-    SolarBICreditRegisterView
+    SolarBICreditRegisterView,
+    SolarBITrialRegisterView
 )
 from superset.solar.models import Plan, ResetRequest, Team, TeamRegisterUser, TeamSubscription, SolarBIUser, TeamRole
 from superset.security import SupersetSecurityManager
@@ -139,6 +140,7 @@ class CustomSecurityManager(SupersetSecurityManager):
     invitation_view = SolarBIRegisterInvitationUserDBView()
 
     credit_register_view = SolarBICreditRegisterView()
+    trial_register_view = SolarBITrialRegisterView()
 
     registeruserdbview = SolarBIRegisterUserDBView
     authdbview = SolarBIAuthDBView
@@ -164,6 +166,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         self.appbuilder.add_view_no_menu(self.invite_register_view)
         self.appbuilder.add_view_no_menu(self.invitation_view)
         self.appbuilder.add_view_no_menu(self.credit_register_view)
+        self.appbuilder.add_view_no_menu(self.trial_register_view)
 
     def sync_role_definitions(self):
         """Inits the Superset application with security roles and such"""
@@ -328,7 +331,7 @@ class CustomSecurityManager(SupersetSecurityManager):
         except Exception as e:
             self.get_session.rollback()
 
-    def add_team(self, user, team_name, date=None, credit=0):
+    def add_team(self, user, team_name, date=None, credit=None, plan_id=None, trial_days=None):
         new_team = self.team_model()
         new_team.team_name = team_name
         if date:
@@ -349,7 +352,7 @@ class CustomSecurityManager(SupersetSecurityManager):
 
             self.get_session.merge(user)
             self.get_session.commit()
-            self.create_stripe_user_and_sub(user, new_team, credit)
+            self.create_stripe_user_and_sub(user, new_team, credit, plan_id, trial_days)
 
             create_mp_team(new_team)
             mp_add_user_to_team(user, new_team)
@@ -706,30 +709,39 @@ class CustomSecurityManager(SupersetSecurityManager):
             # log.info(LOGMSG_WAR_SEC_LOGIN_FAILED.format(username))
             return None
 
-    def create_stripe_user_and_sub(self, user, team, credit=0):
+    def create_stripe_user_and_sub(self, user, team, credit=None, plan_id=None, trial_days=None):
         try:
             resp = stripe.Customer.create(email=user.email, name=f'{user.first_name} {user.last_name}',
                                           description=team.team_name)
             team.stripe_user_id = resp['id']
-            resp = stripe.Customer.create_balance_transaction(
-                resp['id'],
-                amount=credit * -1,
-                currency='aud'
-            )
+            if credit:
+                resp = stripe.Customer.create_balance_transaction(
+                    resp['id'],
+                    amount=credit * -1,
+                    currency='aud'
+                )
             logging.info(resp)
 
             # add subscription to free tier
-            free_plan = self.get_session.query(Plan).filter_by(id=1).first()
-            sub_resp = stripe.Subscription.create(customer=team.stripe_user_id, items=[{
-                'plan': free_plan.stripe_id,
+            if plan_id:
+                plan = self.get_session.query(Plan).filter_by(id=plan_id).first()
+            else:
+                plan = self.get_session.query(Plan).filter_by(id=1).first()
+            utc_trial_end_ts = datetime.datetime.now().timestamp()
+            sub_resp = stripe.Subscription.create(customer=team.stripe_user_id, trial_end=int(utc_trial_end_ts)+14*24*3600,
+                                                  items=[{
+                'plan': plan.stripe_id,
                 'quantity': '1'
             }])
             team_subscription = self.subscription_model()
             team_subscription.team = team.id
-            team_subscription.plan = free_plan.id
+            team_subscription.plan = plan.id
             team_subscription.stripe_sub_id = sub_resp['id']
-            team_subscription.remain_count = free_plan.num_request
+            team_subscription.remain_count = plan.num_request
+            user.trial_used = True
+            # team_subscription.trial_used = True
             self.get_session.add(team_subscription)
+            self.get_session.merge(user)
             self.get_session.commit()
 
             return True
