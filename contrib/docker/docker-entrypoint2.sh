@@ -28,6 +28,7 @@ export POSTGRES_PASSWORD=$6
 export POSTGRES_HOST=$7
 export POSTGRES_PORT=$8
 export POSTGRES_DB=$9
+export SG_API_KEY=${10}
 
 celery worker --app=superset.sql_lab:celery_app --pool=gevent -Ofair &
 gunicorn --bind  0.0.0.0:8088 \
