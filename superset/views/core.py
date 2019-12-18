@@ -56,7 +56,7 @@ from sqlalchemy import and_, or_, select
 from werkzeug.routing import BaseConverter
 from ..solar.forms import SolarBIListWidget
 from ..solar.models import Plan, TeamSubscription, Team, StripeEvent
-from ..solar.utils import set_session_team, get_session_team, log_to_mp, get_athena_query
+from ..solar.utils import set_session_team, get_session_team, log_to_mp, get_athena_query, sendgrid_email_sender
 from superset import (
     app,
     appbuilder,
@@ -1918,7 +1918,7 @@ class Superset(BaseSupersetView):
         from sendgrid import SendGridAPIClient
         from sendgrid.helpers.mail import Mail
         message = Mail(
-            from_email='no-reply@solarbi.com.au',
+            from_email=sendgrid_email_sender,
             to_emails=user.email,
         )
         message.dynamic_template_data = {
