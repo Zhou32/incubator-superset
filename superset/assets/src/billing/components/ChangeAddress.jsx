@@ -119,7 +119,7 @@ function ChangeAddress({
   return (
     <div>
       <Dialog open={open} onClose={handleChangeAddressClose} aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">Subscribe</DialogTitle>
+        <DialogTitle id="form-dialog-title">Change Address</DialogTitle>
         <DialogContent>
           <div>
             <label className={classes.label} htmlFor="country">Country</label>

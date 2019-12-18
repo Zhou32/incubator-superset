@@ -131,7 +131,12 @@
   var DefaultLoadingContainer = function DefaultLoadingContainer(props) {
     return _react2.default.createElement(
       'div',
-      null,
+      {
+        style: {
+          position: 'absolute', left: '47%', top: '50%',
+          fontSize: 16, fontFamily: 'Montserrat, sans-serif', fontWeight: 'bold',
+        }
+      },
       'Loading...'
     );
   };

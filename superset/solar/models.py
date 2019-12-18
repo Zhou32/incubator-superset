@@ -113,14 +113,15 @@ class TeamSubscription(Model):
     remain_count = Column(Integer, default=0)
     stripe_sub_id = Column(String(64))
     end_time = Column(Integer)
-    trial_used = Column(Boolean, default=False)
 
 
 class SolarBIUser(User):
     __tablename__ = 'ab_user'
     email_confirm = Column(Boolean, default=False)
     team_role = relationship('TeamRole', secondary=assoc_teamrole_user, backref='user')
+    trial_used = Column(Boolean, default=False)
     __table_args__ = {'extend_existing': True}
+
 
 class StripeEvent(Model):
     __tablename__ = 'stripe_event'
