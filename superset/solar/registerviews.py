@@ -259,7 +259,7 @@ class SolarBITrialRegisterView(SolarBIRegisterUserDBView):
 
         _ = self.sg.client.marketing.contacts.put(request_body={
             "list_ids": [
-                "eb9b2596-dea7-4dd4-af6f-9398f52ad43e"
+                "823624d1-c51e-4193-8542-3904b7586c29"
             ],
             "contacts": [
                 {
