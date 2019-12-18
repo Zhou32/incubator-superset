@@ -37,7 +37,7 @@ from .forms import (
     SolarBIRegisterInvitationUserDBForm, SolarBITeamFormWidget, SolarBIInvitationWidget,
 )
 from .models import SolarBIUser, Plan
-from .utils import post_request, get_session_team, set_session_team, log_to_mp, free_credit_in_dollar
+from .utils import post_request, get_session_team, set_session_team, log_to_mp, free_credit_in_dollar, sendgrid_email_sender
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
@@ -112,7 +112,7 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
 
     def send_sg_email(self, register_user):
         message = Mail(
-            from_email='no-reply@solarbi.com.au',
+            from_email=sendgrid_email_sender,
             to_emails=register_user.email,
         )
         url = url_for(
@@ -304,7 +304,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
             Method for sending the registration Email to the user
         """
         message = Mail(
-            from_email='no-reply@solarbi.com.au',
+            from_email=sendgrid_email_sender,
             to_emails=register_user.email,
         )
         if existed:
@@ -505,7 +505,7 @@ class SolarBIRegisterInvitationView(BaseRegisterUser):
 
     def send_sg_email(self, register_user):
         message = Mail(
-            from_email='no-reply@solarbi.com.au',
+            from_email=sendgrid_email_sender,
             to_emails=register_user.email,
         )
         url = url_for(
