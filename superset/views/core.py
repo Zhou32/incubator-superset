@@ -56,7 +56,7 @@ from sqlalchemy import and_, or_, select
 from werkzeug.routing import BaseConverter
 from ..solar.forms import SolarBIListWidget
 from ..solar.models import Plan, TeamSubscription, Team, StripeEvent
-from ..solar.utils import set_session_team, get_session_team, log_to_mp, get_athena_query
+from ..solar.utils import set_session_team, get_session_team, log_to_mp, get_athena_query, sendgrid_email_sender
 from superset import (
     app,
     appbuilder,
@@ -624,7 +624,7 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
         if subscription.end_time:
             if subscription.end_time != -1:
                 current_datetime = datetime.utcnow()
-                end_datetime = datetime.fromtimestamp(subscription.end_time)
+                end_datetime = datetime.utcfromtimestamp(subscription.end_time)
                 remain_days = (end_datetime - current_datetime).days
 
         entry_point = 'solarBI'
@@ -634,13 +634,14 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
         for team_role in g.user.team_role:
             if team_role.team.id == team.id and team_role.role.name == 'team_owner':
                 is_team_admin = True
-        can_trial = is_team_admin and not subscription.trial_used
+        can_trial = is_team_admin and not g.user.trial_used
         payload = {
             'user': bootstrap_user_data(g.user),
             'common': BaseSupersetView().common_bootstrap_payload(),
             'datasource_id': datasource_id,
             'datasource_type': 'table',
             'remain_count': subscription.remain_count,
+            'plan_id': subscription.plan,
             'remain_days': remain_days,
             'can_trial': can_trial,
         }
@@ -769,11 +770,12 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
         flash('Team Error', 'danger')
         return redirect("/")
 
-
-    @app.errorhandler(404)
-    def page_not_found(e):
-        # note that we set the 404 status explicitly
-        return redirect("/")
+    # @app.errorhandler(404)
+    # def page_not_found(self):
+    #     # note that we set the 404 status explicitly
+    #     return self.render_template(
+    #         "superset/export_dashboards.html", dashboards_url="/dashboard/list"
+    #     )
 
 
 # appbuilder.add_view(
@@ -860,6 +862,7 @@ class SolarBIBillingView(ModelView):
             'card_has_expired': card_has_expired,
             'card_expire_soon': card_expire_soon,
             'card_info': card_info,
+            'balance': cus_obj['balance'],
         }
 
         return self.render_template(
@@ -880,10 +883,10 @@ class SolarBIBillingView(ModelView):
 
         logging.info('Updating plan for {}'.format(team.team_name))
         try:
-            # stripe_customer = stripe.Customer.retrieve(id=team.stripe_user_id)
+            stripe_customer = stripe.Customer.retrieve(id=team.stripe_user_id)
 
             pm_id = team.stripe_pm_id
-            if team.stripe_pm_id is None:
+            if team.stripe_pm_id is None and stripe_customer['balance'] > -5000:
                 form_data = get_form_data()[0]['token']
                 # stripe.Customer.modify(stripe_customer.stripe_id, source=form_data['id'])
                 pm_id = form_data['id']
@@ -995,6 +998,13 @@ class SolarBIBillingView(ModelView):
                                                          'id': current_subscription['items']['data'][0].id,
                                                          'plan': plan_stripe_id}])
                 return_subscription_id = new_plan.stripe_id
+
+                # log to mixpanel
+                log_to_mp(g.user, team.team_name, 'upgrade plan', {
+                    'old plan': old_plan.plan_name,
+                    'new plan': new_plan.plan_name,
+                })
+
             elif new_plan.id < old_plan.id:
                 # get subscribe list for the team
                 sub_list = stripe.Subscription.list(customer=team.stripe_user_id)
@@ -1014,15 +1024,17 @@ class SolarBIBillingView(ModelView):
                     'quantity':'1',
                 }])
                 return_subscription_id = old_plan.stripe_id
+
+                # log to mixpanel
+                log_to_mp(g.user, team.team_name, 'downgrade plan', {
+                    'old plan': old_plan.plan_name,
+                    'new plan': new_plan.plan_name,
+                })
+
             else:
                 return_subscription_id = None
             self.appbuilder.get_session.commit()
 
-            # log to mixpanel
-            log_to_mp(g.user, team.team_name, 'change plan', {
-                'old plan': old_plan.plan_name,
-                'new plan': new_plan.plan_name,
-            })
 
             return True, return_subscription_id
         except Exception as e:
@@ -1047,7 +1059,7 @@ class SolarBIBillingView(ModelView):
             try:
                 # team = self.appbuilder.sm.find_team(user_id=g.user.id)
                 team_sub = self.appbuilder.sm.get_subscription(team_id=team.id)
-                if team_sub.trial_used:
+                if g.user.trial_used:
                     raise json_error_response('Already used trial.')
                 stripe_sub = stripe.Subscription.retrieve(team_sub.stripe_sub_id)
                 starter_plan = self.appbuilder.get_session.query(Plan).filter_by(id=2).first()
@@ -1059,10 +1071,11 @@ class SolarBIBillingView(ModelView):
                                                                 'id': stripe_sub['items']['data'][0].id,
                                                                 'plan': starter_plan.stripe_id,
                                                             }])
-                team_sub.trial_used = True
+                g.user.trial_used = True
                 team_sub.remain_count = starter_plan.num_request
                 team_sub.plan = starter_plan.id
                 team_sub.end_time = subscription['current_period_end']
+                self.appbuilder.get_session.merge(g.user)
                 self.appbuilder.get_session.commit()
 
                 log_to_mp(g.user, team.team_name, 'start trial', {
@@ -1073,7 +1086,10 @@ class SolarBIBillingView(ModelView):
 
                 return json_success(json.dumps({
                     'msg': 'Start trial successfully! You have 14 days to use 7 advance searches.',
-                    'remain_count': starter_plan.num_request}))
+                    'remain_count': starter_plan.num_request,
+                    'plan_id': 2,
+                    'remain_days': 13,
+                }))
             except ValueError as e:
                 return json_error_response(e)
             except Exception as e:
@@ -1112,7 +1128,7 @@ class SolarBIBillingView(ModelView):
             })
         except Exception as e:
             self.appbuilder.get_session.rollback()
-            logging.error(e)
+            logging.warn(e)
 
     def revert_to_free(self, event_object):
         try:
@@ -1140,7 +1156,7 @@ class SolarBIBillingView(ModelView):
             self.appbuilder.get_session.commit()
         except Exception as e:
             self.appbuilder.get_session.rollback()
-            logging.error(e)
+            logging.warn(e)
 
     @api
     @expose('/webhook', methods=['POST'])
@@ -1898,27 +1914,25 @@ class Superset(BaseSupersetView):
             Method for sending the Email to the user
         """
         log = logging.getLogger(__name__)
-        email_template = 'appbuilder/general/security/data_request_mail.html'
 
+        from sendgrid import SendGridAPIClient
+        from sendgrid.helpers.mail import Mail
+        message = Mail(
+            from_email=sendgrid_email_sender,
+            to_emails=user.email,
+        )
+        message.dynamic_template_data = {
+            'first_name': user.first_name,
+            'address_name': address_name,
+        }
+        message.template_id = 'd-d9166982344e4054a583d9b7b6ccec56'
         try:
-            from flask_mail import Mail, Message
-        except:
-            log.error("Install Flask-Mail to use Mail")
-            return False
-        mail = Mail(self.appbuilder.get_app)
-        msg = Message()
-        msg.sender = 'SolarBI', 'no-reply@solarbi.com.au'
-        msg.subject = "SolarBI - Your data request is received"
-        msg.html = self.render_template(email_template,
-                                        username=user.username,
-                                        address_name=address_name)
-        msg.recipients = [user.email]
-        try:
-            mail.send(msg)
+            sendgrid_client = SendGridAPIClient(os.environ['SG_API_KEY'])
+            _ = sendgrid_client.send(message)
+            return True
         except Exception as e:
-            log.error("Send email exception: {0}".format(str(e)))
+            log.error('Send email exception: {0}'.format(str(e)))
             return False
-        return True
 
     @event_logger.log_this
     @api
@@ -3685,9 +3699,21 @@ class Superset(BaseSupersetView):
     @app.errorhandler(500)
     def show_traceback(self):
         return (
-            render_template("superset/traceback.html", error_msg=get_error_msg()),
+            render_template("solar/500_error.html"),
             500,
         )
+        # return (
+        #     render_template("superset/traceback.html", error_msg=get_error_msg()),
+        #     500,
+        # )
+
+    @app.errorhandler(404)
+    def page_not_found(self):
+        return (
+            render_template("solar/404_error.html"),
+            404,
+        )
+
 
     @expose("/welcome")
     def welcome(self):
@@ -3930,7 +3956,7 @@ class Superset(BaseSupersetView):
         if subscription.end_time:
             if subscription.end_time != -1:
                 current_datetime = datetime.utcnow()
-                end_datetime = datetime.fromtimestamp(subscription.end_time)
+                end_datetime = datetime.utcfromtimestamp(subscription.end_time)
                 remain_days = (end_datetime - current_datetime).days
 
         # Check if the team can trial
@@ -3953,6 +3979,7 @@ class Superset(BaseSupersetView):
             'common': self.common_bootstrap_payload(),
             'remain_count': subscription.remain_count,
             'remain_days': remain_days,
+            'plan_id': subscription.plan,
             'can_trial': can_trial,
         }
         table_name = datasource.table_name \

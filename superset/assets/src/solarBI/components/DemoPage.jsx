@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -20,7 +21,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
-import Button from '@material-ui/core/Button';
+// import Button from '@material-ui/core/Button';
 import CardContent from '@material-ui/core/CardContent';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -151,8 +152,8 @@ const styles = tm => ({
 
   },
   textField: {
-    marginLeft: tm.spacing.unit,
-    marginRight: tm.spacing.unit,
+    marginLeft: tm.spacing(1),
+    marginRight: tm.spacing(1),
     width: 750,
   },
 });
@@ -208,84 +209,81 @@ class DemoPage extends React.Component {
               </AppBar>
               {value === 0 && <TabContainer>
                 <div className={classes.textWrapper}>
-                 <p className={classes.text}>
+                  <p className={classes.text}>
                     Located around 10km south-south-east of Bendigo, the centre of Victoria <br />
                     might be considered to be on the steps of the Mandurang Uniting Church.<br />
-                     No longer in use, the church sits on the site that corresponds with centroid<br />
+                    No longer in use, the church sits on the site that corresponds with centroid<br />
                     calculations from a number of different organisations, including Geoscience <br />
                     Australia, the Department of Natural Resources and Environment (DNRE), and <br />
                     the Department of Geospatial Science, Royal Melbourne Institute of Technology (RMIT).<br />
                     <br />
                     <br />
                     Location: 42° 01' 17" South, 146° 35' 36" East
-                    </p>
-
+                  </p>
                 </div>
               </TabContainer>}
               {value === 1 && <TabContainer>
-              <div className={classes.textWrapper}>
-                <p className={classes.text}>
-                One possible definition of the centre for New South Wales is located just off Cockies Road, <br />
-                33km west-north-west of Tottenham (Tottenham is 110km west of Dubbo). This spot, <br />
-                south of the Fiveways Intersection, is marked by a large sign, constructed for Australia's <br />
-                Bicentennial celebrations.
-                <br />
-                <br />
-                Location: 32° 09' 48" South, 147° 01' 00" East</p>
+                <div className={classes.textWrapper}>
+                  <p className={classes.text}>
+                    One possible definition of the centre for New South Wales is located just off Cockies Road, <br />
+                    33km west-north-west of Tottenham (Tottenham is 110km west of Dubbo). This spot, <br />
+                    south of the Fiveways Intersection, is marked by a large sign, constructed for Australia's <br />
+                    Bicentennial celebrations.<br />
+                    <br />
+                    Location: 32° 09' 48" South, 147° 01' 00" East</p>
                 </div>
               </TabContainer>}
               {value === 2 && <TabContainer>
                 <p className={classes.text}>
-                In Queensland, the geographical centre is located 17km north-west of Muttaburra. <br />
-                Also famous from a paleontological perspective, this region was once a pre-historic inland sea.<br />
-                A wealth of fossilized remains has been uncovered here, and when a previously <br />
-                undiscovered species was found, it was became known as the Muttaburrasaurus.<br />
-                <br />
-                <br />
-                Location: 22° 29' 13" South, 144° 25' 54" East</p>
+                  In Queensland, the geographical centre is located 17km north-west of Muttaburra. <br />
+                  Also famous from a paleontological perspective, this region was once a pre-historic inland sea.<br />
+                  A wealth of fossilized remains has been uncovered here, and when a previously <br />
+                  undiscovered species was found, it was became known as the Muttaburrasaurus.<br />
+                  <br />
+                  <br />
+                  Location: 22° 29' 13" South, 144° 25' 54" East</p>
               </TabContainer>}
               {value === 3 && <TabContainer>
                 <p className={classes.text}>
-                Using the method described earlier, one estimate of where the centre of the<br />
-                Northern Territory lies can be found approximately 91 km west-north-west of<br />
-                Tennant Creek. A short distance past the Kartijirarrakanya Claypan, <br />
-                this centre is in a particularly harsh, arid part of the territory.
-                <br />
-                <br />
-                Location: 19° 23' 00" South, 133° 21' 28" East</p>
+                  Using the method described earlier, one estimate of where the centre of the<br />
+                  Northern Territory lies can be found approximately 91 km west-north-west of<br />
+                  Tennant Creek. A short distance past the Kartijirarrakanya Claypan, <br />
+                  this centre is in a particularly harsh, arid part of the territory.<br />
+                  <br />
+                  Location: 19° 23' 00" South, 133° 21' 28" East</p>
               </TabContainer>}
               {value === 4 && <TabContainer>
                 <p className={classes.text}>
-                Despite three sides of its border being straight lines, defining the centre of<br />
-                South Australia is no easier thanks to an irregular shaped coastline.<br />
-                According to one method, the centre is near the Churchill Smith bore, <br />
-                which is approximately 12km north-east of the Mt Eba cattle station.<br />
-                In relation to more commonly known landmarks, the centre of <br />
-                South Australia is located some distance south-west of Lake Eyre.<br />
-                <br />
-                <br />
-                Location: 30° 03' 30" South, 135° 45' 48" East</p>
+                  Despite three sides of its border being straight lines, defining the centre of<br />
+                  South Australia is no easier thanks to an irregular shaped coastline.<br />
+                  According to one method, the centre is near the Churchill Smith bore, <br />
+                  which is approximately 12km north-east of the Mt Eba cattle station.<br />
+                  In relation to more commonly known landmarks, the centre of <br />
+                  South Australia is located some distance south-west of Lake Eyre.<br />
+                  <br />
+                  <br />
+                  Location: 30° 03' 30" South, 135° 45' 48" East</p>
               </TabContainer>}
               {value === 5 && <TabContainer>
                 <p className={classes.text}>
-                In Western Australia, what could be called the centre is found in the<br />
-                Gascoyne Region, east south-east of the Glenayle Homestead and north<br />
-                east of the Glenayle - Carnegie Road.<br />
-                <br />
-                <br />
-                Location: 25° 19' 41" South, 122° 17' 54" East</p>
+                  In Western Australia, what could be called the centre is found in the<br />
+                  Gascoyne Region, east south-east of the Glenayle Homestead and north<br />
+                  east of the Glenayle - Carnegie Road.<br />
+                  <br />
+                  <br />
+                  Location: 25° 19' 41" South, 122° 17' 54" East</p>
               </TabContainer>}
               {value === 6 && <TabContainer>
                 <p className={classes.text}>
-                One possible centre for Tasmania is found on the western shore of Little Pine Lagoon.<br />
-                This small lake lies next to the Marlborough Highway, between the towns of Bronte and Miena.<br />
-                On the Lyell Highway, just a short distance east of Bronte, lies a cairn which was erected<br />
-                in 1983 by members of the Institution of Surveyors (Australian Tasmanian Division). <br />
-                This marker commemorates the early surveyors who explored and mapped the state, <br />
-                and marks Trig Point 715 - said to be near the geographical centre.<br />
-                <br />
-                <br />
-                Location: 42° 01' 17" South, 146° 35' 36" East</p>
+                  One possible centre for Tasmania is found on the western shore of Little Pine Lagoon.<br />
+                  This small lake lies next to the Marlborough Highway, between the towns of Bronte and Miena.<br />
+                  On the Lyell Highway, just a short distance east of Bronte, lies a cairn which was erected<br />
+                  in 1983 by members of the Institution of Surveyors (Australian Tasmanian Division). <br />
+                  This marker commemorates the early surveyors who explored and mapped the state, <br />
+                  and marks Trig Point 715 - said to be near the geographical centre.<br />
+                  <br />
+                  <br />
+                  Location: 42° 01' 17" South, 146° 35' 36" East</p>
               </TabContainer>}
             </div>
           </CardContent>

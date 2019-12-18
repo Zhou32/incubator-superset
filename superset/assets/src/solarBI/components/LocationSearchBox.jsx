@@ -39,8 +39,8 @@ const propTypes = {
 
 const styles = tm => ({
   textField: {
-    marginLeft: tm.spacing.unit,
-    marginRight: tm.spacing.unit,
+    marginLeft: tm.spacing(1),
+    marginRight: tm.spacing(1),
     width: 750,
   },
   button: {
@@ -58,7 +58,7 @@ const styles = tm => ({
     marginLeft: 20,
   },
   icon: {
-    margin: tm.spacing.unit,
+    margin: tm.spacing(1),
   },
   input: {
     margin: '50 40',
