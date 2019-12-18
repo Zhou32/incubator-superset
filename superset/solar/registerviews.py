@@ -23,7 +23,7 @@ import stripe
 
 from flask import flash, redirect, url_for, g, request, make_response, jsonify, session
 from flask_babel import lazy_gettext
-from flask_mail import Mail, Message
+# from flask_mail import Mail, Message
 
 from flask_appbuilder._compat import as_unicode
 from flask_appbuilder import const as c, has_access
@@ -39,7 +39,7 @@ from .forms import (
 from .models import SolarBIUser
 from .utils import post_request, get_session_team, set_session_team, log_to_mp
 from sendgrid import SendGridAPIClient
-from mailchimp3 import MailChimp
+from sendgrid.helpers.mail import Mail
 
 log = logging.getLogger(__name__)
 
@@ -74,18 +74,9 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
         # self.handle_aws_info(org_reg, user)
         self.appbuilder.sm.del_register_user(reg)
 
-        # Create user in Mailchimp
-        # self.mc_client.lists.members.create(list_id='c257103535', data={
-        #     'email_address': user.email,
-        #     'status': 'subscribed',
-        #     'merge_fields': {
-        #         'FNAME': user.first_name,
-        #         'LNAME': user.last_name,
-        #     },
-        # })
         _ = self.sg.client.marketing.contacts.put(request_body={
             "list_ids": [
-                "eb9b2596-dea7-4dd4-af6f-9398f52ad43e"
+                "823624d1-c51e-4193-8542-3904b7586c29"
             ],
             "contacts": [
                 {
@@ -119,32 +110,28 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
             form.email.validators.append(Unique(datamodel_user, 'email'))
             form.email.validators.append(Unique(datamodel_register_user, 'email'))
 
-    @expose('/here/')
-    def handle_aws_info(self, team, user):
-        info = post_request('https://3ozse3mao8.execute-api.ap-southeast-2.amazonaws.com/test/createteam',
-                            {"team_name": team.team_name, "team_id": team.id})
-        aws_info = json.loads(info.text)
-        access_key = aws_info['AccessKeyId']
-        secret_key = aws_info['SecretAccessKey']
-        athena_link = f'awsathena+jdbc://{access_key}:{secret_key}@athena.ap-southeast-2.amazonaws.com/awesome_demo?s3_staging_dir=s3://a.meter-test.dex/test_query_result'
-        self.testconn(athena_link, team, user)
-
-    def testconn(self, athena_link, team, user):
-        """Tests a sqla connection"""
-        from ..views.base import json_error_response
-
-        times_trail = 3
-
-        for i in range(times_trail):
-            try:
-                time.sleep(5)
-                self.appbuilder.sm.create_db_role(team.team_name, athena_link, user)
-                break
-            except Exception as e:
-                if i == times_trail-1:
-                    logging.exception(e)
-                    return json_error_response(('Connection failed!\n\n'
-                                                'The error message returned was:\n{}').format(e))
+    def send_sg_email(self, register_user):
+        message = Mail(
+            from_email='no-reply@solarbi.com.au',
+            to_emails=register_user.email,
+        )
+        url = url_for(
+            ".activation",
+            _external=True,
+            activation_hash=register_user.registration_hash,
+        )
+        message.dynamic_template_data = {
+            'url': url,
+            'first_name': register_user.first_name,
+        }
+        message.template_id = 'd-41d88127f1e14a28b1fedc2e0b456657'
+        try:
+            sendgrid_client = SendGridAPIClient(os.environ['SG_API_KEY'])
+            _ = sendgrid_client.send(message)
+            return True
+        except Exception as e:
+            log.error('Send email exception: {0}'.format(str(e)))
+            return False
 
     def add_registration_team_admin(self, **kwargs):
         """
@@ -165,8 +152,7 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
                 self.appbuilder.sm.del_register_user(register_user)
                 return None
 
-            if self.send_email(register_user):
-                print('send success')
+            if self.send_sg_email(register_user):
                 flash(as_unicode(lazy_gettext("Register success! An activation email has been sent to you.")), 'info')
                 return register_user
             else:
@@ -215,7 +201,7 @@ class SolarBICreditRegisterView(SolarBIRegisterUserDBView):
 
         _ = self.sg.client.marketing.contacts.put(request_body={
             "list_ids": [
-                "eb9b2596-dea7-4dd4-af6f-9398f52ad43e"
+                "823624d1-c51e-4193-8542-3904b7586c29"
             ],
             "contacts": [
                 {
@@ -255,35 +241,38 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
     email_template = 'appbuilder/general/security/team_member_invitation_mail.html'
     edit_widget = SolarBITeamFormWidget
 
-    def send_email(self, register_user, existed=False):
+    def send_sg_email(self, register_user, existed=False):
         """
             Method for sending the registration Email to the user
         """
-        mail = Mail(self.appbuilder.get_app)
-        msg = Message()
-        msg.sender = 'SolarBI', 'no-reply@solarbi.com.au'
+        message = Mail(
+            from_email='no-reply@solarbi.com.au',
+            to_emails=register_user.email,
+        )
         if existed:
-            msg.subject = "SolarBI - You have been added to a new team"
-            msg.html = self.render_template('appbuilder/general/security/new_team_invitation_mail.html',
-                                            invited_first=register_user.first_name,
-                                            invited_last=register_user.last_name,
-                                            team_name=get_session_team(self.appbuilder.sm, g.user.id)[1],
-                                            team_admin_first=g.user.first_name,
-                                            team_admin_last=g.user.last_name)
+            message.dynamic_template_data = {
+                'invited_first': register_user.first_name,
+                'invited_last': register_user.last_name,
+                'team_name': get_session_team(self.appbuilder.sm, g.user.id)[1],
+                'team_admin_first': g.user.first_name,
+                'team_admin_last': g.user.last_name,
+            }
+            message.template_id = 'd-3904a5fe60184bb3a99ebed1664f924a'
         else:
-            msg.subject = self.email_subject
             url = self.appbuilder.sm.get_url_for_invitation(register_user.registration_hash)
-            msg.html = self.render_template(self.email_template,
-                                            url=url,
-                                            team_name=register_user.team)
+            message.dynamic_template_data = {
+                'url': url,
+                'team_name': register_user.team,
+            }
+            message.template_id = 'd-58f22673cff740019dd94fa9d118b73a'
 
-        msg.recipients = [register_user.email]
         try:
-            mail.send(msg)
+            sendgrid_client = SendGridAPIClient(os.environ['SG_API_KEY'])
+            _ = sendgrid_client.send(message)
+            return True
         except Exception as e:
             log.error("Send email exception: {0}".format(str(e)))
             return False
-        return True
 
     def add_form_unique_validations(self, form):
         datamodel_user = self.appbuilder.sm.get_user_datamodel
@@ -344,7 +333,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
                 reg_user, existed = self.appbuilder.sm.add_invite_register_user(email=form.email.data, team=team,
                                                                                 role=role_id, inviter=user_id)
                 if reg_user:
-                    if self.send_email(reg_user, existed):
+                    if self.send_sg_email(reg_user, existed):
                         if not existed:
                             flash(as_unicode('Invitation sent to %s' % form.email.data), 'info')
                         else:
@@ -359,12 +348,6 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
                 return redirect('/solar/my-team')
         else:
             flash(as_unicode('Invalid email'), 'danger')
-            # widgets = self._get_edit_widget(form=form)
-            # return self.render_template(self.form_template,
-            #                             title=self.form_title,
-            #                             widgets=widgets,
-            #                             appbuilder=self.appbuilder
-            #                             )
             return redirect('/solar/my-team')
 
     @expose('/update-team-name', methods=['POST'])
@@ -408,7 +391,7 @@ class SolarBIRegisterInvitationUserDBView(RegisterUserDBView):
                                                                         role=role_id,
                                                                         inviter=g.user.id)
         if reg_user:
-            if self.send_email(reg_user, existed):
+            if self.send_sg_email(reg_user, existed):
                 flash(as_unicode('Resend invitation to %s' % user_email), 'info')
                 return jsonify(dict(redirect='/solar/my-team'))
             else:
@@ -441,26 +424,49 @@ class SolarBIRegisterInvitationView(BaseRegisterUser):
     email_template = 'appbuilder/general/security/account_activation_mail.html'
     email_subject = 'SolarBI - Team Member Activation'
 
-    def send_email(self, register_user):
-        """
-            Method for sending the registration Email to the user
-        """
-        mail = Mail(self.appbuilder.get_app)
-        msg = Message()
-        msg.sender = 'SolarBI', 'no-reply@solarbi.com.au'
-        msg.subject = self.email_subject
-        url = url_for('.activate', _external=True, invitation_hash=register_user.registration_hash)
-        msg.html = self.render_template(self.email_template,
-                                        url=url,
-                                        username=register_user.username,
-                                        team_name=register_user.team)
-        msg.recipients = [register_user.email]
+    # def send_email(self, register_user):
+    #     """
+    #         Method for sending the registration Email to the user
+    #     """
+    #     mail = Mail(self.appbuilder.get_app)
+    #     msg = Message()
+    #     msg.sender = 'SolarBI', 'no-reply@solarbi.com.au'
+    #     msg.subject = self.email_subject
+    #     url = url_for('.activate', _external=True, invitation_hash=register_user.registration_hash)
+    #     msg.html = self.render_template(self.email_template,
+    #                                     url=url,
+    #                                     username=register_user.username,
+    #                                     team_name=register_user.team)
+    #     msg.recipients = [register_user.email]
+    #     try:
+    #         mail.send(msg)
+    #     except Exception as e:
+    #         log.error('Send email exception: {0}'.format(str(e)))
+    #         return False
+    #     return True
+
+    def send_sg_email(self, register_user):
+        message = Mail(
+            from_email='no-reply@solarbi.com.au',
+            to_emails=register_user.email,
+        )
+        url = url_for(
+            ".activation",
+            _external=True,
+            activation_hash=register_user.registration_hash,
+        )
+        message.dynamic_template_data = {
+            'url': url,
+            'first_name': register_user.first_name,
+        }
+        message.template_id = 'd-41d88127f1e14a28b1fedc2e0b456657'
         try:
-            mail.send(msg)
+            sendgrid_client = SendGridAPIClient(os.environ['SG_API_KEY'])
+            _ = sendgrid_client.send(message)
+            return True
         except Exception as e:
             log.error('Send email exception: {0}'.format(str(e)))
             return False
-        return True
 
     @expose('/invitation/<string:invitation_hash>', methods=['GET'])
     def invitation(self, invitation_hash):
@@ -493,7 +499,7 @@ class SolarBIRegisterInvitationView(BaseRegisterUser):
                                                                              username=form.username.data,
                                                                              password=form.password.data,)
         if register_user:
-            if self.send_email(register_user):
+            if self.send_sg_email(register_user):
                 flash(as_unicode(self.activation_message), 'info')
                 return self.appbuilder.get_url_for_index
             else:
@@ -539,7 +545,7 @@ class SolarBIRegisterInvitationView(BaseRegisterUser):
         # })
         _ = self.sg.client.marketing.contacts.put(request_body={
             "list_ids": [
-                "eb9b2596-dea7-4dd4-af6f-9398f52ad43e"
+                "823624d1-c51e-4193-8542-3904b7586c29"
             ],
             "contacts": [
                 {
