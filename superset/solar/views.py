@@ -119,35 +119,33 @@ class SolarBIAuthDBView(AuthDBView):
         if not register_user:
             return jsonify(dict(err="Sorry we cannot find the email"))
 
-        mail = Mail(self.appbuilder.get_app)
-        msg = Message()
-        msg.sender = 'SolarBI', 'no-reply@solarbi.com.au'
-
-        # is None -> team admin
+        message = Mail(
+            from_email='no-reply@solarbi.com.au',
+            to_emails=register_user.email,
+        )
         if register_user.inviter is None:
-            msg.subject = 'SolarBI - Team Created Confirmation'
             url = url_for('SolarBIRegisterUserDBView.activation',
                           _external=True,
                           activation_hash=register_user.registration_hash)
         else:
-            msg.subject = 'SolarBI - Team Member Activation'
             url = url_for('SolarBIRegisterInvitationView.activate',
                           _external=True,
                           invitation_hash=register_user.registration_hash)
 
-        msg.html = self.render_template(self.email_template,
-                                        url=url,
-                                        username=register_user.username)
-        msg.recipients = [register_user.email]
+        message.dynamic_template_data = {
+            'url': url,
+            'first_name': register_user.first_name,
+        }
+        message.template_id = 'd-41d88127f1e14a28b1fedc2e0b456657'
         try:
-            mail.send(msg)
+            sendgrid_client = SendGridAPIClient(os.environ['SG_API_KEY'])
+            _ = sendgrid_client.send(message)
+            flash(as_unicode("Resend activation email success. Please check your email."), 'info')
+            return jsonify(dict(redirect='/login'))
         except Exception as e:
             log.error('Send email exception: {0}'.format(str(e)))
             flash(as_unicode("Snd email exception: " + str(e)), 'danger')
             return jsonify(dict(redirect='/login'))
-
-        flash(as_unicode("Resend activation email success. Please check your email."), 'info')
-        return jsonify(dict(redirect='/login'))
 
 
 class SolarBIPasswordRecoverView(PublicFormView):
@@ -383,6 +381,10 @@ class SolarBIUserInfoEditView(UserInfoEditView):
         #     flash(as_unicode(self.message), "info")
 
     def is_in_sg(self):
+        # First check the 50 most recent changed contacts
+        response1 = self.sg.client.marketing.lists._('823624d1-c51e-4193-8542-3904b7586c29?contact_sample=true').get()
+
+
         response = self.sg.client.marketing.contacts.search.post(request_body={
             "query": "email LIKE '" + g.user.email + "' AND CONTAINS(list_ids, '823624d1-c51e-4193-8542-3904b7586c29')"
         })
