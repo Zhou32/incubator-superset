@@ -1914,27 +1914,25 @@ class Superset(BaseSupersetView):
             Method for sending the Email to the user
         """
         log = logging.getLogger(__name__)
-        email_template = 'appbuilder/general/security/data_request_mail.html'
 
+        from sendgrid import SendGridAPIClient
+        from sendgrid.helpers.mail import Mail
+        message = Mail(
+            from_email='no-reply@solarbi.com.au',
+            to_emails=user.email,
+        )
+        message.dynamic_template_data = {
+            'first_name': user.first_name,
+            'address_name': address_name,
+        }
+        message.template_id = 'd-d9166982344e4054a583d9b7b6ccec56'
         try:
-            from flask_mail import Mail, Message
-        except:
-            log.error("Install Flask-Mail to use Mail")
-            return False
-        mail = Mail(self.appbuilder.get_app)
-        msg = Message()
-        msg.sender = 'SolarBI', 'no-reply@solarbi.com.au'
-        msg.subject = "SolarBI - Your data request is received"
-        msg.html = self.render_template(email_template,
-                                        username=user.username,
-                                        address_name=address_name)
-        msg.recipients = [user.email]
-        try:
-            mail.send(msg)
+            sendgrid_client = SendGridAPIClient(os.environ['SG_API_KEY'])
+            _ = sendgrid_client.send(message)
+            return True
         except Exception as e:
-            log.error("Send email exception: {0}".format(str(e)))
+            log.error('Send email exception: {0}'.format(str(e)))
             return False
-        return True
 
     @event_logger.log_this
     @api
