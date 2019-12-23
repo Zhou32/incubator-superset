@@ -81,12 +81,12 @@ SECRET_KEY = "\2\1thisismyscretkey\1\2\e\y\y\h"  # noqa
 # The SQLAlchemy connection string.
 # SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(DATA_DIR, "superset.db")
 # SQLALCHEMY_DATABASE_URI = 'mysql://myapp@localhost/myapp'
-SQLALCHEMY_DATABASE_URI = 'postgresql://%s:%s@%s:%s/%s' % (os.environ["POSTGRES_USER"],
-                                                           os.environ["POSTGRES_PASSWORD"],
-                                                           os.environ["POSTGRES_HOST"],
-                                                           os.environ["POSTGRES_PORT"],
-                                                           os.environ["POSTGRES_DB"])
-
+# SQLALCHEMY_DATABASE_URI = 'postgresql://%s:%s@%s:%s/%s' % (os.environ["POSTGRES_USER"],
+#                                                            os.environ["POSTGRES_PASSWORD"],
+#                                                            os.environ["POSTGRES_HOST"],
+#                                                            os.environ["POSTGRES_PORT"],
+#                                                            os.environ["POSTGRES_DB"])
+SQLALCHEMY_DATABASE_URI = 'mysql://root:' + os.environ["TEST_MYSQL_PASSWORD"] + '@localhost:3306/solarbi_test'
 # SQLALCHEMY_DATABASE_URI = 'mysql://%s:%s@%s:%s/%s' % (os.environ["MYSQL_USER"],
 #                                                       os.environ["MYSQL_PASSWORD"],
 #                                                       os.environ["MYSQL_HOST"],
