@@ -33,10 +33,11 @@ RUN apt-get install -y build-essential libssl-dev \
     libffi-dev python3-dev libsasl2-dev libldap2-dev libxi-dev
 
 # Install extra useful tool for development
-RUN apt-get install -y vim less postgresql-client redis-tools
+RUN apt-get install -y vim less redis-tools
 
 RUN apt-get install -y default-jdk-headless
 
+RUN apt-get install libxml2-dev libxslt1-dev zlib1g-dev -y
 
 
 # Install nodejs for custom build
@@ -86,18 +87,19 @@ ENV SMTP_PASSWORD SMTP_PASSWORD
 ENV STRIPE_SK STRIPE_SK
 ENV STRIPE_PK STRIPE_PK
 
-ENV POSTGRES_USER POSTGRES_USER
-ENV POSTGRES_PASSWORD POSTGRES_PASSWORD
-ENV POSTGRES_HOST POSTGRES_HOST
-ENV POSTGRES_PORT POSTGRES_PORT
-ENV POSTGRES_DB POSTGRES_DB
+ENV MYSQL_USER MYSQL_USER
+ENV MYSQL_PASSWORD MYSQL_PASSWORD
+ENV MYSQL_HOST MYSQL_HOST
+ENV MYSQL_PORT MYSQL_PORT
+ENV MYSQL_DB MYSQL_DB
 ENV SG_API_KEY SG_API_KEY
+ENV VERSION VERSION
 
 USER root
 RUN ["chmod", "+x", "/entrypoint.sh"]
 
 USER superset
-ENTRYPOINT /entrypoint.sh $SMTP_USERNAME $SMTP_PASSWORD $STRIPE_SK $STRIPE_PK $POSTGRES_USER $POSTGRES_PASSWORD $POSTGRES_HOST $POSTGRES_PORT $POSTGRES_DB $SG_API_KEY
+ENTRYPOINT /entrypoint.sh $SMTP_USERNAME $SMTP_PASSWORD $STRIPE_SK $STRIPE_PK $MYSQL_USER $MYSQL_PASSWORD $MYSQL_HOST $MYSQL_PORT $MYSQL_DB $SG_API_KEY $VERSION
 
 
 HEALTHCHECK CMD ["curl", "-f", "http://localhost:8088/health"]
