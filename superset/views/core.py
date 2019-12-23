@@ -3964,7 +3964,7 @@ class Superset(BaseSupersetView):
         for team_role in g.user.team_role:
             if team_role.team.id == team.id and team_role.role.name == 'team_owner':
                 can_trial = True
-        can_trial = can_trial and not subscription.trial_used
+        can_trial = can_trial and not g.user.trial_used
         bootstrap_data = {
             'can_add': slice_add_perm,
             'can_download': slice_download_perm,
