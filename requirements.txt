@@ -93,3 +93,4 @@ sendgrid==6.1.0
 stripe==2.37.2
 PyAthenaJDBC==2.0.5
 redis==3.2.1
+mysqlclient==1.4.6
