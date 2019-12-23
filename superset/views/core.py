@@ -925,9 +925,12 @@ class SolarBIBillingView(ModelView):
             if form_data['abn']:
                 stripe.Customer.create_tax_id(cus_id, type="au_abn", value=form_data['abn'])
 
-        _ = stripe.Customer.modify(cus_id, address={'country': form_data['country'], 'state': form_data['state'],
-                                                    'postal_code': form_data['postal_code'], 'city': form_data['city'],
-                                                    'line1': form_data['line1'], 'line2': form_data['line2']})
+        _ = stripe.Customer.modify(cus_id,
+                                   name=form_data['name'],
+                                   email=form_data['email'],
+                                   address={'country': form_data['country'], 'state': form_data['state'],
+                                            'postal_code': form_data['postal_code'], 'city': form_data['city'],
+                                            'line1': form_data['line1'], 'line2': form_data['line2']})
 
         return json_success(json.dumps({'msg': 'Successfully changed billing detail!'}))
 
