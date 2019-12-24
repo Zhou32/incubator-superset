@@ -764,11 +764,11 @@ class SolarBIBillingView(ModelView):
         # Check remain day of the subscription, if passed 14 days change to free plan
         need_update_cc = False
         if team_sub.end_time and team_sub.end_time != -1:
-            need_update_cc = True
             current_time = datetime.utcnow()
             end_datetime = datetime.utcfromtimestamp(team_sub.end_time)
             remain_days = (current_time - end_datetime).days
             if remain_days >= 14:
+                need_update_cc = True
                 self.revert_to_free(team)
 
         plan = self.appbuilder.get_session.query(Plan).filter_by(id=team_sub.plan).first()
