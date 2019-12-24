@@ -56,7 +56,7 @@ from sqlalchemy import and_, or_, select
 from werkzeug.routing import BaseConverter
 from ..solar.forms import SolarBIListWidget
 from ..solar.models import Plan, TeamSubscription, Team, StripeEvent
-from ..solar.utils import set_session_team, get_session_team, log_to_mp, get_athena_query, sendgrid_email_sender
+from ..solar.utils import set_session_team, get_session_team, log_to_mp, get_athena_query, send_sendgrid_email
 from superset import (
     app,
     appbuilder,
@@ -723,40 +723,6 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
             bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
         )
 
-    # @expose('/billing', methods=['GET', 'POST'])
-    # def billing(self):
-    #     if not g.user or not g.user.get_id():
-    #         return redirect(appbuilder.get_url_for_login)
-    #     team = self.appbuilder.sm.find_team(user_id=g.user.id)
-    #     logging.info(team.stripe_user_id)
-    #     entry_point = 'solarBI'
-    #
-    #     datasource_id = self.get_solar_datasource()
-    #
-    #     # welcome_dashboard_id = (
-    #     #     db.session
-    #     #     .query(UserAttribute.welcome_dashboard_id)
-    #     #     .filter_by(user_id=g.user.get_id())
-    #     #     .scalar()
-    #     # )
-    #     # if welcome_dashboard_id:
-    #     #     return self.dashboard(str(welcome_dashboard_id))
-    #
-    #     payload = {
-    #         'user': bootstrap_user_data(g.user),
-    #         'common': BaseSupersetView().common_bootstrap_payload(),
-    #         'datasource_id': datasource_id,
-    #         'datasource_type': 'table',
-    #         'entry': 'add',
-    #     }
-    #
-    #     return self.render_template(
-    #         'solar/billing.html',
-    #         entry=entry_point,
-    #         title='Billing - SolarBI',
-    #         bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
-    #     )
-
     @expose('/switch_team/<team_id>', methods=['GET'])
     def switch_team(self, team_id):
         if not g.user or not g.user.get_id():
@@ -770,35 +736,6 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
         flash('Team Error', 'danger')
         return redirect("/")
 
-    # @app.errorhandler(404)
-    # def page_not_found(self):
-    #     # note that we set the 404 status explicitly
-    #     return self.render_template(
-    #         "superset/export_dashboards.html", dashboards_url="/dashboard/list"
-    #     )
-
-
-# appbuilder.add_view(
-#     SolarBIModelAddView,
-#     'Search your Location',
-#     href='/solar/add',
-#     label=__('Search'),
-#     icon='fa-search',
-#     category='SolarBI',
-#     category_label=__('SolarBI'),
-#     category_icon='fa-sun-o',
-# )
-#
-# appbuilder.add_view(
-#     SolarBIModelWelcomeView,
-#     'Introduction',
-#     href='/solar/welcome',
-#     label=__('Welcome'),
-#     icon='fa-home',
-#     category='SolarBI',
-#     category_label=__('SolarBI'),
-#     category_icon='fa-sun-o',
-# )
 
 appbuilder.add_view(
     SolarBIModelView,
@@ -823,6 +760,17 @@ class SolarBIBillingView(ModelView):
 
         team = self.appbuilder.get_session.query(Team).filter_by(id=session['team_id']).first()
         team_sub = self.appbuilder.sm.get_subscription(team_id=team.id)
+
+        # Check remain day of the subscription, if passed 14 days change to free plan
+        need_update_cc = False
+        if team_sub.end_time and team_sub.end_time != -1:
+            need_update_cc = True
+            current_time = datetime.utcnow()
+            end_datetime = datetime.utcfromtimestamp(team_sub.end_time)
+            remain_days = (current_time - end_datetime).days
+            if remain_days >= 14:
+                self.revert_to_free(team)
+
         plan = self.appbuilder.get_session.query(Plan).filter_by(id=team_sub.plan).first()
         # Retrieve customer basic information
         cus_obj = stripe.Customer.retrieve(team.stripe_user_id)
@@ -863,6 +811,7 @@ class SolarBIBillingView(ModelView):
             'card_expire_soon': card_expire_soon,
             'card_info': card_info,
             'balance': cus_obj['balance'],
+            'need_update_cc': need_update_cc,
         }
 
         return self.render_template(
@@ -874,8 +823,8 @@ class SolarBIBillingView(ModelView):
 
     @api
     @handle_api_exception
-    @expose('/change_plan/<plan_id>/', methods=['GET', 'POST'])
-    def change_plan(self, plan_id=None):
+    @expose('/change_plan/<plan_id>/<update_cc>', methods=['GET', 'POST'])
+    def change_plan(self, plan_id=None, update_cc=False):
         if not g.user or not g.user.get_id():
             return json_error_response('Incorrect call to endpoint')
         team = self.appbuilder.sm.find_team(team_id=session['team_id'])
@@ -886,7 +835,7 @@ class SolarBIBillingView(ModelView):
             stripe_customer = stripe.Customer.retrieve(id=team.stripe_user_id)
 
             pm_id = team.stripe_pm_id
-            if team.stripe_pm_id is None and stripe_customer['balance'] > -5000:
+            if update_cc:
                 form_data = get_form_data()[0]['token']
                 # stripe.Customer.modify(stripe_customer.stripe_id, source=form_data['id'])
                 pm_id = form_data['id']
@@ -1005,6 +954,11 @@ class SolarBIBillingView(ModelView):
                     'new plan': new_plan.plan_name,
                 })
 
+                message = {
+                    "new_plan_name":new_plan.plan_name
+                }
+                template_id = 'd-58fa993811e2490aac30a2acc047e08e'
+
             elif new_plan.id < old_plan.id:
                 # get subscribe list for the team
                 sub_list = stripe.Subscription.list(customer=team.stripe_user_id)
@@ -1030,13 +984,18 @@ class SolarBIBillingView(ModelView):
                     'old plan': old_plan.plan_name,
                     'new plan': new_plan.plan_name,
                 })
+                message = {
+                    "new_plan_name": new_plan.plan_name
+                }
+                template_id = 'd-81ed56fd6c924e3b8337c3cce9fbd17b'
 
             else:
                 return_subscription_id = None
             self.appbuilder.get_session.commit()
 
-
+            _ = send_sendgrid_email(g.user, message, template_id)
             return True, return_subscription_id
+
         except Exception as e:
             self.appbuilder.get_session.rollback()
             logging.error(e)
@@ -1084,6 +1043,10 @@ class SolarBIBillingView(ModelView):
                     'trial end': team_sub.end_time,
                 })
 
+                template_id = 'd-db96cb2be4764a25bf8417f85c2045ba'
+
+                send_sendgrid_email(g.user, {}, template_id)
+
                 return json_success(json.dumps({
                     'msg': 'Start trial successfully! You have 14 days to use 7 advance searches.',
                     'remain_count': starter_plan.num_request,
@@ -1106,43 +1069,54 @@ class SolarBIBillingView(ModelView):
             for item in paid_list:
                 logging.info(f'Customer {event_object["customer_name"]} Item {item["plan"]["nickname"]}')
 
+
         try:
             stripe_plan = paid_list[0]
             local_plan = self.appbuilder.get_session.query(Plan).filter_by(stripe_id=stripe_plan["plan"]['id']).first()
 
-            # Fetch team_subscription by the subscription on invoice
-            team_sub = self.appbuilder.sm.get_subscription(sub_id=stripe_plan['subscription'])
+            # Mute renew for free plan
+            if local_plan.id != 1:
 
-            # Set subscribed plan to the plan on the invoice, and reset remain count
-            # This event should happen only when customer upgrade to paid from free for the first time and paid upfront,
-            # or at the start of new billing cycle. So it is safe to reset.
-            if team_sub is None:
-                raise Exception('team subscription not found')
-            team_sub.plan = local_plan.id
-            team_sub.remain_count = local_plan.num_request
-            team_sub.end_time = stripe_plan['period']['end']
-            team = self.appbuilder.sm.find_team(team_id=team_sub.team)
-            self.appbuilder.get_session.commit()
-            log_to_mp(None, team.team_name, 'auto renew successful', {
-                'plan': local_plan.plan_name,
-            })
+                # Fetch team_subscription by the subscription on invoice
+                team_sub = self.appbuilder.sm.get_subscription(sub_id=stripe_plan['subscription'])
+
+                # Set subscribed plan to the plan on the invoice, and reset remain count
+                # This event should happen only when customer upgrade to paid from free for the first time and paid upfront,
+                # or at the start of new billing cycle. So it is safe to reset.
+                if team_sub is None:
+                    raise Exception('team subscription not found')
+                team_sub.plan = local_plan.id
+                team_sub.remain_count = local_plan.num_request
+                team_sub.end_time = stripe_plan['period']['end']
+                team = self.appbuilder.sm.find_team(team_id=team_sub.team)
+                self.appbuilder.get_session.commit()
+
+                log_to_mp(None, team.team_name, 'auto renew successful', {
+                    'plan': local_plan.plan_name,
+                })
+
+                email_content = {
+                    "plan_name": local_plan.plan_name,
+                    "num_request": local_plan.num_request,
+                    "end_date": (datetime.utcfromtimestamp(stripe_plan['period']['end']) + timedelta(hours=10)).date(
+                    ).strftime('%d-%m-%Y')
+                }
+                template_id = 'd-884268c3f8cb4695ba1647c95a770aa1'
+                user = self.appbuilder.sm.find_user(email=event_object["customer_email"])
+                send_sendgrid_email(user, email_content, template_id)
+
         except Exception as e:
             self.appbuilder.get_session.rollback()
-            logging.warn(e)
+            logging.warning(e)
 
-    def revert_to_free(self, event_object):
+    def revert_to_free(self, team):
         try:
-            logging.info(event_object)
-            paid_list = event_object['lines']['data']
-            stripe_plan = paid_list[0]
             free_plan = self.appbuilder.get_session.query(Plan).filter_by(id=1).first()
-            team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(stripe_sub_id=stripe_plan['subscription']).first()
+            team_sub = self.appbuilder.sm.get_subscription(team_id=team.id)
             if team_sub is None:
                 raise Exception('team subscription not found')
             logging.info('Downgrading stripe plan to free.')
-            stripe_sub = stripe.Subscription.retrieve(team_sub.stripe_sub_id)
-            stripe.Subscription.delete(stripe_sub.stripe_id)
-            stripe_sub = stripe.Subscription.create(customer=stripe_sub['customer'], items=[{
+            stripe_sub = stripe.Subscription.create(customer=team.stripe_user_id, items=[{
                 'plan': free_plan.stripe_id,
                 'quantity': '1',
             }])
@@ -1152,11 +1126,30 @@ class SolarBIBillingView(ModelView):
             team_sub.end_time = -1
             team_sub.remain_count = 0
             team = self.appbuilder.sm.find_team(team_id=team_sub.team)
-            log_to_mp(None, team.team_name, 'revert to free', {})
+            log_to_mp(None, team.team_name, 'revert to free after 14 days', {})
+
             self.appbuilder.get_session.commit()
         except Exception as e:
             self.appbuilder.get_session.rollback()
-            logging.warn(e)
+            logging.warning(e)
+
+    def payment_fail(self, event_object):
+        try:
+            logging.info(event_object)
+            paid_list = event_object['lines']['data']
+            stripe_plan = paid_list[0]
+            # free_plan = self.appbuilder.get_session.query(Plan).filter_by(id=1).first()
+            team_sub = self.appbuilder.get_session.query(TeamSubscription).filter_by(stripe_sub_id=stripe_plan['subscription']).first()
+
+            team = self.appbuilder.sm.find_team(team_id=team_sub.team)
+            log_to_mp(None, team.team_name, 'payment failed', {})
+
+            # TODO send payment fail email
+
+            self.appbuilder.get_session.commit()
+        except Exception as e:
+            self.appbuilder.get_session.rollback()
+            logging.warning(e)
 
     @api
     @expose('/webhook', methods=['POST'])
@@ -1187,7 +1180,7 @@ class SolarBIBillingView(ModelView):
                 # print(event)
                 self.renew(event['data']['object'])
             elif event.type == 'invoice.payment_failed':
-                self.revert_to_free(event['data']['object'])
+                self.payment_fail(event['data']['object'])
         return Response(status=200)
 
 
@@ -1914,25 +1907,13 @@ class Superset(BaseSupersetView):
             Method for sending the Email to the user
         """
         log = logging.getLogger(__name__)
-
-        from sendgrid import SendGridAPIClient
-        from sendgrid.helpers.mail import Mail
-        message = Mail(
-            from_email=sendgrid_email_sender,
-            to_emails=user.email,
-        )
-        message.dynamic_template_data = {
+        dynamic_template_data = {
             'first_name': user.first_name,
             'address_name': address_name,
         }
-        message.template_id = 'd-d9166982344e4054a583d9b7b6ccec56'
-        try:
-            sendgrid_client = SendGridAPIClient(os.environ['SG_API_KEY'])
-            _ = sendgrid_client.send(message)
-            return True
-        except Exception as e:
-            log.error('Send email exception: {0}'.format(str(e)))
-            return False
+        template_id = 'd-d9166982344e4054a583d9b7b6ccec56'
+
+        return send_sendgrid_email(user, dynamic_template_data, template_id)
 
     @event_logger.log_this
     @api
