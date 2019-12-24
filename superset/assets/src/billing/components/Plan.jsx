@@ -39,7 +39,7 @@ function Plan({ billing, changePlanConnect }) {
 
   const handlePlanClick = (id) => {
     setPlanId(id);
-    if (billing.pm_id === null && billing.balance > -5000) {
+    if (billing.pm_id === null || billing.balance > -5000 || billing.need_update_cc === true) {
       setOpenACC(true);
     } else {
       setOpenCC(true);
@@ -94,6 +94,7 @@ function Plan({ billing, changePlanConnect }) {
         <Elements>
           <AddCreditCard
             planId={planId}
+            updateCC="1"
             openACC={openACC}
             handleCloseACC={handleCloseACC}
             changePlan={changePlanConnect}
@@ -104,6 +105,7 @@ function Plan({ billing, changePlanConnect }) {
 
       <ChangeConfirm
         planId={planId}
+        updateCC="0"
         openCC={openCC}
         handleCloseCC={handleCloseCC}
         changePlan={changePlanConnect}

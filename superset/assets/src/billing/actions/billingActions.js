@@ -48,9 +48,9 @@ export function changePlanFailed() {
   return { type: CHANGE_PLAN_FAILED };
 }
 
-export function changePlan(planId, payload, timeout = 60) {
+export function changePlan(planId, updateCC, payload, timeout = 60) {
   return (dispatch) => {
-    const url = '/billing/change_plan/' + planId + '/';
+    const url = '/billing/change_plan/' + planId + '/' + updateCC + '/';
     const controller = new AbortController();
     const { signal } = controller;
     dispatch(changePlanStarted());

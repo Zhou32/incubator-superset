@@ -86,7 +86,7 @@ class TeamRegisterUser(Model):
     username = Column(String(64), unique=True, nullable=False)
     password = Column(String(256))
     email = Column(String(64), nullable=False)
-    team = Column(String(250), nullable=False)
+    team = Column(String(250))
     registration_date = Column(DateTime, default=datetime.datetime.now, nullable=True)
     registration_hash = Column(String(256))
     inviter = Column('inviter_id', Integer, ForeignKey('ab_user.id'), nullable=True)
