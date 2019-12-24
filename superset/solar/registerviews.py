@@ -139,7 +139,7 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
                                                hashed_password=register_user.password)
             if not user:
                 flash(as_unicode(self.error_message), 'danger')
-                self.appbuilder.sm.del_register_user(register_user)
+                self.appbuilder.sm.del_register_user_and_user(register_user)
                 return None
 
             if self.send_sg_email(register_user):
@@ -147,7 +147,7 @@ class SolarBIRegisterUserDBView(RegisterUserDBView):
                 return register_user
             else:
                 flash(as_unicode(self.error_message), 'danger')
-                self.appbuilder.sm.del_register_user(register_user)
+                self.appbuilder.sm.del_register_user_and_user(register_user)
                 return None
 
     def form_post(self, form):
@@ -521,14 +521,13 @@ class SolarBIRegisterInvitationView(BaseRegisterUser):
                                                                              last_name=form.last_name.data,
                                                                              username=form.username.data,
                                                                              password=form.password.data,)
-        if register_user:
-            if self.send_sg_email(register_user):
-                flash(as_unicode(self.activation_message), 'info')
-                return self.appbuilder.get_url_for_index
-            else:
-                flash(as_unicode(self.error_message), 'danger')
-                self.appbuilder.sm.del_register_user(register_user)
-                return None
+        if register_user and self.send_sg_email(register_user):
+            flash(as_unicode(self.activation_message), 'info')
+            return self.appbuilder.get_url_for_index
+        else:
+            flash(as_unicode(self.error_message), 'danger')
+            # self.appbuilder.sm.del_register_user(register_user)
+            return None
 
     @expose('/invitation/<string:invitation_hash>', methods=['POST'])
     def invite_register(self, invitation_hash):
