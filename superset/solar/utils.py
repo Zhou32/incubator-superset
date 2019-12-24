@@ -19,6 +19,9 @@ import json
 
 from flask import session, redirect
 from mixpanel import Mixpanel
+from sendgrid.helpers.mail import Mail
+from sendgrid import SendGridAPIClient
+import logging as log
 import os
 
 mp = Mixpanel('8b85dcbb1c5f693a3b045b24fca1e787')
@@ -174,3 +177,19 @@ def get_athena_query(lat, lng, start_date, end_date, data_type, resolution):
                        + group_str + " " + order_str
 
     return athena_query
+
+
+def send_sendgrid_email(user, message_data, template_id):
+    message = Mail(
+        from_email=sendgrid_email_sender,
+        to_emails=user.email,
+    )
+    message.dynamic_template_data = message_data
+    message.template_id = template_id
+    try:
+        sendgrid_client = SendGridAPIClient(os.environ['SG_API_KEY'])
+        _ = sendgrid_client.send(message)
+        return True
+    except Exception as e:
+        log.error('Send email exception: {0}'.format(str(e)))
+        return False

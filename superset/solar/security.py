@@ -729,8 +729,9 @@ class CustomSecurityManager(SupersetSecurityManager):
                 plan = self.get_session.query(Plan).filter_by(id=plan_id).first()
             else:
                 plan = self.get_session.query(Plan).filter_by(id=1).first()
-            utc_trial_end_ts = datetime.datetime.now().timestamp()
-            sub_resp = stripe.Subscription.create(customer=team.stripe_user_id, trial_end=int(utc_trial_end_ts)+14*24*3600,
+            if trial_days:
+                utc_trial_end_ts = datetime.datetime.now().timestamp()
+            sub_resp = stripe.Subscription.create(customer=team.stripe_user_id, trial_end=int(utc_trial_end_ts)+14*24*3600 if trial_days else None,
                                                   items=[{
                 'plan': plan.stripe_id,
                 'quantity': '1'
@@ -740,6 +741,7 @@ class CustomSecurityManager(SupersetSecurityManager):
             team_subscription.plan = plan.id
             team_subscription.stripe_sub_id = sub_resp['id']
             team_subscription.remain_count = plan.num_request
+            user.trial_used = True if trial_days else False
             # team_subscription.trial_used = True
             self.get_session.add(team_subscription)
             self.get_session.merge(user)
