@@ -30,12 +30,12 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function ChangeConfirm({ planId, openCC, handleCloseCC, changePlan, billing }) {
+function ChangeConfirm({ planId, updateCC, openCC, handleCloseCC, changePlan, billing }) {
   const classes = useStyles();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    changePlan(planId, null).then(() => {
+    changePlan(planId, updateCC, null).then(() => {
       handleCloseCC();
     });
   };
@@ -66,6 +66,7 @@ function ChangeConfirm({ planId, openCC, handleCloseCC, changePlan, billing }) {
 ChangeConfirm.propTypes = {
   billing: PropTypes.object.isRequired,
   planId: PropTypes.string.isRequired,
+  updateCC: PropTypes.string.isRequired,
   openCC: PropTypes.bool.isRequired,
   handleCloseCC: PropTypes.func.isRequired,
   changePlan: PropTypes.func.isRequired,

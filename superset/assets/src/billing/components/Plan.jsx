@@ -94,6 +94,7 @@ function Plan({ billing, changePlanConnect }) {
         <Elements>
           <AddCreditCard
             planId={planId}
+            updateCC="1"
             openACC={openACC}
             handleCloseACC={handleCloseACC}
             changePlan={changePlanConnect}
@@ -104,6 +105,7 @@ function Plan({ billing, changePlanConnect }) {
 
       <ChangeConfirm
         planId={planId}
+        updateCC="0"
         openCC={openCC}
         handleCloseCC={handleCloseCC}
         changePlan={changePlanConnect}
