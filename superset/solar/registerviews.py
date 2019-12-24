@@ -483,23 +483,13 @@ class SolarBIRegisterInvitationView(BaseRegisterUser):
     #     return True
 
     def send_sg_email(self, register_user):
-        message = Mail(
-            from_email=sendgrid_email_sender,
-            to_emails=register_user.email,
-        )
         url = url_for('.activate', _external=True, invitation_hash=register_user.registration_hash)
-        message.dynamic_template_data = {
+        dynamic_template_data = {
             'url': url,
             'first_name': register_user.first_name,
         }
-        message.template_id = 'd-41d88127f1e14a28b1fedc2e0b456657'
-        try:
-            sendgrid_client = SendGridAPIClient(os.environ['SG_API_KEY'])
-            _ = sendgrid_client.send(message)
-            return True
-        except Exception as e:
-            log.error('Send email exception: {0}'.format(str(e)))
-            return False
+        template_id = 'd-41d88127f1e14a28b1fedc2e0b456657'
+        return send_sendgrid_email(register_user, dynamic_template_data, template_id)
 
     @expose('/invitation/<string:invitation_hash>', methods=['GET'])
     def invitation(self, invitation_hash):
