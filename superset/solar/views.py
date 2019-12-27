@@ -294,7 +294,7 @@ class SolarBIUserInfoEditView(UserInfoEditView):
     form = SolarBIUserInfoEditForm
     form_template = 'appbuilder/general/security/edit_user_info.html'
     edit_widget = SolarBIIUserInfoEditWidget
-    mc_client = MailChimp(mc_api=os.environ['MC_API_KEY'], mc_user='solarbi')
+    # mc_client = MailChimp(mc_api=os.environ['MC_API_KEY'], mc_user='solarbi')
     sg = SendGridAPIClient(os.environ['SG_API_KEY'])
     headers = {'authorization': 'Bearer ' + os.environ['SG_API_KEY']}
     message = "Profile information has been successfully updated"
@@ -383,7 +383,10 @@ class SolarBIUserInfoEditView(UserInfoEditView):
     def is_in_sg(self):
         # First check the 50 most recent changed contacts
         response1 = self.sg.client.marketing.lists._('823624d1-c51e-4193-8542-3904b7586c29?contact_sample=true').get()
-
+        contact_sample = json.loads(response1.body.decode('utf-8'))['contact_sample']
+        for contact in contact_sample:
+            if g.user.email == contact['email']:
+                return 1
 
         response = self.sg.client.marketing.contacts.search.post(request_body={
             "query": "email LIKE '" + g.user.email + "' AND CONTAINS(list_ids, '823624d1-c51e-4193-8542-3904b7586c29')"

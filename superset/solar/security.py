@@ -368,7 +368,7 @@ class CustomSecurityManager(SupersetSecurityManager):
 
     def find_team(self, team_id=None, team_name=None, user_id=None):
         if team_name:
-            return self.get_session.query(self.team_model).filter_by(team_name=team_name).first()
+            return self.get_session.query(self.team_model).filter_by(team_name=team_name).order_by(self.team_model.id).first()
         elif user_id:
             user = self.get_session.query(self.user_model).filter_by(id=user_id).first()
             if len(user.team_role) > 0:
@@ -436,13 +436,12 @@ class CustomSecurityManager(SupersetSecurityManager):
             self.get_session.merge(team)
             self.get_session.commit()
 
-
-            return user
+            return True
         except Exception as e:
             logging.error(e)
             return False
 
-    def del_register_user(self, register_user):
+    def del_register_user_and_user(self, register_user):
         try:
             super(CustomSecurityManager, self).del_register_user(register_user)
             user = self.find_user(username=register_user.username)
@@ -454,8 +453,6 @@ class CustomSecurityManager(SupersetSecurityManager):
             logging.error(str(e))
             self.get_session.rollback()
             return False
-
-
 
     # def delete_team(self, team):
     #     from superset.models.core import Database
@@ -575,7 +572,8 @@ class CustomSecurityManager(SupersetSecurityManager):
     def get_team_members(self, team_id):
         team = self.find_team(team_id=team_id)
         email_role = []
-        for user in team.users:
+        team_users = sorted(team.users, key=lambda x: x.id)
+        for user in team_users:
             for user_role in user.team_role:
                 if user_role.team.id == team.id:
                     if user_role.role.name == 'team_owner':
@@ -724,6 +722,7 @@ class CustomSecurityManager(SupersetSecurityManager):
 
             # add subscription to free tier
             if plan_id:
+                user.trial_used = True
                 plan = self.get_session.query(Plan).filter_by(id=plan_id).first()
             else:
                 plan = self.get_session.query(Plan).filter_by(id=1).first()
@@ -749,7 +748,6 @@ class CustomSecurityManager(SupersetSecurityManager):
         except Exception as e:
             self.get_session.rollback()
             logging.error(e)
-            raise Exception(e)
             return False
 
     def get_subscription(self, team_id=None, sub_id=None):

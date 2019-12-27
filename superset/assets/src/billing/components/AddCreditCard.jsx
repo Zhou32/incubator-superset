@@ -54,7 +54,7 @@ const createOptions = () => ({
   },
 });
 
-function AddCreditCard({ planId, stripe, openACC, handleCloseACC, changePlan, billing }) {
+function AddCreditCard({ planId, updateCC, stripe, openACC, handleCloseACC, changePlan, billing }) {
   const classes = useStyles();
   const [showError, setShowError] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -67,7 +67,7 @@ function AddCreditCard({ planId, stripe, openACC, handleCloseACC, changePlan, bi
           setErrorMsg(payload.error.message);
           setShowError(true);
         } else {
-          changePlan(planId, payload).then(() => {
+          changePlan(planId, updateCC, payload).then(() => {
             handleCloseACC();
           });
         }

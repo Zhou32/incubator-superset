@@ -39,7 +39,7 @@ function Plan({ billing, changePlanConnect }) {
 
   const handlePlanClick = (id) => {
     setPlanId(id);
-    if (billing.pm_id === null && billing.balance > -5000) {
+    if (billing.pm_id === null || billing.balance > -5000 || billing.need_update_cc === true) {
       setOpenACC(true);
     } else {
       setOpenCC(true);
@@ -61,7 +61,7 @@ function Plan({ billing, changePlanConnect }) {
           </div>
         </div>
         <div className="plan-option-pane">
-          <div className="option-name"><i className="fas fa-hotel" /><span>Starter</span></div>
+          <div className="option-name"><i className="fas fa-play-circle" /><span>Starter</span></div>
           <div className="option-description">$19 You can have unlimited search plus 7 requested dataset.</div>
           <div className="option-submit">
             <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('01')} disabled={billing.plan_id === '01'}>
@@ -79,7 +79,7 @@ function Plan({ billing, changePlanConnect }) {
           </div>
         </div>
         <div className="plan-option-pane">
-          <div className="option-name"><i className="fas fa-project-diagram" /><span>Advance</span></div>
+          <div className="option-name"><i className="fas fa-infinity" /><span>Advance</span></div>
           <div className="option-description">$49 You can have unlimited search plus 30 requested dataset.</div>
           <div className="option-submit">
             <Button variant="outlined" color="primary" className={classes.button} onClick={() => handlePlanClick('03')} disabled={billing.plan_id === '03'}>
@@ -94,6 +94,7 @@ function Plan({ billing, changePlanConnect }) {
         <Elements>
           <AddCreditCard
             planId={planId}
+            updateCC="1"
             openACC={openACC}
             handleCloseACC={handleCloseACC}
             changePlan={changePlanConnect}
@@ -104,6 +105,7 @@ function Plan({ billing, changePlanConnect }) {
 
       <ChangeConfirm
         planId={planId}
+        updateCC="0"
         openCC={openCC}
         handleCloseCC={handleCloseCC}
         changePlan={changePlanConnect}

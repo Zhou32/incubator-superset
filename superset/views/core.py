@@ -764,11 +764,11 @@ class SolarBIBillingView(ModelView):
         # Check remain day of the subscription, if passed 14 days change to free plan
         need_update_cc = False
         if team_sub.end_time and team_sub.end_time != -1:
-            need_update_cc = True
             current_time = datetime.utcnow()
             end_datetime = datetime.utcfromtimestamp(team_sub.end_time)
             remain_days = (current_time - end_datetime).days
             if remain_days >= 14:
+                need_update_cc = True
                 self.revert_to_free(team)
 
         plan = self.appbuilder.get_session.query(Plan).filter_by(id=team_sub.plan).first()
@@ -823,7 +823,7 @@ class SolarBIBillingView(ModelView):
 
     @api
     @handle_api_exception
-    @expose('/change_plan/<plan_id>/<update_cc>', methods=['GET', 'POST'])
+    @expose('/change_plan/<plan_id>/<update_cc>/', methods=['GET', 'POST'])
     def change_plan(self, plan_id=None, update_cc=False):
         if not g.user or not g.user.get_id():
             return json_error_response('Incorrect call to endpoint')
@@ -835,7 +835,7 @@ class SolarBIBillingView(ModelView):
             stripe_customer = stripe.Customer.retrieve(id=team.stripe_user_id)
 
             pm_id = team.stripe_pm_id
-            if update_cc:
+            if update_cc == '1':
                 form_data = get_form_data()[0]['token']
                 # stripe.Customer.modify(stripe_customer.stripe_id, source=form_data['id'])
                 pm_id = form_data['id']
@@ -873,9 +873,12 @@ class SolarBIBillingView(ModelView):
             if form_data['abn']:
                 stripe.Customer.create_tax_id(cus_id, type="au_abn", value=form_data['abn'])
 
-        _ = stripe.Customer.modify(cus_id, address={'country': form_data['country'], 'state': form_data['state'],
-                                                    'postal_code': form_data['postal_code'], 'city': form_data['city'],
-                                                    'line1': form_data['line1'], 'line2': form_data['line2']})
+        _ = stripe.Customer.modify(cus_id,
+                                   name=form_data['name'],
+                                   email=form_data['email'],
+                                   address={'country': form_data['country'], 'state': form_data['state'],
+                                            'postal_code': form_data['postal_code'], 'city': form_data['city'],
+                                            'line1': form_data['line1'], 'line2': form_data['line2']})
 
         return json_success(json.dumps({'msg': 'Successfully changed billing detail!'}))
 
@@ -3945,7 +3948,7 @@ class Superset(BaseSupersetView):
         for team_role in g.user.team_role:
             if team_role.team.id == team.id and team_role.role.name == 'team_owner':
                 can_trial = True
-        can_trial = can_trial and not subscription.trial_used
+        can_trial = can_trial and not g.user.trial_used
         bootstrap_data = {
             'can_add': slice_add_perm,
             'can_download': slice_download_perm,
