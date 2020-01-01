@@ -30,6 +30,7 @@ export MYSQL_PORT=$8
 export MYSQL_DB=$9
 export SG_API_KEY=${10}
 export VERSION=${11}
+export FREE_CREDIT_DOLLAR=${12}
 
 celery worker --app=superset.sql_lab:celery_app --pool=gevent -Ofair &
 gunicorn --bind  0.0.0.0:8088 \
