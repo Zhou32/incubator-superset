@@ -759,3 +759,9 @@ class CustomSecurityManager(SupersetSecurityManager):
             return subscription
         else:
             return None
+
+    def find_team_admin(self, team_id=None):
+        role = self.find_role('team_owner')
+        team_role = self.get_session.query(TeamRole).filter_by(team_id=team_id, role_id=role.id).first()
+        admin = team_role.user
+        return admin

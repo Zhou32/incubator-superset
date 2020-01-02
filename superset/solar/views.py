@@ -34,7 +34,7 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from mailchimp3 import MailChimp
 
-from .utils import set_session_team, update_mp_user, log_to_mp, sendgrid_email_sender
+from .utils import set_session_team, update_mp_user, log_to_mp, send_sendgrid_email, sendgrid_email_sender
 
 
 from .forms import (
@@ -119,10 +119,6 @@ class SolarBIAuthDBView(AuthDBView):
         if not register_user:
             return jsonify(dict(err="Sorry we cannot find the email"))
 
-        message = Mail(
-            from_email=sendgrid_email_sender,
-            to_emails=register_user.email,
-        )
         if register_user.inviter is None:
             url = url_for('SolarBIRegisterUserDBView.activation',
                           _external=True,
@@ -132,20 +128,12 @@ class SolarBIAuthDBView(AuthDBView):
                           _external=True,
                           invitation_hash=register_user.registration_hash)
 
-        message.dynamic_template_data = {
+        dynamic_template_data = {
             'url': url,
             'first_name': register_user.first_name,
         }
-        message.template_id = 'd-41d88127f1e14a28b1fedc2e0b456657'
-        try:
-            sendgrid_client = SendGridAPIClient(os.environ['SG_API_KEY'])
-            _ = sendgrid_client.send(message)
-            flash(as_unicode("Resend activation email success. Please check your email."), 'info')
-            return jsonify(dict(redirect='/login'))
-        except Exception as e:
-            log.error('Send email exception: {0}'.format(str(e)))
-            flash(as_unicode("Snd email exception: " + str(e)), 'danger')
-            return jsonify(dict(redirect='/login'))
+        template_id = 'd-41d88127f1e14a28b1fedc2e0b456657'
+        return send_sendgrid_email(register_user, dynamic_template_data, template_id)
 
 
 class SolarBIPasswordRecoverView(PublicFormView):
@@ -188,25 +176,6 @@ class SolarBIPasswordRecoverView(PublicFormView):
         except Exception as e:
             log.error('Send email exception: {0}'.format(str(e)))
             return False
-
-    # def send_email(self, email, hash_val):
-    #     """
-    #         Method for sending the registration Email to the user
-    #     """
-    #     mail = Mail(self.appbuilder.get_app)
-    #     msg = Message()
-    #     msg.sender = 'SolarBI', 'no-reply@solarbi.com.au'
-    #     msg.subject = self.email_subject
-    #     url = url_for('.reset', _external=True, reset_hash=hash_val)
-    #     msg.html = self.render_template(self.email_template,
-    #                                     url=url)
-    #     msg.recipients = [email]
-    #     try:
-    #         mail.send(msg)
-    #     except Exception as e:
-    #         log.error('Send email exception: {0}'.format(str(e)))
-    #         return False
-    #     return True
 
     def add_password_reset(self, email):
         reset_hash = self.appbuilder.sm.add_reset_request(email)

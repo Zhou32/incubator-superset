@@ -761,15 +761,19 @@ class SolarBIBillingView(ModelView):
         team = self.appbuilder.get_session.query(Team).filter_by(id=session['team_id']).first()
         team_sub = self.appbuilder.sm.get_subscription(team_id=team.id)
 
+        user = self.appbuilder.sm.find_team_admin(team_id=team.id)
         # Check remain day of the subscription, if passed 14 days change to free plan
-        need_update_cc = False
-        if team_sub.end_time and team_sub.end_time != -1:
+        need_update_cc = team.stripe_pm_id is None
+        if team_sub.end_time:
             current_time = datetime.utcnow()
             end_datetime = datetime.utcfromtimestamp(team_sub.end_time)
             remain_days = (current_time - end_datetime).days
             if remain_days >= 14:
                 need_update_cc = True
                 self.revert_to_free(team)
+
+                # Remove credit card to force update cc for next time
+                team.stripe_pm_id = None
 
         plan = self.appbuilder.get_session.query(Plan).filter_by(id=team_sub.plan).first()
         # Retrieve customer basic information
@@ -923,6 +927,14 @@ class SolarBIBillingView(ModelView):
                 # Disable free trial for future
                 team_sub.trial_used = True
 
+                # Update the stripe subscription to new plan
+                new_sub = stripe.Subscription.modify(current_subscription.stripe_id,
+                                                     cancel_at_period_end=False,
+                                                     trial_end='now',
+                                                     items=[{
+                                                         'id': current_subscription['items']['data'][0].id,
+                                                         'plan': plan_stripe_id}])
+
                 # If upgrading from paid plan to higher paid plan, cannot trigger payment succeeded event as it will be
                 # on next billing cycle. Since the customer has successfully paid before, assume the card is still valid,
                 # upgrade plan immediately
@@ -931,25 +943,22 @@ class SolarBIBillingView(ModelView):
                     team_sub.remain_count = old_count + new_plan.num_request - old_plan.num_request
                     team_sub.plan = new_plan.id
 
+                    return_subscription_id = new_plan.stripe_id
+
                 # Otherwise if upgrade from free to paid, then will trigger payment event, wait for event and let webhook
                 # upgrade the plan
                 else:
                     logging.info('Customer new to paid plan, will upgrade after payment succeeded')
+                    return_subscription_id = old_plan.stripe_id
 
+                # In case customer has downgrade before and want to upgrade again
                 sub_list = stripe.Subscription.list(customer=team.stripe_user_id)
-                if len(sub_list['data']) ==2:
+                if len(sub_list['data']) >=2:
                     logging.info(f'Team {team.team_name} has downgraded before')
                     for sub in sub_list['data']:
                         if sub['id'] != current_subscription.stripe_id:
                             stripe.Subscription.delete(sub['id'])
 
-                new_sub = stripe.Subscription.modify(current_subscription.stripe_id,
-                                                     cancel_at_period_end=False,
-                                                     trial_end='now',
-                                                     items=[{
-                                                         'id': current_subscription['items']['data'][0].id,
-                                                         'plan': plan_stripe_id}])
-                return_subscription_id = new_plan.stripe_id
 
                 # log to mixpanel
                 log_to_mp(g.user, team.team_name, 'upgrade plan', {
@@ -970,7 +979,7 @@ class SolarBIBillingView(ModelView):
                 # Record current period end and will be used as start for next plan
                 period_end = old_sub['current_period_end']
                 # Delete other plan if has more than one plan, which means downgraded before
-                if len(sub_list['data']) ==2:
+                if len(sub_list['data']) >=2:
                     logging.info(f'Team {team.team_name} has downgraded before')
                     for sub in sub_list['data']:
                         if sub['id'] != current_subscription.stripe_id:
@@ -1077,27 +1086,26 @@ class SolarBIBillingView(ModelView):
             stripe_plan = paid_list[0]
             local_plan = self.appbuilder.get_session.query(Plan).filter_by(stripe_id=stripe_plan["plan"]['id']).first()
 
+            # Fetch team_subscription by the subscription on invoice
+            team_sub = self.appbuilder.sm.get_subscription(sub_id=stripe_plan['subscription'])
+
+            # Set subscribed plan to the plan on the invoice, and reset remain count
+            # This event should happen only when customer upgrade to paid from free for the first time and paid upfront,
+            # or at the start of new billing cycle. So it is safe to reset.
+            if team_sub is None:
+                raise Exception('team subscription not found')
+            team_sub.plan = local_plan.id
+            team_sub.remain_count = local_plan.num_request
+            team_sub.end_time = stripe_plan['period']['end']
+            team = self.appbuilder.sm.find_team(team_id=team_sub.team)
+            self.appbuilder.get_session.commit()
+
+            log_to_mp(None, team.team_name, 'auto renew successful', {
+                'plan': local_plan.plan_name,
+            })
+
             # Mute renew for free plan
             if local_plan.id != 1:
-
-                # Fetch team_subscription by the subscription on invoice
-                team_sub = self.appbuilder.sm.get_subscription(sub_id=stripe_plan['subscription'])
-
-                # Set subscribed plan to the plan on the invoice, and reset remain count
-                # This event should happen only when customer upgrade to paid from free for the first time and paid upfront,
-                # or at the start of new billing cycle. So it is safe to reset.
-                if team_sub is None:
-                    raise Exception('team subscription not found')
-                team_sub.plan = local_plan.id
-                team_sub.remain_count = local_plan.num_request
-                team_sub.end_time = stripe_plan['period']['end']
-                team = self.appbuilder.sm.find_team(team_id=team_sub.team)
-                self.appbuilder.get_session.commit()
-
-                log_to_mp(None, team.team_name, 'auto renew successful', {
-                    'plan': local_plan.plan_name,
-                })
-
                 email_content = {
                     "plan_name": local_plan.plan_name,
                     "num_request": local_plan.num_request,
@@ -1126,7 +1134,7 @@ class SolarBIBillingView(ModelView):
             logging.info('Old subscription removed and free subscription created')
             logging.info(stripe_sub)
             team_sub.plan = free_plan.id
-            team_sub.end_time = -1
+            team_sub.end_time = stripe_sub['current_period_end']
             team_sub.remain_count = 0
             team = self.appbuilder.sm.find_team(team_id=team_sub.team)
             log_to_mp(None, team.team_name, 'revert to free after 14 days', {})
@@ -1148,10 +1156,13 @@ class SolarBIBillingView(ModelView):
             log_to_mp(None, team.team_name, 'payment failed', {})
 
             # TODO send payment fail email
+            template_id = 'd-fb23de7a3b914762be9011bd92a083cb'
 
-            self.appbuilder.get_session.commit()
+            team_admin = self.appbuilder.sm.find_team_admin(team_id=team.id)
+
+            send_sendgrid_email(team_admin, None, template_id)
+
         except Exception as e:
-            self.appbuilder.get_session.rollback()
             logging.warning(e)
 
     @api
