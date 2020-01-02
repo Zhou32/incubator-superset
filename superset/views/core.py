@@ -802,6 +802,9 @@ class SolarBIBillingView(ModelView):
             elif one_month_later >= card_expire_date:
                 card_expire_soon = True
 
+        # need to update cc detail if (no detail or pass-due 14 days) and balance less than $50
+        need_update_cc = need_update_cc and cus_obj['balance'] > (-1 * 5000)
+
         entry_point = 'billing'
         payload = {
             'user': bootstrap_user_data(g.user),
