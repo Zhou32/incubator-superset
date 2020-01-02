@@ -355,7 +355,7 @@ class SolarBIUserInfoEditView(UserInfoEditView):
         contact_sample = json.loads(response1.body.decode('utf-8'))['contact_sample']
         for contact in contact_sample:
             if g.user.email == contact['email']:
-                return 1
+                return contact['id']
 
         response = self.sg.client.marketing.contacts.search.post(request_body={
             "query": "email LIKE '" + g.user.email + "' AND CONTAINS(list_ids, '823624d1-c51e-4193-8542-3904b7586c29')"
