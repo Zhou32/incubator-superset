@@ -1169,6 +1169,17 @@ class SolarBIBillingView(ModelView):
         except Exception as e:
             logging.warning(e)
 
+    def update_invoice_item_description(self, event_object):
+        try:
+            logging.info(event_object)
+            team = self.appbuilder.get_session.query(Team).filter_by(stripe_user_id=event_object['customer']).first()
+            plan_name = event_object['lines']['data'][0]['plan']['nickname']
+            description = f'SolarBI {team.team_name} {plan_name}'
+            logging.info(f'Monthly invoice description: {description}')
+            _ = stripe.Invoice.modify(event_object['id'], statement_descriptor=description)
+        except Exception as e:
+            logging.warning(e)
+
     @api
     @expose('/webhook', methods=['POST'])
     def webhook(self):
@@ -1199,6 +1210,8 @@ class SolarBIBillingView(ModelView):
                 self.renew(event['data']['object'])
             elif event.type == 'invoice.payment_failed':
                 self.payment_fail(event['data']['object'])
+            elif event.type == 'invoice.created':
+                self.update_invoice_item_description(event['data']['object'])
         return Response(status=200)
 
 
