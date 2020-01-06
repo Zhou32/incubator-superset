@@ -1108,7 +1108,7 @@ class SolarBIBillingView(ModelView):
             })
 
             # Mute renew for free plan
-            if local_plan.id != 1:
+            if event_object['amount_paid'] > 0:
                 email_content = {
                     "plan_name": local_plan.plan_name,
                     "num_request": local_plan.num_request,
