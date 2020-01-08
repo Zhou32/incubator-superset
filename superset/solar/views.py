@@ -32,7 +32,6 @@ from flask_appbuilder.security.forms import ResetPasswordForm
 from .models import SolarBIUser, TeamRegisterUser, Plan
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
-from mailchimp3 import MailChimp
 
 from .utils import set_session_team, update_mp_user, log_to_mp, send_sendgrid_email, sendgrid_email_sender
 
@@ -263,7 +262,6 @@ class SolarBIUserInfoEditView(UserInfoEditView):
     form = SolarBIUserInfoEditForm
     form_template = 'appbuilder/general/security/edit_user_info.html'
     edit_widget = SolarBIIUserInfoEditWidget
-    # mc_client = MailChimp(mc_api=os.environ['MC_API_KEY'], mc_user='solarbi')
     sg = SendGridAPIClient(os.environ['SG_API_KEY'])
     headers = {'authorization': 'Bearer ' + os.environ['SG_API_KEY']}
     message = "Profile information has been successfully updated"
