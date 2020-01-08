@@ -3956,7 +3956,7 @@ class Superset(BaseSupersetView):
 
             # Log to mixpanel
             log_to_mp(g.user, get_session_team(self.appbuilder.sm, g.user.id)[1], 'save search', {
-                'name': slc.slice_name,
+                "name": form_data['requestParams']['slice_name']
             })
 
             return self.save_or_overwrite_solarbislice(

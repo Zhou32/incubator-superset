@@ -176,7 +176,7 @@ const styles = tm => ({
   },
   exportCard: {
     margin: '40px auto',
-    width: '75%',
+    width: '70%',
     // height: 680,
   },
   lengthLabel: {
