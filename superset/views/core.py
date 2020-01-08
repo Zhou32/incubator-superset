@@ -1107,16 +1107,19 @@ class SolarBIBillingView(ModelView):
                 'plan': local_plan.plan_name,
             })
 
-            # Mute renew for free plan
+            # Mute renew for 0 peyment
+            # TODO for customers with credits renewing plan is also 0
             if event_object['amount_paid'] > 0:
+                user = self.appbuilder.sm.find_user(email=event_object["customer_email"])
                 email_content = {
+                    "first_name": user.first_name,
                     "plan_name": local_plan.plan_name,
                     "num_request": local_plan.num_request,
                     "end_date": (datetime.utcfromtimestamp(stripe_plan['period']['end']) + timedelta(hours=10)).date(
                     ).strftime('%d-%m-%Y')
                 }
                 template_id = 'd-884268c3f8cb4695ba1647c95a770aa1'
-                user = self.appbuilder.sm.find_user(email=event_object["customer_email"])
+
                 send_sendgrid_email(user, email_content, template_id)
 
         except Exception as e:
@@ -3879,6 +3882,7 @@ class Superset(BaseSupersetView):
             "dashboard_id": dash.id if dash else None,
         }
 
+
         if request.args.get("goto_dash") == "true":
             response.update({"dashboard": dash.url})
 
@@ -3949,6 +3953,12 @@ class Superset(BaseSupersetView):
                 status=400)
 
         if action in ('saveas', 'overwrite'):
+
+            # Log to mixpanel
+            log_to_mp(g.user, get_session_team(self.appbuilder.sm, g.user.id)[1], 'save search', {
+                'name': slc.slice_name,
+            })
+
             return self.save_or_overwrite_solarbislice(
                 request.args,
                 slc, slice_add_perm,
