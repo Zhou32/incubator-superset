@@ -621,12 +621,19 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
         subscription = self.appbuilder.sm.get_subscription(team_id=team.id)
 
         # Count the subscription remaining days
+        # TODO: change default not to -1 in case bug
         remain_days = -1
         if subscription.end_time:
-            if subscription.end_time != -1:
-                current_datetime = datetime.utcnow()
-                end_datetime = datetime.utcfromtimestamp(subscription.end_time)
-                remain_days = (end_datetime - current_datetime).days
+            current_datetime = datetime.utcnow()
+            end_datetime = datetime.utcfromtimestamp(subscription.end_time)
+            remain_days = (end_datetime - current_datetime).days
+
+            # If has passed 14 days of end time, revert customer plan to free
+            if remain_days <= -14:
+                self.revert_to_free(team)
+
+                # Remove credit card to force update cc for next time
+                team.stripe_pm_id = None
 
         entry_point = 'solarBI'
 
@@ -663,40 +670,29 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
                             permission.view_menu.name.split(':')[1].replace(')', '')
                         return datasource_id
 
-    @expose('/welcome')
-    def welcome(self):
-        """Personalized welcome page"""
+    def revert_to_free(self, team):
+        try:
+            free_plan = self.appbuilder.get_session.query(Plan).filter_by(id=1).first()
+            team_sub = self.appbuilder.sm.get_subscription(team_id=team.id)
+            if team_sub is None:
+                raise Exception('team subscription not found')
+            logging.info('Downgrading stripe plan to free.')
+            stripe_sub = stripe.Subscription.create(customer=team.stripe_user_id, items=[{
+                'plan': free_plan.stripe_id,
+                'quantity': '1',
+            }])
+            logging.info('Old subscription removed and free subscription created')
+            logging.info(stripe_sub)
+            team_sub.plan = free_plan.id
+            team_sub.end_time = stripe_sub['current_period_end']
+            team_sub.remain_count = 0
+            team = self.appbuilder.sm.find_team(team_id=team_sub.team)
+            log_to_mp(None, team.team_name, 'revert to free after 14 days', {})
 
-        if not g.user or not g.user.get_id():
-            return redirect(appbuilder.get_url_for_login)
-
-        entry_point = 'solarBI'
-
-        datasource_id = self.get_solar_datasource()
-
-        # welcome_dashboard_id = (
-        #     db.session
-        #     .query(UserAttribute.welcome_dashboard_id)
-        #     .filter_by(user_id=g.user.get_id())
-        #     .scalar()
-        # )
-        # if welcome_dashboard_id:
-        #     return self.dashboard(str(welcome_dashboard_id))
-
-        payload = {
-            'user': bootstrap_user_data(g.user),
-            'common': BaseSupersetView().common_bootstrap_payload(),
-            'datasource_id': datasource_id,
-            'datasource_type': 'table',
-            'entry': 'welcome',
-        }
-
-        return self.render_template(
-            'solar/basic.html',
-            entry=entry_point,
-            title='Welcome - SolarBI',
-            bootstrap_data=json.dumps(payload, default=utils.json_iso_dttm_ser),
-        )
+            self.appbuilder.get_session.commit()
+        except Exception as e:
+            self.appbuilder.get_session.rollback()
+            logging.warning(e)
 
     @expose('/demo')
     def demo(self):
@@ -3977,10 +3973,16 @@ class Superset(BaseSupersetView):
         # Count the subscription remaining days
         remain_days = -1
         if subscription.end_time:
-            if subscription.end_time != -1:
-                current_datetime = datetime.utcnow()
-                end_datetime = datetime.utcfromtimestamp(subscription.end_time)
-                remain_days = (end_datetime - current_datetime).days
+            current_datetime = datetime.utcnow()
+            end_datetime = datetime.utcfromtimestamp(subscription.end_time)
+            remain_days = (end_datetime - current_datetime).days
+
+            # If has passed 14 days of end time, revert customer plan to free
+            if remain_days <= -14:
+                self.revert_to_free(team)
+
+                # Remove credit card to force update cc for next time
+                team.stripe_pm_id = None
 
         # Check if the team can trial
         can_trial = False
@@ -4030,6 +4032,30 @@ class Superset(BaseSupersetView):
             standalone_mode=standalone,
             is_solar=is_solar,
         )
+
+    def revert_to_free(self, team):
+        try:
+            free_plan = self.appbuilder.get_session.query(Plan).filter_by(id=1).first()
+            team_sub = self.appbuilder.sm.get_subscription(team_id=team.id)
+            if team_sub is None:
+                raise Exception('team subscription not found')
+            logging.info('Downgrading stripe plan to free.')
+            stripe_sub = stripe.Subscription.create(customer=team.stripe_user_id, items=[{
+                'plan': free_plan.stripe_id,
+                'quantity': '1',
+            }])
+            logging.info('Old subscription removed and free subscription created')
+            logging.info(stripe_sub)
+            team_sub.plan = free_plan.id
+            team_sub.end_time = stripe_sub['current_period_end']
+            team_sub.remain_count = 0
+            team = self.appbuilder.sm.find_team(team_id=team_sub.team)
+            log_to_mp(None, team.team_name, 'revert to free after 14 days', {})
+
+            self.appbuilder.get_session.commit()
+        except Exception as e:
+            self.appbuilder.get_session.rollback()
+            logging.warning(e)
 
     @has_access
     @expose("/profile/<username>/")

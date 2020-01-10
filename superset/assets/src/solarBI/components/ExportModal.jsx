@@ -623,7 +623,8 @@ class ExportModal extends React.Component {
                 <CardContent>
                   <div>
                     {solarBI.remain_days >= 0 && solarBI.plan_id !== 1 && <Chip style={{ fontSize: '1.05em' }} label={`Current subscription remains ${solarBI.remain_days} days left`} />}
-                    {solarBI.remain_days === -1 && solarBI.plan_id === 1 && <Chip style={{ fontSize: '1.05em' }} label="You are in the free plan" />}
+                    {solarBI.plan_id === 1 && <Chip style={{ fontSize: '1.05em' }} label="You are in the free plan" />}
+                    {solarBI.remain_days < 0 && solarBI.plan_id !== 1 && <Chip style={{ fontSize: '1.05em' }} label={`Your plan has passed due for ${-solarBI.remain_days} days`} />}
                     <p className={classes.addressText}>
                       {this.props.address.slice(0, -11)}
                     </p>
@@ -770,27 +771,6 @@ class ExportModal extends React.Component {
                         <FormControlLabel classes={{ label: classes.formControlLabel }} value="annual" control={<Radio color="secondary" />} label="Annual" labelPlacement="bottom" />
                       </RadioGroup>
                     </FormControl>
-                    {/* <hr className={classes.contentHr} />
-                    <div>
-                      <FormLabel
-                        classes={{ root: classes.costLabel, focused: classes.labelFocused }}
-                        component="legend"
-                      >Cost</FormLabel>
-                      <TextField
-                        id="cost"
-                        variant="outlined"
-                        className={classes.costOutput}
-                        value={new Date(startDate) > new Date(endDate)
-                          || new Date(startDate) < new Date('1990-01-01')
-                          || new Date(endDate) > new Date('2019-07-31') ? 'NaN' : this.state.cost}
-                        InputProps={{
-                          classes: { input: classes.textInput },
-                          startAdornment: <InputAdornment
-                            className={classes.dollar}
-                            position="start">$</InputAdornment>,
-                        }}
-                      />
-                    </div> */}
                     <div style={{ marginTop: 50 }}>
                       <Button
                         className={classNames(classes.button, classes.closeBtn)}
