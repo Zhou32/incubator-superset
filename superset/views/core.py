@@ -620,6 +620,7 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
         subscription = self.appbuilder.sm.get_subscription(team_id=team.id)
 
         # Count the subscription remaining days
+        # TODO: change default not to -1 in case bug
         remain_days = -1
         if subscription.end_time:
             if subscription.end_time != -1:
