@@ -32,9 +32,8 @@ from flask_appbuilder.security.forms import ResetPasswordForm
 from .models import SolarBIUser, TeamRegisterUser, Plan
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
-from mailchimp3 import MailChimp
 
-from .utils import set_session_team, update_mp_user, log_to_mp, sendgrid_email_sender
+from .utils import set_session_team, update_mp_user, log_to_mp, send_sendgrid_email, sendgrid_email_sender
 
 
 from .forms import (
@@ -119,10 +118,6 @@ class SolarBIAuthDBView(AuthDBView):
         if not register_user:
             return jsonify(dict(err="Sorry we cannot find the email"))
 
-        message = Mail(
-            from_email=sendgrid_email_sender,
-            to_emails=register_user.email,
-        )
         if register_user.inviter is None:
             url = url_for('SolarBIRegisterUserDBView.activation',
                           _external=True,
@@ -132,20 +127,12 @@ class SolarBIAuthDBView(AuthDBView):
                           _external=True,
                           invitation_hash=register_user.registration_hash)
 
-        message.dynamic_template_data = {
+        dynamic_template_data = {
             'url': url,
             'first_name': register_user.first_name,
         }
-        message.template_id = 'd-41d88127f1e14a28b1fedc2e0b456657'
-        try:
-            sendgrid_client = SendGridAPIClient(os.environ['SG_API_KEY'])
-            _ = sendgrid_client.send(message)
-            flash(as_unicode("Resend activation email success. Please check your email."), 'info')
-            return jsonify(dict(redirect='/login'))
-        except Exception as e:
-            log.error('Send email exception: {0}'.format(str(e)))
-            flash(as_unicode("Snd email exception: " + str(e)), 'danger')
-            return jsonify(dict(redirect='/login'))
+        template_id = 'd-41d88127f1e14a28b1fedc2e0b456657'
+        return send_sendgrid_email(register_user, dynamic_template_data, template_id)
 
 
 class SolarBIPasswordRecoverView(PublicFormView):
@@ -188,25 +175,6 @@ class SolarBIPasswordRecoverView(PublicFormView):
         except Exception as e:
             log.error('Send email exception: {0}'.format(str(e)))
             return False
-
-    # def send_email(self, email, hash_val):
-    #     """
-    #         Method for sending the registration Email to the user
-    #     """
-    #     mail = Mail(self.appbuilder.get_app)
-    #     msg = Message()
-    #     msg.sender = 'SolarBI', 'no-reply@solarbi.com.au'
-    #     msg.subject = self.email_subject
-    #     url = url_for('.reset', _external=True, reset_hash=hash_val)
-    #     msg.html = self.render_template(self.email_template,
-    #                                     url=url)
-    #     msg.recipients = [email]
-    #     try:
-    #         mail.send(msg)
-    #     except Exception as e:
-    #         log.error('Send email exception: {0}'.format(str(e)))
-    #         return False
-    #     return True
 
     def add_password_reset(self, email):
         reset_hash = self.appbuilder.sm.add_reset_request(email)
@@ -294,7 +262,6 @@ class SolarBIUserInfoEditView(UserInfoEditView):
     form = SolarBIUserInfoEditForm
     form_template = 'appbuilder/general/security/edit_user_info.html'
     edit_widget = SolarBIIUserInfoEditWidget
-    # mc_client = MailChimp(mc_api=os.environ['MC_API_KEY'], mc_user='solarbi')
     sg = SendGridAPIClient(os.environ['SG_API_KEY'])
     headers = {'authorization': 'Bearer ' + os.environ['SG_API_KEY']}
     message = "Profile information has been successfully updated"
@@ -309,10 +276,11 @@ class SolarBIUserInfoEditView(UserInfoEditView):
             if key == "subscription":
                 contact_id = self.is_in_sg()
                 user_in_sg = contact_id != -1
-                user_in_gs = self.user_in_gs(g.user.email)
+                # user_in_gs = self.user_in_gs(g.user.email)
+                user_in_marketing_suppression = self.user_in_marketing_suppression(g.user.email)
 
                 form_field = getattr(form, key)
-                form_field.data = (user_in_sg and not user_in_gs)
+                form_field.data = (user_in_sg and not user_in_marketing_suppression)
                 continue
 
             form_field = getattr(form, key)
@@ -339,11 +307,12 @@ class SolarBIUserInfoEditView(UserInfoEditView):
         item = self.appbuilder.sm.get_user_by_id(g.user.id)
 
         if form.email.data != item.email:
-            # If the user has been in SG already, delete it from contacts and global unsubscription
+            # If the user has been in SG already, delete it from contacts and marketing suppression group
             contact_id = self.is_in_sg()
             if contact_id != -1:
                 self.delete_contact(contact_id)
-                self.delete_gs(item.email)
+                # self.delete_gs(item.email)
+                self.delete_user_from_marketing_suppression(item.email)
 
             self.add_or_update_contact(form.email.data, form.first_name.data, form.last_name.data)
         else:
@@ -353,15 +322,19 @@ class SolarBIUserInfoEditView(UserInfoEditView):
                 if contact_id != -1:
                     self.add_or_update_contact(form.email.data, form.first_name.data, form.last_name.data)
 
-            subscription_status = (is_in_sg and not self.user_in_gs(form.email.data))
+            # subscription_status = (is_in_sg and not self.user_in_gs(form.email.data))
+            user_in_marketing_suppression = self.user_in_marketing_suppression(form.email.data)
+            subscription_status = (is_in_sg and not user_in_marketing_suppression)
             if form.subscription.data != subscription_status:
                 if form.subscription.data:
-                    if self.user_in_gs(form.email.data):
-                        self.delete_gs(form.email.data)
+                    if self.user_in_marketing_suppression(form.email.data):
+                        # self.delete_gs(form.email.data)
+                        self.delete_user_from_marketing_suppression(form.email.data)
                     else:
                         self.add_or_update_contact(form.email.data, form.first_name.data, form.last_name.data)
                 else:
-                    self.add_to_gs(form.email.data)
+                    # self.add_to_gs(form.email.data)
+                    self.add_user_to_marketing_suppression(form.email.data)
 
         form.username.data = item.username
         form.populate_obj(item)
@@ -375,10 +348,6 @@ class SolarBIUserInfoEditView(UserInfoEditView):
                 stripe.Customer.modify(team_role.team.stripe_user_id, email=g.user.email)
 
         flash(as_unicode(self.message), "info")
-        # if 'compliance' in self.message:
-        #     flash(as_unicode(self.message), "warning")
-        # else:
-        #     flash(as_unicode(self.message), "info")
 
     def is_in_sg(self):
         # First check the 50 most recent changed contacts
@@ -386,7 +355,7 @@ class SolarBIUserInfoEditView(UserInfoEditView):
         contact_sample = json.loads(response1.body.decode('utf-8'))['contact_sample']
         for contact in contact_sample:
             if g.user.email == contact['email']:
-                return 1
+                return contact['id']
 
         response = self.sg.client.marketing.contacts.search.post(request_body={
             "query": "email LIKE '" + g.user.email + "' AND CONTAINS(list_ids, '823624d1-c51e-4193-8542-3904b7586c29')"
@@ -396,15 +365,6 @@ class SolarBIUserInfoEditView(UserInfoEditView):
             return -1
         else:
             return res['result'][0]['id']
-
-        # all_contacts = {}
-        # for contact in res['result']:
-        #     all_contacts[contact['email']] = contact['id']
-
-        # if g.user.email in all_contacts:
-        #     return all_contacts[g.user.email]
-        # else:
-        #     return -1
 
     def add_or_update_contact(self, email, first_name, last_name):
         _ = self.sg.client.marketing.contacts.put(request_body={
@@ -420,6 +380,24 @@ class SolarBIUserInfoEditView(UserInfoEditView):
             ]
         })
         # _ = json.loads(response.body.decode("utf-8"))
+
+    def add_user_to_marketing_suppression(self, email):
+        url = "https://api.sendgrid.com/v3/asm/groups/14067/suppressions"
+        payload = "{\"recipient_emails\":[\"" + email + "\"]}"
+        _ = requests.request("POST", url, data=payload, headers=self.headers)
+
+    def delete_user_from_marketing_suppression(self, email):
+        url = "https://api.sendgrid.com/v3/asm/groups/14067/suppressions/" + email
+        _ = requests.request("DELETE", url, headers=self.headers)
+
+    def user_in_marketing_suppression(self, email):
+        url = "https://api.sendgrid.com/v3/asm/groups/14067/suppressions/search"
+        payload = '{"recipient_emails":["' + email + '"]}'
+        response = requests.request("POST", url, data=payload, headers=self.headers)
+        if json.loads(response.text):
+            return True
+        else:
+            return False
 
     def delete_contact(self, contact_id):
         self.sg.client.marketing.contacts.delete(query_params={"ids": contact_id})
@@ -440,45 +418,6 @@ class SolarBIUserInfoEditView(UserInfoEditView):
     def delete_gs(self, email):
         url = "https://api.sendgrid.com/v3/asm/suppressions/global/" + email
         _ = requests.request("DELETE", url, headers=self.headers)
-
-    # def is_in_mc(self):
-    #     email_md5 = self.get_email_md5(g.user.email)
-    #     try:
-    #         _ = self.mc_client.lists.members.get(list_id='c257103535', subscriber_hash=email_md5)
-    #         return True
-    #     except MailChimpError as e:
-    #         return False
-
-    # def is_subscribed(self):
-    #     email_md5 = self.get_email_md5(g.user.email)
-    #     try:
-    #         list_member = self.mc_client.lists.members.get(list_id='c257103535', subscriber_hash=email_md5)
-    #         is_subscribed = list_member['status'] == 'subscribed'
-    #     except MailChimpError as e:
-    #         is_subscribed = False
-    #
-    #     return is_subscribed
-    #
-    # def create_user_in_mc(self, email, first_name, last_name):
-    #     self.mc_client.lists.members.create(list_id='c257103535', data={
-    #         'email_address': email,
-    #         'status': 'subscribed',
-    #         'merge_fields': {
-    #             'FNAME': first_name,
-    #             'LNAME': last_name,
-    #         },
-    #     })
-    #
-    # def update_user_sub_status(self, email, status):
-    #     self.mc_client.lists.members.update(list_id='c257103535',
-    #                                         subscriber_hash=self.get_email_md5(email),
-    #                                         data={'status': status})
-    #
-    # def get_email_md5(self, email):
-    #     import hashlib
-    #
-    #     email_md5 = hashlib.md5(email.encode()).hexdigest()
-    #     return email_md5
 
 
 class SolarBIResetMyPasswordView(ResetMyPasswordView):

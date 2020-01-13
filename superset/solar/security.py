@@ -436,13 +436,12 @@ class CustomSecurityManager(SupersetSecurityManager):
             self.get_session.merge(team)
             self.get_session.commit()
 
-
-            return user
+            return True
         except Exception as e:
             logging.error(e)
             return False
 
-    def del_register_user(self, register_user):
+    def del_register_user_and_user(self, register_user):
         try:
             super(CustomSecurityManager, self).del_register_user(register_user)
             user = self.find_user(username=register_user.username)
@@ -454,8 +453,6 @@ class CustomSecurityManager(SupersetSecurityManager):
             logging.error(str(e))
             self.get_session.rollback()
             return False
-
-
 
     # def delete_team(self, team):
     #     from superset.models.core import Database
@@ -729,8 +726,9 @@ class CustomSecurityManager(SupersetSecurityManager):
                 plan = self.get_session.query(Plan).filter_by(id=plan_id).first()
             else:
                 plan = self.get_session.query(Plan).filter_by(id=1).first()
-            utc_trial_end_ts = datetime.datetime.now().timestamp()
-            sub_resp = stripe.Subscription.create(customer=team.stripe_user_id, trial_end=int(utc_trial_end_ts)+14*24*3600,
+            if trial_days:
+                utc_trial_end_ts = datetime.datetime.now().timestamp()
+            sub_resp = stripe.Subscription.create(customer=team.stripe_user_id, trial_end=int(utc_trial_end_ts)+14*24*3600 if trial_days else None,
                                                   items=[{
                 'plan': plan.stripe_id,
                 'quantity': '1'
@@ -740,6 +738,7 @@ class CustomSecurityManager(SupersetSecurityManager):
             team_subscription.plan = plan.id
             team_subscription.stripe_sub_id = sub_resp['id']
             team_subscription.remain_count = plan.num_request
+            user.trial_used = True if trial_days else False
             # team_subscription.trial_used = True
             self.get_session.add(team_subscription)
             self.get_session.merge(user)
@@ -760,3 +759,9 @@ class CustomSecurityManager(SupersetSecurityManager):
             return subscription
         else:
             return None
+
+    def find_team_admin(self, team_id=None):
+        role = self.find_role('team_owner')
+        team_role = self.get_session.query(TeamRole).filter_by(team_id=team_id, role_id=role.id).first()
+        admin = team_role.user
+        return admin

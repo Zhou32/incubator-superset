@@ -23,7 +23,7 @@
 {% set logo_target_path = appbuilder.app.config.get('LOGO_TARGET_PATH') or '/profile/{}/'.format(current_user.username) %}
 {% set current_user_role = appbuilder.sm.get_role_in_team(current_user, session['team_id']).name %}
 {% set team_ids = appbuilder.sm.get_teams_for_user(current_user.id) %}
-<link href="{{url_for('static',filename='assets/stylesheets/solarbi.less')}}?v=2.5" rel="stylesheet">
+<link href="{{url_for('static',filename='assets/stylesheets/solarbi.less')}}?v=2.8" rel="stylesheet">
 
 
 <!-- Sidebar -->
@@ -41,7 +41,7 @@
 	<nav class="s-sidebar__nav">
 		<div class="sidebar-title">
 			<img class="sidebar-solarbi-sun" src="/static/assets/images/solarbi_auth_sun.png" alt="solar sun">
-			<h4 class="sidebar-solarbi-text">SolarBI</h4>
+			<h4 class="sidebar-solarbi-text">SolarBI<span class="alpha-logo">Alpha</span></h4>
 		</div>
 		<ul id="bar-list" style="font-family: Montserrat,sans-serif; font-weight: 500">
 			<li>

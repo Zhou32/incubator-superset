@@ -23,12 +23,14 @@ export SMTP_PASSWORD=$2
 export STRIPE_SK=$3
 export STRIPE_PK=$4
 
-export POSTGRES_USER=$5
-export POSTGRES_PASSWORD=$6
-export POSTGRES_HOST=$7
-export POSTGRES_PORT=$8
-export POSTGRES_DB=$9
+export MYSQL_USER=$5
+export MYSQL_PASSWORD=$6
+export MYSQL_HOST=$7
+export MYSQL_PORT=$8
+export MYSQL_DB=$9
 export SG_API_KEY=${10}
+export VERSION=${11}
+export FREE_CREDIT_DOLLAR=${12}
 
 celery worker --app=superset.sql_lab:celery_app --pool=gevent -Ofair &
 gunicorn --bind  0.0.0.0:8088 \
