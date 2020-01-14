@@ -172,6 +172,14 @@
 
 <script>
 	$(document).ready(function () {
+	  $('form').bind("keypress", function(e) {
+      if (e.keyCode === 13) {
+        e.preventDefault();
+        return false;
+      }
+    });
+
+
 		$('.md-select').on('click', function () {
 			$(this).toggleClass('active')
 		});
@@ -193,6 +201,7 @@
 
 
 		$('#addTeamBtn').click(function() {
+		  $(this).prop('disabled',true);
 			$('#team_name_error').hide();
 			$('#team_name_empty').hide();
 			$('#team_name_existed_error').hide();
