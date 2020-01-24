@@ -22,7 +22,7 @@ from dateutil.relativedelta import relativedelta
 import logging
 import re
 import time
-import traceback
+import requests
 import boto3
 from typing import Dict, List  # noqa: F401
 from urllib import parse
@@ -620,6 +620,7 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
         team = self.appbuilder.get_session.query(Team).filter_by(id=session['team_id']).first()
         subscription = self.appbuilder.sm.get_subscription(team_id=team.id)
 
+        self.appbuilder.sm.convert_test_user_to_live(team)
         # Count the subscription remaining days
         # TODO: change default not to -1 in case bug
         remain_days = -1
@@ -774,6 +775,21 @@ class SolarBIBillingView(ModelView):
 
         plan = self.appbuilder.get_session.query(Plan).filter_by(id=team_sub.plan).first()
         # Retrieve customer basic information
+        self.appbuilder.sm.convert_test_user_to_live(team)
+        # try:
+        #     cus_obj = stripe.Customer.retrieve(team.stripe_user_id)
+        # except stripe.error.InvalidRequestError as e:
+        #     stripe.api_key = "sk_test_lmhjMQ9t1nqu2FNGgR5hv3N600QYlekFDt"
+        #     cus_obj = stripe.Customer.retrieve(team.stripe_user_id)
+        #     stripe.api_key = os.getenv('STRIPE_SK')
+        #     if cus_obj['balance'] != 0:
+        #         self.appbuilder.sm.create_stripe_user_and_sub(user[0],
+        #                                                       team,
+        #                                                       credit=-cus_obj['balance'],
+        #                                                       plan_id=1, recover=True)
+        #     else:
+        #         self.appbuilder.sm.create_stripe_user_and_sub(user[0], team, plan_id=1, recover=True)
+
         cus_obj = stripe.Customer.retrieve(team.stripe_user_id)
         cus_name = cus_obj.name
         cus_email = cus_obj.email
@@ -1957,33 +1973,48 @@ class Superset(BaseSupersetView):
         This endpoint evolved to be the entry point of many different
         requests that GETs or POSTs a form_data."""
         try:
-            self.send_email(g.user, address_name)
-            athena_query = get_athena_query(lat, lng, start_date, end_date, type, resolution)
+            # Check whether the team has available requests. If there is no remaining request, then return an
+            # error json message, otherwise subtract the remaining requests by 1
+            team = self.appbuilder.sm.find_team(team_id=get_session_team(self.appbuilder.sm, g.user.id)[0])
+            subscription = self.appbuilder.sm.get_subscription(team_id=team.id)
+            if subscription.remain_count <= 0:
+                return json_error_response("You cannot request any more data.")
+            else:
+                subscription.remain_count = subscription.remain_count - 1
+                self.appbuilder.get_session.commit()
 
+            # Start call the api to request solar radiation data and compute the generation
+            url = os.environ["GENERATION_API"]
+            payload = "{'start_date': '" + start_date + "', 'end_date': '" + end_date + "', 'lat': " + lat + \
+                      ", 'lng': " + lng + ", 'bucket': 'colin-query-test', " \
+                      "'team_id': '" + str(get_session_team(self.appbuilder.sm, g.user.id)[0]) + \
+                      "', 'email': '" + g.user.email + "', 'resolution': '" + resolution + "'}"
+            response = requests.request("POST", url, data=payload)
+            response = json.loads(response.text)
+
+            # athena_query = get_athena_query(lat, lng, start_date, end_date, type, resolution)
             # AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
             # AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
             # session = boto3.session.Session(aws_access_key_id=AWS_ACCESS_KEY_ID,
             #                                 aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
             # client = session.client('athena', region_name='ap-southeast-2')
-            client = boto3.client('athena', region_name='ap-southeast-2')
-            response = client.start_query_execution(
-                QueryString=athena_query,
-                QueryExecutionContext={
-                    'Database': 'solar_radiation_hill'
-                },
-                ResultConfiguration={
-                    'OutputLocation': 's3://solarbi-saved-radiation/TID' +
-                                      str(get_session_team(self.appbuilder.sm, g.user.id)[0]) +
-                                      '/' + g.user.email,
-                    # 'EncryptionConfiguration': {
-                    #     'EncryptionOption': 'SSE_S3',
-                    #     'KmsKey': 'string'
-                    # }
-                },
-            )
+            # response = client.start_query_execution(
+            #     QueryString=athena_query,
+            #     QueryExecutionContext={
+            #         'Database': 'solar_radiation_hill'
+            #     },
+            #     ResultConfiguration={
+            #         'OutputLocation': 's3://colin-query-test/TID' +
+            #                           str(get_session_team(self.appbuilder.sm, g.user.id)[0]) +
+            #                           '/' + g.user.email,
+            #         # 'EncryptionConfiguration': {
+            #         #     'EncryptionOption': 'SSE_S3',
+            #         #     'KmsKey': 'string'
+            #         # }
+            #     },
+            # )
 
-            # self.send_email(g.user, address_name)
-            # print(response['QueryExecutionId'])
+            # Save the query details in the database
             form_data = get_form_data()[0]
             args = {'action': 'saveas',
                     'slice_name': address_name + '_' + form_data['startDate'] + '_' +
@@ -1991,19 +2022,15 @@ class Superset(BaseSupersetView):
             datasource = ConnectorRegistry.get_datasource(
                 form_data['datasource_type'], form_data['datasource_id'], db.session)
             self.save_or_overwrite_solarbislice(args, None, True, None, False, form_data['datasource_id'],
-                                                 form_data['datasource_type'], datasource.name,
-                                                query_id=response['QueryExecutionId'],
+                                                form_data['datasource_type'], datasource.name,
+                                                # query_id=response['QueryExecutionId'],
+                                                query_id=response['query_id'],
                                                 start_date=form_data['startDate'],
                                                 end_date=form_data['endDate'], data_type=type, resolution=resolution)
-            team = self.appbuilder.sm.find_team(team_id=get_session_team(self.appbuilder.sm, g.user.id)[0])
-            subscription = self.appbuilder.sm.get_subscription(team_id=team.id)
 
-            if subscription.remain_count <= 0:
-                return json_error_response("You cannot request any more data.")
-            else:
-                subscription.remain_count = subscription.remain_count - 1
-                self.appbuilder.get_session.commit()
-
+            # After data request success and save db success, send user a job received email
+            self.send_email(g.user, address_name)
+            # Then log this event into Mixpanel
             log_to_mp(g.user, team.team_name, 'request data', {
                 'lat': lat,
                 'lng': lng,
@@ -2013,7 +2040,8 @@ class Superset(BaseSupersetView):
                 'type': type,
                 'address': address_name,
             })
-            return json_success(json.dumps({'query_id': response['QueryExecutionId']}))
+            # return json_success(json.dumps({'query_id': response['QueryExecutionId']}))
+            return json_success(json.dumps({'query_id': response['query_id']}))
         except Exception:
             return json_error_response("Request failed.")
 
