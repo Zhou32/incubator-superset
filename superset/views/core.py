@@ -1986,7 +1986,7 @@ class Superset(BaseSupersetView):
             # Start call the api to request solar radiation data and compute the generation
             url = os.environ["GENERATION_API"]
             payload = "{'start_date': '" + start_date + "', 'end_date': '" + end_date + "', 'lat': " + lat + \
-                      ", 'lng': " + lng + ", 'bucket': 'colin-query-test', " \
+                      ", 'lng': " + lng + ", 'bucket': 'solarbi-saved-radiation', " \
                       "'team_id': '" + str(get_session_team(self.appbuilder.sm, g.user.id)[0]) + \
                       "', 'email': '" + g.user.email + "', 'resolution': '" + resolution + "'}"
             response = requests.request("POST", url, data=payload)
