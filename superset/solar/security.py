@@ -746,6 +746,7 @@ class CustomSecurityManager(SupersetSecurityManager):
                 old_sub = self.get_subscription(team_id=team.id)
                 old_sub.plan = plan.id
                 old_sub.remain_count = 0
+                old_sub.stripe_sub_id = sub_resp['id']
                 old_sub.end_time = None
 
             self.get_session.merge(user)
