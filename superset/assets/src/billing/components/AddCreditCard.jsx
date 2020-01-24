@@ -64,8 +64,14 @@ function AddCreditCard({ planId, updateCC, stripe, openACC, handleCloseACC, chan
     if (stripe) {
       stripe.createToken().then((payload) => {
         if (payload.error) {
-          setErrorMsg(payload.error.message);
-          setShowError(true);
+          if (payload.error.code === 'card_declined') {
+            setErrorMsg('Your card was declined.');
+            setShowError(true);
+          } else {
+            setErrorMsg(payload.error.message);
+            setShowError(true);
+          }
+
         } else {
           changePlan(planId, updateCC, payload).then(() => {
             handleCloseACC();
