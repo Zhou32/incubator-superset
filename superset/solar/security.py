@@ -733,14 +733,14 @@ class CustomSecurityManager(SupersetSecurityManager):
                 'plan': plan.stripe_id,
                 'quantity': '1'
             }])
-            team_subscription = self.subscription_model()
-            team_subscription.team = team.id
-            team_subscription.plan = plan.id
-            team_subscription.stripe_sub_id = sub_resp['id']
-            team_subscription.remain_count = plan.num_request
-            user.trial_used = True if trial_days else False
             # team_subscription.trial_used = True
             if not recover:
+                team_subscription = self.subscription_model()
+                team_subscription.team = team.id
+                team_subscription.plan = plan.id
+                team_subscription.stripe_sub_id = sub_resp['id']
+                team_subscription.remain_count = plan.num_request
+                user.trial_used = True if trial_days else False
                 self.get_session.add(team_subscription)
             else:
                 old_sub = self.get_subscription(team_id=team.id)
@@ -772,3 +772,16 @@ class CustomSecurityManager(SupersetSecurityManager):
         team_role = self.get_session.query(TeamRole).filter_by(team_id=team_id, role_id=role.id).first()
         admin = team_role.user
         return admin
+
+    def convert_test_user_to_live(self, team):
+        user = self.find_team_admin(team_id=team.id)
+        try:
+            _ = stripe.Customer.retrieve(team.stripe_user_id)
+        except stripe.error.InvalidRequestError as e:
+            stripe.api_key = "sk_test_lmhjMQ9t1nqu2FNGgR5hv3N600QYlekFDt"
+            cus_obj = stripe.Customer.retrieve(team.stripe_user_id)
+            stripe.api_key = os.getenv('STRIPE_SK')
+            if cus_obj['balance'] != 0:
+                self.create_stripe_user_and_sub(user[0], team, credit=-cus_obj['balance'], plan_id=1, recover=True)
+            else:
+                self.create_stripe_user_and_sub(user[0], team, plan_id=1, recover=True)

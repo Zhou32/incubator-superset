@@ -619,6 +619,7 @@ class SolarBIModelView(SupersetModelView, DeleteMixin):
         team = self.appbuilder.get_session.query(Team).filter_by(id=session['team_id']).first()
         subscription = self.appbuilder.sm.get_subscription(team_id=team.id)
 
+        self.appbuilder.sm.convert_test_user_to_live(team)
         # Count the subscription remaining days
         # TODO: change default not to -1 in case bug
         remain_days = -1
@@ -773,19 +774,20 @@ class SolarBIBillingView(ModelView):
 
         plan = self.appbuilder.get_session.query(Plan).filter_by(id=team_sub.plan).first()
         # Retrieve customer basic information
-        try:
-            cus_obj = stripe.Customer.retrieve(team.stripe_user_id)
-        except stripe.error.InvalidRequestError as e:
-            stripe.api_key = "sk_test_lmhjMQ9t1nqu2FNGgR5hv3N600QYlekFDt"
-            cus_obj = stripe.Customer.retrieve(team.stripe_user_id)
-            stripe.api_key = os.getenv('STRIPE_SK')
-            if cus_obj['balance'] != 0:
-                self.appbuilder.sm.create_stripe_user_and_sub(user[0],
-                                                              team,
-                                                              credit=-cus_obj['balance'],
-                                                              plan_id=1, recover=True)
-            else:
-                self.appbuilder.sm.create_stripe_user_and_sub(user[0], team, plan_id=1, recover=True)
+        self.appbuilder.sm.convert_test_user_to_live(team)
+        # try:
+        #     cus_obj = stripe.Customer.retrieve(team.stripe_user_id)
+        # except stripe.error.InvalidRequestError as e:
+        #     stripe.api_key = "sk_test_lmhjMQ9t1nqu2FNGgR5hv3N600QYlekFDt"
+        #     cus_obj = stripe.Customer.retrieve(team.stripe_user_id)
+        #     stripe.api_key = os.getenv('STRIPE_SK')
+        #     if cus_obj['balance'] != 0:
+        #         self.appbuilder.sm.create_stripe_user_and_sub(user[0],
+        #                                                       team,
+        #                                                       credit=-cus_obj['balance'],
+        #                                                       plan_id=1, recover=True)
+        #     else:
+        #         self.appbuilder.sm.create_stripe_user_and_sub(user[0], team, plan_id=1, recover=True)
 
         cus_obj = stripe.Customer.retrieve(team.stripe_user_id)
         cus_name = cus_obj.name
