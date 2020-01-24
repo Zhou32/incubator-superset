@@ -783,9 +783,9 @@ class SolarBIBillingView(ModelView):
                 self.appbuilder.sm.create_stripe_user_and_sub(user[0],
                                                               team,
                                                               credit=-cus_obj['balance'],
-                                                              plan_id=1)
+                                                              plan_id=1, recover=True)
             else:
-                self.appbuilder.sm.create_stripe_user_and_sub(user[0], team, plan_id=1)
+                self.appbuilder.sm.create_stripe_user_and_sub(user[0], team, plan_id=1, recover=True)
 
         cus_obj = stripe.Customer.retrieve(team.stripe_user_id)
         cus_name = cus_obj.name

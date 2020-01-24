@@ -707,7 +707,7 @@ class CustomSecurityManager(SupersetSecurityManager):
             # log.info(LOGMSG_WAR_SEC_LOGIN_FAILED.format(username))
             return None
 
-    def create_stripe_user_and_sub(self, user, team, credit=None, plan_id=None, trial_days=None):
+    def create_stripe_user_and_sub(self, user, team, credit=None, plan_id=None, trial_days=None, recover=False):
         try:
             resp = stripe.Customer.create(email=user.email, name=f'{user.first_name} {user.last_name}',
                                           description=team.team_name)
@@ -740,7 +740,14 @@ class CustomSecurityManager(SupersetSecurityManager):
             team_subscription.remain_count = plan.num_request
             user.trial_used = True if trial_days else False
             # team_subscription.trial_used = True
-            self.get_session.add(team_subscription)
+            if not recover:
+                self.get_session.add(team_subscription)
+            else:
+                old_sub = self.get_subscription(team_id=team.id)
+                old_sub.plan = plan.id
+                old_sub.remain_count = 0
+                old_sub.end_time = None
+
             self.get_session.merge(user)
             self.get_session.commit()
 
