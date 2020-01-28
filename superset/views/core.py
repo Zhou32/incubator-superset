@@ -1963,10 +1963,9 @@ class Superset(BaseSupersetView):
     @event_logger.log_this
     @api
     @handle_api_exception
-    @expose('/request_data/<lat>/<lng>/<start_date>/<end_date>/<type>/<resolution>/<address_name>/',
+    @expose('/request_data/<lat>/<lng>/<start_date>/<end_date>/<resolution>/<address_name>/',
             methods=['GET', 'POST'])
-    def request_data(self, lat=None, lng=None, start_date=None, end_date=None,
-                    type=None, resolution=None, address_name=None):
+    def request_data(self, lat=None, lng=None, start_date=None, end_date=None, resolution=None, address_name=None):
         """Serves all request that GET or POST form_data
 
         This endpoint evolved to be the entry point of many different
@@ -2017,7 +2016,7 @@ class Superset(BaseSupersetView):
             form_data = get_form_data()[0]
             args = {'action': 'saveas',
                     'slice_name': address_name + '_' + form_data['startDate'] + '_' +
-                                  form_data['endDate'] + '_' + type + '_' + resolution}
+                                  form_data['endDate'] + '_both_' + resolution}
             datasource = ConnectorRegistry.get_datasource(
                 form_data['datasource_type'], form_data['datasource_id'], db.session)
             self.save_or_overwrite_solarbislice(args, None, True, None, False, form_data['datasource_id'],
@@ -2025,7 +2024,7 @@ class Superset(BaseSupersetView):
                                                 # query_id=response['QueryExecutionId'],
                                                 query_id=response['query_id'],
                                                 start_date=form_data['startDate'],
-                                                end_date=form_data['endDate'], data_type=type, resolution=resolution)
+                                                end_date=form_data['endDate'], data_type='both', resolution=resolution)
 
             # After data request success and save db success, send user a job received email
             self.send_email(g.user, address_name)
@@ -2036,7 +2035,7 @@ class Superset(BaseSupersetView):
                 'start date': start_date,
                 'end date': end_date,
                 'resulution': resolution,
-                'type': type,
+                'type': 'both',
                 'address': address_name,
             })
             # return json_success(json.dumps({'query_id': response['QueryExecutionId']}))
