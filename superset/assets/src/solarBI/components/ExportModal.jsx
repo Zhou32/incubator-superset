@@ -329,7 +329,7 @@ class ExportModal extends React.Component {
 
     this.state = {
       anchorEl: null,
-      type: 'dni',
+      // type: 'dni',
       pickerStart: new Date('2007-01-01T00:00:00'),
       pickerEnd: new Date('2019-07-01T00:00:00'),
       startDate: '2007-01-01',
@@ -338,7 +338,7 @@ class ExportModal extends React.Component {
       cost: (16).toFixed(2),
     };
 
-    this.handleTypeChange = this.handleTypeChange.bind(this);
+    // this.handleTypeChange = this.handleTypeChange.bind(this);
     this.handleStartDateChange = this.handleStartDateChange.bind(this);
     this.handleEndDateChange = this.handleEndDateChange.bind(this);
     this.handleResolutionChange = this.handleResolutionChange.bind(this);
@@ -491,9 +491,9 @@ class ExportModal extends React.Component {
   //   return ret;
   // }
 
-  handleTypeChange(event) {
-    this.setState({ type: event.target.value });
-  }
+  // handleTypeChange(event) {
+  //   this.setState({ type: event.target.value });
+  // }
 
   // handleStartDateChange(event) {
   //   this.setState({ startDate: event.target.value });
@@ -561,7 +561,7 @@ class ExportModal extends React.Component {
         lng: this.props.solarBI.queryResponse.data.lng.toFixed(7) + '',
         startDate: this.state.startDate,
         endDate: this.state.endDate,
-        type: this.state.type,
+        // type: this.state.type,
         resolution: this.state.resolution,
         datasource_id: this.props.solarBI.queryResponse.form_data.datasource_id,
         datasource_type: this.props.solarBI.queryResponse.form_data.datasource_type,
@@ -739,7 +739,7 @@ class ExportModal extends React.Component {
                         </Typography>
                       </Popover>
                     </div>
-                    <hr className={classes.contentHr} />
+                    {/* <hr className={classes.contentHr} />
                     <FormControl component="fieldset" className={classes.formControl}>
                       <FormLabel classes={{ root: classes.typeLabel, focused: classes.labelFocused }} component="legend">Type</FormLabel>
                       <RadioGroup
@@ -753,7 +753,7 @@ class ExportModal extends React.Component {
                         <FormControlLabel classes={{ label: classes.formControlLabel }} value="ghi" control={<Radio color="secondary" />} label="GHI" labelPlacement="bottom" />
                         <FormControlLabel classes={{ label: classes.formControlLabel }} value="both" control={<Radio color="secondary" />} label="Download both" labelPlacement="bottom" />
                       </RadioGroup>
-                    </FormControl>
+                    </FormControl> */}
                     <hr className={classes.contentHr} />
                     <FormControl component="fieldset" className={classes.formControl}>
                       <FormLabel classes={{ root: classes.resolutionLabel, focused: classes.labelFocused }} component="legend">Resolution</FormLabel>
